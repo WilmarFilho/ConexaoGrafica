@@ -56,17 +56,35 @@ jobs:
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
         run: |
-          # --delete só dentro das duas pastas enviadas: nunca em wp-content
-          # inteiro, senão os uploads do cliente iriam junto.
-          for pasta in plugins/conexao-core themes/conexao; do
+          # A rede da Hostinger descarta parte dos IPs dos runners do GitHub: a
+          # mesma configuração conecta numa execução e expira na seguinte. Por
+          # isso as tentativas repetidas — cada uma sai de um IP diferente.
+          enviar() {
+            # --delete só dentro das duas pastas enviadas: nunca em wp-content
+            # inteiro, senão os uploads do cliente iriam junto.
             # --chmod fixa as permissões no destino: o checkout do runner não
             # carrega as do cPanel, e copiá-las às cegas deixaria o site quebrado.
             rsync -az --delete --chmod=D755,F644 \
               --exclude='.git*' \
               --exclude='node_modules' \
-              -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT -o StrictHostKeyChecking=yes" \
-              "wp-content/$pasta/" \
-              "$SSH_USER@$SSH_HOST:$REMOTE_PATH/wp-content/$pasta/"
+              -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT -o StrictHostKeyChecking=yes -o ConnectTimeout=20" \
+              "wp-content/$1/" \
+              "$SSH_USER@$SSH_HOST:$REMOTE_PATH/wp-content/$1/"
+          }
+
+          for pasta in plugins/conexao-core themes/conexao; do
+            tentativa=1
+            until enviar "$pasta"; do
+              if [ "$tentativa" -ge 6 ]; then
+                echo "::error::$pasta não subiu após 6 tentativas — provável bloqueio de rede"
+                exit 1
+              fi
+              espera=$(( tentativa * 20 ))
+              echo "tentativa $tentativa falhou; repetindo em ${espera}s"
+              sleep "$espera"
+              tentativa=$(( tentativa + 1 ))
+            done
+            echo "$pasta enviado na tentativa $tentativa"
           done
 
       - name: Limpar cache de rewrite
@@ -78,7 +96,7 @@ jobs:
         # Se o WP-CLI não existir no servidor, o deploy não deve falhar por isso.
         continue-on-error: true
         run: |
-          ssh -i ~/.ssh/id_deploy -p "$SSH_PORT" -o StrictHostKeyChecking=yes \
+          ssh -i ~/.ssh/id_deploy -p "$SSH_PORT" -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
             "$SSH_USER@$SSH_HOST" \
             "cd $REMOTE_PATH && wp rewrite flush --skip-plugins=akismet 2>/dev/null || true"
 
