@@ -21,14 +21,23 @@ jobs:
       - name: Baixar o repositório
         uses: actions/checkout@v4
 
+      - name: Instalar PHP 8.2
+        # A mesma versão de produção. O runner traz 8.3, e o apt do Ubuntu 24.04
+        # não tem pacote php8.2-cli — daí a action.
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
       - name: Checar sintaxe PHP
         # Um parse error derruba o site inteiro. Barato demais para não checar.
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq php8.2-cli
+          php -v | head -1
           erros=0
           while IFS= read -r arquivo; do
             php -l "$arquivo" > /dev/null || { echo "::error file=$arquivo::erro de sintaxe"; erros=1; }
           done < <(find wp-content -name '*.php')
+          echo "Arquivos verificados: $(find wp-content -name '*.php' | wc -l)"
           exit $erros
 
       - name: Preparar a chave SSH
