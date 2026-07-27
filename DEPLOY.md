@@ -17,29 +17,28 @@ ssh-keygen -t ed25519 -C "deploy-github-conexao" -f ~/.ssh/conexao_deploy -N ""
 
 Isso gera dois arquivos: `conexao_deploy` (privada) e `conexao_deploy.pub` (pública).
 
-## 2. Liberar SSH para a conta `clientescx`
+## 2. SSH da conta `clientescx` — já configurado
 
-Hoje o shell dessa conta é `/usr/local/cpanel/bin/noshell` — ou seja, **SSH está
-desativado** para ela. Sem liberar, a chave de deploy não entra.
+Feito em 27/07/2026:
 
-Em **WHM → Account Functions → Manage Shell Access → clientescx**, escolha
-**Jailed Shell**. Jailed prende a sessão ao diretório da conta: é o suficiente
-para o `rsync` e evita dar um shell completo à automação.
+- **Jailed Shell** ativado em WHM → Account Functions → Manage Shell Access.
+  Jailed prende a sessão ao diretório da conta: basta para o `rsync` e não dá
+  shell completo à automação.
+- Chave pública instalada em `/home/clientescx/.ssh/authorized_keys`
+  (pasta `700`, arquivo `600`, dono `clientescx`). Impressão digital:
+  `SHA256:szSVpB3qXLJclwqCcm0VgQMj+GEgr2I77OAFdhEDTdQ`
 
-Depois instale a chave pública:
+Verificado dentro do jail: `rsync` e `wp` disponíveis, `wp-content/themes` e
+`wp-content/plugins` graváveis pela conta.
 
-```bash
-ssh-copy-id -i ~/.ssh/conexao_deploy.pub clientescx@187.127.42.20
-```
-
-Ou cole `conexao_deploy.pub` em **cPanel → SSH Access → Manage SSH Keys →
-Import** e clique em **Authorize**.
-
-Teste antes de seguir:
+Para reconferir:
 
 ```bash
 ssh -i ~/.ssh/conexao_deploy clientescx@187.127.42.20 "pwd && ls -d public_html/graficaconexao.com.br"
 ```
+
+Se um dia der `Shell access is not enabled on your account!`, o shell voltou
+para `noshell` — a autenticação por chave está funcionando, é só o shell.
 
 ### Por que não deployar como root
 
@@ -144,6 +143,26 @@ O destino é uma instalação limpa — verificado por SSH. Em
 `wp-content` só existem os temas padrão (`twentytwentythree`, `twentytwentyfour`,
 `twentytwentyfive`) e `akismet`/`hello.php`. Não há tema nem plugin customizado
 para o `--delete` destruir.
+
+O ensaio (`rsync --dry-run`) foi rodado em 27/07/2026 e confirmou:
+
+```
+plugins/conexao-core   20 arquivos criados, 0 removidos
+themes/conexao         40 arquivos criados, 0 removidos
+```
+
+Para repetir o ensaio antes de qualquer deploy futuro — o `--dry-run` não escreve
+nada, então pode rodar à vontade:
+
+```bash
+rsync -az --delete --dry-run --itemize-changes \
+  -e "ssh -i ~/.ssh/conexao_deploy" \
+  wp-content/themes/conexao/ \
+  clientescx@187.127.42.20:/home/clientescx/public_html/graficaconexao.com.br/wp-content/themes/conexao/
+```
+
+Olhe a linha `Number of deleted files`. Se não for zero, confira o que sairia
+antes de seguir.
 
 Ainda assim, `--delete` remove no servidor o que não existe no repositório. Se um
 dia isso mudar, faça o backup antes:
