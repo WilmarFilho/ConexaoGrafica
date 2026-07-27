@@ -177,6 +177,25 @@ os arquivos, mas não ativa nada:
 **Plugins → Conexão Core → Ativar** e **Aparência → Temas → Conexão Gráfica →
 Ativar**. Em seguida, **Configurações → Links permanentes → Salvar**.
 
+## Quando o deploy falha com "Connection timed out"
+
+A rede da Hostinger descarta parte dos IPs dos runners do GitHub. O log do `sshd`
+do servidor confirmou: um runner (`13.66.174.85`) conectou normalmente, e minutos
+depois nenhum pacote chegou. Não há firewall na máquina — CSF e firewalld estão
+inativos e o `iptables` tem policy ACCEPT.
+
+O workflow tenta seis vezes, com espera progressiva (20s a 100s). Cada tentativa
+sai de um IP diferente, o que costuma resolver.
+
+Se falhar as seis, as opções são:
+
+1. **Re-executar pela aba Actions** — quase sempre pega um IP que passa.
+2. **Pedir à Hostinger** que libere as faixas de IP do GitHub Actions no firewall
+   de rede da VPS.
+3. **Inverter o sentido**: um cron no servidor faz `git pull` a cada N minutos.
+   O servidor sai para a internet em vez de receber conexão, e o bloqueio deixa
+   de importar. Custa a latência do cron.
+
 ## Reverter
 
 Como cada deploy é um commit, voltar é voltar o commit:

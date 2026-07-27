@@ -248,25 +248,61 @@ Nunca edite arquivo direto no File Manager do cPanel: o próximo deploy sobrescr
 a alteração sem avisar. `DISALLOW_FILE_EDIT` já está ligado localmente pelo mesmo
 motivo.
 
-### Conteúdo (banco + uploads)
+### Banco de dados: nunca vai junto
 
-O banco local é descartável: serve para testar. Produtos, posts e páginas reais são
-cadastrados **em produção**. Se em algum momento for preciso levar o banco daqui
-para lá (por exemplo, na carga inicial do catálogo):
+O deploy **não** toca no banco, e isso é deliberado. Código e conteúdo mudam por
+motivos diferentes e em ritmos diferentes:
+
+| | Onde é a verdade | Como viaja |
+|---|---|---|
+| Plugin e tema | o repositório | `git push` → deploy automático |
+| Produtos, slides, páginas, leads, configurações | o banco de produção | não viaja |
+| Imagens da biblioteca de mídia | `wp-content/uploads` do servidor | não viaja |
+
+Se o deploy levasse o banco junto, todo push apagaria em produção os produtos que
+o cliente cadastrou, os leads capturados pelo rodapé e qualquer texto editado no
+painel. O banco local é descartável: existe para testar.
+
+**Consequência prática:** o que você cadastra em `localhost:8080` não aparece em
+`graficaconexao.com.br`. Slides, categorias, soluções, produtos, banners e os
+menus precisam ser criados **em produção**, pelo painel. O menu **Conexão** lista
+o que ainda falta em cada seção.
+
+### Se um dia precisar levar o banco daqui para lá
+
+Só faz sentido numa carga inicial, com produção ainda vazia. Nunca como rotina.
 
 ```bash
 docker compose exec wordpress wp --allow-root db export /tmp/dump.sql
 docker compose cp wordpress:/tmp/dump.sql ./dump.sql
 ```
 
-Importe pelo phpMyAdmin do cPanel e rode o search-replace **pelo WP-CLI do servidor**
-(nunca com `find & replace` de SQL, que corrompe os campos serializados):
+Importe pelo phpMyAdmin do cPanel e **sempre** rode o search-replace pelo WP-CLI,
+nunca com find & replace de SQL — o WordPress guarda arrays serializados, e
+trocar texto neles pelo SQL corrompe o tamanho declarado das strings:
 
 ```bash
 wp search-replace 'http://localhost:8080' 'https://graficaconexao.com.br' --all-tables --precise
 ```
 
-Uploads vão por SFTP/rsync para `wp-content/uploads` — nunca pelo Git.
+Importar o dump substitui **todos** os usuários de produção pelos locais, senha
+inclusive. Se o cliente já tem acesso ao painel, ele perde.
+
+### Backup do banco
+
+O deploy não cria backup porque não mexe no banco — mas o banco continua sendo a
+parte insubstituível do site. Ative os backups automáticos em **cPanel → Backup**,
+ou agende um export por cron:
+
+```bash
+cd ~/public_html/graficaconexao.com.br && wp db export ~/backups/db-$(date +\%F).sql
+```
+
+### Uploads
+
+As imagens entram pela **biblioteca de mídia do painel de produção**. Nunca pelo
+Git: o `.gitignore` bloqueia `wp-content/uploads` de propósito, porque são
+arquivos grandes, binários e que só crescem.
 
 ### Antes de cada deploy
 
