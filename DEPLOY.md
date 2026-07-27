@@ -17,36 +17,62 @@ ssh-keygen -t ed25519 -C "deploy-github-conexao" -f ~/.ssh/conexao_deploy -N ""
 
 Isso gera dois arquivos: `conexao_deploy` (privada) e `conexao_deploy.pub` (pública).
 
-## 2. Autorizar a chave no servidor
+## 2. Liberar SSH para a conta `clientescx`
 
-Instale a **pública** na conta do cPanel. Use o usuário `clientescx`, não o root:
-um deploy não precisa de acesso administrativo, e limitar o alcance da chave
-limita o estrago se ela vazar.
+Hoje o shell dessa conta é `/usr/local/cpanel/bin/noshell` — ou seja, **SSH está
+desativado** para ela. Sem liberar, a chave de deploy não entra.
+
+Em **WHM → Account Functions → Manage Shell Access → clientescx**, escolha
+**Jailed Shell**. Jailed prende a sessão ao diretório da conta: é o suficiente
+para o `rsync` e evita dar um shell completo à automação.
+
+Depois instale a chave pública:
 
 ```bash
 ssh-copy-id -i ~/.ssh/conexao_deploy.pub clientescx@187.127.42.20
 ```
 
-Se a hospedagem bloquear `ssh-copy-id`, cole o conteúdo de `conexao_deploy.pub`
-em **cPanel → SSH Access → Manage SSH Keys → Import**, e depois clique em
-**Authorize**.
+Ou cole `conexao_deploy.pub` em **cPanel → SSH Access → Manage SSH Keys →
+Import** e clique em **Authorize**.
 
 Teste antes de seguir:
 
 ```bash
-ssh -i ~/.ssh/conexao_deploy clientescx@187.127.42.20 "pwd && ls -d public_html"
+ssh -i ~/.ssh/conexao_deploy clientescx@187.127.42.20 "pwd && ls -d public_html/graficaconexao.com.br"
 ```
 
-## 3. Descobrir o caminho do site
+### Por que não deployar como root
 
-Ainda na sessão SSH, confirme onde o WordPress mora:
+O root já tem SSH liberado, e seria mais rápido. Mas o `rsync` rodando como root
+cria arquivos com dono `root`, enquanto o WordPress escreve como `clientescx` —
+plugins e uploads passariam a falhar. E daria ao GitHub Actions acesso total à
+VPS, que hospeda outros vinte e poucos sites.
+
+Se por algum motivo o Jailed Shell não for possível, a alternativa é conectar
+como root e forçar o dono no envio (o rsync do servidor é 3.2.5, suporta):
+
+```
+rsync -az --delete --chown=clientescx:clientescx ...
+```
+
+Funciona, mas mantém a chave de root no GitHub. É a segunda melhor opção.
+
+## 3. Caminho do site — já validado
+
+```
+/home/clientescx/public_html/graficaconexao.com.br
+```
+
+Confirmado por SSH em 27/07/2026. **Não é** `/home/clientescx/public_html`: esse
+caminho é outro WordPress, de outro cliente (roda hello-elementor). A conta
+`clientescx` é revenda e hospeda mais de vinte sites como addon domains — apontar
+o deploy para a raiz sobrescreveria o site errado.
+
+Para reconferir a qualquer momento:
 
 ```bash
-ssh -i ~/.ssh/conexao_deploy clientescx@187.127.42.20 "ls -d ~/public_html/wp-content"
+ssh root@187.127.42.20 "find /home/clientescx -maxdepth 3 -name wp-config.php"
 ```
-
-Normalmente é `/home/clientescx/public_html`. Se o domínio for um addon domain,
-pode ser `/home/clientescx/graficaconexao.com.br`. O que valer é o `REMOTE_PATH`.
 
 ## 4. Capturar a impressão digital do servidor
 
@@ -66,8 +92,8 @@ Em **Settings → Secrets and variables → Actions → New repository secret**:
 |--------------------|------------------------------------------------------------|
 | `SSH_HOST`         | `187.127.42.20`                                            |
 | `SSH_USER`         | `clientescx`                                               |
-| `SSH_PORT`         | `22` (só se a hospedagem usar outra porta)                 |
-| `REMOTE_PATH`      | `/home/clientescx/public_html`                             |
+| `SSH_PORT`         | `22`                                                       |
+| `REMOTE_PATH`      | `/home/clientescx/public_html/graficaconexao.com.br`       |
 | `SSH_KEY`          | conteúdo **inteiro** de `~/.ssh/conexao_deploy`            |
 | `SSH_KNOWN_HOSTS`  | saída do `ssh-keyscan` do passo 4                          |
 
@@ -93,15 +119,25 @@ O push dispara o workflow. Acompanhe em **Actions** no GitHub.
 3. Roda `wp rewrite flush` se houver WP-CLI no servidor. Falha nesse passo não
    quebra o deploy.
 
-## Primeiro deploy: cuidado
+## Primeiro deploy
 
-O `--delete` remove, no servidor, arquivos que não existem no repositório. Se já
-houver uma versão do tema ou do plugin em produção com ajustes feitos direto no
-File Manager, **eles serão perdidos**. Antes do primeiro push:
+O destino é uma instalação limpa — verificado por SSH. Em
+`wp-content` só existem os temas padrão (`twentytwentythree`, `twentytwentyfour`,
+`twentytwentyfive`) e `akismet`/`hello.php`. Não há tema nem plugin customizado
+para o `--delete` destruir.
+
+Ainda assim, `--delete` remove no servidor o que não existe no repositório. Se um
+dia isso mudar, faça o backup antes:
 
 ```bash
-ssh clientescx@187.127.42.20 "cd ~/public_html/wp-content && tar czf ~/backup-antes-do-deploy.tar.gz plugins themes"
+ssh clientescx@187.127.42.20 "cd ~/public_html/graficaconexao.com.br/wp-content && tar czf ~/backup-antes-do-deploy.tar.gz plugins themes"
 ```
+
+Depois do primeiro deploy, ative o tema e o plugin em produção — o `rsync` copia
+os arquivos, mas não ativa nada:
+
+**Plugins → Conexão Core → Ativar** e **Aparência → Temas → Conexão Gráfica →
+Ativar**. Em seguida, **Configurações → Links permanentes → Salvar**.
 
 ## Reverter
 
