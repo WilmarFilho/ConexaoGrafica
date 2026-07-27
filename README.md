@@ -268,7 +268,35 @@ painel. O banco local é descartável: existe para testar.
 menus precisam ser criados **em produção**, pelo painel. O menu **Conexão** lista
 o que ainda falta em cada seção.
 
-### Se um dia precisar levar o banco daqui para lá
+### Sincronizar banco e uploads para produção (fase de construção)
+
+Enquanto o site está sendo construído e produção não tem conteúdo real, dá para
+espelhar o ambiente local com um comando:
+
+```bash
+bash scripts/sincronizar-producao.sh
+```
+
+O script faz backup do banco de produção, importa o local, alinha o prefixo das
+tabelas, troca as URLs e envia os uploads.
+
+**Por que não roda no GitHub Actions:** o runner não enxerga o MySQL do seu
+Docker, e commitar um dump neste repositório — que é público — exporia hashes de
+senha e e-mails. Por isso a sincronia é local e manual.
+
+Ele tem uma trava: se produção já tiver produtos publicados ou leads recebidos,
+ele para e exige `--forcar`. É o sinal de que o site saiu do ar de construção e
+o banco de produção virou a fonte da verdade — a partir daí a sincronia deve
+parar de ser usada e o cadastro passa a ser direto em produção.
+
+Depois de sincronizar, **troque a senha do administrador**: o banco importado
+traz as credenciais de desenvolvimento para um site público.
+
+```bash
+ssh clientescx@187.127.42.20 "cd ~/public_html/graficaconexao.com.br && wp user update root --user_pass='<senha forte>'"
+```
+
+### Migração manual, se preferir
 
 Só faz sentido numa carga inicial, com produção ainda vazia. Nunca como rotina.
 
