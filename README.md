@@ -3,7 +3,8 @@
 Site da Conexão Gráfica: catálogo de produtos gráficos configuráveis, blog e páginas
 montadas com seções reutilizáveis. **Sem page builder** — PHP, templates e shortcodes.
 
-Produção: `graficaconexao.com.br` — WordPress 7.0.x / PHP 8.2 / Plesk (WP Toolkit).
+Produção: `graficaconexao.com.br` — WordPress 7.0.x / PHP 8.2 / cPanel (conta
+`clientescx`). Deploy automático a cada push na `main`: ver [DEPLOY.md](DEPLOY.md).
 
 ## Ambiente local
 
@@ -111,6 +112,19 @@ hamburguer; a busca fica na linha de baixo, sobre fundo claro.
 `lista-categorias.php` é a fonte única da lista: a faixa do desktop e o menu
 mobile chamam o mesmo partial, com classes diferentes.
 
+Locais de menu em **Aparência → Menus**:
+
+- **Topbar (faixa preta)** — Produtos, Soluções, Blog, Contato. Sem menu atribuído,
+  o tema cai num fallback com esses quatro links.
+- **Categorias do header** — controla rótulo e **ordem** da terceira faixa. Sem menu,
+  lista as categorias de produto de primeiro nível.
+
+A logo vem de `assets/img/logo.png`. Uma logo definida em **Aparência → Personalizar
+→ Identidade do site** tem prioridade sobre ela.
+
+O número do WhatsApp e o destino do botão "Solicitar Orçamento" ficam em
+**Configurações → Conexão**.
+
 ## Seções no mobile
 
 Abaixo de 700px, toda seção em grade vira um carrossel de um card por vez, com
@@ -129,29 +143,21 @@ separadamente sem duplicar marcação.
 Sem isso o navegador segura o CSS antigo entre uma edição e outra, e você acaba
 depurando um arquivo que o browser nem baixou.
 
-Locais de menu em **Aparência → Menus**:
-
-- **Topbar (faixa preta)** — Produtos, Soluções, Blog, Contato. Sem menu atribuído,
-  o tema cai num fallback com esses quatro links.
-- **Categorias do header** — controla rótulo e **ordem** da terceira faixa. Sem menu,
-  lista as categorias de produto de primeiro nível em ordem alfabética.
-
-A logo vem de `assets/img/logo.png`. Uma logo definida em **Aparência → Personalizar
-→ Identidade do site** tem prioridade sobre ela.
-
-O número do WhatsApp e o destino do botão "Solicitar Orçamento" ficam em
-**Configurações → Conexão**.
-
 ## Seções reutilizáveis (shortcodes)
 
 **Página do WordPress não executa PHP.** Você cria a página e cola o *shortcode*;
 o HTML mora no tema, em `template-parts/sections/`. É assim que uma seção é
 reaproveitada em várias páginas sem duplicar código.
 
-| Shortcode           | Renderiza                     | Conteúdo vem de              |
-|---------------------|-------------------------------|------------------------------|
-| `[cnx_hero]`        | Carrossel de destaques        | CPT **Slides**               |
-| `[cnx_diferenciais]`| Faixa dos 4 selos             | Array filtrável em PHP       |
+| Shortcode              | Renderiza                  | Conteúdo vem de              |
+|------------------------|----------------------------|------------------------------|
+| `[cnx_hero]`           | Carrossel de destaques     | CPT **Slides**               |
+| `[cnx_diferenciais]`   | Faixa dos 4 selos          | Array filtrável em PHP       |
+| `[cnx_categorias]`     | Categorias em destaque     | Taxonomia **Categorias**     |
+| `[cnx_solucoes]`       | Cards por segmento         | Taxonomia **Soluções**       |
+| `[cnx_mais_vendidos]`  | Vitrine de produtos        | Produtos marcados destaque   |
+| `[cnx_banner]`         | Faixa com foto de fundo    | CPT **Banners**              |
+| `[cnx_como_funciona]`  | As quatro etapas           | Array filtrável em PHP       |
 
 A home é a página "Home", cujo conteúdo é literalmente:
 
@@ -159,6 +165,16 @@ A home é a página "Home", cujo conteúdo é literalmente:
 [cnx_hero]
 
 [cnx_diferenciais]
+
+[cnx_categorias]
+
+[cnx_solucoes]
+
+[cnx_mais_vendidos]
+
+[cnx_banner slug="parceria-estrategica"]
+
+[cnx_como_funciona]
 ```
 
 `[cnx_hero]` aceita `limite` (máximo de slides) e `autoplay` (segundos; `0`
@@ -213,7 +229,7 @@ recarregar a página não reenvia o formulário. Cada inscrição vira um post d
 - **Leads → Exportar CSV** baixa a lista com BOM (o Excel abre os acentos certos).
 
 O `wp_mail()` do container local não tem MTA, então a notificação falha em
-desenvolvimento — isso é esperado. Em produção o Plesk entrega normalmente; se
+desenvolvimento — isso é esperado. Em produção o cPanel entrega normalmente; se
 não entregar, instale um plugin de SMTP.
 
 ## Deploy para produção
@@ -225,9 +241,12 @@ Código e conteúdo seguem caminhos diferentes — essa é a regra que evita dor
 O repositório contém *apenas* `wp-content/plugins/conexao-core` e
 `wp-content/themes/conexao`. O core do WP e os uploads ficam de fora.
 
-No Plesk: **WordPress → Git** → aponte para o repositório e configure o destino como
-a raiz do site. Cada push vira um deploy. Nunca edite arquivo direto no File Manager
-do servidor — `DISALLOW_FILE_EDIT` já está ligado localmente pelo mesmo motivo.
+Todo push na `main` dispara o GitHub Actions, que checa a sintaxe PHP e envia as
+duas pastas por `rsync`. A configuração dos segredos está em [DEPLOY.md](DEPLOY.md).
+
+Nunca edite arquivo direto no File Manager do cPanel: o próximo deploy sobrescreve
+a alteração sem avisar. `DISALLOW_FILE_EDIT` já está ligado localmente pelo mesmo
+motivo.
 
 ### Conteúdo (banco + uploads)
 
@@ -240,7 +259,7 @@ docker compose exec wordpress wp --allow-root db export /tmp/dump.sql
 docker compose cp wordpress:/tmp/dump.sql ./dump.sql
 ```
 
-Importe pelo phpMyAdmin do Plesk e rode o search-replace **pelo WP-CLI do Plesk**
+Importe pelo phpMyAdmin do cPanel e rode o search-replace **pelo WP-CLI do servidor**
 (nunca com `find & replace` de SQL, que corrompe os campos serializados):
 
 ```bash
