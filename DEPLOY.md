@@ -74,15 +74,34 @@ Para reconferir a qualquer momento:
 ssh root@187.127.42.20 "find /home/clientescx -maxdepth 3 -name wp-config.php"
 ```
 
-## 4. Capturar a impressão digital do servidor
+## 4. Impressão digital do servidor
 
 Sem isso o workflow aceitaria qualquer servidor que responda naquele IP.
 
 ```bash
-ssh-keyscan -H 187.127.42.20
+ssh-keyscan -t rsa,ecdsa,ed25519 187.127.42.20
 ```
 
-Copie **todas** as linhas da saída.
+Copie todas as linhas de chave (as que começam com o IP; as iniciadas por `#`
+podem ficar de fora).
+
+Confira que batem com o que foi verificado em 27/07/2026 — estas vieram de uma
+conexão SSH real ao servidor, não só do scan:
+
+```
+ED25519  SHA256:vZxYag/OG72tdRf18Vr6BwCtBYO8YaNFaJPk3ttn3PQ
+RSA      SHA256:rSL8Eb1ziLvpkpVJGsPYq03PXpsBXuD2x/nOOkgTeNA
+ECDSA    SHA256:vNeV3RRb19mcnsR5jx/KCTBiRLzVxf7zD3X5/R9h2Kg
+```
+
+Para conferir uma saída de scan contra essa lista:
+
+```bash
+ssh-keyscan -t rsa,ecdsa,ed25519 187.127.42.20 2>/dev/null | ssh-keygen -lf -
+```
+
+Se alguma impressão digital divergir, **pare**: ou o servidor foi reinstalado, ou
+alguém está no meio do caminho.
 
 ## 5. Cadastrar os segredos no GitHub
 
