@@ -59,7 +59,9 @@ jobs:
           # --delete só dentro das duas pastas enviadas: nunca em wp-content
           # inteiro, senão os uploads do cliente iriam junto.
           for pasta in plugins/conexao-core themes/conexao; do
-            rsync -az --delete \
+            # --chmod fixa as permissões no destino: o checkout do runner não
+            # carrega as do cPanel, e copiá-las às cegas deixaria o site quebrado.
+            rsync -az --delete --chmod=D755,F644 \
               --exclude='.git*' \
               --exclude='node_modules' \
               -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT -o StrictHostKeyChecking=yes" \

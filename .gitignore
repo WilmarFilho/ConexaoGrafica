@@ -1,12 +1,16 @@
 # O core do WP mora num volume Docker, nunca no repositório.
+#
+# Todos os padrões abaixo levam barra inicial de propósito: sem ela, "index.php"
+# casaria em qualquer nível e engoliria o index.php do tema — que o WordPress
+# exige para reconhecer o tema como válido.
 /wp-admin/
 /wp-includes/
-wp-config.php
-wp-*.php
-index.php
-xmlrpc.php
-license.txt
-readme.html
+/wp-config.php
+/wp-*.php
+/index.php
+/xmlrpc.php
+/license.txt
+/readme.html
 
 # Só versionamos nosso código dentro de wp-content.
 wp-content/*
