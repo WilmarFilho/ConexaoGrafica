@@ -1,0 +1,65 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: conexao_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: conexao
+      MYSQL_USER: conexao
+      MYSQL_PASSWORD: conexao
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    # Espelha a produção (graficaconexao.com.br): WordPress 7.0.x sobre PHP 8.2.
+    image: wordpress:php8.2-apache
+    container_name: conexao_wp
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: conexao
+      WORDPRESS_DB_USER: conexao
+      WORDPRESS_DB_PASSWORD: conexao
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'WP_DEBUG_LOG', true );
+        define( 'WP_DEBUG_DISPLAY', false );
+        define( 'SCRIPT_DEBUG', true );
+        define( 'DISALLOW_FILE_EDIT', true );
+    volumes:
+      # O core do WP fica num volume; só o nosso código é montado do disco.
+      - wp_core:/var/www/html
+      - ./wp-content/plugins/conexao-core:/var/www/html/wp-content/plugins/conexao-core
+      - ./wp-content/themes/conexao:/var/www/html/wp-content/themes/conexao
+      - ./wp-content/uploads:/var/www/html/wp-content/uploads
+      - ./docker/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - ./docker/apache-wordpress.conf:/etc/apache2/conf-enabled/zz-wordpress.conf
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: conexao_pma
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: conexao
+      PMA_PASSWORD: conexao
+      UPLOAD_LIMIT: 64M
+
+volumes:
+  db_data:
+  wp_core:

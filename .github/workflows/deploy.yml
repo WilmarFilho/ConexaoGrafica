@@ -1,0 +1,76 @@
+name: Deploy para produção
+
+# Todo push na main publica o plugin e o tema em graficaconexao.com.br.
+# workflow_dispatch permite disparar manualmente pela aba Actions.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # Dois deploys simultâneos poderiam escrever no mesmo diretório.
+  group: deploy-producao
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Enviar para o cPanel
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v4
+
+      - name: Checar sintaxe PHP
+        # Um parse error derruba o site inteiro. Barato demais para não checar.
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq php8.2-cli
+          erros=0
+          while IFS= read -r arquivo; do
+            php -l "$arquivo" > /dev/null || { echo "::error file=$arquivo::erro de sintaxe"; erros=1; }
+          done < <(find wp-content -name '*.php')
+          exit $erros
+
+      - name: Preparar a chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          # known_hosts fixo: sem isso o StrictHostKeyChecking não protege de nada.
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Enviar plugin e tema
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+        run: |
+          # --delete só dentro das duas pastas enviadas: nunca em wp-content
+          # inteiro, senão os uploads do cliente iriam junto.
+          for pasta in plugins/conexao-core themes/conexao; do
+            rsync -az --delete \
+              --exclude='.git*' \
+              --exclude='node_modules' \
+              -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT -o StrictHostKeyChecking=yes" \
+              "wp-content/$pasta/" \
+              "$SSH_USER@$SSH_HOST:$REMOTE_PATH/wp-content/$pasta/"
+          done
+
+      - name: Limpar cache de rewrite
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+        # Se o WP-CLI não existir no servidor, o deploy não deve falhar por isso.
+        continue-on-error: true
+        run: |
+          ssh -i ~/.ssh/id_deploy -p "$SSH_PORT" -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$SSH_HOST" \
+            "cd $REMOTE_PATH && wp rewrite flush --skip-plugins=akismet 2>/dev/null || true"
+
+      - name: Remover a chave
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

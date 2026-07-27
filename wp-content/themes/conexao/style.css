@@ -1,0 +1,2116 @@
+/*
+Theme Name:  Conexão Gráfica
+Theme URI:   https://graficaconexao.com.br
+Author:      Conexão Gráfica
+Description: Tema sob medida da Conexão Gráfica. Sem page builder — PHP, seções reutilizáveis e shortcodes.
+Version:     0.1.0
+Requires at least: 6.4
+Requires PHP: 8.1
+Text Domain: conexao
+*/
+
+:root {
+	--cnx-laranja: #f0873f;
+	--cnx-laranja-escuro: #d9722c;
+	--cnx-texto: #2b2b2b;
+	--cnx-cinza: #6b6b6b;
+	--cnx-borda: #e3e3e3;
+	--cnx-fundo: #f7f7f7;
+	--cnx-preto: #0d0d0d;
+	--cnx-whatsapp: #25d366;
+	--cnx-max: 1180px;
+	--cnx-topbar-altura: 44px;
+	--cnx-barra-mobile: 56px;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	color: var(--cnx-texto);
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	line-height: 1.5;
+}
+
+.cnx-container {
+	width: 100%;
+	max-width: var(--cnx-max);
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+/* --- Topbar ----------------------------------------------------------- */
+
+.cnx-topbar {
+	background: var(--cnx-preto);
+	color: #fff;
+	font-size: 13.5px;
+}
+
+.cnx-topbar__inner {
+	display: flex;
+	align-items: stretch;
+	justify-content: space-between;
+	gap: 24px;
+	width: 100%;
+	max-width: var(--cnx-max);
+	min-height: var(--cnx-topbar-altura);
+	margin: 0 auto;
+	padding-left: 20px;
+}
+
+.cnx-topbar a {
+	color: inherit;
+	text-decoration: none;
+}
+
+/* Atalho do vendedor */
+
+.cnx-topbar__vendedor {
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	white-space: nowrap;
+}
+
+.cnx-topbar__vendedor:hover {
+	color: #e8e8e8;
+}
+
+.cnx-topbar__zap {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	color: #fff;
+	background: var(--cnx-whatsapp);
+	border-radius: 50%;
+}
+
+/* Menu + CTA */
+
+.cnx-topbar__nav {
+	display: flex;
+	align-items: stretch;
+	gap: 28px;
+}
+
+.cnx-topbar__menu {
+	display: flex;
+	align-items: center;
+	gap: 28px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cnx-topbar__menu a {
+	position: relative;
+	display: inline-block;
+	padding: 2px 0;
+	transition: color .15s;
+}
+
+.cnx-topbar__menu a:hover,
+.cnx-topbar__menu .current-menu-item > a {
+	color: var(--cnx-laranja);
+}
+
+.cnx-topbar__cta {
+	display: inline-flex;
+	align-items: center;
+	padding: 0 26px;
+	font-weight: 600;
+	white-space: nowrap;
+	background: var(--cnx-laranja);
+	transition: background-color .15s;
+}
+
+.cnx-topbar__cta:hover {
+	background: var(--cnx-laranja-escuro);
+}
+
+@media (max-width: 860px) {
+	.cnx-topbar__menu {
+		display: none;
+	}
+
+	.cnx-topbar__nav {
+		gap: 0;
+	}
+
+	.cnx-topbar__cta {
+		padding: 0 18px;
+	}
+}
+
+@media (max-width: 480px) {
+	.cnx-topbar {
+		font-size: 12.5px;
+	}
+
+	.cnx-topbar__inner {
+		gap: 12px;
+		padding-left: 14px;
+	}
+}
+
+/* --- Header: logo, busca e ações -------------------------------------- */
+
+.cnx-branding {
+	background: #fff;
+}
+
+.cnx-branding__inner {
+	display: flex;
+	align-items: center;
+	gap: 28px;
+	width: 100%;
+	max-width: var(--cnx-max);
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.cnx-branding__logo {
+	flex: 0 0 auto;
+	line-height: 0;
+}
+
+.cnx-branding__logo img {
+	width: auto;
+	height: 48px;
+}
+
+/* Busca */
+
+.cnx-busca {
+	position: relative;
+	flex: 1 1 auto;
+	max-width: 660px;
+}
+
+.cnx-busca__input {
+	width: 100%;
+	height: 48px;
+	padding: 0 52px 0 22px;
+	color: var(--cnx-texto);
+	font-family: inherit;
+	font-size: 14.5px;
+	background: #fff;
+	border: 1px solid var(--cnx-borda);
+	border-radius: 999px;
+	appearance: none;
+	transition: border-color .15s, box-shadow .15s;
+}
+
+.cnx-busca__input::placeholder {
+	color: #9a9a9a;
+}
+
+.cnx-busca__input:focus {
+	border-color: var(--cnx-laranja);
+	box-shadow: 0 0 0 3px rgba(240, 135, 63, .18);
+	outline: none;
+}
+
+.cnx-busca__botao {
+	position: absolute;
+	top: 50%;
+	right: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	color: #8d8d8d;
+	background: none;
+	border: 0;
+	border-radius: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
+	transition: color .15s;
+}
+
+.cnx-busca__botao:hover {
+	color: var(--cnx-laranja);
+}
+
+/* Conta e carrinho */
+
+.cnx-branding__acoes {
+	display: flex;
+	flex: 0 0 auto;
+	gap: 12px;
+	margin-left: auto;
+}
+
+.cnx-acao {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	color: #5f5f5f;
+	background: #fff;
+	border: 1px solid var(--cnx-borda);
+	border-radius: 50%;
+	transition: color .15s, border-color .15s;
+}
+
+.cnx-acao:hover {
+	color: var(--cnx-laranja);
+	border-color: var(--cnx-laranja);
+}
+
+/* --- Header: faixa de categorias -------------------------------------- */
+
+.cnx-categorias {
+	background: #fafafa;
+	border-top: 1px solid #ededed;
+	border-bottom: 1px solid #ededed;
+}
+
+.cnx-categorias__inner {
+	width: 100%;
+	max-width: var(--cnx-max);
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+.cnx-categorias__lista {
+	display: flex;
+	align-items: stretch;
+	justify-content: space-between;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cnx-categorias__lista > li {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+.cnx-categorias__lista a {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	min-height: 58px;
+	padding: 10px 6px;
+	color: #4a4a4a;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.35;
+	text-align: center;
+	text-decoration: none;
+	text-wrap: balance;
+	transition: color .15s;
+}
+
+.cnx-categorias__lista a:hover,
+.cnx-categorias__lista .current-menu-item > a {
+	color: var(--cnx-laranja);
+}
+
+/* --- Hamburguer e menu mobile ------------------------------------------ */
+
+.cnx-hamburguer {
+	display: none;
+	flex-direction: column;
+	gap: 4px;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	background: none;
+	border: 0;
+	cursor: pointer;
+}
+
+.cnx-hamburguer span {
+	display: block;
+	width: 24px;
+	height: 3px;
+	margin: 0 auto;
+	background: var(--cnx-laranja);
+	border-radius: 2px;
+}
+
+/* Fechado por visibility + transform, nunca por display:none — display não anima.
+   visibility também tira o painel do foco e do leitor de tela, então o atributo
+   hidden fica desnecessário. */
+.cnx-menu-mobile {
+	position: fixed;
+	inset: 0;
+	z-index: 60;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	visibility: hidden;
+	color: #fff;
+	background-color: #140b06;
+	background-position: top right;
+	background-size: cover;
+	background-repeat: no-repeat;
+	opacity: 0;
+	transform: translateX(14%);
+	/* A visibility só troca no fim da saída, senão o painel some antes de animar. */
+	transition: opacity .26s ease, transform .3s cubic-bezier(.22, .61, .36, 1), visibility 0s linear .3s;
+}
+
+.cnx-menu-mobile.esta-aberto {
+	visibility: visible;
+	opacity: 1;
+	transform: none;
+	transition: opacity .22s ease, transform .3s cubic-bezier(.22, .61, .36, 1), visibility 0s;
+}
+
+/* O conteúdo entra logo atrás do painel, dando profundidade à abertura. */
+.cnx-menu-mobile__nav,
+.cnx-menu-mobile__topo {
+	opacity: 0;
+	transform: translateY(10px);
+	transition: opacity .25s ease .06s, transform .3s ease .06s;
+}
+
+.cnx-menu-mobile.esta-aberto .cnx-menu-mobile__nav,
+.cnx-menu-mobile.esta-aberto .cnx-menu-mobile__topo {
+	opacity: 1;
+	transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cnx-menu-mobile,
+	.cnx-menu-mobile.esta-aberto,
+	.cnx-menu-mobile__nav,
+	.cnx-menu-mobile__topo,
+	.cnx-menu-mobile.esta-aberto .cnx-menu-mobile__nav,
+	.cnx-menu-mobile.esta-aberto .cnx-menu-mobile__topo {
+		transition-duration: 0s;
+		transform: none;
+	}
+}
+
+/* Trava a rolagem do fundo enquanto o painel está aberto. */
+body.cnx-sem-rolagem {
+	overflow: hidden;
+}
+
+.cnx-menu-mobile__topo {
+	display: flex;
+	justify-content: flex-end;
+	padding: 16px 20px 4px;
+}
+
+.cnx-menu-mobile__fechar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	color: var(--cnx-laranja);
+	background: none;
+	border: 0;
+	cursor: pointer;
+}
+
+.cnx-menu-mobile__nav {
+	padding: 8px 22px 40px;
+}
+
+.cnx-menu-mobile__categorias,
+.cnx-menu-mobile__institucional {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cnx-menu-mobile__categorias > li + li {
+	border-top: 1px solid rgba(255, 255, 255, .16);
+}
+
+.cnx-menu-mobile__categorias a {
+	display: block;
+	max-width: 18ch;
+	padding: 15px 0;
+	color: #fff;
+	font-size: 15px;
+	line-height: 1.35;
+	text-decoration: none;
+}
+
+.cnx-menu-mobile__institucional {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px 24px;
+	margin-top: 26px;
+	padding-top: 26px;
+	border-top: 1px solid rgba(255, 255, 255, .16);
+}
+
+.cnx-menu-mobile__institucional a {
+	color: #fff;
+	font-size: 13.5px;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.cnx-menu-mobile__categorias a:hover,
+.cnx-menu-mobile__institucional a:hover {
+	color: var(--cnx-laranja);
+}
+
+/* Botão que ocupa a largura toda, com o ícone encostado na borda direita. */
+.cnx-btn--bloco {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	margin-top: 28px;
+	padding: 16px 48px;
+}
+
+.cnx-btn--bloco svg {
+	position: absolute;
+	right: 20px;
+}
+
+/* --- Header no mobile --------------------------------------------------- */
+
+@media (max-width: 900px) {
+	/* A topbar e a faixa de categorias migram para o menu lateral. */
+	.cnx-topbar,
+	.cnx-categorias {
+		display: none;
+	}
+
+	.cnx-hamburguer {
+		display: flex;
+	}
+
+	/* Barra preta atrás da primeira linha (logo + ações). */
+	.cnx-branding {
+		position: relative;
+		background: #fafafa;
+	}
+
+	.cnx-branding::before {
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		height: var(--cnx-barra-mobile);
+		background: var(--cnx-preto);
+		content: "";
+	}
+
+	.cnx-branding__inner {
+		position: relative;
+		z-index: 1;
+		flex-wrap: wrap;
+		gap: 0;
+		padding: 0 16px 14px;
+	}
+
+	.cnx-branding__logo,
+	.cnx-branding__acoes {
+		height: var(--cnx-barra-mobile);
+		align-items: center;
+	}
+
+	.cnx-branding__logo {
+		display: flex;
+	}
+
+	.cnx-branding__logo img {
+		height: 30px;
+	}
+
+	.cnx-branding__acoes {
+		display: flex;
+		gap: 10px;
+	}
+
+	/* Dentro da barra preta os ícones precisam inverter. */
+	.cnx-acao {
+		width: 34px;
+		height: 34px;
+		color: #fff;
+		background: transparent;
+		border-color: rgba(255, 255, 255, .45);
+	}
+
+	.cnx-acao:hover {
+		color: var(--cnx-laranja);
+		border-color: var(--cnx-laranja);
+	}
+
+	.cnx-acao svg {
+		width: 16px;
+		height: 16px;
+	}
+
+	.cnx-busca {
+		order: 3;
+		flex-basis: 100%;
+		max-width: none;
+		margin-top: 14px;
+	}
+
+	.cnx-busca__input {
+		height: 44px;
+		font-size: 13.5px;
+	}
+}
+
+/* --- Acessibilidade --------------------------------------------------- */
+
+.screen-reader-text {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+.cnx-pular {
+	position: absolute;
+	left: -9999px;
+	z-index: 100;
+	padding: 12px 20px;
+	color: #fff;
+	background: var(--cnx-preto);
+}
+
+.cnx-pular:focus {
+	left: 8px;
+	top: 8px;
+}
+
+/* --- Página montada com seções ---------------------------------------- */
+
+/* As seções cuidam da própria largura; o texto solto fica no container. */
+.cnx-pagina > :not(section) {
+	width: 100%;
+	max-width: var(--cnx-max);
+	margin-right: auto;
+	margin-left: auto;
+	padding-right: 20px;
+	padding-left: 20px;
+}
+
+/* --- Botões ----------------------------------------------------------- */
+
+.cnx-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	padding: 13px 22px;
+	font-size: 14.5px;
+	font-weight: 600;
+	text-decoration: none;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	transition: background-color .15s, color .15s, border-color .15s;
+}
+
+.cnx-btn--primario {
+	color: #fff;
+	background: var(--cnx-laranja);
+}
+
+.cnx-btn--primario:hover {
+	background: var(--cnx-laranja-escuro);
+}
+
+.cnx-btn--secundario {
+	color: var(--cnx-texto);
+	background: #fff;
+	border-color: #2b2b2b;
+}
+
+.cnx-btn--secundario:hover {
+	color: #fff;
+	background: var(--cnx-texto);
+}
+
+/* --- Hero / carrossel -------------------------------------------------- */
+
+.cnx-hero {
+	position: relative;
+	max-width: var(--cnx-max);
+	margin: 24px auto 0;
+}
+
+.cnx-hero__janela {
+	position: relative;
+	overflow: hidden;
+}
+
+.cnx-hero__trilho {
+	display: flex;
+	transition: transform .5s ease;
+}
+
+.cnx-hero__slide {
+	flex: 0 0 100%;
+	min-width: 100%;
+	background-color: #e8e8e8;
+	background-position: center right;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
+.cnx-hero__conteudo {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 32px;
+	align-items: center;
+	min-height: 300px;
+	padding: 44px 76px;
+}
+
+.cnx-hero__titulo {
+	margin: 0 0 16px;
+	font-size: 30px;
+	font-weight: 400;
+	line-height: 1.25;
+	letter-spacing: -.2px;
+}
+
+.cnx-hero__titulo strong {
+	font-weight: 700;
+}
+
+.cnx-hero__descricao {
+	margin: 0 0 26px;
+	max-width: 46ch;
+	color: #4d4d4d;
+	font-size: 14.5px;
+}
+
+.cnx-hero__botoes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.cnx-hero__imagem {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.cnx-hero__produto {
+	max-width: 100%;
+	height: auto;
+	max-height: 260px;
+	object-fit: contain;
+	mix-blend-mode: multiply;
+}
+
+/* Setas */
+
+.cnx-hero__seta {
+	position: absolute;
+	top: 50%;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 42px;
+	height: 42px;
+	color: var(--cnx-texto);
+	background: #fff;
+	border: 0;
+	border-radius: 50%;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, .13);
+	transform: translateY(-50%);
+	cursor: pointer;
+	transition: color .15s, box-shadow .15s;
+}
+
+.cnx-hero__seta:hover {
+	color: var(--cnx-laranja);
+	box-shadow: 0 3px 12px rgba(0, 0, 0, .2);
+}
+
+.cnx-hero__seta--anterior {
+	left: 18px;
+}
+
+.cnx-hero__seta--proximo {
+	right: 18px;
+}
+
+/* Pontos */
+
+.cnx-hero__pontos {
+	position: absolute;
+	bottom: 18px;
+	left: 50%;
+	z-index: 2;
+	display: flex;
+	gap: 7px;
+	padding: 7px 12px;
+	background: rgba(255, 255, 255, .92);
+	border-radius: 999px;
+	transform: translateX(-50%);
+}
+
+.cnx-hero__ponto {
+	width: 8px;
+	height: 8px;
+	padding: 0;
+	background: #c6c6c6;
+	border: 0;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: background-color .15s;
+}
+
+.cnx-hero__ponto[aria-selected="true"] {
+	background: #4a4a4a;
+}
+
+/* Faixa colorida */
+
+.cnx-hero__arcoiris {
+	height: 4px;
+	background: linear-gradient(
+		90deg,
+		#f26522 0%,
+		#f7941e 10%,
+		#f5d000 22%,
+		#8cc63f 36%,
+		#00b7a8 50%,
+		#0f9bd7 64%,
+		#4a5fc1 78%,
+		#8e4dbd 90%,
+		#e0399e 100%
+	);
+}
+
+@media (max-width: 900px) {
+	.cnx-hero {
+		margin-top: 0;
+	}
+
+	/* display:contents promove título, descrição e botões a itens do grid,
+	   permitindo a imagem ao lado do título sem duplicar marcação. */
+	.cnx-hero__texto {
+		display: contents;
+	}
+
+	.cnx-hero__conteudo {
+		grid-template-columns: 1fr 33%;
+		gap: 0 18px;
+		align-items: start;
+		min-height: 0;
+		padding: 28px 22px 54px;
+		text-align: left;
+	}
+
+	.cnx-hero__titulo {
+		grid-column: 1;
+		grid-row: 1;
+		margin-bottom: 18px;
+		font-size: 21px;
+	}
+
+	.cnx-hero__imagem {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	.cnx-hero__descricao {
+		grid-column: 1 / -1;
+		grid-row: 2;
+		max-width: none;
+		margin-bottom: 22px;
+		font-size: 13px;
+	}
+
+	.cnx-hero__botoes {
+		grid-column: 1 / -1;
+		grid-row: 3;
+		flex-direction: column;
+		gap: 14px;
+	}
+
+	/* Botões ocupam a largura toda; ícone encostado na direita. */
+	.cnx-hero__botoes .cnx-btn {
+		position: relative;
+		justify-content: center;
+		width: 100%;
+		padding: 15px 46px;
+	}
+
+	.cnx-hero__botoes .cnx-btn svg {
+		position: absolute;
+		right: 18px;
+	}
+
+	.cnx-hero__produto {
+		max-height: 150px;
+	}
+
+	/* No touch a navegação é por swipe e pelos pontos. */
+	.cnx-hero__seta {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cnx-hero__trilho {
+		transition: none;
+	}
+}
+
+/* --- Diferenciais ------------------------------------------------------ */
+
+.cnx-diferenciais__inner {
+	width: 100%;
+	max-width: var(--cnx-max);
+	margin: 0 auto;
+	padding: 26px 20px 8px;
+}
+
+.cnx-diferencial {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 4px 12px;
+	height: 100%;
+	padding: 16px 18px;
+	background: #fff;
+	border: 1px solid #e8e8e8;
+	border-radius: 3px;
+}
+
+.cnx-diferencial__icone {
+	grid-row: 1;
+	color: var(--cnx-texto);
+	line-height: 0;
+}
+
+.cnx-diferencial__titulo {
+	grid-column: 2;
+	margin: 0;
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+.cnx-diferencial__texto {
+	grid-column: 2;
+	margin: 0;
+	color: #7a7a7a;
+	font-size: 12.5px;
+	line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+	.cnx-diferenciais__inner {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 520px) {
+	.cnx-diferenciais__inner {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* --- Chassi das seções ------------------------------------------------- */
+
+.cnx-secao__inner {
+	width: 100%;
+	max-width: var(--cnx-max);
+	margin: 0 auto;
+	padding: 26px 20px 0;
+}
+
+.cnx-secao__titulo {
+	margin: 0 0 14px;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.cnx-secao__titulo--centro {
+	margin-bottom: 26px;
+	font-size: 16px;
+	text-align: center;
+}
+
+.cnx-grade {
+	display: grid;
+	gap: 16px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cnx-grade--4 {
+	grid-template-columns: repeat(4, 1fr);
+}
+
+/* --- Trilho de cards ---------------------------------------------------- */
+
+.cnx-palco {
+	position: relative;
+}
+
+/* Sempre trilho, mesmo no desktop: a vitrine costuma ter mais de 4 produtos. */
+.cnx-grade--trilho {
+	display: flex;
+	gap: 16px;
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	scrollbar-width: none;
+}
+
+.cnx-grade--trilho::-webkit-scrollbar {
+	display: none;
+}
+
+.cnx-grade--trilho > li {
+	flex: 0 0 calc((100% - 48px) / 4);
+	scroll-snap-align: start;
+}
+
+.cnx-seta {
+	position: absolute;
+	top: 38%;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	color: var(--cnx-texto);
+	background: #fff;
+	border: 1px solid #ececec;
+	border-radius: 50%;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+	transform: translateY(-50%);
+	cursor: pointer;
+	transition: color .15s;
+}
+
+.cnx-seta:hover {
+	color: var(--cnx-laranja);
+}
+
+.cnx-seta[hidden] {
+	display: none;
+}
+
+.cnx-seta--anterior {
+	left: -19px;
+}
+
+.cnx-seta--proximo {
+	right: -19px;
+}
+
+/* Caixa neutra enquanto a foto do card não foi cadastrada. */
+.cnx-placeholder {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: repeating-linear-gradient(
+		45deg,
+		#ececec,
+		#ececec 8px,
+		#e4e4e4 8px,
+		#e4e4e4 16px
+	);
+}
+
+/* --- Categorias em destaque -------------------------------------------- */
+
+.cnx-card-categoria {
+	display: block;
+	color: inherit;
+	text-decoration: none;
+}
+
+.cnx-card-categoria__midia {
+	display: block;
+	aspect-ratio: 4 / 3.4;
+	overflow: hidden;
+	background: var(--cnx-fundo);
+	border-radius: 2px;
+}
+
+.cnx-card-categoria__midia img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform .3s ease;
+}
+
+.cnx-card-categoria:hover .cnx-card-categoria__midia img {
+	transform: scale(1.04);
+}
+
+.cnx-card-categoria__nome {
+	display: block;
+	max-width: 15ch;
+	margin: 10px auto 0;
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1.35;
+	text-align: center;
+	text-wrap: balance;
+}
+
+/* --- Soluções ----------------------------------------------------------- */
+
+.cnx-card-solucao {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	color: inherit;
+	text-decoration: none;
+}
+
+.cnx-card-solucao__tarja {
+	display: block;
+	padding: 9px 14px;
+	color: #fff;
+	font-size: 12.5px;
+	font-weight: 400;
+	line-height: 1.3;
+}
+
+.cnx-card-solucao__tarja strong {
+	font-weight: 700;
+}
+
+.cnx-card-solucao__midia {
+	display: block;
+	aspect-ratio: 4 / 3.2;
+	overflow: hidden;
+	background: var(--cnx-fundo);
+}
+
+.cnx-card-solucao__midia img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform .3s ease;
+}
+
+.cnx-card-solucao:hover .cnx-card-solucao__midia img {
+	transform: scale(1.04);
+}
+
+.cnx-card-solucao__texto {
+	display: block;
+	margin-top: 10px;
+	color: #6b6b6b;
+	font-size: 11.5px;
+	line-height: 1.45;
+}
+
+.cnx-card-solucao__texto strong {
+	display: block;
+	color: var(--cnx-texto);
+	font-size: 12px;
+}
+
+/* --- Vitrine de produtos ------------------------------------------------ */
+
+.cnx-card-produto {
+	display: block;
+	color: inherit;
+	text-decoration: none;
+}
+
+.cnx-card-produto__midia {
+	display: block;
+	aspect-ratio: 4 / 3.2;
+	overflow: hidden;
+	background: var(--cnx-fundo);
+	border-radius: 2px;
+}
+
+.cnx-card-produto__midia img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform .3s ease;
+}
+
+.cnx-card-produto:hover .cnx-card-produto__midia img {
+	transform: scale(1.04);
+}
+
+.cnx-card-produto__texto {
+	display: block;
+	margin-top: 10px;
+	color: #6b6b6b;
+	font-size: 11.5px;
+	line-height: 1.45;
+}
+
+.cnx-card-produto__texto strong {
+	display: block;
+	color: var(--cnx-texto);
+	font-size: 12px;
+}
+
+/* --- Banner de chamada --------------------------------------------------- */
+
+.cnx-banner__caixa {
+	position: relative;
+	background-color: #dedede;
+	background-position: center;
+	background-size: cover;
+}
+
+.cnx-banner__caixa::before {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(90deg, rgba(232, 232, 232, .97) 0%, rgba(232, 232, 232, .92) 38%, rgba(232, 232, 232, .25) 62%, rgba(20, 20, 20, .28) 100%);
+	content: "";
+}
+
+.cnx-banner__caixa--sem-foto::before {
+	background: linear-gradient(90deg, #e8e8e8 0%, #e0e0e0 100%);
+}
+
+.cnx-banner__conteudo {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-template-columns: 1.15fr 1fr;
+	gap: 24px;
+	align-items: center;
+	min-height: 190px;
+	padding: 40px 56px;
+}
+
+.cnx-banner__titulo {
+	margin: 0 0 12px;
+	font-size: 25px;
+	font-weight: 400;
+	line-height: 1.3;
+}
+
+.cnx-banner__titulo strong {
+	font-weight: 700;
+}
+
+.cnx-banner__descricao {
+	margin: 0;
+	max-width: 44ch;
+	color: #4d4d4d;
+	font-size: 13px;
+}
+
+.cnx-banner__acao {
+	display: flex;
+	justify-content: center;
+}
+
+/* --- Como funciona ------------------------------------------------------- */
+
+.cnx-etapas .cnx-secao__inner {
+	padding-top: 40px;
+	padding-bottom: 20px;
+}
+
+.cnx-etapas__lista {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 18px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cnx-etapa {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	width: 108px;
+}
+
+.cnx-etapa__circulo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 62px;
+	height: 62px;
+	color: #fff;
+	background: var(--cnx-laranja);
+	border-radius: 50%;
+}
+
+.cnx-etapa__titulo {
+	font-size: 12.5px;
+	font-weight: 600;
+	text-align: center;
+}
+
+.cnx-etapas__seta {
+	display: flex;
+	align-items: center;
+	height: 62px;
+	color: #b9b9b9;
+}
+
+/* --- Responsivo das seções ---------------------------------------------- */
+
+@media (max-width: 900px) {
+	.cnx-grade--4 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.cnx-grade--trilho > li {
+		flex-basis: calc((100% - 16px) / 2);
+	}
+
+	.cnx-seta--anterior {
+		left: -4px;
+	}
+
+	.cnx-seta--proximo {
+		right: -4px;
+	}
+
+	.cnx-banner__conteudo {
+		grid-template-columns: 1fr;
+		gap: 20px;
+		padding: 30px 22px;
+	}
+
+	.cnx-banner__descricao {
+		max-width: none;
+	}
+
+	.cnx-banner__acao {
+		justify-content: stretch;
+	}
+
+	.cnx-banner__acao .cnx-btn {
+		justify-content: center;
+		width: 100%;
+		padding: 15px 20px;
+	}
+
+	.cnx-banner__caixa::before {
+		background: linear-gradient(180deg, rgba(232, 232, 232, .95) 0%, rgba(232, 232, 232, .82) 60%, rgba(232, 232, 232, .7) 100%);
+	}
+}
+
+/* --- Seções no mobile: cada grade vira um carrossel de um card ----------- */
+
+@media (max-width: 700px) {
+	/* Um card por vez, centralizado. Cada item ocupa uma tela inteira e o respiro
+	   é padding DELE, não do trilho — assim o card vizinho fica totalmente fora
+	   da área visível em vez de espiar pela lateral. */
+	.cnx-grade--4,
+	.cnx-grade--trilho {
+		display: flex;
+		gap: 0;
+		padding: 0;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scroll-behavior: smooth;
+		scrollbar-width: none;
+	}
+
+	.cnx-grade--4::-webkit-scrollbar,
+	.cnx-grade--trilho::-webkit-scrollbar {
+		display: none;
+	}
+
+	.cnx-grade--4 > li,
+	.cnx-grade--trilho > li {
+		flex: 0 0 100%;
+		padding: 0 20%;
+		scroll-snap-align: center;
+	}
+
+	/* Os diferenciais são cards largos, com texto ao lado do ícone. */
+	.cnx-diferenciais .cnx-grade--4 > li {
+		padding: 0 8%;
+	}
+
+	.cnx-seta--anterior {
+		left: 4px;
+	}
+
+	.cnx-seta--proximo {
+		right: 4px;
+	}
+
+	.cnx-secao__inner,
+	.cnx-diferenciais__inner {
+		padding-right: 0;
+		padding-left: 0;
+	}
+
+	.cnx-secao__titulo {
+		padding: 0 20px;
+	}
+
+	/* Régua separando uma seção da outra, como no layout. */
+	.cnx-secao + .cnx-secao .cnx-secao__inner {
+		padding-top: 24px;
+		border-top: 1px solid var(--cnx-borda);
+	}
+
+	.cnx-banner .cnx-secao__inner,
+	.cnx-etapas .cnx-secao__inner {
+		border-top: 0;
+	}
+
+	.cnx-banner .cnx-secao__inner {
+		padding-right: 0;
+		padding-left: 0;
+	}
+}
+
+@media (max-width: 560px) {
+	.cnx-banner__titulo {
+		font-size: 20px;
+	}
+
+	/* As quatro etapas continuam numa linha só, encolhidas. */
+	.cnx-etapas__lista {
+		flex-wrap: nowrap;
+		gap: 4px;
+	}
+
+	.cnx-etapa {
+		width: auto;
+		flex: 1 1 0;
+		gap: 8px;
+	}
+
+	.cnx-etapa__circulo {
+		width: 48px;
+		height: 48px;
+	}
+
+	.cnx-etapa__circulo svg {
+		width: 21px;
+		height: 21px;
+	}
+
+	.cnx-etapa__titulo {
+		font-size: 10.5px;
+	}
+
+	.cnx-etapas__seta {
+		height: 48px;
+	}
+
+	.cnx-etapas__seta svg {
+		width: 12px;
+		height: 12px;
+	}
+}
+
+/* --- Rodapé: faixa de captura ------------------------------------------ */
+
+.cnx-btn--contorno {
+	color: #fff;
+	background: transparent;
+	border-color: rgba(255, 255, 255, .8);
+}
+
+.cnx-btn--contorno:hover {
+	color: var(--cnx-texto);
+	background: #fff;
+	border-color: #fff;
+}
+
+.cnx-cta {
+	position: relative;
+	margin-top: 44px;
+	overflow: hidden;
+	color: #fff;
+	background-color: #140b06;
+	/* O detalhe laranja mora na borda direita da arte: ancorar à direita mantém
+	   ele no canto em qualquer largura, inclusive em telas ultralargas. */
+	background-position: right center;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
+/* Selo decorativo: preso na extremidade superior esquerda da faixa, fora do grid. */
+.cnx-cta__selo {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 0;
+	width: 150px;
+	height: auto;
+	opacity: .9;
+	pointer-events: none;
+}
+
+.cnx-cta__inner {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-template-columns: 1.25fr 1fr;
+	gap: 48px;
+	align-items: center;
+	width: 100%;
+	max-width: var(--cnx-max);
+	margin: 0 auto;
+	padding: 48px 20px;
+}
+
+.cnx-cta__titulo {
+	margin: 0 0 4px;
+	font-size: 20px;
+	font-weight: 700;
+}
+
+.cnx-cta__subtitulo {
+	margin: 0 0 22px;
+	font-size: 18px;
+	font-weight: 400;
+}
+
+.cnx-cta__subtitulo strong {
+	color: var(--cnx-laranja);
+	font-weight: 700;
+}
+
+/* Formulário */
+
+.cnx-form {
+	display: grid;
+	gap: 12px;
+}
+
+.cnx-form__campo {
+	width: 100%;
+	height: 44px;
+	padding: 0 14px;
+	color: #fff;
+	font-family: inherit;
+	font-size: 13.5px;
+	background: rgba(255, 255, 255, .06);
+	border: 1px solid rgba(255, 255, 255, .28);
+	border-radius: 3px;
+	appearance: none;
+}
+
+.cnx-form__campo::placeholder {
+	color: rgba(255, 255, 255, .65);
+}
+
+.cnx-form__campo:focus {
+	border-color: var(--cnx-laranja);
+	outline: none;
+}
+
+/* A seta do select desaparece com appearance:none — desenhada de volta aqui. */
+.cnx-form__campo--select {
+	padding-right: 38px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 12px center;
+	background-size: 16px;
+}
+
+.cnx-form__campo--select option {
+	color: var(--cnx-texto);
+	background: #fff;
+}
+
+/* Honeypot: fora da tela, mas ainda preenchível por robô. */
+.cnx-form__armadilha {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+.cnx-form__enviar {
+	width: 100%;
+	height: 46px;
+	color: #fff;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	background: var(--cnx-laranja);
+	border: 0;
+	border-radius: 3px;
+	cursor: pointer;
+	transition: background-color .15s;
+}
+
+.cnx-form__enviar:hover {
+	background: var(--cnx-laranja-escuro);
+}
+
+.cnx-cta__nota {
+	margin: 14px 0 0;
+	color: rgba(255, 255, 255, .55);
+	font-size: 11.5px;
+}
+
+.cnx-aviso {
+	margin: 0;
+	padding: 13px 16px;
+	font-size: 13.5px;
+	border-radius: 3px;
+}
+
+.cnx-aviso--sucesso {
+	color: #d6ffe4;
+	background: rgba(37, 211, 102, .16);
+	border: 1px solid rgba(37, 211, 102, .5);
+}
+
+.cnx-aviso--erro {
+	margin-bottom: 12px;
+	color: #ffd9d9;
+	background: rgba(214, 54, 56, .16);
+	border: 1px solid rgba(214, 54, 56, .5);
+}
+
+/* --- Rodapé institucional ---------------------------------------------- */
+
+.cnx-rodape {
+	background: #fbfbfb;
+}
+
+.cnx-rodape__inner {
+	display: grid;
+	grid-template-columns: 1.15fr .7fr 1.1fr .9fr;
+	gap: 32px;
+	width: 100%;
+	max-width: var(--cnx-max);
+	margin: 0 auto;
+	padding: 44px 20px 32px;
+}
+
+.cnx-rodape__marca img {
+	width: 128px;
+	height: auto;
+}
+
+.cnx-rodape__sobre {
+	margin: 18px 0 0;
+	max-width: 30ch;
+	color: #8a8a8a;
+	font-size: 11.5px;
+	line-height: 1.6;
+}
+
+.cnx-rodape__lista,
+.cnx-rodape__legal,
+.cnx-pagamentos,
+.cnx-redes {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cnx-rodape__lista {
+	display: grid;
+	gap: 14px;
+}
+
+.cnx-rodape__lista a {
+	color: #4a4a4a;
+	font-size: 13.5px;
+	text-decoration: none;
+	transition: color .15s;
+}
+
+.cnx-rodape__lista a:hover {
+	color: var(--cnx-laranja);
+}
+
+.cnx-rodape__rotulo {
+	margin: 0 0 4px;
+	font-size: 12.5px;
+	font-weight: 700;
+}
+
+.cnx-rodape__rotulo + .cnx-rodape__valor {
+	margin: 0 0 14px;
+}
+
+.cnx-rodape__valor {
+	color: #7a7a7a;
+	font-size: 11.5px;
+}
+
+.cnx-rodape__valor a {
+	color: #7a7a7a;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.cnx-rodape__valor a:hover {
+	color: var(--cnx-laranja);
+}
+
+.cnx-rodape__selo {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	margin: 18px 0 0;
+	color: #5a5a5a;
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: .3px;
+}
+
+.cnx-rodape__extras .cnx-rodape__rotulo {
+	margin-bottom: 10px;
+}
+
+.cnx-rodape__redes {
+	margin-top: 22px;
+}
+
+.cnx-pagamentos {
+	display: flex;
+	gap: 8px;
+	color: #b4b4b4;
+}
+
+.cnx-redes {
+	display: flex;
+	gap: 7px;
+}
+
+.cnx-redes a {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	color: #fff;
+	background: var(--cnx-laranja);
+	border-radius: 3px;
+	transition: background-color .15s;
+}
+
+.cnx-redes a:hover {
+	background: var(--cnx-laranja-escuro);
+}
+
+/* Base */
+
+.cnx-rodape__base {
+	border-top: 1px solid #ececec;
+}
+
+.cnx-rodape__base-inner {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px 28px;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	max-width: var(--cnx-max);
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.cnx-rodape__direitos {
+	margin: 0;
+	color: #9a9a9a;
+	font-size: 11.5px;
+}
+
+.cnx-rodape__legal {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 22px;
+}
+
+.cnx-rodape__legal a {
+	color: #7a7a7a;
+	font-size: 11.5px;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.cnx-rodape__legal a:hover {
+	color: var(--cnx-laranja);
+}
+
+/* --- Botões flutuantes -------------------------------------------------- */
+
+.cnx-flutuante {
+	position: fixed;
+	right: 20px;
+	z-index: 40;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 0;
+	cursor: pointer;
+	transition: transform .15s, background-color .15s;
+}
+
+.cnx-flutuante:hover {
+	transform: translateY(-2px);
+}
+
+.cnx-flutuante--zap {
+	bottom: 76px;
+	width: 52px;
+	height: 52px;
+	color: #fff;
+	background: var(--cnx-whatsapp);
+	border-radius: 50%;
+	box-shadow: 0 3px 12px rgba(0, 0, 0, .22);
+}
+
+.cnx-flutuante--topo {
+	bottom: 20px;
+	width: 40px;
+	height: 40px;
+	color: #fff;
+	background: #c4c4c4;
+	border-radius: 4px;
+}
+
+.cnx-flutuante--topo:hover {
+	background: #9c9c9c;
+}
+
+.cnx-flutuante--topo[hidden] {
+	display: none;
+}
+
+@media (max-width: 900px) {
+	.cnx-cta__inner {
+		grid-template-columns: 1fr;
+		gap: 30px;
+		padding: 36px 20px;
+	}
+
+	.cnx-cta__chamada {
+		text-align: center;
+	}
+
+	/* Na tela estreita o selo só atrapalharia a leitura. */
+	.cnx-cta__selo {
+		width: 96px;
+		opacity: .35;
+	}
+
+	/* No mobile o rodapé muda de ordem: marca centralizada, menu ao lado das
+	   redes, contato, e pagamentos numa faixa própria. display:contents solta
+	   pagamentos e redes do wrapper para o grid posicioná-los. */
+	.cnx-rodape__inner {
+		grid-template-columns: 1fr 1fr;
+		gap: 26px 20px;
+		grid-template-areas:
+			"marca marca"
+			"menu redes"
+			"contato contato"
+			"pagamentos pagamentos";
+	}
+
+	.cnx-rodape__marca {
+		grid-area: marca;
+		text-align: center;
+	}
+
+	.cnx-rodape__marca img {
+		margin: 0 auto;
+	}
+
+	.cnx-rodape__sobre {
+		max-width: 42ch;
+		margin-right: auto;
+		margin-left: auto;
+	}
+
+	.cnx-rodape__menu {
+		grid-area: menu;
+	}
+
+	.cnx-rodape__contato {
+		grid-area: contato;
+		padding-top: 24px;
+		border-top: 1px solid #ececec;
+	}
+
+	.cnx-rodape__extras {
+		display: contents;
+	}
+
+	.cnx-rodape__pagamentos {
+		grid-area: pagamentos;
+		padding-top: 24px;
+		text-align: center;
+		border-top: 1px solid #ececec;
+	}
+
+	.cnx-rodape__pagamentos .cnx-pagamentos {
+		justify-content: center;
+	}
+
+	.cnx-rodape__redes {
+		grid-area: redes;
+		margin-top: 0;
+		padding-left: 20px;
+		border-left: 1px solid #ececec;
+	}
+
+	.cnx-rodape__base-inner {
+		flex-direction: column-reverse;
+		align-items: flex-start;
+		gap: 20px;
+	}
+
+	.cnx-rodape__legal {
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.cnx-rodape__direitos {
+		width: 100%;
+		text-align: center;
+	}
+
+	.cnx-flutuante {
+		right: 14px;
+	}
+}
+
+/* --- Página do produto ------------------------------------------------ */
+
+.cnx-produto {
+	display: grid;
+	grid-template-columns: 1.2fr 1fr;
+	gap: 48px;
+	padding: 32px 0 64px;
+}
+
+@media (max-width: 900px) {
+	.cnx-produto {
+		grid-template-columns: 1fr;
+		gap: 28px;
+	}
+}
+
+.cnx-produto__titulo {
+	margin: 0 0 10px;
+	font-size: 28px;
+}
+
+.cnx-produto__resumo {
+	margin: 0 0 28px;
+	color: var(--cnx-cinza);
+}
+
+.cnx-galeria-principal img {
+	width: 100%;
+	height: auto;
+	background: var(--cnx-fundo);
+	border-radius: 6px;
+}
+
+.cnx-galeria-thumbs {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 10px;
+	margin-top: 10px;
+	padding: 0;
+	list-style: none;
+}
+
+.cnx-galeria-thumbs button {
+	display: block;
+	width: 100%;
+	padding: 0;
+	background: none;
+	border: 2px solid transparent;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.cnx-galeria-thumbs button[aria-current="true"] {
+	border-color: var(--cnx-laranja);
+}
+
+.cnx-galeria-thumbs img {
+	display: block;
+	width: 100%;
+	height: 90px;
+	object-fit: cover;
+	border-radius: 4px;
+}
+
+/* --- Configurador ----------------------------------------------------- */
+
+.cnx-config__grupo {
+	margin-bottom: 26px;
+}
+
+.cnx-config__titulo {
+	margin: 0 0 2px;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.cnx-config__ajuda {
+	margin: 0 0 10px;
+	color: var(--cnx-cinza);
+	font-size: 13px;
+}
+
+.cnx-config__opcoes {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+}
+
+.cnx-opcao {
+	padding: 11px 14px;
+	color: var(--cnx-texto);
+	font-size: 14px;
+	text-align: center;
+	background: #fff;
+	border: 1px solid var(--cnx-borda);
+	border-radius: 6px;
+	cursor: pointer;
+	transition: border-color .15s, color .15s;
+}
+
+.cnx-opcao:hover {
+	border-color: var(--cnx-laranja);
+}
+
+.cnx-opcao[aria-pressed="true"] {
+	color: var(--cnx-laranja-escuro);
+	font-weight: 600;
+	border-color: var(--cnx-laranja);
+	box-shadow: inset 0 0 0 1px var(--cnx-laranja);
+}
+
+/* --- Resumo / CTA ----------------------------------------------------- */
+
+.cnx-resumo {
+	padding: 20px;
+	border: 1px solid var(--cnx-borda);
+	border-radius: 6px;
+}
+
+.cnx-resumo__titulo {
+	margin: 0 0 14px;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.cnx-resumo__linha {
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 8px 0;
+	font-size: 14px;
+	border-bottom: 1px solid var(--cnx-borda);
+}
+
+.cnx-resumo__linha span:first-child {
+	color: var(--cnx-cinza);
+}
+
+.cnx-resumo__aviso {
+	margin: 14px 0;
+	color: var(--cnx-cinza);
+	font-size: 13px;
+}
+
+/* Botão de orçamento da página de produto. Nome próprio de propósito: já houve
+   colisão com a faixa .cnx-cta do rodapé, e o atalho background: daqui zerava
+   o background-size da faixa. */
+.cnx-btn-orcamento {
+	display: block;
+	width: 100%;
+	padding: 14px;
+	color: #fff;
+	font-size: 15px;
+	font-weight: 600;
+	text-align: center;
+	text-decoration: none;
+	background: var(--cnx-laranja);
+	border: 0;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.cnx-btn-orcamento:hover {
+	background: var(--cnx-laranja-escuro);
+}
+
+.cnx-btn-orcamento[aria-disabled="true"] {
+	background: #b8b8b8;
+	cursor: not-allowed;
+}
+
+/* --- Accordion -------------------------------------------------------- */
+
+.cnx-accordion {
+	margin-top: 32px;
+	border-top: 1px solid var(--cnx-borda);
+}
+
+.cnx-accordion details {
+	border-bottom: 1px solid var(--cnx-borda);
+}
+
+.cnx-accordion summary {
+	padding: 14px 0;
+	font-size: 15px;
+	list-style: none;
+	cursor: pointer;
+}
+
+.cnx-accordion summary::-webkit-details-marker {
+	display: none;
+}
+
+.cnx-accordion summary::after {
+	float: right;
+	color: var(--cnx-cinza);
+	content: "+";
+}
+
+.cnx-accordion details[open] summary::after {
+	content: "−";
+}
+
+.cnx-accordion__conteudo {
+	padding-bottom: 16px;
+	color: var(--cnx-cinza);
+	font-size: 14px;
+}

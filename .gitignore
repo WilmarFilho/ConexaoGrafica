@@ -1,0 +1,39 @@
+# O core do WP mora num volume Docker, nunca no repositório.
+/wp-admin/
+/wp-includes/
+wp-config.php
+wp-*.php
+index.php
+xmlrpc.php
+license.txt
+readme.html
+
+# Só versionamos nosso código dentro de wp-content.
+wp-content/*
+!wp-content/plugins/
+wp-content/plugins/*
+!wp-content/plugins/conexao-core/
+!wp-content/themes/
+wp-content/themes/*
+!wp-content/themes/conexao/
+
+# Uploads e artefatos locais
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+*.log
+*.sql
+*.sql.gz
+
+# Scripts descartáveis de manutenção local
+.tmp/
+
+# Artes de origem: entram no site pela biblioteca de mídia, não pelo Git.
+/*.png
+/*.jpg
+
+# SO / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

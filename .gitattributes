@@ -1,0 +1,7 @@
+# O deploy vai para um servidor Linux: tudo versionado com LF, independente de
+# quem commitou de onde. Sem isso, arquivos com CRLF chegam ao cPanel.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary
