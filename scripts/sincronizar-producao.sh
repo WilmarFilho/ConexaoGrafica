@@ -28,26 +28,45 @@ remoto() {
 	ssh -n -i "$CHAVE" -o BatchMode=yes -o ConnectTimeout=20 "$SSH_USER@$SSH_HOST" "cd $REMOTO && $*"
 }
 
-echo "==> Conferindo o estado de produção"
+local_sql() {
+	docker compose -f "$PROJETO/docker-compose.yml" exec -T db \
+		mysql -uconexao -pconexao conexao -N -B -e "$1" 2>/dev/null | tr -d '\r'
+}
 
-PRODUTOS=$(remoto "wp post list --post_type=cnx_produto --post_status=publish --format=count" 2>/dev/null || echo 0)
+echo "==> Comparando os dois ambientes"
+
+# Contar o que existe em produção não diz nada: a sincronia anterior colocou o
+# conteúdo local lá. O que importa é o que EXCEDE o local — isso só pode ter
+# nascido em produção, e some se sobrescrevermos.
+PROD_PRODUTOS=$(remoto "wp post list --post_type=cnx_produto --post_status=publish --format=count" 2>/dev/null || echo 0)
+PROD_PAGINAS=$(remoto "wp post list --post_type=page,post --post_status=publish --format=count" 2>/dev/null || echo 0)
 LEADS=$(remoto "wp post list --post_type=cnx_lead --format=count" 2>/dev/null || echo 0)
 
-echo "    produtos publicados: $PRODUTOS"
-echo "    leads recebidos:     $LEADS"
+LOCAL_PRODUTOS=$(local_sql "SELECT COUNT(*) FROM wp_posts WHERE post_type='cnx_produto' AND post_status='publish'")
+LOCAL_PAGINAS=$(local_sql "SELECT COUNT(*) FROM wp_posts WHERE post_type IN ('page','post') AND post_status='publish'")
 
-# Trava de segurança: se já há conteúdo real lá, sobrescrever destrói trabalho
-# de outra pessoa. A partir do lançamento, este script deve parar de ser usado.
-if [ "${1:-}" != "--forcar" ] && { [ "$PRODUTOS" -gt 0 ] || [ "$LEADS" -gt 0 ]; }; then
+printf '    produtos   local %-4s produção %s\n' "$LOCAL_PRODUTOS" "$PROD_PRODUTOS"
+printf '    páginas    local %-4s produção %s\n' "$LOCAL_PAGINAS" "$PROD_PAGINAS"
+printf '    leads      produção %s\n' "$LEADS"
+
+MOTIVO=""
+[ "$PROD_PRODUTOS" -gt "$LOCAL_PRODUTOS" ] && MOTIVO="produção tem $(( PROD_PRODUTOS - LOCAL_PRODUTOS )) produto(s) que não existem no local"
+[ "$PROD_PAGINAS" -gt "$LOCAL_PAGINAS" ] && MOTIVO="${MOTIVO:+$MOTIVO; }produção tem $(( PROD_PAGINAS - LOCAL_PAGINAS )) página(s) a mais"
+[ "$LEADS" -gt 0 ] && MOTIVO="${MOTIVO:+$MOTIVO; }$LEADS lead(s) recebido(s) pelo site no ar"
+
+# Leads só nascem de visita real: se há algum, o site está sendo usado de verdade
+# e o banco de produção virou a fonte da verdade.
+if [ "${1:-}" != "--forcar" ] && [ -n "$MOTIVO" ]; then
 	cat <<-AVISO
 
-	  PARADO. Produção já tem conteúdo próprio:
-	    $PRODUTOS produto(s) e $LEADS lead(s).
+	  PARADO. Há conteúdo em produção que o local não tem:
+	    $MOTIVO
 
-	  Sobrescrever o banco apagaria isso. Se o site já foi ao ar, o caminho
-	  passa a ser o contrário: cadastrar direto em produção.
+	  Sobrescrever apagaria isso — e a sincronia é de mão única, do local
+	  para produção. Se o site já está em uso, o caminho passa a ser o
+	  contrário: cadastrar direto em produção.
 
-	  Se ainda assim for isso mesmo que você quer:
+	  Se ainda assim for isso mesmo:
 	    bash scripts/sincronizar-producao.sh --forcar
 
 	AVISO
