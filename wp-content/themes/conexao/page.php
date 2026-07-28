@@ -15,6 +15,10 @@ while ( have_posts() ) :
 	the_post();
 	?>
 	<article <?php post_class( 'cnx-pagina' ); ?>>
+		<?php if ( ! is_front_page() ) : ?>
+			<h1 class="cnx-pagina__titulo"><?php the_title(); ?></h1>
+		<?php endif; ?>
+
 		<?php the_content(); ?>
 	</article>
 	<?php

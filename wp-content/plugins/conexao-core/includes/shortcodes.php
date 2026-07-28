@@ -361,6 +361,36 @@ function cnx_shortcode_como_funciona( array|string $atts = array() ): string {
 }
 
 /**
+ * [cnx_contato] — canais de atendimento, todos vindos de Configurações → Conexão.
+ *
+ * Usado nas páginas Contato e Solicitar Orçamento: nenhum telefone fica
+ * cravado em página nenhuma.
+ */
+add_shortcode( 'cnx_contato', 'cnx_shortcode_contato' );
+
+function cnx_shortcode_contato(): string {
+	$dados = array(
+		'whatsapp' => cnx_whatsapp_link( cnx_whatsapp_saudacao() ),
+		'horario'  => (string) get_option( 'cnx_horario', '' ),
+		'tel1'     => (string) get_option( 'cnx_telefone_1', '' ),
+		'tel2'     => (string) get_option( 'cnx_telefone_2', '' ),
+		'email'    => (string) get_option( 'cnx_email_comercial', '' ),
+	);
+
+	if ( '' === implode( '', $dados ) ) {
+		return cnx_aviso_admin(
+			__( 'Nenhum canal de contato configurado. Preencha em Configurações → Conexão.', 'conexao' )
+		);
+	}
+
+	ob_start();
+
+	get_template_part( 'template-parts/sections/contato', null, $dados );
+
+	return (string) ob_get_clean();
+}
+
+/**
  * Aviso visível só para quem pode editar — o visitante nunca vê seção quebrada.
  */
 function cnx_aviso_admin( string $mensagem ): string {
