@@ -29,8 +29,10 @@ remoto() {
 }
 
 local_sql() {
+	# </dev/null pelo mesmo motivo do ssh -n: sem isso o docker engole o stdin
+	# do script e o read da confirmação recebe EOF.
 	docker compose -f "$PROJETO/docker-compose.yml" exec -T db \
-		mysql -uconexao -pconexao conexao -N -B -e "$1" 2>/dev/null | tr -d '\r'
+		mysql -uconexao -pconexao conexao -N -B -e "$1" </dev/null 2>/dev/null | tr -d '\r'
 }
 
 echo "==> Comparando os dois ambientes"

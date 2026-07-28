@@ -19,6 +19,45 @@ function cnx_register_banner_meta_boxes(): void {
 		'normal',
 		'high'
 	);
+
+	add_meta_box(
+		'cnx_banner_bg_mobile',
+		__( 'Foto de fundo (mobile)', 'conexao' ),
+		'cnx_render_box_banner_mobile',
+		CNX_CPT_BANNER,
+		'side',
+		'low'
+	);
+}
+
+/**
+ * A arte do mobile costuma ser um recorte vertical diferente da do desktop —
+ * por isso um campo próprio, e não um crop automático.
+ */
+function cnx_render_box_banner_mobile( WP_Post $post ): void {
+	$bg_id = (int) cnx_meta( $post->ID, 'banner_bg_mobile', 0 );
+	?>
+	<div class="cnx-galeria" data-cnx-galeria data-cnx-unica>
+		<ul class="cnx-galeria__list">
+			<?php if ( $bg_id ) : ?>
+				<li class="cnx-galeria__item" data-id="<?php echo esc_attr( (string) $bg_id ); ?>">
+					<?php echo wp_get_attachment_image( $bg_id, 'thumbnail' ); ?>
+					<button type="button" class="cnx-galeria__remove" aria-label="<?php esc_attr_e( 'Remover imagem', 'conexao' ); ?>">✕</button>
+				</li>
+			<?php endif; ?>
+		</ul>
+
+		<input type="hidden" name="cnx_banner_bg_mobile" value="<?php echo esc_attr( $bg_id ? (string) $bg_id : '' ); ?>">
+
+		<button type="button" class="button button-secondary cnx-galeria__add">
+			<?php esc_html_e( 'Selecionar imagem', 'conexao' ); ?>
+		</button>
+
+		<p class="description" style="margin-top:8px;">
+			<?php esc_html_e( 'Opcional. Sem imagem, o mobile usa a mesma foto de fundo do desktop.', 'conexao' ); ?>
+		</p>
+	</div>
+	<?php
 }
 
 function cnx_render_box_banner( WP_Post $post ): void {
@@ -102,6 +141,9 @@ function cnx_save_banner_meta( int $post_id, WP_Post $post ): void {
 		? esc_url_raw( trim( (string) wp_unslash( $_POST['cnx_banner_btn_url'] ) ) )
 		: '';
 	cnx_update_meta( $post_id, 'banner_btn_url', $btn_url );
+
+	$bg_mobile = isset( $_POST['cnx_banner_bg_mobile'] ) ? absint( $_POST['cnx_banner_bg_mobile'] ) : 0;
+	cnx_update_meta( $post_id, 'banner_bg_mobile', $bg_mobile ? (string) $bg_mobile : '' );
 }
 
 /**

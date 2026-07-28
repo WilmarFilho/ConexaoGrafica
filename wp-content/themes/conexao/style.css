@@ -994,9 +994,10 @@ body.cnx-sem-rolagem {
 }
 
 .cnx-secao__titulo {
-	margin: 0 0 14px;
-	font-size: 15px;
-	font-weight: 600;
+	margin: 0 0 18px;
+	color: var(--cnx-tinta);
+	font-size: 22px;
+	font-weight: 700;
 }
 
 .cnx-secao__titulo--centro {
@@ -1103,7 +1104,8 @@ body.cnx-sem-rolagem {
 
 .cnx-card-categoria__midia {
 	display: block;
-	aspect-ratio: 4 / 3.4;
+	/* Proporção do design: cards de 309x363. */
+	aspect-ratio: 309 / 363;
 	overflow: hidden;
 	background: var(--cnx-fundo);
 	border-radius: 2px;
@@ -1156,7 +1158,8 @@ body.cnx-sem-rolagem {
 
 .cnx-card-solucao__midia {
 	display: block;
-	aspect-ratio: 4 / 3.2;
+	/* Tarja + foto somam a mesma proporção 309x363 dos demais cards. */
+	aspect-ratio: 309 / 326;
 	overflow: hidden;
 	background: var(--cnx-fundo);
 }
@@ -1196,7 +1199,8 @@ body.cnx-sem-rolagem {
 
 .cnx-card-produto__midia {
 	display: block;
-	aspect-ratio: 4 / 3.2;
+	/* Proporção do design: cards de 309x363. */
+	aspect-ratio: 309 / 363;
 	overflow: hidden;
 	background: var(--cnx-fundo);
 	border-radius: 2px;
@@ -1215,16 +1219,18 @@ body.cnx-sem-rolagem {
 
 .cnx-card-produto__texto {
 	display: block;
-	margin-top: 10px;
-	color: #6b6b6b;
-	font-size: 11.5px;
+	margin-top: 12px;
+	color: var(--cnx-tinta-suave);
+	font-size: 16px;
+	font-weight: 500;
 	line-height: 1.45;
 }
 
 .cnx-card-produto__texto strong {
 	display: block;
-	color: var(--cnx-texto);
-	font-size: 12px;
+	color: var(--cnx-tinta);
+	font-size: 16px;
+	font-weight: 700;
 }
 
 /* --- Banner de chamada --------------------------------------------------- */
@@ -1232,6 +1238,7 @@ body.cnx-sem-rolagem {
 .cnx-banner__caixa {
 	position: relative;
 	background-color: #dedede;
+	background-image: var(--cnx-banner-bg);
 	background-position: center;
 	background-size: cover;
 }
@@ -1381,6 +1388,17 @@ body.cnx-sem-rolagem {
 	.cnx-banner__caixa::before {
 		background: linear-gradient(180deg, rgba(232, 232, 232, .95) 0%, rgba(232, 232, 232, .82) 60%, rgba(232, 232, 232, .7) 100%);
 	}
+
+	/* Com arte própria do mobile, a foto assume e o overlay sai de cena:
+	   o degradê de legibilidade já vem embutido na arte. */
+	.cnx-banner__caixa--arte-mobile {
+		background-image: var(--cnx-banner-bg-mobile, var(--cnx-banner-bg));
+		background-position: top center;
+	}
+
+	.cnx-banner__caixa--arte-mobile::before {
+		content: none;
+	}
 }
 
 /* --- Seções no mobile: cada grade vira um carrossel de um card ----------- */
@@ -1433,6 +1451,16 @@ body.cnx-sem-rolagem {
 
 	.cnx-secao__titulo {
 		padding: 0 20px;
+		font-size: 18px;
+	}
+
+	/* Cards das seções: nomes e textos descem para 14px. */
+	.cnx-card-produto__texto,
+	.cnx-card-produto__texto strong,
+	.cnx-card-solucao__texto,
+	.cnx-card-solucao__texto strong,
+	.cnx-card-categoria__nome {
+		font-size: 14px;
 	}
 
 	/* Régua separando uma seção da outra, como no layout. */

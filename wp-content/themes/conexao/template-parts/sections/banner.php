@@ -20,16 +20,42 @@ $cnx_btn_txt = (string) cnx_meta( $cnx_id, 'banner_btn_txt' );
 $cnx_btn_url = (string) cnx_meta( $cnx_id, 'banner_btn_url' );
 $cnx_fundo   = get_the_post_thumbnail_url( $cnx_id, 'full' );
 
+$cnx_bg_mobile_id = (int) cnx_meta( $cnx_id, 'banner_bg_mobile', 0 );
+$cnx_fundo_mobile = $cnx_bg_mobile_id ? wp_get_attachment_image_url( $cnx_bg_mobile_id, 'full' ) : '';
+
 if ( '' === trim( $cnx_titulo ) ) {
 	$cnx_titulo = esc_html( get_the_title( $cnx_id ) );
+}
+
+// As artes viajam como custom properties; qual delas vira background é decisão
+// da media query no CSS — inline style não consegue reagir à largura.
+$cnx_estilo = array();
+
+if ( $cnx_fundo ) {
+	$cnx_estilo[] = "--cnx-banner-bg:url('" . esc_url( $cnx_fundo ) . "')";
+}
+
+if ( $cnx_fundo_mobile ) {
+	$cnx_estilo[] = "--cnx-banner-bg-mobile:url('" . esc_url( $cnx_fundo_mobile ) . "')";
+}
+
+$cnx_classes = 'cnx-banner__caixa';
+
+if ( ! $cnx_fundo ) {
+	$cnx_classes .= ' cnx-banner__caixa--sem-foto';
+}
+
+// A arte mobile já traz o degradê de legibilidade embutido: o overlay sairia por cima dele.
+if ( $cnx_fundo_mobile ) {
+	$cnx_classes .= ' cnx-banner__caixa--arte-mobile';
 }
 ?>
 
 <section class="cnx-secao cnx-banner">
 	<div class="cnx-secao__inner">
-		<div class="cnx-banner__caixa <?php echo $cnx_fundo ? '' : 'cnx-banner__caixa--sem-foto'; ?>"
-			<?php if ( $cnx_fundo ) : ?>
-				style="background-image:url('<?php echo esc_url( $cnx_fundo ); ?>');"
+		<div class="<?php echo esc_attr( $cnx_classes ); ?>"
+			<?php if ( ! empty( $cnx_estilo ) ) : ?>
+				style="<?php echo esc_attr( implode( ';', $cnx_estilo ) ); ?>"
 			<?php endif; ?>>
 
 			<div class="cnx-banner__conteudo">
