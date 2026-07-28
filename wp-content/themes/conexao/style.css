@@ -1261,7 +1261,8 @@ body.cnx-sem-rolagem {
 	grid-template-columns: 1.15fr 1fr;
 	gap: 24px;
 	align-items: center;
-	min-height: 190px;
+	/* Altura do design; o box-sizing do reset inclui o padding na conta. */
+	min-height: 353px;
 	padding: 40px 56px;
 }
 
