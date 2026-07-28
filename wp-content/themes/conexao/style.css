@@ -98,7 +98,8 @@ body {
 .cnx-topbar {
 	background: var(--cnx-preto);
 	color: #fff;
-	font-size: 13.5px;
+	font-size: 14px;
+	font-weight: 700;
 }
 
 .cnx-topbar__inner {
@@ -132,14 +133,9 @@ body {
 }
 
 .cnx-topbar__zap {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 22px;
-	height: 22px;
-	color: #fff;
-	background: var(--cnx-whatsapp);
-	border-radius: 50%;
+	display: block;
+	width: 21px;
+	height: auto;
 }
 
 /* Menu + CTA */
@@ -175,7 +171,7 @@ body {
 	display: inline-flex;
 	align-items: center;
 	padding: 0 26px;
-	font-weight: 600;
+	font-weight: 700;
 	white-space: nowrap;
 	background: var(--cnx-laranja);
 	transition: background-color .15s;
@@ -248,9 +244,10 @@ body {
 	width: 100%;
 	height: 48px;
 	padding: 0 52px 0 22px;
-	color: var(--cnx-texto);
+	color: var(--cnx-tinta);
 	font-family: inherit;
-	font-size: 14.5px;
+	font-size: 16px;
+	font-weight: 500;
 	background: #fff;
 	border: 1px solid var(--cnx-borda);
 	border-radius: 999px;
@@ -259,7 +256,8 @@ body {
 }
 
 .cnx-busca__input::placeholder {
-	color: #9a9a9a;
+	color: var(--cnx-tinta-suave);
+	font-weight: 500;
 }
 
 .cnx-busca__input:focus {
@@ -354,9 +352,9 @@ body {
 	height: 100%;
 	min-height: 58px;
 	padding: 10px 6px;
-	color: #4a4a4a;
-	font-size: 13px;
-	font-weight: 600;
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 700;
 	line-height: 1.35;
 	text-align: center;
 	text-decoration: none;
@@ -733,9 +731,11 @@ body.cnx-sem-rolagem {
 	padding: 44px 76px;
 }
 
+/* "Mixed": corre em regular e o destaque vem do <strong> do cadastro. */
 .cnx-hero__titulo {
 	margin: 0 0 16px;
-	font-size: 30px;
+	color: var(--cnx-tinta);
+	font-size: 36px;
 	font-weight: 400;
 	line-height: 1.25;
 	letter-spacing: -.2px;
@@ -748,8 +748,14 @@ body.cnx-sem-rolagem {
 .cnx-hero__descricao {
 	margin: 0 0 26px;
 	max-width: 46ch;
-	color: #4d4d4d;
-	font-size: 14.5px;
+	color: var(--cnx-tinta-suave);
+	font-size: 16px;
+	font-weight: 500;
+}
+
+/* No hero os botões são 14px; o padrão global de 16px vale para o resto. */
+.cnx-hero__botoes .cnx-btn {
+	font-size: 14px;
 }
 
 .cnx-hero__botoes {
@@ -767,7 +773,7 @@ body.cnx-sem-rolagem {
 .cnx-hero__produto {
 	max-width: 100%;
 	height: auto;
-	max-height: 260px;
+	max-height: 330px;
 	object-fit: contain;
 	mix-blend-mode: multiply;
 }
