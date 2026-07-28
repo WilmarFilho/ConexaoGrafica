@@ -1300,32 +1300,37 @@ body.cnx-sem-rolagem {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 12px;
-	width: 108px;
+	gap: 26px;
+	width: 150px;
 }
 
 .cnx-etapa__circulo {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 62px;
-	height: 62px;
-	color: #fff;
+	width: 150px;
+	height: 150px;
 	background: var(--cnx-laranja);
 	border-radius: 50%;
 }
 
+.cnx-etapa__circulo img {
+	width: 54px;
+	height: auto;
+}
+
 .cnx-etapa__titulo {
-	font-size: 12.5px;
-	font-weight: 600;
+	color: var(--cnx-tinta);
+	font-size: 16px;
+	font-weight: 700;
 	text-align: center;
 }
 
 .cnx-etapas__seta {
 	display: flex;
 	align-items: center;
-	height: 62px;
-	color: #b9b9b9;
+	height: 150px;
+	color: #c9c9c9;
 }
 
 /* --- Responsivo das seções ---------------------------------------------- */
@@ -1455,25 +1460,24 @@ body.cnx-sem-rolagem {
 	.cnx-etapa {
 		width: auto;
 		flex: 1 1 0;
-		gap: 8px;
+		gap: 10px;
 	}
 
 	.cnx-etapa__circulo {
-		width: 48px;
-		height: 48px;
+		width: 64px;
+		height: 64px;
 	}
 
-	.cnx-etapa__circulo svg {
-		width: 21px;
-		height: 21px;
+	.cnx-etapa__circulo img {
+		width: 24px;
 	}
 
 	.cnx-etapa__titulo {
-		font-size: 10.5px;
+		font-size: 11px;
 	}
 
 	.cnx-etapas__seta {
-		height: 48px;
+		height: 64px;
 	}
 
 	.cnx-etapas__seta svg {
@@ -1502,6 +1506,7 @@ body.cnx-sem-rolagem {
 	overflow: hidden;
 	color: #fff;
 	background-color: #140b06;
+	background-image: url("assets/img/footer-bg.png");
 	/* O detalhe laranja mora na borda direita da arte: ancorar à direita mantém
 	   ele no canto em qualquer largura, inclusive em telas ultralargas. */
 	background-position: right center;
@@ -1903,14 +1908,22 @@ body.cnx-sem-rolagem {
 		padding: 36px 20px;
 	}
 
-	.cnx-cta__chamada {
-		text-align: center;
+	/* Arte própria do mobile: degradê com o laranja no canto superior direito. */
+	.cnx-cta {
+		background-image: url("assets/img/footer-bg-mobile.png");
+		background-position: top right;
 	}
 
-	/* Na tela estreita o selo só atrapalharia a leitura. */
+	/* No mobile o selo compõe com o degradê, visível atrás do título. */
 	.cnx-cta__selo {
-		width: 96px;
-		opacity: .35;
+		width: 150px;
+		opacity: .9;
+	}
+
+	/* Divisória entre a chamada e o formulário, como no layout. */
+	.cnx-cta__formulario {
+		padding-top: 26px;
+		border-top: 1px solid rgba(255, 255, 255, .18);
 	}
 
 	/* No mobile o rodapé muda de ordem: marca centralizada, menu ao lado das

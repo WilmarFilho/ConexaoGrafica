@@ -15,8 +15,8 @@ if ( '' === $cnx_orcamento && function_exists( 'cnx_whatsapp_link' ) ) {
 $cnx_tipos = function_exists( 'cnx_tipos_de_servico' ) ? cnx_tipos_de_servico() : array();
 ?>
 
-<section class="cnx-cta" id="cnx-desconto"
-	style="background-image:url('<?php echo esc_url( get_theme_file_uri( 'assets/img/footer-bg.png' ) ); ?>');">
+<?php // O fundo fica no CSS: o mobile troca a imagem por media query, e inline venceria. ?>
+<section class="cnx-cta" id="cnx-desconto">
 	<?php // Decorativo e fora do grid: ancorado no canto superior esquerdo da faixa. ?>
 	<img class="cnx-cta__selo"
 		src="<?php echo esc_url( get_theme_file_uri( 'assets/img/footer-selo.png' ) ); ?>"
