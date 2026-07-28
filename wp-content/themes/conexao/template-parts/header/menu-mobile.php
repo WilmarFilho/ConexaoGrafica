@@ -22,7 +22,7 @@ if ( '' === $cnx_orcamento && function_exists( 'cnx_whatsapp_link' ) ) {
  */
 ?>
 <div class="cnx-menu-mobile" id="cnx-menu-mobile" data-cnx-menu
-	style="background-image:url('<?php echo esc_url( get_theme_file_uri( 'assets/img/footer-bg.png' ) ); ?>');">
+	style="background-image:url('<?php echo esc_url( get_theme_file_uri( 'assets/img/header-bg-mobile.png' ) ); ?>');">
 
 	<div class="cnx-menu-mobile__topo">
 		<button type="button" class="cnx-menu-mobile__fechar" data-cnx-menu-fechar
