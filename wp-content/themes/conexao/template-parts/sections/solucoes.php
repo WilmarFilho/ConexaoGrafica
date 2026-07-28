@@ -31,7 +31,7 @@ if ( empty( $cnx_termos ) ) {
 				$cnx_img    = (int) get_term_meta( $cnx_termo->term_id, 'cnx_imagem', true );
 
 				if ( '' === $cnx_cor ) {
-					$cnx_cor = '#f0873f';
+					$cnx_cor = '#ff6700';
 				}
 
 				if ( '' === trim( wp_strip_all_tags( $cnx_rotulo ) ) ) {

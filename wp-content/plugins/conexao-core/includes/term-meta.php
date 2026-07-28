@@ -47,7 +47,7 @@ function cnx_term_fields( string $taxonomy ): array {
 			'cnx_cor'    => array(
 				'tipo'    => 'cor',
 				'label'   => __( 'Cor da tarja', 'conexao' ),
-				'padrao'  => '#f0873f',
+				'padrao'  => '#ff6700',
 			),
 			'cnx_ordem'  => array(
 				'tipo'  => 'numero',
@@ -142,7 +142,7 @@ function cnx_render_term_field( string $chave, array $campo, string $valor ): vo
 			printf(
 				'<input type="color" id="%1$s" name="%1$s" value="%2$s">',
 				esc_attr( $chave ),
-				esc_attr( $valor ?: (string) ( $campo['padrao'] ?? '#f0873f' ) )
+				esc_attr( $valor ?: (string) ( $campo['padrao'] ?? '#ff6700' ) )
 			);
 			break;
 

@@ -368,7 +368,7 @@ function cnx_aviso_admin( string $mensagem ): string {
 		return '';
 	}
 
-	return '<p style="margin:20px auto;max-width:1180px;padding:14px 18px;border-left:3px solid #f0873f;background:#fff8f2;color:#5c4433;font-size:14px;">'
+	return '<p style="margin:20px auto;max-width:1180px;padding:14px 18px;border-left:3px solid #ff6700;background:#fff8f2;color:#5c4433;font-size:14px;">'
 		. esc_html( $mensagem )
 		. '</p>';
 }

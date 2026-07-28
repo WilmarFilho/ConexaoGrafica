@@ -58,7 +58,7 @@ function cnx_produto_column_content( string $column, int $post_id ): void {
 
 		case 'cnx_destaque':
 			echo '1' === cnx_meta( $post_id, 'destaque' )
-				? '<span class="dashicons dashicons-star-filled" style="color:#f0873f;"></span>'
+				? '<span class="dashicons dashicons-star-filled" style="color:#ff6700;"></span>'
 				: '—';
 			break;
 	}

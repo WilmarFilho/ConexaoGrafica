@@ -13,7 +13,6 @@ $cnx_tel1     = (string) get_option( 'cnx_telefone_1', '' );
 $cnx_tel2     = (string) get_option( 'cnx_telefone_2', '' );
 $cnx_email    = (string) get_option( 'cnx_email_comercial', '' );
 $cnx_sobre    = (string) get_option( 'cnx_sobre_curto', '' );
-$cnx_whatsapp = function_exists( 'cnx_whatsapp_link' ) ? cnx_whatsapp_link( cnx_whatsapp_saudacao() ) : '';
 
 $cnx_redes = array_filter(
 	array(
@@ -92,14 +91,7 @@ $cnx_tel_link = static fn( string $tel ): string => (string) preg_replace( '/\D/
 				</p>
 			<?php endif; ?>
 
-			<p class="cnx-rodape__selo">
-				<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
-					stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-					<rect x="4" y="10" width="16" height="11" rx="2"/>
-					<path d="M8 10V7a4 4 0 0 1 8 0v3"/>
-				</svg>
-				<?php esc_html_e( 'COMPRA SEGURA', 'conexao' ); ?>
-			</p>
+			<?php get_template_part( 'template-parts/footer/selo', null, array( 'classe' => 'cnx-rodape__selo--desktop' ) ); ?>
 		</div>
 
 		<?php
@@ -113,25 +105,29 @@ $cnx_tel_link = static fn( string $tel ): string => (string) preg_replace( '/\D/
 			<div class="cnx-rodape__pagamentos">
 			<h3 class="cnx-rodape__rotulo"><?php esc_html_e( 'Formas de pagamento', 'conexao' ); ?></h3>
 
+			<?php
+			// Artes fornecidas pelo cliente; o alt descreve o meio de pagamento.
+			$cnx_pagamentos = array(
+				'a' => array( __( 'Cartão de crédito', 'conexao' ), 41, 33 ),
+				'b' => array( __( 'Pix', 'conexao' ), 36, 36 ),
+				'c' => array( __( 'Boleto', 'conexao' ), 42, 33 ),
+			);
+			?>
+
 			<ul class="cnx-pagamentos" aria-label="<?php esc_attr_e( 'Formas de pagamento aceitas', 'conexao' ); ?>">
-				<li title="<?php esc_attr_e( 'Cartão de crédito', 'conexao' ); ?>">
-					<svg viewBox="0 0 32 22" width="30" height="21" fill="none" stroke="currentColor" stroke-width="1.4" focusable="false" aria-hidden="true">
-						<rect x="1" y="1" width="30" height="20" rx="3"/><path d="M1 7.5h30"/>
-					</svg>
-				</li>
-				<li title="<?php esc_attr_e( 'Pix', 'conexao' ); ?>">
-					<svg viewBox="0 0 32 22" width="30" height="21" fill="none" stroke="currentColor" stroke-width="1.4" focusable="false" aria-hidden="true">
-						<rect x="1" y="1" width="30" height="20" rx="3"/>
-						<path d="m16 5.5 5.5 5.5L16 16.5 10.5 11Z"/>
-					</svg>
-				</li>
-				<li title="<?php esc_attr_e( 'Boleto', 'conexao' ); ?>">
-					<svg viewBox="0 0 32 22" width="30" height="21" fill="none" stroke="currentColor" stroke-width="1.4" focusable="false" aria-hidden="true">
-						<rect x="1" y="1" width="30" height="20" rx="3"/>
-						<path d="M7 6v10M10 6v10M13.5 6v10M17 6v10M20.5 6v10M24 6v10"/>
-					</svg>
-				</li>
+				<?php foreach ( $cnx_pagamentos as $cnx_arquivo => $cnx_dados ) : ?>
+					<li>
+						<img src="<?php echo esc_url( get_theme_file_uri( "assets/img/pagamento/{$cnx_arquivo}.png" ) ); ?>"
+							alt="<?php echo esc_attr( $cnx_dados[0] ); ?>"
+							width="<?php echo esc_attr( (string) $cnx_dados[1] ); ?>"
+							height="<?php echo esc_attr( (string) $cnx_dados[2] ); ?>"
+							loading="lazy" decoding="async">
+					</li>
+				<?php endforeach; ?>
 			</ul>
+
+			<?php // No mobile o selo aparece aqui, sob os ícones. ?>
+			<?php get_template_part( 'template-parts/footer/selo', null, array( 'classe' => 'cnx-rodape__selo--mobile' ) ); ?>
 			</div>
 
 			<?php if ( ! empty( $cnx_redes ) ) : ?>
@@ -156,12 +152,21 @@ $cnx_tel_link = static fn( string $tel ): string => (string) preg_replace( '/\D/
 				</ul>
 				</div>
 			<?php endif; ?>
+
+			<?php
+			// No fluxo do rodapé, não fixos: acompanham a borda do conteúdo e
+			// não cobrem nada. No mobile a cópia da base assume.
+			get_template_part( 'template-parts/footer/botoes', null, array( 'classe' => 'cnx-rodape__botoes--desktop' ) );
+			?>
 		</div>
 
 	</div>
 
 	<div class="cnx-rodape__base">
 		<div class="cnx-rodape__base-inner">
+			<?php // Só visível no mobile, ao lado dos links legais. ?>
+			<?php get_template_part( 'template-parts/footer/botoes', null, array( 'classe' => 'cnx-rodape__botoes--mobile' ) ); ?>
+
 			<p class="cnx-rodape__direitos">
 				<?php
 				printf(
@@ -189,20 +194,3 @@ $cnx_tel_link = static fn( string $tel ): string => (string) preg_replace( '/\D/
 
 	<div class="cnx-hero__arcoiris" aria-hidden="true"></div>
 </div>
-
-<?php if ( '' !== $cnx_whatsapp ) : ?>
-	<a class="cnx-flutuante cnx-flutuante--zap" href="<?php echo esc_url( $cnx_whatsapp ); ?>"
-		target="_blank" rel="noopener" aria-label="<?php esc_attr_e( 'Falar no WhatsApp', 'conexao' ); ?>">
-		<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" focusable="false">
-			<path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm5.8 14.16c-.25.69-1.44 1.32-1.99 1.4-.53.08-1.19.11-1.92-.12-.44-.14-1.01-.33-1.74-.64-3.06-1.32-5.06-4.4-5.21-4.6-.15-.2-1.25-1.66-1.25-3.17s.79-2.25 1.07-2.56c.28-.31.61-.38.81-.38h.58c.19 0 .44-.07.69.53.25.6.86 2.08.94 2.23.08.15.13.33.02.53-.1.2-.15.33-.3.5l-.45.53c-.15.15-.31.32-.13.63.17.31.77 1.28 1.66 2.07 1.14 1.02 2.1 1.34 2.4 1.49.3.15.48.13.65-.08.18-.2.75-.88.95-1.18.2-.3.4-.25.68-.15.28.1 1.76.83 2.06.98.3.15.5.23.58.35.07.13.07.72-.18 1.41Z"/>
-		</svg>
-	</a>
-<?php endif; ?>
-
-<button type="button" class="cnx-flutuante cnx-flutuante--topo" data-cnx-topo
-	aria-label="<?php esc_attr_e( 'Voltar ao topo', 'conexao' ); ?>" hidden>
-	<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
-		stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-		<path d="m6 15 6-6 6 6"/>
-	</svg>
-</button>

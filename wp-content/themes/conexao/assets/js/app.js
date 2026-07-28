@@ -4,6 +4,10 @@
 ( function () {
 	'use strict';
 
+	/**
+	 * O botão vive no rodapé, não flutuando na tela — quem chegou até ele já
+	 * rolou a página inteira, então não há o que esconder nem rolagem a vigiar.
+	 */
 	function botaoVoltarAoTopo() {
 		var botao = document.querySelector( '[data-cnx-topo]' );
 
@@ -11,19 +15,11 @@
 			return;
 		}
 
-		function avaliar() {
-			// Só aparece depois que rolar o equivalente a uma tela.
-			botao.hidden = window.scrollY < window.innerHeight * 0.8;
-		}
-
 		botao.addEventListener( 'click', function () {
 			var suave = ! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
 			window.scrollTo( { top: 0, behavior: suave ? 'smooth' : 'auto' } );
 		} );
-
-		window.addEventListener( 'scroll', avaliar, { passive: true } );
-		avaliar();
 	}
 
 	function menuMobile() {
