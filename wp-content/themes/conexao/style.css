@@ -1534,6 +1534,11 @@ body.cnx-sem-rolagem {
 	padding: 48px 20px;
 }
 
+/* Cada coluna da faixa centraliza o próprio conteúdo. */
+.cnx-cta__chamada {
+	text-align: center;
+}
+
 .cnx-cta__titulo {
 	margin: 0 0 4px;
 	font-size: 20px;
@@ -1625,6 +1630,7 @@ body.cnx-sem-rolagem {
 	margin: 14px 0 0;
 	color: rgba(255, 255, 255, .55);
 	font-size: 11.5px;
+	text-align: center;
 }
 
 .cnx-aviso {
