@@ -959,7 +959,8 @@ body.cnx-sem-rolagem {
 .cnx-diferencial__titulo {
 	grid-column: 2;
 	margin: 0;
-	font-size: 15px;
+	color: var(--cnx-tinta);
+	font-size: 18px;
 	font-weight: 700;
 	line-height: 1.3;
 }
@@ -967,8 +968,9 @@ body.cnx-sem-rolagem {
 .cnx-diferencial__texto {
 	grid-column: 2;
 	margin: 0;
-	color: #7a7a7a;
-	font-size: 12.5px;
+	color: var(--cnx-tinta-suave);
+	font-size: 12px;
+	font-weight: 600;
 	line-height: 1.45;
 }
 
