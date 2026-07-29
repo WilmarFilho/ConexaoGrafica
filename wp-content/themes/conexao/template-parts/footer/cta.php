@@ -17,11 +17,12 @@ $cnx_tipos = function_exists( 'cnx_tipos_de_servico' ) ? cnx_tipos_de_servico() 
 
 <?php // O fundo fica no CSS: o mobile troca a imagem por media query, e inline venceria. ?>
 <section class="cnx-cta" id="cnx-desconto">
+	<?php // Decorativo e fora do layout de colunas: preso ao canto esquerdo da faixa, centro vertical. ?>
+	<img class="cnx-cta__selo"
+		src="<?php echo esc_url( get_theme_file_uri( 'assets/img/footer-selo.png' ) ); ?>"
+		alt="" width="245" height="245" loading="lazy" decoding="async" aria-hidden="true">
+
 	<div class="cnx-cta__inner">
-		<?php // Decorativo e fora do grid: centralizado na vertical, na borda esquerda do container. ?>
-		<img class="cnx-cta__selo"
-			src="<?php echo esc_url( get_theme_file_uri( 'assets/img/footer-selo.png' ) ); ?>"
-			alt="" width="245" height="245" loading="lazy" decoding="async" aria-hidden="true">
 
 		<div class="cnx-cta__chamada">
 			<div class="cnx-cta__texto">

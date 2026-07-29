@@ -1679,11 +1679,12 @@ body.cnx-sem-rolagem {
 	background-repeat: no-repeat;
 }
 
-/* Selo decorativo: centro vertical da faixa, encostado na borda do container. */
+/* Selo decorativo: fora do layout de colunas, preso ao canto esquerdo da FAIXA
+   (não do container), centralizado na vertical — como no Figma. */
 .cnx-cta__selo {
 	position: absolute;
 	top: 50%;
-	left: 20px;
+	left: 96px;
 	z-index: 0;
 	width: 230px;
 	height: auto;
@@ -1705,9 +1706,12 @@ body.cnx-sem-rolagem {
 	padding: 48px 20px;
 }
 
-/* O texto centraliza no espaço entre o selo e o formulário, como no design. */
+/* O texto centraliza no espaço entre o selo e o formulário. O selo é ancorado
+   na janela (borda da faixa), então a invasão dele no container cresce quando a
+   tela encolhe: o padding compensa exatamente essa invasão — a borda direita do
+   selo fica em 326px (96 + 230) e a esquerda do container em 50vw − 590px. */
 .cnx-cta__chamada {
-	padding-left: 264px;
+	padding-left: max(0px, calc(916px - 50vw));
 	text-align: center;
 }
 
@@ -2084,6 +2088,7 @@ body.cnx-sem-rolagem {
 	/* No mobile o selo compõe com o degradê, visível atrás do título. */
 	.cnx-cta__selo {
 		top: 0;
+		left: 16px;
 		width: 150px;
 		opacity: .9;
 		transform: none;
