@@ -1232,7 +1232,7 @@ body.cnx-sem-rolagem {
 	/* Proporção do design: cards de 309x363. */
 	aspect-ratio: 309 / 363;
 	overflow: hidden;
-	background: #edeceb;
+	background: #e2e2e2;
 	border-radius: 2px;
 }
 

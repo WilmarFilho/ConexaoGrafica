@@ -73,6 +73,7 @@ function cnx_render_box_dados( WP_Post $post ): void {
 	$prazo    = cnx_meta( $post->ID, 'prazo' );
 	$destaque = cnx_meta( $post->ID, 'destaque' );
 	$whats    = cnx_meta( $post->ID, 'whatsapp' );
+	$fundo    = cnx_meta( $post->ID, 'fundo' );
 	?>
 	<div class="cnx-fields">
 		<p class="cnx-field">
@@ -100,6 +101,12 @@ function cnx_render_box_dados( WP_Post $post ): void {
 			<label for="cnx_whatsapp"><strong><?php esc_html_e( 'WhatsApp específico deste produto', 'conexao' ); ?></strong></label>
 			<input type="text" id="cnx_whatsapp" name="cnx_whatsapp" class="regular-text" value="<?php echo esc_attr( $whats ); ?>" placeholder="5521999999999">
 			<span class="description"><?php esc_html_e( 'Opcional. Se vazio, usa o número global em Configurações → Conexão.', 'conexao' ); ?></span>
+		</p>
+
+		<p class="cnx-field cnx-field--inline">
+			<label for="cnx_fundo"><strong><?php esc_html_e( 'Cor de fundo do card', 'conexao' ); ?></strong></label>
+			<input type="color" id="cnx_fundo" name="cnx_fundo" value="<?php echo esc_attr( $fundo ?: '#e2e2e2' ); ?>">
+			<span class="description"><?php esc_html_e( 'Aparece atrás da imagem nas sobras do enquadramento, na vitrine e nas listagens.', 'conexao' ); ?></span>
 		</p>
 
 		<p class="cnx-field">
@@ -301,6 +308,9 @@ function cnx_save_produto_meta( int $post_id, WP_Post $post ): void {
 
 	$qtd_minima = isset( $_POST['cnx_qtd_minima'] ) ? absint( $_POST['cnx_qtd_minima'] ) : 0;
 	cnx_update_meta( $post_id, 'qtd_minima', $qtd_minima ? (string) $qtd_minima : '' );
+
+	$fundo = isset( $_POST['cnx_fundo'] ) ? (string) sanitize_hex_color( wp_unslash( $_POST['cnx_fundo'] ) ) : '';
+	cnx_update_meta( $post_id, 'fundo', $fundo );
 
 	cnx_update_meta( $post_id, 'destaque', empty( $_POST['cnx_destaque'] ) ? '' : '1' );
 

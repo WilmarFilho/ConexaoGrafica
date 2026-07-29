@@ -28,10 +28,14 @@ if ( empty( $cnx_produtos ) ) {
 		<div class="cnx-palco" data-cnx-trilho-rolavel>
 			<ul class="cnx-grade cnx-grade--trilho" data-cnx-pista>
 				<?php foreach ( $cnx_produtos as $cnx_produto ) : ?>
-					<?php $cnx_resumo = (string) cnx_meta( $cnx_produto->ID, 'resumo' ); ?>
+					<?php
+					$cnx_resumo = (string) cnx_meta( $cnx_produto->ID, 'resumo' );
+					$cnx_fundo  = (string) cnx_meta( $cnx_produto->ID, 'fundo' );
+					?>
 					<li>
 						<a class="cnx-card-produto" href="<?php echo esc_url( (string) get_permalink( $cnx_produto ) ); ?>">
-							<span class="cnx-card-produto__midia">
+							<span class="cnx-card-produto__midia"
+								<?php if ( '' !== $cnx_fundo ) : ?>style="background:<?php echo esc_attr( $cnx_fundo ); ?>;"<?php endif; ?>>
 								<?php cnx_figura( (int) get_post_thumbnail_id( $cnx_produto ), 'cnx-card' ); ?>
 							</span>
 
