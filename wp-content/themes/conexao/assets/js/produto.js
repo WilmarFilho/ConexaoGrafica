@@ -1,8 +1,9 @@
 /**
- * Configurador do produto.
+ * Página do produto: galeria, configurador e modal de orçamento.
  *
- * Cada grupo aceita uma escolha. Quando todos os grupos obrigatórios estão
- * preenchidos, o botão vira um link wa.me com a mensagem já montada.
+ * O configurador não monta mais o link do WhatsApp: ele só guarda as escolhas e
+ * as entrega ao modal, que envia pelo servidor. Assim o lead fica gravado antes
+ * do redirecionamento.
  */
 ( function () {
 	'use strict';
@@ -27,36 +28,93 @@
 		} );
 	}
 
-	function iniciarConfigurador( form ) {
-		var grupos    = Array.prototype.slice.call( form.querySelectorAll( '[data-cnx-grupo]' ) );
-		var cta       = form.querySelector( '[data-cnx-cta]' );
-		var aviso     = form.querySelector( '[data-cnx-aviso]' );
-		var escolhas  = {};
+	/**
+	 * Devolve as escolhas do configurador como texto, uma por linha.
+	 */
+	function montarResumo( escolhas, grupos ) {
+		var linhas = [];
 
-		function montarMensagem() {
-			var linhas = [];
+		grupos.forEach( function ( grupo ) {
+			var titulo = grupo.dataset.titulo;
 
-			if ( form.dataset.saudacao ) {
-				linhas.push( form.dataset.saudacao, '' );
+			if ( escolhas[ titulo ] ) {
+				linhas.push( titulo + ': ' + escolhas[ titulo ] );
+			}
+		} );
+
+		return linhas.join( '\n' );
+	}
+
+	function iniciarModal( obterResumo ) {
+		var modal = document.querySelector( '[data-cnx-modal]' );
+
+		if ( ! modal ) {
+			return null;
+		}
+
+		var campoResumo = modal.querySelector( '[data-cnx-modal-resumo]' );
+		var primeiro    = modal.querySelector( 'input:not([type="hidden"])' );
+
+		function abrir() {
+			if ( campoResumo && obterResumo ) {
+				campoResumo.value = obterResumo();
 			}
 
-			linhas.push( 'Produto: ' + form.dataset.produto );
+			modal.classList.add( 'esta-aberto' );
+			document.body.classList.add( 'cnx-sem-rolagem' );
 
-			grupos.forEach( function ( grupo ) {
-				var titulo = grupo.dataset.titulo;
+			if ( primeiro ) {
+				window.requestAnimationFrame( function () {
+					primeiro.focus();
+				} );
+			}
+		}
 
-				if ( escolhas[ titulo ] ) {
-					linhas.push( titulo + ': ' + escolhas[ titulo ] );
-				}
+		function fechar() {
+			modal.classList.remove( 'esta-aberto' );
+			document.body.classList.remove( 'cnx-sem-rolagem' );
+		}
+
+		modal.querySelectorAll( '[data-cnx-modal-fechar]' ).forEach( function ( alvo ) {
+			alvo.addEventListener( 'click', fechar );
+		} );
+
+		document.addEventListener( 'keydown', function ( e ) {
+			if ( 'Escape' === e.key && modal.classList.contains( 'esta-aberto' ) ) {
+				fechar();
+			}
+		} );
+
+		return { abrir: abrir, fechar: fechar };
+	}
+
+	function iniciarProduto() {
+		var form    = document.querySelector( '[data-cnx-config]' );
+		var grupos  = form ? Array.prototype.slice.call( form.querySelectorAll( '[data-cnx-grupo]' ) ) : [];
+		var aviso   = form ? form.querySelector( '[data-cnx-aviso]' ) : null;
+		var botoes  = Array.prototype.slice.call( document.querySelectorAll( '[data-cnx-abrir-modal]' ) );
+		var escolhas = {};
+
+		var modal = iniciarModal( function () {
+			return montarResumo( escolhas, grupos );
+		} );
+
+		if ( ! modal ) {
+			return;
+		}
+
+		function pronto() {
+			// Sem configurador não há o que validar: o botão já vale.
+			if ( ! grupos.length ) {
+				return true;
+			}
+
+			return ! grupos.some( function ( grupo ) {
+				return '1' === grupo.dataset.obrigatorio && ! escolhas[ grupo.dataset.titulo ];
 			} );
-
-			linhas.push( '', form.dataset.url );
-
-			return linhas.join( '\n' );
 		}
 
 		function atualizar() {
-			// Espelha as escolhas no bloco de resumo.
 			grupos.forEach( function ( grupo ) {
 				var titulo = grupo.dataset.titulo;
 				var linha  = form.querySelector( '[data-cnx-resumo="' + CSS.escape( titulo ) + '"] [data-cnx-valor]' );
@@ -66,31 +124,26 @@
 				}
 			} );
 
-			var faltando = grupos.filter( function ( grupo ) {
-				return '1' === grupo.dataset.obrigatorio && ! escolhas[ grupo.dataset.titulo ];
+			var ok = pronto();
+
+			botoes.forEach( function ( botao ) {
+				botao.setAttribute( 'aria-disabled', String( ! ok ) );
 			} );
 
-			var pronto = 0 === faltando.length && Boolean( form.dataset.numero );
-
-			cta.setAttribute( 'aria-disabled', String( ! pronto ) );
-
-			if ( pronto ) {
-				cta.href = 'https://wa.me/' + form.dataset.numero +
-					'?text=' + encodeURIComponent( montarMensagem() );
-			} else {
-				cta.removeAttribute( 'href' );
-			}
-
 			if ( aviso ) {
-				aviso.hidden = pronto;
+				aviso.hidden = ok;
 			}
 		}
 
-		// aria-disabled não bloqueia o clique num <a>; o listener faz isso.
-		cta.addEventListener( 'click', function ( e ) {
-			if ( 'true' === cta.getAttribute( 'aria-disabled' ) ) {
-				e.preventDefault();
-			}
+		botoes.forEach( function ( botao ) {
+			botao.addEventListener( 'click', function () {
+				// aria-disabled não impede o clique num <button>; a checagem faz isso.
+				if ( 'true' === botao.getAttribute( 'aria-disabled' ) ) {
+					return;
+				}
+
+				modal.abrir();
+			} );
 		} );
 
 		grupos.forEach( function ( grupo ) {
@@ -122,7 +175,6 @@
 
 	document.addEventListener( 'DOMContentLoaded', function () {
 		iniciarGaleria();
-
-		document.querySelectorAll( '[data-cnx-config]' ).forEach( iniciarConfigurador );
+		iniciarProduto();
 	} );
 } )();

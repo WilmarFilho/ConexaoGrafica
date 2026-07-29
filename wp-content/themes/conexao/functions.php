@@ -69,6 +69,99 @@ function cnx_topbar_menu_fallback( array $args = array() ): void {
 }
 
 /**
+ * SVG de uma rede social. Fica aqui porque rodapé e blog usam os mesmos ícones.
+ */
+function cnx_icone_rede( string $rede ): string {
+	$formas = array(
+		'instagram' => '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/>',
+		'facebook'  => '<path d="M14 8.5h2.5V5.5H14c-2 0-3.3 1.4-3.3 3.4v1.8H8.5v3h2.2V21h3v-7.3h2.3l.5-3h-2.8V9.4c0-.6.3-.9.8-.9Z" fill="currentColor" stroke="none"/>',
+		'youtube'   => '<rect x="2.5" y="6" width="19" height="12" rx="3.5"/><path d="m10.5 9.5 5 2.5-5 2.5Z" fill="currentColor" stroke="none"/>',
+	);
+
+	if ( ! isset( $formas[ $rede ] ) ) {
+		return '';
+	}
+
+	return '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"'
+		. ' stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'
+		. $formas[ $rede ] . '</svg>';
+}
+
+/**
+ * Trilha de navegação. Sai como <nav> com lista ordenada, que é o que leitor de
+ * tela e o Google esperam.
+ *
+ * @param array<int, array{0:string,1:string}> $extras Pares [rótulo, url]; url vazia = item atual.
+ */
+function cnx_breadcrumb( array $extras = array() ): void {
+	$itens = array( array( __( 'Home', 'conexao' ), home_url( '/' ) ) );
+
+	foreach ( $extras as $extra ) {
+		$itens[] = $extra;
+	}
+
+	$ultimo = count( $itens ) - 1;
+	?>
+	<nav class="cnx-trilha" aria-label="<?php esc_attr_e( 'Trilha de navegação', 'conexao' ); ?>">
+		<ol>
+			<?php foreach ( $itens as $i => $item ) : ?>
+				<li>
+					<?php if ( '' !== $item[1] && $i !== $ultimo ) : ?>
+						<a href="<?php echo esc_url( $item[1] ); ?>"><?php echo esc_html( $item[0] ); ?></a>
+					<?php else : ?>
+						<span aria-current="page"><?php echo esc_html( $item[0] ); ?></span>
+					<?php endif; ?>
+				</li>
+			<?php endforeach; ?>
+		</ol>
+	</nav>
+	<?php
+}
+
+/**
+ * Primeira categoria de produto de um post, para montar a trilha.
+ */
+function cnx_categoria_principal( int $post_id ): ?WP_Term {
+	$termos = get_the_terms( $post_id, 'cnx_categoria_produto' );
+
+	return ( is_array( $termos ) && ! empty( $termos ) ) ? $termos[0] : null;
+}
+
+/**
+ * Tempo de leitura em minutos. 200 palavras por minuto é a média usada em
+ * pesquisa de legibilidade; abaixo de um minuto arredonda para um.
+ */
+function cnx_tempo_leitura( int $post_id ): int {
+	$texto    = (string) get_post_field( 'post_content', $post_id );
+	$palavras = str_word_count( wp_strip_all_tags( strip_shortcodes( $texto ) ) );
+
+	return max( 1, (int) ceil( $palavras / 200 ) );
+}
+
+/**
+ * Contador de leituras, para a lista "Posts mais lidos".
+ *
+ * Não conta quem está logado (o autor relendo o próprio texto inflaria o
+ * número) nem requisições sem navegador.
+ */
+add_action( 'wp_head', 'cnx_contar_visualizacao' );
+
+function cnx_contar_visualizacao(): void {
+	if ( ! is_singular( 'post' ) || is_user_logged_in() ) {
+		return;
+	}
+
+	if ( empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
+		return;
+	}
+
+	$post_id = get_queried_object_id();
+	$atual   = (int) get_post_meta( $post_id, '_cnx_visualizacoes', true );
+
+	update_post_meta( $post_id, '_cnx_visualizacoes', $atual + 1 );
+}
+
+/**
  * Quantos produtos por página nas listagens de categoria e solução.
  *
  * Doze fecha três linhas de quatro no desktop; o padrão do WordPress (10)

@@ -50,6 +50,8 @@ function cnx_register_settings(): void {
 		'cnx_facebook'        => 'esc_url_raw',
 		'cnx_youtube'         => 'esc_url_raw',
 		'cnx_sobre_curto'     => 'sanitize_textarea_field',
+		'cnx_endereco'        => 'sanitize_textarea_field',
+		'cnx_mapa_embed'      => 'esc_url_raw',
 	);
 
 	foreach ( $campos_texto as $chave => $sanitizer ) {
@@ -158,6 +160,32 @@ function cnx_render_settings_page(): void {
 						</td>
 					</tr>
 				<?php endforeach; ?>
+
+				<tr>
+					<th scope="row">
+						<label for="cnx_endereco"><?php esc_html_e( 'Endereço', 'conexao' ); ?></label>
+					</th>
+					<td>
+						<textarea id="cnx_endereco" name="cnx_endereco" rows="2" class="large-text"><?php
+							echo esc_textarea( get_option( 'cnx_endereco', '' ) );
+						?></textarea>
+						<p class="description"><?php esc_html_e( 'Exibido na página de Contato.', 'conexao' ); ?></p>
+					</td>
+				</tr>
+
+				<tr>
+					<th scope="row">
+						<label for="cnx_mapa_embed"><?php esc_html_e( 'Mapa (URL de incorporação)', 'conexao' ); ?></label>
+					</th>
+					<td>
+						<input type="url" id="cnx_mapa_embed" name="cnx_mapa_embed" class="large-text"
+							value="<?php echo esc_attr( get_option( 'cnx_mapa_embed', '' ) ); ?>"
+							placeholder="https://www.google.com/maps/embed?pb=...">
+						<p class="description">
+							<?php esc_html_e( 'No Google Maps: Compartilhar → Incorporar um mapa → copie somente o endereço do src do iframe. Vazio esconde o mapa.', 'conexao' ); ?>
+						</p>
+					</td>
+				</tr>
 
 				<tr>
 					<th scope="row">

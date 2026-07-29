@@ -87,6 +87,9 @@ remoto "mkdir -p ~/backups && wp db export ~/backups/prod-$CARIMBO.sql --quiet"
 echo "    salvo em ~/backups/prod-$CARIMBO.sql"
 
 echo "==> 2/6  Exportando o banco local"
+# O diretório é ignorado pelo Git, então não vem com o clone nem sobrevive a
+# uma limpeza: criar aqui evita o script morrer no meio, já com o backup feito.
+mkdir -p "$PROJETO/.tmp"
 docker compose -f "$PROJETO/docker-compose.yml" exec -T db \
 	mysqldump -uconexao -pconexao --no-tablespaces --default-character-set=utf8mb4 conexao \
 	> "$PROJETO/.tmp/local.sql" 2>/dev/null

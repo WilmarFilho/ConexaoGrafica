@@ -1474,14 +1474,24 @@ body.cnx-sem-rolagem {
 		right: 4px;
 	}
 
-	.cnx-secao__inner,
+	/* Só as seções que viram carrossel perdem o padding lateral — o trilho
+	   precisa sangrar até a borda. Escopado de propósito: a regra solta atingia
+	   qualquer .cnx-secao__inner e deixava a listagem de categoria sem respiro. */
+	.cnx-categorias-destaque .cnx-secao__inner,
+	.cnx-solucoes .cnx-secao__inner,
+	.cnx-vitrine .cnx-secao__inner,
 	.cnx-diferenciais__inner {
 		padding-right: 0;
 		padding-left: 0;
 	}
 
-	.cnx-secao__titulo {
+	.cnx-categorias-destaque .cnx-secao__titulo,
+	.cnx-solucoes .cnx-secao__titulo,
+	.cnx-vitrine .cnx-secao__titulo {
 		padding: 0 20px;
+	}
+
+	.cnx-secao__titulo {
 		font-size: 18px;
 	}
 
@@ -1551,6 +1561,818 @@ body.cnx-sem-rolagem {
 	}
 }
 
+/* --- Trilha de navegação ------------------------------------------------- */
+
+.cnx-trilha {
+	padding-top: 22px;
+}
+
+.cnx-trilha ol {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.cnx-trilha li + li::before {
+	margin-right: 8px;
+	color: #bdbdbd;
+	content: "›";
+}
+
+.cnx-trilha a {
+	color: var(--cnx-tinta-suave);
+	text-decoration: none;
+}
+
+.cnx-trilha a:hover {
+	color: var(--cnx-laranja);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.cnx-trilha [aria-current="page"] {
+	color: var(--cnx-laranja);
+}
+
+/* --- Campos de formulário (claros) -------------------------------------- */
+
+.cnx-campo {
+	width: 100%;
+	padding: 13px 16px;
+	color: var(--cnx-tinta);
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 500;
+	background: #fff;
+	border: 1px solid var(--cnx-borda);
+	border-radius: 3px;
+	appearance: none;
+}
+
+.cnx-campo::placeholder {
+	color: #9a9a9a;
+	font-weight: 500;
+}
+
+.cnx-campo:focus {
+	border-color: var(--cnx-laranja);
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(255, 103, 0, .14);
+}
+
+.cnx-campo--select {
+	padding-right: 40px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23777777' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 14px center;
+	background-size: 16px;
+}
+
+.cnx-aviso--claro.cnx-aviso--sucesso {
+	color: #1b7a43;
+	background: #eaf9f0;
+	border-color: #9fdcb8;
+}
+
+.cnx-aviso--claro.cnx-aviso--erro {
+	color: #a3282a;
+	background: #fdeeee;
+	border-color: #f0b4b5;
+}
+
+/* --- Modal de orçamento -------------------------------------------------- */
+
+/* Fechado por visibility, não display:none — display não anima. */
+.cnx-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 80;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity .2s ease, visibility 0s linear .2s;
+}
+
+.cnx-modal.esta-aberto {
+	visibility: visible;
+	opacity: 1;
+	transition: opacity .2s ease, visibility 0s;
+}
+
+.cnx-modal__fundo {
+	position: absolute;
+	inset: 0;
+	background: rgba(20, 11, 6, .55);
+}
+
+.cnx-modal__caixa {
+	position: relative;
+	width: 100%;
+	max-width: 420px;
+	padding: 34px 30px 30px;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
+	transform: translateY(12px);
+	transition: transform .25s ease;
+}
+
+.cnx-modal.esta-aberto .cnx-modal__caixa {
+	transform: none;
+}
+
+.cnx-modal__fechar {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	color: #8d8d8d;
+	background: none;
+	border: 0;
+	cursor: pointer;
+}
+
+.cnx-modal__fechar:hover {
+	color: var(--cnx-tinta);
+}
+
+.cnx-modal__titulo {
+	margin: 0 0 10px;
+	color: var(--cnx-tinta);
+	font-size: 22px;
+	font-weight: 700;
+	text-align: center;
+}
+
+.cnx-modal__aviso {
+	display: flex;
+	align-items: flex-start;
+	gap: 9px;
+	margin: 0 0 22px;
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.45;
+	text-align: left;
+}
+
+.cnx-modal__aviso img {
+	flex: 0 0 auto;
+	margin-top: 2px;
+}
+
+.cnx-modal__form {
+	display: grid;
+	gap: 12px;
+}
+
+.cnx-modal__enviar {
+	margin-top: 6px;
+	padding: 15px;
+	color: #fff;
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 700;
+	background: var(--cnx-laranja);
+	border: 0;
+	border-radius: 3px;
+	cursor: pointer;
+	transition: background-color .15s;
+}
+
+.cnx-modal__enviar:hover {
+	background: var(--cnx-laranja-escuro);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cnx-modal,
+	.cnx-modal.esta-aberto,
+	.cnx-modal__caixa,
+	.cnx-modal.esta-aberto .cnx-modal__caixa {
+		transition-duration: 0s;
+		transform: none;
+	}
+}
+
+/* --- Blog: grade com coluna lateral ------------------------------------- */
+
+.cnx-blog__grade {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 300px;
+	gap: 44px;
+	align-items: start;
+	padding-top: 28px;
+	padding-bottom: 20px;
+}
+
+.cnx-blog__cabecalho {
+	margin-bottom: 30px;
+}
+
+.cnx-blog__lista {
+	display: grid;
+	gap: 42px;
+}
+
+.cnx-blog__contador {
+	margin: 12px 0 0;
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 500;
+	text-align: center;
+}
+
+/* Card de post */
+
+.cnx-post-card__midia {
+	display: block;
+	aspect-ratio: 16 / 8;
+	overflow: hidden;
+	background: #e2e2e2;
+	border-radius: 4px;
+}
+
+.cnx-post-card__midia img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform .35s ease;
+}
+
+.cnx-post-card__midia:hover img {
+	transform: scale(1.03);
+}
+
+.cnx-post-card__corpo {
+	padding-top: 16px;
+}
+
+.cnx-post-card__topo {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+	justify-content: space-between;
+}
+
+.cnx-post-card__titulo {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+.cnx-post-card__titulo a {
+	color: var(--cnx-tinta);
+	text-decoration: none;
+}
+
+.cnx-post-card__titulo a:hover {
+	color: var(--cnx-laranja);
+}
+
+.cnx-post-card__resumo {
+	margin: 10px 0 0;
+	color: var(--cnx-tinta-suave);
+	font-size: 15px;
+	font-weight: 500;
+	line-height: 1.6;
+}
+
+.cnx-post-card__meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-top: 14px;
+	color: var(--cnx-tinta-suave);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.cnx-post-card__autor {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+}
+
+.cnx-avatar {
+	border-radius: 50%;
+}
+
+.cnx-post-card__cats {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-left: auto;
+}
+
+.cnx-post-card__cats a,
+.cnx-etiquetas a {
+	display: inline-block;
+	padding: 4px 10px;
+	color: var(--cnx-laranja);
+	font-size: 11.5px;
+	font-weight: 600;
+	text-decoration: none;
+	background: #fff3ec;
+	border-radius: 3px;
+}
+
+.cnx-post-card__cats a:hover,
+.cnx-etiquetas a:hover {
+	color: #fff;
+	background: var(--cnx-laranja);
+}
+
+.cnx-compartilhar {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	color: var(--cnx-laranja);
+	background: none;
+	border: 0;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: background-color .15s;
+}
+
+.cnx-compartilhar:hover,
+.cnx-compartilhar.esta-copiado {
+	background: #fff3ec;
+}
+
+.cnx-compartilhar--destaque {
+	margin-left: auto;
+}
+
+/* --- Coluna lateral do blog --------------------------------------------- */
+
+.cnx-lateral {
+	display: grid;
+	gap: 30px;
+}
+
+.cnx-lateral__titulo {
+	margin: 0 0 12px;
+	color: var(--cnx-tinta);
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.cnx-busca-lateral {
+	position: relative;
+}
+
+.cnx-busca-lateral input {
+	width: 100%;
+	height: 44px;
+	padding: 0 44px 0 16px;
+	color: var(--cnx-tinta);
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 500;
+	background: #fff;
+	border: 1px solid var(--cnx-borda);
+	border-radius: 999px;
+	appearance: none;
+}
+
+.cnx-busca-lateral input:focus {
+	border-color: var(--cnx-laranja);
+	outline: none;
+}
+
+.cnx-busca-lateral button {
+	position: absolute;
+	top: 50%;
+	right: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	color: #8d8d8d;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	transform: translateY(-50%);
+}
+
+.cnx-busca-lateral button:hover {
+	color: var(--cnx-laranja);
+}
+
+.cnx-etiquetas {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cnx-mais-lidos {
+	display: grid;
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cnx-mais-lidos a {
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.45;
+	text-decoration: none;
+}
+
+.cnx-mais-lidos a:hover {
+	color: var(--cnx-laranja);
+}
+
+.cnx-lateral__banner {
+	display: block;
+	overflow: hidden;
+	border-radius: 4px;
+}
+
+.cnx-lateral__banner img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.cnx-nuvem {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 10px;
+	align-items: baseline;
+	margin: 0;
+	line-height: 1.5;
+}
+
+.cnx-nuvem a {
+	color: var(--cnx-tinta-suave);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.cnx-nuvem a:hover {
+	color: var(--cnx-laranja);
+}
+
+/* --- Artigo -------------------------------------------------------------- */
+
+.cnx-artigo__titulo {
+	margin: 0 0 12px;
+	color: var(--cnx-tinta);
+	font-size: 30px;
+	font-weight: 700;
+	line-height: 1.25;
+}
+
+.cnx-artigo__linha-fina {
+	margin: 0 0 16px;
+	color: var(--cnx-tinta-suave);
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1.6;
+}
+
+.cnx-artigo__meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	padding-bottom: 22px;
+	color: var(--cnx-tinta-suave);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.cnx-artigo__capa {
+	margin: 0 0 26px;
+	overflow: hidden;
+	border-radius: 4px;
+}
+
+.cnx-artigo__capa img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.cnx-artigo__corpo {
+	color: var(--cnx-tinta-suave);
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1.75;
+}
+
+.cnx-artigo__corpo h2,
+.cnx-artigo__corpo h3 {
+	margin: 32px 0 10px;
+	color: var(--cnx-tinta);
+	font-size: 20px;
+	font-weight: 700;
+}
+
+.cnx-artigo__corpo a {
+	color: var(--cnx-laranja);
+}
+
+.cnx-artigo__corpo img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 4px;
+}
+
+.cnx-artigo__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 30px;
+}
+
+.cnx-artigo__tags a {
+	padding: 4px 10px;
+	color: var(--cnx-laranja);
+	font-size: 11.5px;
+	font-weight: 600;
+	text-decoration: none;
+	background: #fff3ec;
+	border-radius: 3px;
+}
+
+/* "Fique por dentro" */
+
+.cnx-relacionados-blog__lista {
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20px;
+	max-width: 620px;
+}
+
+.cnx-mini-post {
+	display: grid;
+	gap: 10px;
+	color: inherit;
+	text-decoration: none;
+}
+
+.cnx-mini-post__midia {
+	display: block;
+	aspect-ratio: 16 / 10;
+	overflow: hidden;
+	background: #e2e2e2;
+	border-radius: 4px;
+}
+
+.cnx-mini-post__midia img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.cnx-mini-post__corpo strong {
+	display: block;
+	color: var(--cnx-tinta);
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.35;
+}
+
+.cnx-mini-post__corpo > span {
+	display: block;
+	margin-top: 4px;
+	color: var(--cnx-tinta-suave);
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.5;
+}
+
+.cnx-mini-post__corpo em {
+	display: block;
+	margin-top: 6px;
+	color: var(--cnx-laranja);
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 600;
+}
+
+/* --- Contato ------------------------------------------------------------- */
+
+.cnx-contato__grade {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: 44px;
+	align-items: start;
+	padding-top: 30px;
+}
+
+.cnx-contato__titulo {
+	margin: 0 0 10px;
+	color: var(--cnx-tinta);
+	font-size: 26px;
+	font-weight: 700;
+}
+
+.cnx-contato__subtitulo {
+	margin: 34px 0 8px;
+	color: var(--cnx-tinta);
+	font-size: 22px;
+	font-weight: 700;
+}
+
+.cnx-contato__texto {
+	margin: 0 0 18px;
+	max-width: 46ch;
+	color: var(--cnx-tinta-suave);
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1.6;
+}
+
+.cnx-canais {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 18px 24px;
+	margin: 0;
+	padding: 22px 0 0;
+	list-style: none;
+	border-top: 1px solid var(--cnx-borda);
+}
+
+.cnx-canal > a,
+.cnx-canal {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	color: inherit;
+	text-decoration: none;
+}
+
+.cnx-canal__icone {
+	flex: 0 0 auto;
+	color: var(--cnx-laranja);
+	line-height: 0;
+}
+
+.cnx-canal strong {
+	display: block;
+	color: var(--cnx-tinta);
+	font-size: 15px;
+	font-weight: 700;
+}
+
+.cnx-canal span span {
+	display: block;
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.cnx-canal > a:hover span span {
+	color: var(--cnx-laranja);
+}
+
+.cnx-form-contato {
+	display: grid;
+	gap: 14px;
+	max-width: 480px;
+}
+
+.cnx-form-contato__enviar {
+	padding: 15px;
+	color: #fff;
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 700;
+	background: var(--cnx-laranja);
+	border: 0;
+	border-radius: 3px;
+	cursor: pointer;
+	transition: background-color .15s;
+}
+
+.cnx-form-contato__enviar:hover {
+	background: var(--cnx-laranja-escuro);
+}
+
+.cnx-mapa {
+	width: 100%;
+	min-height: 520px;
+	border: 0;
+	border-radius: 4px;
+}
+
+.cnx-mapa--vazio {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 320px;
+	padding: 30px;
+	color: var(--cnx-tinta-suave);
+	font-size: 15px;
+	font-weight: 500;
+	text-align: center;
+	background: var(--cnx-fundo);
+	border: 1px dashed var(--cnx-borda);
+}
+
+/* --- Paginação ----------------------------------------------------------- */
+
+.pagination,
+.navigation.pagination {
+	margin-top: 34px;
+}
+
+.nav-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
+}
+
+.nav-links .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 34px;
+	height: 34px;
+	padding: 0 10px;
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+	background: #fff;
+	border: 1px solid var(--cnx-borda);
+	border-radius: 3px;
+}
+
+.nav-links .page-numbers:hover {
+	color: var(--cnx-laranja);
+	border-color: var(--cnx-laranja);
+}
+
+.nav-links .page-numbers.current {
+	color: #fff;
+	background: var(--cnx-laranja);
+	border-color: var(--cnx-laranja);
+}
+
+.nav-links .page-numbers.dots {
+	background: none;
+	border-color: transparent;
+}
+
+@media (max-width: 1000px) {
+	.cnx-blog__grade,
+	.cnx-contato__grade {
+		grid-template-columns: 1fr;
+		gap: 34px;
+	}
+
+	.cnx-mapa {
+		min-height: 320px;
+	}
+}
+
+@media (max-width: 600px) {
+	.cnx-canais {
+		grid-template-columns: 1fr;
+	}
+
+	.cnx-post-card__titulo {
+		font-size: 19px;
+	}
+
+	.cnx-artigo__titulo {
+		font-size: 24px;
+	}
+
+	.cnx-relacionados-blog__lista {
+		grid-template-columns: 1fr;
+	}
+}
+
 /* --- Listagem de categoria / solução ------------------------------------ */
 
 .cnx-listagem .cnx-secao__inner {
@@ -1564,15 +2386,15 @@ body.cnx-sem-rolagem {
 .cnx-listagem__rotulo {
 	margin: 0 0 4px;
 	color: var(--cnx-tinta-suave);
-	font-size: 14px;
-	font-weight: 500;
+	font-size: 16px;
+	font-weight: 700;
 }
 
 .cnx-listagem__titulo {
 	margin: 0;
 	color: var(--cnx-tinta);
-	font-size: 26px;
-	font-weight: 700;
+	font-size: 28px;
+	font-weight: 600;
 	line-height: 1.25;
 }
 
@@ -1602,6 +2424,13 @@ body.cnx-sem-rolagem {
 	display: flex;
 	justify-content: center;
 	padding: 38px 0 10px;
+}
+
+/* Respiro antes do rodapé: a vitrine de relacionados é a última coisa da
+   página, e sem isso ela encosta na faixa de desconto. */
+.cnx-listagem ~ .cnx-vitrine .cnx-secao__inner,
+.single-cnx_produto .cnx-vitrine .cnx-secao__inner {
+	padding-bottom: 120px;
 }
 
 /* --- Card de listagem --------------------------------------------------- */
@@ -1646,7 +2475,7 @@ body.cnx-sem-rolagem {
 	display: block;
 	margin-top: 2px;
 	color: var(--cnx-laranja);
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: 500;
 }
 
@@ -1657,11 +2486,85 @@ body.cnx-sem-rolagem {
 
 @media (max-width: 900px) {
 	.cnx-grade-listagem {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, 1fr);
+		gap: 22px 12px;
 	}
 
 	.cnx-listagem__titulo {
 		font-size: 22px;
+	}
+}
+
+@media (max-width: 700px) {
+	.cnx-grade-listagem {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 20px 14px;
+	}
+
+	.cnx-card-simples__nome {
+		margin-top: 8px;
+		font-size: 14px;
+	}
+
+	.cnx-card-simples__link {
+		font-size: 14px;
+	}
+
+	/* Botão de largura total, como no layout. */
+	.cnx-listagem__mais .cnx-btn {
+		justify-content: center;
+		width: 100%;
+	}
+
+	/* Relacionados no fim da listagem e do produto: grade 2x2 com respiro
+	   lateral, não o carrossel da home. Nome e descrição truncam numa linha. */
+	.cnx-listagem ~ .cnx-vitrine .cnx-secao__inner,
+	.single-cnx_produto .cnx-vitrine .cnx-secao__inner {
+		padding-right: 20px;
+		padding-left: 20px;
+	}
+
+	.cnx-listagem ~ .cnx-vitrine .cnx-secao__titulo,
+	.single-cnx_produto .cnx-vitrine .cnx-secao__titulo {
+		padding: 0;
+	}
+
+	.cnx-listagem ~ .cnx-vitrine .cnx-grade--trilho,
+	.single-cnx_produto .cnx-vitrine .cnx-grade--trilho {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 22px 14px;
+		overflow: visible;
+	}
+
+	.cnx-listagem ~ .cnx-vitrine .cnx-grade--trilho > li,
+	.single-cnx_produto .cnx-vitrine .cnx-grade--trilho > li {
+		padding: 0;
+	}
+
+	.cnx-listagem ~ .cnx-vitrine .cnx-seta,
+	.single-cnx_produto .cnx-vitrine .cnx-seta {
+		display: none;
+	}
+
+	.cnx-listagem ~ .cnx-vitrine .cnx-card-produto__texto,
+	.single-cnx_produto .cnx-vitrine .cnx-card-produto__texto {
+		overflow: hidden;
+	}
+
+	.cnx-listagem ~ .cnx-vitrine .cnx-card-produto__texto strong,
+	.cnx-listagem ~ .cnx-vitrine .cnx-card-produto__texto span,
+	.single-cnx_produto .cnx-vitrine .cnx-card-produto__texto strong,
+	.single-cnx_produto .cnx-vitrine .cnx-card-produto__texto span {
+		display: block;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.cnx-listagem ~ .cnx-vitrine .cnx-secao__inner,
+	.single-cnx_produto .cnx-vitrine .cnx-secao__inner {
+		padding-bottom: 120px;
 	}
 }
 

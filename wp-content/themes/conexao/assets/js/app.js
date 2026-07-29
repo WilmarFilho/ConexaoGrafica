@@ -83,8 +83,43 @@
 		} );
 	}
 
+	/**
+	 * Compartilhar: no celular abre a folha nativa do sistema; no desktop, onde
+	 * navigator.share raramente existe, copia o link e confirma no próprio botão.
+	 */
+	function compartilhar() {
+		document.querySelectorAll( '[data-cnx-compartilhar]' ).forEach( function ( botao ) {
+			botao.addEventListener( 'click', function () {
+				var dados = {
+					title: botao.dataset.titulo || document.title,
+					url: botao.dataset.url || window.location.href
+				};
+
+				if ( navigator.share ) {
+					navigator.share( dados ).catch( function () {} );
+					return;
+				}
+
+				if ( ! navigator.clipboard ) {
+					return;
+				}
+
+				navigator.clipboard.writeText( dados.url ).then( function () {
+					botao.classList.add( 'esta-copiado' );
+					botao.setAttribute( 'title', 'Link copiado' );
+
+					window.setTimeout( function () {
+						botao.classList.remove( 'esta-copiado' );
+						botao.removeAttribute( 'title' );
+					}, 2000 );
+				} ).catch( function () {} );
+			} );
+		} );
+	}
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		botaoVoltarAoTopo();
 		menuMobile();
+		compartilhar();
 	} );
 } )();

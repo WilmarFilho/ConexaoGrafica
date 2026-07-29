@@ -1,6 +1,6 @@
 <?php
 /**
- * Página de um produto: galeria + configurador + resumo → WhatsApp.
+ * Página de um produto: galeria + configurador + modal de orçamento.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -16,16 +16,28 @@ while ( have_posts() ) :
 	$galeria    = cnx_produto_galeria( $produto_id );
 	$resumo     = cnx_meta( $produto_id, 'resumo' );
 	$numero     = cnx_whatsapp_numero( $produto_id );
-	$saudacao   = cnx_whatsapp_saudacao();
+	$categoria  = cnx_categoria_principal( $produto_id );
 
 	// A imagem destacada abre a galeria.
 	if ( has_post_thumbnail() ) {
 		array_unshift( $galeria, (int) get_post_thumbnail_id() );
 		$galeria = array_values( array_unique( $galeria ) );
 	}
+
+	$trilha = array();
+
+	if ( $categoria instanceof WP_Term ) {
+		$trilha[] = array( $categoria->name, (string) get_term_link( $categoria ) );
+	}
+
+	$trilha[] = array( get_the_title(), '' );
 	?>
 
-	<div class="cnx-container">
+	<div class="cnx-secao__inner">
+		<?php cnx_breadcrumb( $trilha ); ?>
+	</div>
+
+	<div class="cnx-secao__inner">
 		<article <?php post_class( 'cnx-produto' ); ?>>
 
 			<div class="cnx-produto__midia">
@@ -48,6 +60,10 @@ while ( have_posts() ) :
 							<?php endforeach; ?>
 						</ul>
 					<?php endif; ?>
+				<?php else : ?>
+					<div class="cnx-galeria-principal">
+						<span class="cnx-placeholder" aria-hidden="true"></span>
+					</div>
 				<?php endif; ?>
 
 				<?php if ( ! empty( $blocos ) ) : ?>
@@ -71,26 +87,18 @@ while ( have_posts() ) :
 
 				<?php if ( empty( $grupos ) ) : ?>
 
-					<?php if ( $numero ) : ?>
-						<a class="cnx-btn-orcamento" target="_blank" rel="noopener"
-							href="<?php echo esc_url( cnx_whatsapp_link( trim( $saudacao . "\n\nProduto: " . get_the_title() . "\n" . get_permalink() ), $produto_id ) ); ?>">
-							<?php esc_html_e( 'Solicitar orçamento', 'conexao' ); ?>
-						</a>
-					<?php endif; ?>
+					<?php // Produto sem configurador: o modal já basta. ?>
+					<button type="button" class="cnx-btn-orcamento" data-cnx-abrir-modal>
+						<?php esc_html_e( 'Solicitar Orçamento', 'conexao' ); ?>
+					</button>
 
 				<?php else : ?>
 
-					<form class="cnx-config"
-						data-cnx-config
-						data-numero="<?php echo esc_attr( $numero ); ?>"
-						data-saudacao="<?php echo esc_attr( $saudacao ); ?>"
-						data-produto="<?php echo esc_attr( get_the_title() ); ?>"
-						data-url="<?php echo esc_url( get_permalink() ); ?>"
-						onsubmit="return false;">
+					<form class="cnx-config" data-cnx-config onsubmit="return false;">
 
 						<h2 class="cnx-produto__subtitulo"><?php esc_html_e( 'Configuração', 'conexao' ); ?></h2>
 
-						<?php foreach ( $grupos as $indice => $grupo ) : ?>
+						<?php foreach ( $grupos as $grupo ) : ?>
 							<fieldset class="cnx-config__grupo"
 								data-cnx-grupo
 								data-titulo="<?php echo esc_attr( $grupo['titulo'] ); ?>"
@@ -127,9 +135,9 @@ while ( have_posts() ) :
 								<?php esc_html_e( 'Selecione as opções acima para continuar.', 'conexao' ); ?>
 							</p>
 
-							<a class="cnx-btn-orcamento" data-cnx-cta href="#" target="_blank" rel="noopener" aria-disabled="true">
-								<?php esc_html_e( 'Solicitar orçamento', 'conexao' ); ?>
-							</a>
+							<button type="button" class="cnx-btn-orcamento" data-cnx-abrir-modal aria-disabled="true">
+								<?php esc_html_e( 'Solicitar Orçamento', 'conexao' ); ?>
+							</button>
 						</div>
 					</form>
 
@@ -141,7 +149,7 @@ while ( have_posts() ) :
 
 				<?php endif; ?>
 
-				<?php if ( get_the_content() ) : ?>
+				<?php if ( trim( (string) get_the_content() ) ) : ?>
 					<div class="cnx-produto__descricao"><?php the_content(); ?></div>
 				<?php endif; ?>
 			</div>
@@ -150,6 +158,64 @@ while ( have_posts() ) :
 	</div>
 
 	<?php
+	get_template_part(
+		'template-parts/produto/modal-orcamento',
+		null,
+		array( 'produto_id' => $produto_id )
+	);
+
+	/**
+	 * Relacionados: da mesma categoria, senão os destaques. Reaproveita a seção
+	 * da home em vez de repetir a marcação do card.
+	 */
+	$relacionados = array();
+
+	if ( $categoria instanceof WP_Term ) {
+		$relacionados = get_posts(
+			array(
+				'post_type'      => 'cnx_produto',
+				'post_status'    => 'publish',
+				'posts_per_page' => 4,
+				'post__not_in'   => array( $produto_id ),
+				'orderby'        => 'menu_order title',
+				'order'          => 'ASC',
+				'tax_query'      => array(
+					array(
+						'taxonomy' => 'cnx_categoria_produto',
+						'field'    => 'term_id',
+						'terms'    => array( $categoria->term_id ),
+					),
+				),
+			)
+		);
+	}
+
+	if ( count( $relacionados ) < 4 ) {
+		$relacionados = get_posts(
+			array(
+				'post_type'      => 'cnx_produto',
+				'post_status'    => 'publish',
+				'posts_per_page' => 4,
+				'post__not_in'   => array( $produto_id ),
+				'orderby'        => 'menu_order title',
+				'order'          => 'ASC',
+				'meta_key'       => '_cnx_destaque',
+				'meta_value'     => '1',
+			)
+		);
+	}
+
+	if ( ! empty( $relacionados ) ) {
+		get_template_part(
+			'template-parts/sections/mais-vendidos',
+			null,
+			array(
+				'titulo'   => __( 'Produtos relacionados', 'conexao' ),
+				'produtos' => $relacionados,
+			)
+		);
+	}
+
 endwhile;
 
 get_footer();
