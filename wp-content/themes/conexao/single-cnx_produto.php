@@ -212,6 +212,7 @@ while ( have_posts() ) :
 			array(
 				'titulo'   => __( 'Produtos relacionados', 'conexao' ),
 				'produtos' => $relacionados,
+				'contexto' => 'relacionados',
 			)
 		);
 	}

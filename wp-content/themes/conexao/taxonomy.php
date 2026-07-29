@@ -115,6 +115,7 @@ if ( ! empty( $cnx_relacionados ) ) {
 		array(
 			'titulo'   => __( 'Produtos relacionados', 'conexao' ),
 			'produtos' => $cnx_relacionados,
+			'contexto' => 'relacionados',
 		)
 	);
 }

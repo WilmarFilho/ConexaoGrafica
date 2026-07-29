@@ -13,12 +13,21 @@ defined( 'ABSPATH' ) || exit;
 $cnx_titulo   = (string) ( $args['titulo'] ?? '' );
 $cnx_produtos = $args['produtos'] ?? array();
 
+// 'relacionados' muda o mobile: grade 2x2 com respiro, em vez do carrossel.
+$cnx_contexto = (string) ( $args['contexto'] ?? '' );
+
 if ( empty( $cnx_produtos ) ) {
 	return;
 }
+
+$cnx_classes = 'cnx-secao cnx-vitrine';
+
+if ( 'relacionados' === $cnx_contexto ) {
+	$cnx_classes .= ' cnx-vitrine--relacionados';
+}
 ?>
 
-<section class="cnx-secao cnx-vitrine">
+<section class="<?php echo esc_attr( $cnx_classes ); ?>">
 	<div class="cnx-secao__inner">
 
 		<?php if ( '' !== $cnx_titulo ) : ?>

@@ -2187,10 +2187,12 @@ body.cnx-sem-rolagem {
 }
 
 .cnx-contato__titulo {
-	margin: 0 0 10px;
+	margin: 0 0 18px;
+	padding-bottom: 16px;
 	color: var(--cnx-tinta);
 	font-size: 26px;
 	font-weight: 700;
+	border-bottom: 1px solid var(--cnx-borda);
 }
 
 .cnx-contato__subtitulo {
@@ -2277,9 +2279,13 @@ body.cnx-sem-rolagem {
 
 .cnx-mapa {
 	width: 100%;
-	min-height: 520px;
+	min-height: 640px;
 	border: 0;
 	border-radius: 4px;
+	/* Aproxima o estilo laranja do design (hue #ff6800). O JSON de estilos do
+	   Google só funciona na API JavaScript, que exige chave e cobrança — num
+	   iframe de incorporação a única alavanca é filtro CSS sobre o quadro. */
+	filter: sepia(.42) saturate(1.6) hue-rotate(-12deg) contrast(.96) brightness(1.03);
 }
 
 .cnx-mapa--vazio {
@@ -2428,8 +2434,7 @@ body.cnx-sem-rolagem {
 
 /* Respiro antes do rodapé: a vitrine de relacionados é a última coisa da
    página, e sem isso ela encosta na faixa de desconto. */
-.cnx-listagem ~ .cnx-vitrine .cnx-secao__inner,
-.single-cnx_produto .cnx-vitrine .cnx-secao__inner {
+.cnx-vitrine--relacionados .cnx-secao__inner {
 	padding-bottom: 120px;
 }
 
@@ -2516,55 +2521,51 @@ body.cnx-sem-rolagem {
 		width: 100%;
 	}
 
-	/* Relacionados no fim da listagem e do produto: grade 2x2 com respiro
-	   lateral, não o carrossel da home. Nome e descrição truncam numa linha. */
-	.cnx-listagem ~ .cnx-vitrine .cnx-secao__inner,
-	.single-cnx_produto .cnx-vitrine .cnx-secao__inner {
+	/* Relacionados (modificador --relacionados): grade 2x2 com respiro lateral,
+	   não o carrossel da home. Nome e descrição truncam numa linha. */
+	.cnx-vitrine--relacionados .cnx-secao__inner {
 		padding-right: 20px;
+		padding-bottom: 120px;
 		padding-left: 20px;
 	}
 
-	.cnx-listagem ~ .cnx-vitrine .cnx-secao__titulo,
-	.single-cnx_produto .cnx-vitrine .cnx-secao__titulo {
+	.cnx-vitrine--relacionados .cnx-secao__titulo {
 		padding: 0;
 	}
 
-	.cnx-listagem ~ .cnx-vitrine .cnx-grade--trilho,
-	.single-cnx_produto .cnx-vitrine .cnx-grade--trilho {
+	.cnx-vitrine--relacionados .cnx-grade--trilho {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 22px 14px;
 		overflow: visible;
 	}
 
-	.cnx-listagem ~ .cnx-vitrine .cnx-grade--trilho > li,
-	.single-cnx_produto .cnx-vitrine .cnx-grade--trilho > li {
+	.cnx-vitrine--relacionados .cnx-grade--trilho > li {
+		width: auto;
 		padding: 0;
 	}
 
-	.cnx-listagem ~ .cnx-vitrine .cnx-seta,
-	.single-cnx_produto .cnx-vitrine .cnx-seta {
+	.cnx-vitrine--relacionados .cnx-seta {
 		display: none;
 	}
 
-	.cnx-listagem ~ .cnx-vitrine .cnx-card-produto__texto,
-	.single-cnx_produto .cnx-vitrine .cnx-card-produto__texto {
+	/* A caixa da foto mantém a proporção do design mesmo com artes de tamanhos
+	   diferentes: sem isso cada card fica de uma altura. */
+	.cnx-vitrine--relacionados .cnx-card-produto__midia {
+		aspect-ratio: 309 / 363;
+		width: 100%;
+	}
+
+	.cnx-vitrine--relacionados .cnx-card-produto__texto {
 		overflow: hidden;
 	}
 
-	.cnx-listagem ~ .cnx-vitrine .cnx-card-produto__texto strong,
-	.cnx-listagem ~ .cnx-vitrine .cnx-card-produto__texto span,
-	.single-cnx_produto .cnx-vitrine .cnx-card-produto__texto strong,
-	.single-cnx_produto .cnx-vitrine .cnx-card-produto__texto span {
+	.cnx-vitrine--relacionados .cnx-card-produto__texto strong,
+	.cnx-vitrine--relacionados .cnx-card-produto__texto span {
 		display: block;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-	}
-
-	.cnx-listagem ~ .cnx-vitrine .cnx-secao__inner,
-	.single-cnx_produto .cnx-vitrine .cnx-secao__inner {
-		padding-bottom: 120px;
 	}
 }
 
