@@ -208,6 +208,73 @@ function cnx_processar_orcamento(): void {
 	exit;
 }
 
+/* -------------------------------------------------------------------------
+ * Captcha aritmético próprio
+ *
+ * Sem serviço externo: nada de chave de API nem script de terceiro. Os dois
+ * números viajam num token assinado com wp_hash; o servidor confere a soma e a
+ * assinatura, então adulterar o token não passa. Junto com o honeypot, filtra o
+ * spam automatizado comum.
+ * ------------------------------------------------------------------------- */
+
+/**
+ * @return array{a:int, b:int, token:string}
+ */
+function cnx_captcha_desafio(): array {
+	$a = wp_rand( 1, 9 );
+	$b = wp_rand( 1, 9 );
+
+	return array(
+		'a'     => $a,
+		'b'     => $b,
+		'token' => $a . ':' . $b . ':' . wp_hash( 'cnx-captcha|' . $a . '|' . $b ),
+	);
+}
+
+function cnx_captcha_valido(): bool {
+	$token    = isset( $_POST['cnx_captcha_token'] ) ? sanitize_text_field( wp_unslash( $_POST['cnx_captcha_token'] ) ) : '';
+	$resposta = isset( $_POST['cnx_captcha'] ) ? (int) $_POST['cnx_captcha'] : -1;
+
+	$partes = explode( ':', $token );
+
+	if ( 3 !== count( $partes ) ) {
+		return false;
+	}
+
+	list( $a, $b, $assinatura ) = $partes;
+
+	if ( ! hash_equals( wp_hash( 'cnx-captcha|' . $a . '|' . $b ), $assinatura ) ) {
+		return false;
+	}
+
+	return ( (int) $a + (int) $b ) === $resposta;
+}
+
+/**
+ * Campo de captcha pronto para qualquer formulário do tema.
+ */
+function cnx_captcha_campo(): void {
+	$desafio = cnx_captcha_desafio();
+	?>
+	<div class="cnx-captcha">
+		<label for="cnx_captcha">
+			<?php
+			printf(
+				/* translators: 1 e 2: números do desafio */
+				esc_html__( 'Verificação: quanto é %1$d + %2$d?', 'conexao' ),
+				(int) $desafio['a'],
+				(int) $desafio['b']
+			);
+			?>
+		</label>
+		<input type="number" id="cnx_captcha" name="cnx_captcha" class="cnx-campo"
+			inputmode="numeric" required autocomplete="off"
+			placeholder="<?php esc_attr_e( 'Resposta', 'conexao' ); ?>">
+		<input type="hidden" name="cnx_captcha_token" value="<?php echo esc_attr( $desafio['token'] ); ?>">
+	</div>
+	<?php
+}
+
 add_action( 'admin_post_nopriv_cnx_mensagem', 'cnx_processar_mensagem' );
 add_action( 'admin_post_cnx_mensagem', 'cnx_processar_mensagem' );
 
@@ -220,6 +287,10 @@ function cnx_processar_mensagem(): void {
 
 	if ( ! empty( $_POST['cnx_site'] ) ) {
 		cnx_redirecionar_lead( $retorno, 'ok', 'cnx-contato' );
+	}
+
+	if ( ! cnx_captcha_valido() ) {
+		cnx_redirecionar_lead( $retorno, 'captcha', 'cnx-contato' );
 	}
 
 	$nome     = isset( $_POST['cnx_nome'] ) ? sanitize_text_field( wp_unslash( $_POST['cnx_nome'] ) ) : '';

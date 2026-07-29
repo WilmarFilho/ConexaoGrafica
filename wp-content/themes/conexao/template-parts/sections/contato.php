@@ -111,6 +111,10 @@ $cnx_tel_link = static fn( string $tel ): string => (string) preg_replace( '/\D/
 					<p class="cnx-aviso cnx-aviso--erro cnx-aviso--claro" role="alert">
 						<?php esc_html_e( 'Confira o nome e o e-mail e tente de novo.', 'conexao' ); ?>
 					</p>
+				<?php elseif ( 'captcha' === $cnx_status ) : ?>
+					<p class="cnx-aviso cnx-aviso--erro cnx-aviso--claro" role="alert">
+						<?php esc_html_e( 'A soma de verificação não bateu. Tente de novo.', 'conexao' ); ?>
+					</p>
 				<?php elseif ( 'erro' === $cnx_status ) : ?>
 					<p class="cnx-aviso cnx-aviso--erro cnx-aviso--claro" role="alert">
 						<?php esc_html_e( 'Não foi possível enviar agora. Tente novamente em instantes.', 'conexao' ); ?>
@@ -153,6 +157,8 @@ $cnx_tel_link = static fn( string $tel ): string => (string) preg_replace( '/\D/
 						<label for="cnx_c_site"><?php esc_html_e( 'Deixe em branco', 'conexao' ); ?></label>
 						<input type="text" id="cnx_c_site" name="cnx_site" tabindex="-1" autocomplete="off">
 					</div>
+
+					<?php cnx_captcha_campo(); ?>
 
 					<button type="submit" class="cnx-form-contato__enviar">
 						<?php esc_html_e( 'Enviar', 'conexao' ); ?>

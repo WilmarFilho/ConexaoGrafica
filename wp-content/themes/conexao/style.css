@@ -2211,27 +2211,70 @@ body.cnx-sem-rolagem {
 	line-height: 1.6;
 }
 
+/* Faixa compacta: WhatsApp | régua vertical | e-mail e horários. */
 .cnx-canais {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 18px 24px;
-	margin: 0;
-	padding: 22px 0 0;
-	list-style: none;
+	display: flex;
+	align-items: stretch;
+	gap: 26px;
+	padding: 22px 0;
 	border-top: 1px solid var(--cnx-borda);
+	border-bottom: 1px solid var(--cnx-borda);
 }
 
-.cnx-canal > a,
-.cnx-canal {
+.cnx-canais__zap {
 	display: flex;
-	align-items: flex-start;
-	gap: 10px;
+	flex: 0 0 auto;
+	flex-direction: column;
+	gap: 2px;
 	color: inherit;
 	text-decoration: none;
 }
 
+.cnx-canais__zap .cnx-canal__icone {
+	margin-bottom: 6px;
+	color: var(--cnx-laranja);
+	line-height: 0;
+}
+
+.cnx-canais__zap strong {
+	color: var(--cnx-tinta);
+	font-size: 15px;
+	font-weight: 700;
+}
+
+.cnx-canais__zap span {
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.cnx-canais__zap:hover span {
+	color: var(--cnx-laranja);
+}
+
+.cnx-canais__coluna {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	/* min-width: 0 deixa a coluna encolher; sem isso o e-mail estoura no mobile. */
+	min-width: 0;
+	padding-left: 26px;
+	border-left: 1px solid var(--cnx-borda);
+}
+
+.cnx-canal > span:last-child {
+	min-width: 0;
+}
+
+.cnx-canal {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+}
+
 .cnx-canal__icone {
 	flex: 0 0 auto;
+	margin-top: 2px;
 	color: var(--cnx-laranja);
 	line-height: 0;
 }
@@ -2243,14 +2286,22 @@ body.cnx-sem-rolagem {
 	font-weight: 700;
 }
 
-.cnx-canal span span {
+.cnx-canal span span,
+.cnx-canal span a {
 	display: block;
 	color: var(--cnx-tinta-suave);
 	font-size: 14px;
 	font-weight: 500;
+	text-decoration: none;
 }
 
-.cnx-canal > a:hover span span {
+.cnx-canal span a {
+	overflow-wrap: anywhere;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.cnx-canal span a:hover {
 	color: var(--cnx-laranja);
 }
 
@@ -2258,6 +2309,17 @@ body.cnx-sem-rolagem {
 	display: grid;
 	gap: 14px;
 	max-width: 480px;
+}
+
+.cnx-captcha {
+	display: grid;
+	gap: 8px;
+}
+
+.cnx-captcha label {
+	color: var(--cnx-tinta);
+	font-size: 14px;
+	font-weight: 700;
 }
 
 .cnx-form-contato__enviar {
@@ -2362,8 +2424,16 @@ body.cnx-sem-rolagem {
 }
 
 @media (max-width: 600px) {
+	/* No celular a faixa empilha e a régua vira horizontal. */
 	.cnx-canais {
-		grid-template-columns: 1fr;
+		flex-direction: column;
+	}
+
+	.cnx-canais__coluna {
+		padding-top: 16px;
+		padding-left: 0;
+		border-top: 1px solid var(--cnx-borda);
+		border-left: 0;
 	}
 
 	.cnx-post-card__titulo {
@@ -2566,80 +2636,6 @@ body.cnx-sem-rolagem {
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-	}
-}
-
-/* --- Contato ------------------------------------------------------------ */
-
-.cnx-contato__grade {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 16px;
-}
-
-.cnx-contato__cartao {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	padding: 26px 22px;
-	color: inherit;
-	text-decoration: none;
-	background: #fff;
-	border: 1px solid var(--cnx-borda);
-	border-radius: 4px;
-}
-
-.cnx-contato__cartao strong {
-	color: var(--cnx-tinta);
-	font-size: 16px;
-	font-weight: 700;
-}
-
-.cnx-contato__cartao span:last-child {
-	color: var(--cnx-tinta-suave);
-	font-size: 16px;
-	font-weight: 500;
-}
-
-.cnx-contato__cartao a {
-	color: inherit;
-	text-decoration: underline;
-	text-underline-offset: 2px;
-}
-
-.cnx-contato__cartao a:hover {
-	color: var(--cnx-laranja);
-}
-
-.cnx-contato__icone {
-	color: var(--cnx-laranja);
-	line-height: 0;
-	margin-bottom: 6px;
-}
-
-.cnx-contato__cartao--zap {
-	border-color: var(--cnx-whatsapp);
-	transition: transform .15s, box-shadow .15s;
-}
-
-.cnx-contato__cartao--zap .cnx-contato__icone {
-	color: var(--cnx-whatsapp);
-}
-
-.cnx-contato__cartao--zap:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
-}
-
-@media (max-width: 900px) {
-	.cnx-contato__grade {
-		grid-template-columns: repeat(2, 1fr);
-	}
-}
-
-@media (max-width: 560px) {
-	.cnx-contato__grade {
-		grid-template-columns: 1fr;
 	}
 }
 
