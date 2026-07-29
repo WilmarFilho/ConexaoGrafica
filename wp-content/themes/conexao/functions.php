@@ -69,6 +69,24 @@ function cnx_topbar_menu_fallback( array $args = array() ): void {
 }
 
 /**
+ * Quantos produtos por página nas listagens de categoria e solução.
+ *
+ * Doze fecha três linhas de quatro no desktop; o padrão do WordPress (10)
+ * deixaria a última linha quebrada.
+ */
+add_action( 'pre_get_posts', 'cnx_produtos_por_pagina' );
+
+function cnx_produtos_por_pagina( WP_Query $query ): void {
+	if ( is_admin() || ! $query->is_main_query() ) {
+		return;
+	}
+
+	if ( $query->is_tax( array( 'cnx_categoria_produto', 'cnx_solucao' ) ) || $query->is_post_type_archive( 'cnx_produto' ) ) {
+		$query->set( 'posts_per_page', 12 );
+	}
+}
+
+/**
  * Versão de um asset a partir da data de modificação do arquivo.
  *
  * Sem isso o navegador segura style.css e os scripts em cache entre uma edição e
@@ -112,6 +130,26 @@ function cnx_theme_assets(): void {
 			get_theme_file_uri( 'assets/js/carrossel.js' ),
 			array(),
 			cnx_asset_ver( 'assets/js/carrossel.js' ),
+			true
+		);
+	}
+
+	// Listagens de categoria e solução: o "Carregar mais" anexa em vez de navegar.
+	if ( is_tax( array( 'cnx_categoria_produto', 'cnx_solucao' ) ) || is_post_type_archive( 'cnx_produto' ) ) {
+		wp_enqueue_script(
+			'cnx-listagem',
+			get_theme_file_uri( 'assets/js/listagem.js' ),
+			array(),
+			cnx_asset_ver( 'assets/js/listagem.js' ),
+			true
+		);
+
+		// A listagem também mostra "Produtos relacionados", que é um trilho.
+		wp_enqueue_script(
+			'cnx-trilho',
+			get_theme_file_uri( 'assets/js/trilho.js' ),
+			array(),
+			cnx_asset_ver( 'assets/js/trilho.js' ),
 			true
 		);
 	}

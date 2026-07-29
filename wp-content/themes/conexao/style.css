@@ -1551,6 +1551,120 @@ body.cnx-sem-rolagem {
 	}
 }
 
+/* --- Listagem de categoria / solução ------------------------------------ */
+
+.cnx-listagem .cnx-secao__inner {
+	padding-top: 34px;
+}
+
+.cnx-listagem__cabecalho {
+	margin-bottom: 34px;
+}
+
+.cnx-listagem__rotulo {
+	margin: 0 0 4px;
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.cnx-listagem__titulo {
+	margin: 0;
+	color: var(--cnx-tinta);
+	font-size: 26px;
+	font-weight: 700;
+	line-height: 1.25;
+}
+
+.cnx-listagem__descricao {
+	margin: 10px 0 0;
+	max-width: 62ch;
+	color: var(--cnx-tinta-suave);
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.cnx-listagem__vazio {
+	padding: 40px 0 60px;
+	color: var(--cnx-tinta-suave);
+	font-size: 16px;
+	font-weight: 500;
+}
+
+/* Grade de listagem: sempre grade. Diferente de .cnx-grade--4, que no mobile
+   vira carrossel — aqui rolar a página é o comportamento esperado. */
+.cnx-grade-listagem {
+	grid-template-columns: repeat(4, 1fr);
+	gap: 28px 16px;
+}
+
+.cnx-listagem__mais {
+	display: flex;
+	justify-content: center;
+	padding: 38px 0 10px;
+}
+
+/* --- Card de listagem --------------------------------------------------- */
+
+.cnx-card-simples {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	color: inherit;
+	text-decoration: none;
+}
+
+.cnx-card-simples__midia {
+	display: block;
+	aspect-ratio: 309 / 363;
+	overflow: hidden;
+	background: #e2e2e2;
+	border-radius: 2px;
+}
+
+.cnx-card-simples__midia img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	transition: transform .3s ease;
+}
+
+.cnx-card-simples:hover .cnx-card-simples__midia img {
+	transform: scale(1.04);
+}
+
+.cnx-card-simples__nome {
+	display: block;
+	margin-top: 12px;
+	color: var(--cnx-tinta);
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.35;
+}
+
+.cnx-card-simples__link {
+	display: block;
+	margin-top: 2px;
+	color: var(--cnx-laranja);
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.cnx-card-simples:hover .cnx-card-simples__link {
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+	.cnx-grade-listagem {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.cnx-listagem__titulo {
+		font-size: 22px;
+	}
+}
+
 /* --- Contato ------------------------------------------------------------ */
 
 .cnx-contato__grade {
