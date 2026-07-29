@@ -30,7 +30,7 @@ if ( empty( $cnx_termos ) ) {
 					<a class="cnx-card-categoria" href="<?php echo esc_url( (string) get_term_link( $cnx_termo ) ); ?>">
 						<span class="cnx-card-categoria__midia"
 							<?php if ( '' !== $cnx_fundo ) : ?>style="background:<?php echo esc_attr( $cnx_fundo ); ?>;"<?php endif; ?>>
-							<?php cnx_figura( (int) get_term_meta( $cnx_termo->term_id, 'cnx_imagem', true ), 'cnx-card' ); ?>
+							<?php cnx_figura( (int) get_term_meta( $cnx_termo->term_id, 'cnx_imagem', true ), 'cnx-card', '', $cnx_termo->name ); ?>
 						</span>
 						<span class="cnx-card-categoria__nome"><?php echo esc_html( $cnx_termo->name ); ?></span>
 					</a>

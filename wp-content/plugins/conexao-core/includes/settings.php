@@ -54,6 +54,7 @@ function cnx_register_settings(): void {
 		'cnx_mapa_embed'      => 'esc_url_raw',
 		'cnx_seo_titulo'      => 'sanitize_text_field',
 		'cnx_seo_descricao'   => 'sanitize_textarea_field',
+		'cnx_ga4_id'          => 'sanitize_text_field',
 	);
 
 	foreach ( $campos_texto as $chave => $sanitizer ) {
@@ -155,6 +156,19 @@ function cnx_render_settings_page(): void {
 							echo esc_textarea( get_option( 'cnx_seo_descricao', '' ) );
 						?></textarea>
 						<p class="description"><?php esc_html_e( 'Até ~160 caracteres. Aparece no resultado do Google e ao compartilhar o link.', 'conexao' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="cnx_ga4_id"><?php esc_html_e( 'Google Analytics (GA4)', 'conexao' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="cnx_ga4_id" name="cnx_ga4_id" class="regular-text"
+							value="<?php echo esc_attr( get_option( 'cnx_ga4_id', '' ) ); ?>"
+							placeholder="G-XXXXXXXXXX">
+						<p class="description">
+							<?php esc_html_e( 'ID de medição do GA4. Vazio desliga o Analytics; os cliques principais (WhatsApp, orçamento, formulários) são enviados como eventos.', 'conexao' ); ?>
+						</p>
 					</td>
 				</tr>
 			</table>

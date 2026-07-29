@@ -295,7 +295,7 @@ function cnx_legal_menu_fallback( array $args = array() ): void {
  * As fotos entram no admin aos poucos; até lá a seção mostra uma caixa neutra
  * em vez de um buraco no layout ou um <img> quebrado.
  */
-function cnx_figura( int $attachment_id, string $tamanho = 'cnx-card', string $classe = '' ): void {
+function cnx_figura( int $attachment_id, string $tamanho = 'cnx-card', string $classe = '', string $alt = '' ): void {
 	if ( $attachment_id && wp_attachment_is_image( $attachment_id ) ) {
 		echo wp_get_attachment_image(
 			$attachment_id,
@@ -305,7 +305,8 @@ function cnx_figura( int $attachment_id, string $tamanho = 'cnx-card', string $c
 				'class'    => $classe,
 				'loading'  => 'lazy',
 				'decoding' => 'async',
-				'alt'      => '',
+				// Alt descritivo ajuda busca de imagem; vazio marca como decorativa.
+				'alt'      => $alt,
 			)
 		);
 

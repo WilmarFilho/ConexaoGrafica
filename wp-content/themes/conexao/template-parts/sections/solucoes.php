@@ -47,7 +47,7 @@ if ( empty( $cnx_termos ) ) {
 
 						<span class="cnx-card-solucao__midia"
 							<?php if ( '' !== $cnx_fundo ) : ?>style="background:<?php echo esc_attr( $cnx_fundo ); ?>;"<?php endif; ?>>
-							<?php cnx_figura( $cnx_img, 'cnx-card' ); ?>
+							<?php cnx_figura( $cnx_img, 'cnx-card', '', $cnx_termo->name ); ?>
 						</span>
 
 						<span class="cnx-card-solucao__texto">

@@ -129,6 +129,48 @@ function cnx_seo_meta_tags(): void {
 }
 
 /* -------------------------------------------------------------------------
+ * Sitemap
+ * ------------------------------------------------------------------------- */
+
+/**
+ * O sitemap de usuários lista o arquivo de autor — e com ele o login do
+ * administrador, de presente para ataques de força bruta. Fora.
+ */
+add_filter(
+	'wp_sitemaps_add_provider',
+	static function ( $provider, string $nome ) {
+		return 'users' === $nome ? false : $provider;
+	},
+	10,
+	2
+);
+
+/* -------------------------------------------------------------------------
+ * Google Analytics 4
+ *
+ * Só entra com o ID preenchido em Configurações → Conexão. O tema empurra os
+ * cliques principais para o dataLayer (assets/js/app.js); com o gtag presente,
+ * eles viram eventos no GA4 automaticamente.
+ * ------------------------------------------------------------------------- */
+
+add_action( 'wp_head', 'cnx_ga4', 3 );
+
+function cnx_ga4(): void {
+	$id = trim( (string) get_option( 'cnx_ga4_id', '' ) );
+
+	// Aceita apenas o formato G-XXXX: qualquer outra coisa não vira script.
+	if ( ! preg_match( '/^G-[A-Z0-9]{4,}$/i', $id ) ) {
+		return;
+	}
+
+	printf(
+		"<script async src=\"https://www.googletagmanager.com/gtag/js?id=%1\$s\"></script>\n" .
+		"<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','%1\$s');</script>\n",
+		esc_attr( $id )
+	);
+}
+
+/* -------------------------------------------------------------------------
  * JSON-LD
  * ------------------------------------------------------------------------- */
 
@@ -209,6 +251,119 @@ function cnx_seo_json_ld(): void {
 				),
 			);
 		}
+	}
+
+	if ( is_singular( CNX_CPT_PRODUTO ) ) {
+		$produto_id = get_queried_object_id();
+		$categoria  = function_exists( 'cnx_categoria_principal' ) ? cnx_categoria_principal( $produto_id ) : null;
+
+		$produto = array(
+			'@type'       => 'Product',
+			'name'        => get_the_title( $produto_id ),
+			'url'         => (string) get_permalink( $produto_id ),
+			'description' => (string) cnx_meta( $produto_id, 'resumo' ),
+			'brand'       => array(
+				'@type' => 'Brand',
+				'name'  => get_bloginfo( 'name' ),
+			),
+		);
+
+		if ( has_post_thumbnail( $produto_id ) ) {
+			$produto['image'] = (string) get_the_post_thumbnail_url( $produto_id, 'large' );
+		}
+
+		if ( $categoria instanceof WP_Term ) {
+			$produto['category'] = $categoria->name;
+		}
+
+		$grafo[] = $produto;
+
+		$trilha = array(
+			array(
+				'@type'    => 'ListItem',
+				'position' => 1,
+				'name'     => __( 'Home', 'conexao' ),
+				'item'     => home_url( '/' ),
+			),
+		);
+
+		if ( $categoria instanceof WP_Term ) {
+			$trilha[] = array(
+				'@type'    => 'ListItem',
+				'position' => 2,
+				'name'     => $categoria->name,
+				'item'     => (string) get_term_link( $categoria ),
+			);
+		}
+
+		$trilha[] = array(
+			'@type'    => 'ListItem',
+			'position' => count( $trilha ) + 1,
+			'name'     => get_the_title( $produto_id ),
+			'item'     => (string) get_permalink( $produto_id ),
+		);
+
+		$grafo[] = array(
+			'@type'           => 'BreadcrumbList',
+			'itemListElement' => $trilha,
+		);
+	}
+
+	if ( is_singular( 'post' ) ) {
+		$post_id = get_queried_object_id();
+
+		$artigo = array(
+			'@type'         => 'BlogPosting',
+			'headline'      => get_the_title( $post_id ),
+			'url'           => (string) get_permalink( $post_id ),
+			'datePublished' => (string) get_the_date( 'c', $post_id ),
+			'dateModified'  => (string) get_the_modified_date( 'c', $post_id ),
+			'author'        => array(
+				'@type' => 'Person',
+				'name'  => get_the_author_meta( 'display_name', (int) get_post_field( 'post_author', $post_id ) ),
+			),
+			'publisher'     => array(
+				'@type' => 'Organization',
+				'name'  => get_bloginfo( 'name' ),
+			),
+		);
+
+		if ( has_post_thumbnail( $post_id ) ) {
+			$artigo['image'] = (string) get_the_post_thumbnail_url( $post_id, 'large' );
+		}
+
+		$grafo[] = $artigo;
+
+		$blog_id = (int) get_option( 'page_for_posts' );
+		$trilha  = array(
+			array(
+				'@type'    => 'ListItem',
+				'position' => 1,
+				'name'     => __( 'Home', 'conexao' ),
+				'item'     => home_url( '/' ),
+			),
+		);
+
+		if ( $blog_id ) {
+			$trilha[] = array(
+				'@type'    => 'ListItem',
+				'position' => 2,
+				'name'     => get_the_title( $blog_id ),
+				'item'     => (string) get_permalink( $blog_id ),
+			);
+		}
+
+		$trilha[] = array(
+			'@type'    => 'ListItem',
+			'position' => count( $trilha ) + 1,
+			'name'     => get_the_title( $post_id ),
+			'item'     => (string) get_permalink( $post_id ),
+		);
+
+		$grafo[] = array(
+			'@type'           => 'BreadcrumbList',
+			'itemListElement' => $trilha,
+		);
 	}
 
 	if ( empty( $grafo ) ) {

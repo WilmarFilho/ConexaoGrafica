@@ -117,9 +117,64 @@
 		} );
 	}
 
+	/**
+	 * Rastreamento dos cliques principais.
+	 *
+	 * Os eventos vão para window.dataLayer (padrão do Google). Com o GA4
+	 * configurado no painel eles viram eventos de verdade; sem ele, o push é
+	 * inofensivo — nada quebra e nada é enviado a lugar nenhum.
+	 */
+	function rastrear( evento, dados ) {
+		window.dataLayer = window.dataLayer || [];
+		window.dataLayer.push( Object.assign( { event: evento }, dados || {} ) );
+
+		if ( typeof window.gtag === 'function' ) {
+			window.gtag( 'event', evento, dados || {} );
+		}
+	}
+
+	function rastreamento() {
+		document.addEventListener( 'click', function ( e ) {
+			var alvo = e.target.closest( 'a, button' );
+
+			if ( ! alvo ) {
+				return;
+			}
+
+			var href = alvo.getAttribute( 'href' ) || '';
+
+			if ( href.indexOf( 'wa.me' ) !== -1 || href.indexOf( 'api.whatsapp.com' ) !== -1 ) {
+				rastrear( 'clique_whatsapp', { local: alvo.className || 'link' } );
+			} else if ( href.indexOf( 'tel:' ) === 0 ) {
+				rastrear( 'clique_telefone', { numero: href.slice( 4 ) } );
+			} else if ( href.indexOf( 'mailto:' ) === 0 ) {
+				rastrear( 'clique_email', {} );
+			} else if ( alvo.hasAttribute( 'data-cnx-abrir-modal' ) ) {
+				rastrear( 'abriu_orcamento', { pagina: window.location.pathname } );
+			} else if ( alvo.classList.contains( 'cnx-topbar__cta' ) || alvo.classList.contains( 'cnx-btn--primario' ) ) {
+				rastrear( 'clique_solicitar_orcamento', { pagina: window.location.pathname } );
+			}
+		}, true );
+
+		document.addEventListener( 'submit', function ( e ) {
+			var form = e.target;
+
+			if ( form.matches( '[data-cnx-modal-form]' ) ) {
+				rastrear( 'enviou_orcamento_produto', { pagina: window.location.pathname } );
+			} else if ( form.classList.contains( 'cnx-form-contato' ) ) {
+				rastrear( 'enviou_contato', {} );
+			} else if ( form.classList.contains( 'cnx-form' ) ) {
+				rastrear( 'enviou_desconto', {} );
+			} else if ( form.classList.contains( 'cnx-busca' ) || form.classList.contains( 'cnx-busca-lateral' ) ) {
+				rastrear( 'buscou', { termo: ( form.querySelector( 'input[name="s"]' ) || {} ).value || '' } );
+			}
+		}, true );
+	}
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		botaoVoltarAoTopo();
 		menuMobile();
 		compartilhar();
+		rastreamento();
 	} );
 } )();

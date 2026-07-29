@@ -81,7 +81,7 @@ while ( have_posts() ) :
 
 				<?php if ( has_post_thumbnail() ) : ?>
 					<figure class="cnx-artigo__capa">
-						<?php the_post_thumbnail( 'cnx-produto', array( 'fetchpriority' => 'high' ) ); ?>
+						<?php the_post_thumbnail( 'cnx-produto', array( 'fetchpriority' => 'high', 'alt' => get_the_title() ) ); ?>
 					</figure>
 				<?php endif; ?>
 

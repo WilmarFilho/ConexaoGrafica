@@ -2508,6 +2508,19 @@ body.cnx-sem-rolagem {
 	padding-bottom: 120px;
 }
 
+/* O catálogo completo não tem relacionados: o respiro fica na própria listagem. */
+.post-type-archive-cnx_produto .cnx-listagem .cnx-secao__inner {
+	padding-bottom: 120px;
+}
+
+/* Título "Configuração" no padrão dos títulos internos do design. */
+.cnx-produto__subtitulo {
+	margin: 0 0 18px;
+	color: var(--cnx-tinta);
+	font-size: 22px;
+	font-weight: 700;
+}
+
 /* --- Card de listagem --------------------------------------------------- */
 
 .cnx-card-simples {
@@ -3251,13 +3264,18 @@ body.cnx-sem-rolagem {
 }
 
 .cnx-produto__titulo {
-	margin: 0 0 10px;
-	font-size: 28px;
+	margin: 0 0 12px;
+	color: var(--cnx-tinta);
+	font-size: 26px;
+	font-weight: 600;
 }
 
 .cnx-produto__resumo {
-	margin: 0 0 28px;
-	color: var(--cnx-cinza);
+	margin: 0 0 30px;
+	color: var(--cnx-tinta-suave);
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1.6;
 }
 
 .cnx-galeria-principal img {
@@ -3306,14 +3324,16 @@ body.cnx-sem-rolagem {
 
 .cnx-config__titulo {
 	margin: 0 0 2px;
-	font-size: 15px;
-	font-weight: 600;
+	color: var(--cnx-tinta);
+	font-size: 16px;
+	font-weight: 700;
 }
 
 .cnx-config__ajuda {
-	margin: 0 0 10px;
-	color: var(--cnx-cinza);
-	font-size: 13px;
+	margin: 0 0 12px;
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 500;
 }
 
 .cnx-config__opcoes {
@@ -3323,40 +3343,45 @@ body.cnx-sem-rolagem {
 }
 
 .cnx-opcao {
-	padding: 11px 14px;
-	color: var(--cnx-texto);
+	padding: 13px 14px;
+	color: var(--cnx-tinta-suave);
 	font-size: 14px;
+	font-weight: 500;
 	text-align: center;
 	background: #fff;
-	border: 1px solid var(--cnx-borda);
-	border-radius: 6px;
+	border: 1px solid #d9d9d9;
+	border-radius: 2px;
 	cursor: pointer;
 	transition: border-color .15s, color .15s;
 }
 
 .cnx-opcao:hover {
-	border-color: var(--cnx-laranja);
+	border-color: var(--cnx-tinta);
+	color: var(--cnx-tinta);
 }
 
+/* Como na referência: seleção marcada pela borda escura, não pela cor da marca. */
 .cnx-opcao[aria-pressed="true"] {
-	color: var(--cnx-laranja-escuro);
+	color: var(--cnx-tinta);
 	font-weight: 600;
-	border-color: var(--cnx-laranja);
-	box-shadow: inset 0 0 0 1px var(--cnx-laranja);
+	border-color: var(--cnx-tinta);
+	box-shadow: inset 0 0 0 1px var(--cnx-tinta);
 }
 
 /* --- Resumo / CTA ----------------------------------------------------- */
 
 .cnx-resumo {
-	padding: 20px;
-	border: 1px solid var(--cnx-borda);
-	border-radius: 6px;
+	padding: 22px;
+	background: #fff;
+	border: 1px solid #e2e2e2;
+	border-radius: 2px;
 }
 
 .cnx-resumo__titulo {
 	margin: 0 0 14px;
-	font-size: 15px;
-	font-weight: 600;
+	color: var(--cnx-tinta);
+	font-size: 16px;
+	font-weight: 700;
 }
 
 .cnx-resumo__linha {

@@ -204,9 +204,58 @@ function cnx_processar_orcamento(): void {
 
 	// Sem número configurado não há para onde mandar: volta com aviso de sucesso,
 	// já que o lead ficou gravado.
-	wp_safe_redirect( '' !== $link ? $link : add_query_arg( 'cnx_lead', 'ok', $retorno ) );
+	if ( '' === $link ) {
+		wp_safe_redirect( add_query_arg( 'cnx_lead', 'ok', $retorno ) );
+		exit;
+	}
+
+	/*
+	 * Não dá para chegar ao WhatsApp por redirect HTTP: wp_sanitize_redirect()
+	 * remove %0A/%0D por segurança e a mensagem perderia as quebras de linha.
+	 * A ponte é uma página mínima que navega via JS — o texto chega intacto —
+	 * com link manual para quem estiver sem JavaScript.
+	 */
+	header( 'Content-Type: text/html; charset=utf-8' );
+	?>
+	<!doctype html>
+	<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8">
+		<meta name="robots" content="noindex">
+		<title><?php esc_html_e( 'Abrindo o WhatsApp…', 'conexao' ); ?></title>
+		<style>
+			body { display: flex; align-items: center; justify-content: center; min-height: 100vh;
+				margin: 0; font-family: system-ui, sans-serif; color: #444; background: #fafafa; }
+			a { color: #ff6700; }
+		</style>
+	</head>
+	<body>
+		<p>
+			<?php esc_html_e( 'Abrindo o WhatsApp…', 'conexao' ); ?>
+			<?php // esc_attr, não esc_url: esc_url estriparia os %0A das quebras de linha. ?>
+			<a href="<?php echo esc_attr( $link ); ?>"><?php esc_html_e( 'Clique aqui se não abrir sozinho.', 'conexao' ); ?></a>
+		</p>
+		<script>window.location.replace(<?php echo wp_json_encode( $link ); ?>);</script>
+	</body>
+	</html>
+	<?php
 	exit;
 }
+
+/**
+ * wp_safe_redirect() recusa qualquer host externo e cai em /wp-admin/ — era o
+ * destino errado do botão do modal. O wa.me é o único destino externo legítimo
+ * do fluxo de orçamento, então entra na lista de hosts permitidos.
+ */
+add_filter(
+	'allowed_redirect_hosts',
+	static function ( array $hosts ): array {
+		$hosts[] = 'wa.me';
+		$hosts[] = 'api.whatsapp.com';
+
+		return $hosts;
+	}
+);
 
 /* -------------------------------------------------------------------------
  * Captcha aritmético próprio

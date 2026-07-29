@@ -23,7 +23,7 @@ $cnx_fundo = (string) cnx_meta( $cnx_produto->ID, 'fundo' );
 	<a class="cnx-card-simples" href="<?php echo esc_url( (string) get_permalink( $cnx_produto ) ); ?>">
 		<span class="cnx-card-simples__midia"
 			<?php if ( '' !== $cnx_fundo ) : ?>style="background:<?php echo esc_attr( $cnx_fundo ); ?>;"<?php endif; ?>>
-			<?php cnx_figura( (int) get_post_thumbnail_id( $cnx_produto ), 'cnx-card' ); ?>
+			<?php cnx_figura( (int) get_post_thumbnail_id( $cnx_produto ), 'cnx-card', '', get_the_title( $cnx_produto ) ); ?>
 		</span>
 
 		<span class="cnx-card-simples__nome"><?php echo esc_html( get_the_title( $cnx_produto ) ); ?></span>

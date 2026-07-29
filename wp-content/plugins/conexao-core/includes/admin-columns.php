@@ -57,11 +57,49 @@ function cnx_produto_column_content( string $column, int $post_id ): void {
 			break;
 
 		case 'cnx_destaque':
-			echo '1' === cnx_meta( $post_id, 'destaque' )
-				? '<span class="dashicons dashicons-star-filled" style="color:#ff6700;"></span>'
-				: '—';
+			$ativo = '1' === cnx_meta( $post_id, 'destaque' );
+
+			// Um clique liga/desliga o "Mais vendidos" sem abrir o produto.
+			$url = wp_nonce_url(
+				admin_url( 'admin-post.php?action=cnx_toggle_destaque&produto=' . $post_id ),
+				'cnx_toggle_destaque_' . $post_id
+			);
+
+			printf(
+				'<a href="%s" title="%s" style="text-decoration:none;"><span class="dashicons %s" style="color:%s;"></span></a>',
+				esc_url( $url ),
+				$ativo
+					? esc_attr__( 'Remover de "Mais vendidos"', 'conexao' )
+					: esc_attr__( 'Exibir em "Mais vendidos"', 'conexao' ),
+				$ativo ? 'dashicons-star-filled' : 'dashicons-star-empty',
+				$ativo ? '#ff6700' : '#c3c4c7'
+			);
 			break;
 	}
+}
+
+/**
+ * Liga/desliga o destaque a partir da listagem.
+ */
+add_action( 'admin_post_cnx_toggle_destaque', 'cnx_toggle_destaque' );
+
+function cnx_toggle_destaque(): void {
+	$post_id = isset( $_GET['produto'] ) ? absint( $_GET['produto'] ) : 0;
+
+	if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+		wp_die( esc_html__( 'Sem permissão.', 'conexao' ) );
+	}
+
+	check_admin_referer( 'cnx_toggle_destaque_' . $post_id );
+
+	if ( '1' === cnx_meta( $post_id, 'destaque' ) ) {
+		delete_post_meta( $post_id, '_cnx_destaque' );
+	} else {
+		update_post_meta( $post_id, '_cnx_destaque', '1' );
+	}
+
+	wp_safe_redirect( wp_get_referer() ?: admin_url( 'edit.php?post_type=' . CNX_CPT_PRODUTO ) );
+	exit;
 }
 
 /**

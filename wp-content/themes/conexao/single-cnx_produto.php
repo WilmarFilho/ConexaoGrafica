@@ -43,7 +43,7 @@ while ( have_posts() ) :
 			<div class="cnx-produto__midia">
 				<?php if ( ! empty( $galeria ) ) : ?>
 					<div class="cnx-galeria-principal">
-						<?php echo wp_get_attachment_image( $galeria[0], 'cnx-produto', false, array( 'data-cnx-galeria-principal' => 'true' ) ); ?>
+						<?php echo wp_get_attachment_image( $galeria[0], 'cnx-produto', false, array( 'data-cnx-galeria-principal' => 'true', 'alt' => get_the_title() ) ); ?>
 					</div>
 
 					<?php if ( count( $galeria ) > 1 ) : ?>
