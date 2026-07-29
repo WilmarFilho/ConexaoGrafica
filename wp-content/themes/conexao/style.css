@@ -770,12 +770,14 @@ body.cnx-sem-rolagem {
 	justify-content: center;
 }
 
+/* Sem mix-blend-mode: multiply fazia o fundo do slide (a marca d'água de
+   bolinhas) vazar POR CIMA da foto do produto. As artes são PNG com
+   transparência — não precisam de truque para integrar ao fundo. */
 .cnx-hero__produto {
 	max-width: 100%;
 	height: auto;
 	max-height: 330px;
 	object-fit: contain;
-	mix-blend-mode: multiply;
 }
 
 /* Setas */
@@ -1677,16 +1679,17 @@ body.cnx-sem-rolagem {
 	background-repeat: no-repeat;
 }
 
-/* Selo decorativo: preso na extremidade superior esquerda da faixa, fora do grid. */
+/* Selo decorativo: centro vertical da faixa, encostado na borda do container. */
 .cnx-cta__selo {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 50%;
+	left: 20px;
 	z-index: 0;
-	width: 150px;
+	width: 230px;
 	height: auto;
 	opacity: .9;
 	pointer-events: none;
+	transform: translateY(-50%);
 }
 
 .cnx-cta__inner {
@@ -1702,20 +1705,21 @@ body.cnx-sem-rolagem {
 	padding: 48px 20px;
 }
 
-/* Cada coluna da faixa centraliza o próprio conteúdo. */
+/* O texto centraliza no espaço entre o selo e o formulário, como no design. */
 .cnx-cta__chamada {
+	padding-left: 264px;
 	text-align: center;
 }
 
 .cnx-cta__titulo {
-	margin: 0 0 4px;
-	font-size: 20px;
+	margin: 0 0 6px;
+	font-size: 30px;
 	font-weight: 700;
 }
 
 .cnx-cta__subtitulo {
-	margin: 0 0 22px;
-	font-size: 18px;
+	margin: 0 0 26px;
+	font-size: 26px;
 	font-weight: 400;
 }
 
@@ -2079,8 +2083,22 @@ body.cnx-sem-rolagem {
 
 	/* No mobile o selo compõe com o degradê, visível atrás do título. */
 	.cnx-cta__selo {
+		top: 0;
 		width: 150px;
 		opacity: .9;
+		transform: none;
+	}
+
+	.cnx-cta__chamada {
+		padding-left: 0;
+	}
+
+	.cnx-cta__titulo {
+		font-size: 20px;
+	}
+
+	.cnx-cta__subtitulo {
+		font-size: 18px;
 	}
 
 	/* Divisória entre a chamada e o formulário, como no layout. */
