@@ -1117,14 +1117,14 @@ body.cnx-sem-rolagem {
 	/* Proporção do design: cards de 309x363. */
 	aspect-ratio: 309 / 363;
 	overflow: hidden;
-	background: var(--cnx-fundo);
+	background: #edeceb;
 	border-radius: 2px;
 }
 
 .cnx-card-categoria__midia img {
 	width: 100%;
 	height: 100%;
-	object-fit: cover;
+	object-fit: contain;
 	transition: transform .3s ease;
 }
 
@@ -1188,13 +1188,13 @@ body.cnx-sem-rolagem {
 	/* Tarja + foto somam a mesma proporção 309x363 dos demais cards. */
 	aspect-ratio: 309 / 326;
 	overflow: hidden;
-	background: var(--cnx-fundo);
+	background: #edeceb;
 }
 
 .cnx-card-solucao__midia img {
 	width: 100%;
 	height: 100%;
-	object-fit: cover;
+	object-fit: contain;
 	transition: transform .3s ease;
 }
 
@@ -1232,14 +1232,14 @@ body.cnx-sem-rolagem {
 	/* Proporção do design: cards de 309x363. */
 	aspect-ratio: 309 / 363;
 	overflow: hidden;
-	background: var(--cnx-fundo);
+	background: #edeceb;
 	border-radius: 2px;
 }
 
 .cnx-card-produto__midia img {
 	width: 100%;
 	height: 100%;
-	object-fit: cover;
+	object-fit: contain;
 	transition: transform .3s ease;
 }
 

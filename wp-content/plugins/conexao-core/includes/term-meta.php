@@ -22,6 +22,12 @@ function cnx_term_fields( string $taxonomy ): array {
 				'label' => __( 'Imagem do card', 'conexao' ),
 				'ajuda' => __( 'Usada na seção "Categorias em destaque" da home.', 'conexao' ),
 			),
+			'cnx_fundo'    => array(
+				'tipo'   => 'cor',
+				'label'  => __( 'Cor de fundo do card', 'conexao' ),
+				'ajuda'  => __( 'Aparece atrás da imagem nas sobras do enquadramento.', 'conexao' ),
+				'padrao' => '#edeceb',
+			),
 			'cnx_ordem'    => array(
 				'tipo'  => 'numero',
 				'label' => __( 'Ordem', 'conexao' ),

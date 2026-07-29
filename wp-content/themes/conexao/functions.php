@@ -26,8 +26,10 @@ function cnx_theme_setup(): void {
 		)
 	);
 
-	add_image_size( 'cnx-produto', 900, 700, true );
-	add_image_size( 'cnx-card', 480, 380, true );
+	// Sem crop: as artes aparecem inteiras (object-fit: contain no CSS) e o
+	// navegador recebe pixels suficientes para telas com escala de 125%/150%.
+	add_image_size( 'cnx-produto', 1200, 1200, false );
+	add_image_size( 'cnx-card', 800, 800, false );
 }
 
 /**
