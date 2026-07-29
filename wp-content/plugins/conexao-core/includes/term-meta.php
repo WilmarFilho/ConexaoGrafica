@@ -33,6 +33,16 @@ function cnx_term_fields( string $taxonomy ): array {
 				'label' => __( 'Ordem', 'conexao' ),
 				'ajuda' => __( 'Menor aparece primeiro. Vazio vai para o fim, em ordem alfabética.', 'conexao' ),
 			),
+			'cnx_seo_titulo' => array(
+				'tipo'  => 'texto',
+				'label' => __( 'SEO: título para buscadores', 'conexao' ),
+				'ajuda' => __( 'Até ~60 caracteres. Vazio usa o nome do termo.', 'conexao' ),
+			),
+			'cnx_seo_descricao' => array(
+				'tipo'  => 'textarea',
+				'label' => __( 'SEO: descrição para buscadores', 'conexao' ),
+				'ajuda' => __( 'Até ~160 caracteres. Vazio usa a descrição do termo.', 'conexao' ),
+			),
 			'cnx_destaque' => array(
 				'tipo'  => 'checkbox',
 				'label' => __( 'Exibir em "Categorias em destaque"', 'conexao' ),
@@ -175,6 +185,14 @@ function cnx_render_term_field( string $chave, array $campo, string $valor ): vo
 			);
 			break;
 
+		case 'textarea':
+			printf(
+				'<textarea id="%1$s" name="%1$s" rows="3" class="large-text">%2$s</textarea>',
+				esc_attr( $chave ),
+				esc_textarea( $valor )
+			);
+			break;
+
 		default: // texto | html
 			printf(
 				'<input type="text" id="%1$s" name="%1$s" value="%2$s" class="regular-text">',
@@ -225,6 +243,10 @@ function cnx_save_term_fields( int $term_id ): void {
 				$valor = isset( $_POST[ $chave ] ) && '' !== $_POST[ $chave ]
 					? (string) absint( $_POST[ $chave ] )
 					: '';
+				break;
+
+			case 'textarea':
+				$valor = isset( $_POST[ $chave ] ) ? sanitize_textarea_field( wp_unslash( $_POST[ $chave ] ) ) : '';
 				break;
 
 			case 'html':

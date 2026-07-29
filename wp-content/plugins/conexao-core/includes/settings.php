@@ -52,6 +52,8 @@ function cnx_register_settings(): void {
 		'cnx_sobre_curto'     => 'sanitize_textarea_field',
 		'cnx_endereco'        => 'sanitize_textarea_field',
 		'cnx_mapa_embed'      => 'esc_url_raw',
+		'cnx_seo_titulo'      => 'sanitize_text_field',
+		'cnx_seo_descricao'   => 'sanitize_textarea_field',
 	);
 
 	foreach ( $campos_texto as $chave => $sanitizer ) {
@@ -126,6 +128,33 @@ function cnx_render_settings_page(): void {
 						<p class="description">
 							<?php esc_html_e( 'Destino do botão "Solicitar Orçamento" da topbar. Se vazio, o botão abre o WhatsApp.', 'conexao' ); ?>
 						</p>
+					</td>
+				</tr>
+			</table>
+
+			<h2><?php esc_html_e( 'SEO da página inicial', 'conexao' ); ?></h2>
+
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row">
+						<label for="cnx_seo_titulo"><?php esc_html_e( 'Título para buscadores', 'conexao' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="cnx_seo_titulo" name="cnx_seo_titulo" class="large-text"
+							value="<?php echo esc_attr( get_option( 'cnx_seo_titulo', '' ) ); ?>"
+							placeholder="<?php esc_attr_e( 'Gráfica em Goiânia | Impressão profissional — Conexão Gráfica', 'conexao' ); ?>">
+						<p class="description"><?php esc_html_e( 'Até ~60 caracteres. Vazio usa o nome e a descrição do site.', 'conexao' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="cnx_seo_descricao"><?php esc_html_e( 'Descrição para buscadores', 'conexao' ); ?></label>
+					</th>
+					<td>
+						<textarea id="cnx_seo_descricao" name="cnx_seo_descricao" rows="3" class="large-text"><?php
+							echo esc_textarea( get_option( 'cnx_seo_descricao', '' ) );
+						?></textarea>
+						<p class="description"><?php esc_html_e( 'Até ~160 caracteres. Aparece no resultado do Google e ao compartilhar o link.', 'conexao' ); ?></p>
 					</td>
 				</tr>
 			</table>
