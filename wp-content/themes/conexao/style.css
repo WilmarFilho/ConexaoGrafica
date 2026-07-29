@@ -1188,7 +1188,7 @@ body.cnx-sem-rolagem {
 	/* Tarja + foto somam a mesma proporção 309x363 dos demais cards. */
 	aspect-ratio: 309 / 326;
 	overflow: hidden;
-	background: #edeceb;
+	background: #e2e2e2;
 }
 
 .cnx-card-solucao__midia img {

@@ -55,6 +55,12 @@ function cnx_term_fields( string $taxonomy ): array {
 				'label'   => __( 'Cor da tarja', 'conexao' ),
 				'padrao'  => '#ff6700',
 			),
+			'cnx_fundo'  => array(
+				'tipo'   => 'cor',
+				'label'  => __( 'Cor de fundo do card', 'conexao' ),
+				'ajuda'  => __( 'Aparece atrás da imagem nas sobras do enquadramento.', 'conexao' ),
+				'padrao' => '#e2e2e2',
+			),
 			'cnx_ordem'  => array(
 				'tipo'  => 'numero',
 				'label' => __( 'Ordem', 'conexao' ),

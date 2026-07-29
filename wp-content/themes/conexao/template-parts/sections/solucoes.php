@@ -29,6 +29,7 @@ if ( empty( $cnx_termos ) ) {
 				$cnx_cor    = (string) get_term_meta( $cnx_termo->term_id, 'cnx_cor', true );
 				$cnx_rotulo = (string) get_term_meta( $cnx_termo->term_id, 'cnx_rotulo', true );
 				$cnx_img    = (int) get_term_meta( $cnx_termo->term_id, 'cnx_imagem', true );
+				$cnx_fundo  = (string) get_term_meta( $cnx_termo->term_id, 'cnx_fundo', true );
 
 				if ( '' === $cnx_cor ) {
 					$cnx_cor = '#ff6700';
@@ -44,7 +45,8 @@ if ( empty( $cnx_termos ) ) {
 							<?php echo wp_kses( $cnx_rotulo, cnx_slide_html_permitido() ); ?>
 						</span>
 
-						<span class="cnx-card-solucao__midia">
+						<span class="cnx-card-solucao__midia"
+							<?php if ( '' !== $cnx_fundo ) : ?>style="background:<?php echo esc_attr( $cnx_fundo ); ?>;"<?php endif; ?>>
 							<?php cnx_figura( $cnx_img, 'cnx-card' ); ?>
 						</span>
 
