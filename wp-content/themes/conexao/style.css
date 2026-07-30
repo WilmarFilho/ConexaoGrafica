@@ -2517,7 +2517,7 @@ body.cnx-sem-rolagem {
 .cnx-produto__subtitulo {
 	margin: 0 0 22px;
 	color: #2a2a2a;
-	font-size: 28px;
+	font-size: clamp(22px, 1.8vw + 14px, 28px);
 	font-weight: 600;
 }
 
@@ -3302,7 +3302,12 @@ body.cnx-sem-rolagem {
 		order: 11;
 	}
 
-	/* Relacionados na tela de produto: grade 2x2, não carrossel. */
+}
+
+/* Relacionados na tela de produto: grade 2x2, não carrossel — mas só no mobile
+   de verdade. Entre 700 e 900px duas colunas viram cards gigantes que estouram
+   a página; nessa faixa fica o trilho padrão. */
+@media (max-width: 700px) {
 	.single-cnx_produto .cnx-vitrine .cnx-grade--trilho {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
@@ -3324,14 +3329,14 @@ body.cnx-sem-rolagem {
 .cnx-produto__titulo {
 	margin: 0 0 12px;
 	color: #2a2a2a;
-	font-size: 28px;
+	font-size: clamp(22px, 1.8vw + 14px, 28px);
 	font-weight: 600;
 }
 
 .cnx-produto__resumo {
 	margin: 0 0 34px;
 	color: var(--cnx-tinta-suave);
-	font-size: 18px;
+	font-size: clamp(15px, 1vw + 11px, 18px);
 	font-weight: 600;
 	line-height: 1.55;
 }
@@ -3391,14 +3396,14 @@ body.cnx-sem-rolagem {
 .cnx-config__titulo {
 	margin: 0 0 2px;
 	color: #2a2a2a;
-	font-size: 18px;
+	font-size: clamp(15px, 1vw + 11px, 18px);
 	font-weight: 600;
 }
 
 .cnx-config__ajuda {
 	margin: 4px 0 14px;
 	color: var(--cnx-tinta-suave);
-	font-size: 16px;
+	font-size: clamp(14px, 0.8vw + 11px, 16px);
 	font-weight: 500;
 }
 
@@ -3411,7 +3416,7 @@ body.cnx-sem-rolagem {
 .cnx-opcao {
 	padding: 13px 14px;
 	color: var(--cnx-tinta-suave);
-	font-size: 16px;
+	font-size: clamp(14px, 0.8vw + 11px, 16px);
 	font-weight: 500;
 	text-align: center;
 	background: #fff;
@@ -3446,7 +3451,7 @@ body.cnx-sem-rolagem {
 .cnx-resumo__titulo {
 	margin: 0 0 14px;
 	color: #2a2a2a;
-	font-size: 18px;
+	font-size: clamp(15px, 1vw + 11px, 18px);
 	font-weight: 600;
 }
 
@@ -3455,7 +3460,7 @@ body.cnx-sem-rolagem {
 	justify-content: space-between;
 	gap: 16px;
 	padding: 8px 0;
-	font-size: 16px;
+	font-size: clamp(14px, 0.8vw + 11px, 16px);
 	font-weight: 500;
 	border-bottom: 1px solid var(--cnx-borda);
 }
@@ -3511,7 +3516,7 @@ body.cnx-sem-rolagem {
 .cnx-accordion summary {
 	padding: 14px 0;
 	color: #2a2a2a;
-	font-size: 18px;
+	font-size: clamp(15px, 1vw + 11px, 18px);
 	font-weight: 600;
 	list-style: none;
 	cursor: pointer;
@@ -3534,6 +3539,6 @@ body.cnx-sem-rolagem {
 .cnx-accordion__conteudo {
 	padding-bottom: 16px;
 	color: var(--cnx-cinza);
-	font-size: 16px;
+	font-size: clamp(14px, 0.8vw + 11px, 16px);
 	font-weight: 500;
 }
