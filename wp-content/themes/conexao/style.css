@@ -3256,7 +3256,26 @@ body.cnx-sem-rolagem {
 	padding: 32px 0 64px;
 }
 
+/* No desktop o lugar dele é da trilha; só o mobile o exibe. */
+.cnx-produto__categoria {
+	display: none;
+}
+
 @media (max-width: 900px) {
+	/* No mobile a trilha dá lugar ao cabeçalho de categoria, como no design. */
+	.single-cnx_produto .cnx-trilha {
+		display: none;
+	}
+
+	.cnx-produto__categoria {
+		display: block;
+		padding-top: 26px;
+	}
+
+	.cnx-produto__categoria .cnx-listagem__titulo {
+		font-size: 24px;
+	}
+
 	/* Ordem do design no mobile: galeria → título e configuração → accordions.
 	   display:contents promove os filhos das duas colunas ao grid, e só o
 	   accordion precisa de order para descer. */

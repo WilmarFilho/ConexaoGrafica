@@ -35,6 +35,14 @@ while ( have_posts() ) :
 
 	<div class="cnx-secao__inner">
 		<?php cnx_breadcrumb( $trilha ); ?>
+
+		<?php if ( $categoria instanceof WP_Term ) : ?>
+			<?php // No mobile a trilha dá lugar a este cabeçalho, como no design. ?>
+			<header class="cnx-produto__categoria">
+				<p class="cnx-listagem__rotulo"><?php esc_html_e( 'Categoria', 'conexao' ); ?></p>
+				<h2 class="cnx-listagem__titulo"><?php echo esc_html( $categoria->name ); ?></h2>
+			</header>
+		<?php endif; ?>
 	</div>
 
 	<div class="cnx-secao__inner">
@@ -48,12 +56,13 @@ while ( have_posts() ) :
 
 					<?php if ( count( $galeria ) > 1 ) : ?>
 						<ul class="cnx-galeria-thumbs">
-							<?php foreach ( $galeria as $i => $img_id ) : ?>
+							<?php // Como no design: só as fotos além da principal viram miniatura. ?>
+							<?php foreach ( array_slice( $galeria, 1 ) as $img_id ) : ?>
 								<li>
 									<button type="button"
 										data-cnx-thumb
 										data-full="<?php echo esc_url( (string) wp_get_attachment_image_url( $img_id, 'cnx-produto' ) ); ?>"
-										aria-current="<?php echo 0 === $i ? 'true' : 'false'; ?>">
+										aria-current="false">
 										<?php echo wp_get_attachment_image( $img_id, 'cnx-card' ); ?>
 									</button>
 								</li>
