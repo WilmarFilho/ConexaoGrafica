@@ -1352,14 +1352,14 @@ body.cnx-sem-rolagem {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 150px;
-	height: 150px;
+	width: 120px;
+	height: 120px;
 	background: var(--cnx-laranja);
 	border-radius: 50%;
 }
 
 .cnx-etapa__circulo img {
-	width: 54px;
+	width: 44px;
 	height: auto;
 }
 
@@ -2381,10 +2381,8 @@ body.cnx-sem-rolagem {
 	min-height: 640px;
 	border: 0;
 	border-radius: 4px;
-	/* Aproxima o estilo laranja do design (hue #ff6800). O JSON de estilos do
-	   Google só funciona na API JavaScript, que exige chave e cobrança — num
-	   iframe de incorporação a única alavanca é filtro CSS sobre o quadro. */
-	filter: sepia(.42) saturate(1.6) hue-rotate(-12deg) contrast(.96) brightness(1.03);
+	/* O filtro laranja foi reprovado pelo design: fica o mapa cinza tradicional. */
+	filter: grayscale(1) contrast(.98);
 }
 
 .cnx-mapa--vazio {
@@ -2746,6 +2744,14 @@ body.cnx-sem-rolagem {
 	font-weight: 700;
 }
 
+/* Linha de data das paginas legais. */
+.cnx-pagina .cnx-atualizacao {
+	margin-top: 4px;
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 600;
+}
+
 .cnx-pagina > p,
 .cnx-pagina > ul,
 .cnx-pagina > ol {
@@ -3030,8 +3036,8 @@ body.cnx-sem-rolagem {
 }
 
 .cnx-rodape__selo svg {
-	width: 12px;
-	height: 12px;
+	width: 18px;
+	height: 18px;
 }
 
 /* O selo existe duas vezes na marcação (desktop e mobile); só uma é visível

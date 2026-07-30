@@ -21,6 +21,10 @@ while ( have_posts() ) :
 				<?php cnx_breadcrumb( array( array( get_the_title(), '' ) ) ); ?>
 			</div>
 		<?php elseif ( ! is_front_page() ) : ?>
+			<div class="cnx-secao__inner">
+				<?php cnx_breadcrumb( array( array( get_the_title(), '' ) ) ); ?>
+			</div>
+
 			<h1 class="cnx-pagina__titulo"><?php the_title(); ?></h1>
 		<?php endif; ?>
 
