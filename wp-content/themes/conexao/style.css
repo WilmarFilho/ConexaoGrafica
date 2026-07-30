@@ -3269,7 +3269,7 @@ body.cnx-sem-rolagem {
 
 	.cnx-produto__categoria {
 		display: block;
-		padding-top: 26px;
+		padding-top: 10px;
 	}
 
 	.cnx-produto__categoria .cnx-listagem__titulo {
@@ -3304,25 +3304,32 @@ body.cnx-sem-rolagem {
 
 }
 
-/* Relacionados na tela de produto: grade 2x2, não carrossel — mas só no mobile
-   de verdade. Entre 700 e 900px duas colunas viram cards gigantes que estouram
-   a página; nessa faixa fica o trilho padrão. */
+/* Relacionados na tela de produto: SEMPRE grade, nunca carrossel — 4 colunas
+   como no design de desktop, 2 no mobile. Uma regra por largura, sem faixa
+   intermediária herdando comportamento de trilho que estourava a página. */
+.single-cnx_produto .cnx-vitrine .cnx-grade--trilho {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 24px 16px;
+	padding: 0;
+	overflow: visible;
+}
+
+.single-cnx_produto .cnx-vitrine .cnx-grade--trilho > li {
+	flex: none;
+	width: auto;
+	padding: 0;
+}
+
+.single-cnx_produto .cnx-vitrine .cnx-seta {
+	display: none;
+}
+
 @media (max-width: 700px) {
 	.single-cnx_produto .cnx-vitrine .cnx-grade--trilho {
-		display: grid;
 		grid-template-columns: repeat(2, 1fr);
 		gap: 22px 14px;
 		padding: 0 20px;
-		overflow: visible;
-	}
-
-	.single-cnx_produto .cnx-vitrine .cnx-grade--trilho > li {
-		flex: none;
-		padding: 0;
-	}
-
-	.single-cnx_produto .cnx-vitrine .cnx-seta {
-		display: none;
 	}
 }
 
