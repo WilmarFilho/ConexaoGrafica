@@ -2515,10 +2515,10 @@ body.cnx-sem-rolagem {
 
 /* Título "Configuração" no padrão dos títulos internos do design. */
 .cnx-produto__subtitulo {
-	margin: 0 0 18px;
-	color: var(--cnx-tinta);
-	font-size: 22px;
-	font-weight: 700;
+	margin: 0 0 22px;
+	color: #2a2a2a;
+	font-size: 28px;
+	font-weight: 600;
 }
 
 /* --- Card de listagem --------------------------------------------------- */
@@ -3257,25 +3257,64 @@ body.cnx-sem-rolagem {
 }
 
 @media (max-width: 900px) {
+	/* Ordem do design no mobile: galeria → título e configuração → accordions.
+	   display:contents promove os filhos das duas colunas ao grid, e só o
+	   accordion precisa de order para descer. */
 	.cnx-produto {
 		grid-template-columns: 1fr;
-		gap: 28px;
+		gap: 0;
+	}
+
+	.cnx-produto__midia,
+	.cnx-produto__info {
+		display: contents;
+	}
+
+	.cnx-produto .cnx-galeria-thumbs {
+		margin-bottom: 30px;
+	}
+
+	.cnx-produto .cnx-accordion {
+		order: 10;
+		margin-top: 34px;
+	}
+
+	.cnx-produto .cnx-produto__descricao {
+		order: 11;
+	}
+
+	/* Relacionados na tela de produto: grade 2x2, não carrossel. */
+	.single-cnx_produto .cnx-vitrine .cnx-grade--trilho {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 22px 14px;
+		padding: 0 20px;
+		overflow: visible;
+	}
+
+	.single-cnx_produto .cnx-vitrine .cnx-grade--trilho > li {
+		flex: none;
+		padding: 0;
+	}
+
+	.single-cnx_produto .cnx-vitrine .cnx-seta {
+		display: none;
 	}
 }
 
 .cnx-produto__titulo {
 	margin: 0 0 12px;
-	color: var(--cnx-tinta);
-	font-size: 26px;
+	color: #2a2a2a;
+	font-size: 28px;
 	font-weight: 600;
 }
 
 .cnx-produto__resumo {
-	margin: 0 0 30px;
+	margin: 0 0 34px;
 	color: var(--cnx-tinta-suave);
-	font-size: 16px;
-	font-weight: 500;
-	line-height: 1.6;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.55;
 }
 
 .cnx-galeria-principal img {
@@ -3318,21 +3357,29 @@ body.cnx-sem-rolagem {
 
 /* --- Configurador ----------------------------------------------------- */
 
+/* fieldset traz borda e padding proprios do navegador: sem o reset, o grupo
+   inteiro ganha um contorno que nao existe no design. */
 .cnx-config__grupo {
-	margin-bottom: 26px;
+	margin: 0 0 28px;
+	padding: 0;
+	border: 0;
+}
+
+.cnx-config__grupo legend {
+	padding: 0;
 }
 
 .cnx-config__titulo {
 	margin: 0 0 2px;
-	color: var(--cnx-tinta);
-	font-size: 16px;
-	font-weight: 700;
+	color: #2a2a2a;
+	font-size: 18px;
+	font-weight: 600;
 }
 
 .cnx-config__ajuda {
-	margin: 0 0 12px;
+	margin: 4px 0 14px;
 	color: var(--cnx-tinta-suave);
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: 500;
 }
 
@@ -3345,7 +3392,7 @@ body.cnx-sem-rolagem {
 .cnx-opcao {
 	padding: 13px 14px;
 	color: var(--cnx-tinta-suave);
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: 500;
 	text-align: center;
 	background: #fff;
@@ -3379,9 +3426,9 @@ body.cnx-sem-rolagem {
 
 .cnx-resumo__titulo {
 	margin: 0 0 14px;
-	color: var(--cnx-tinta);
-	font-size: 16px;
-	font-weight: 700;
+	color: #2a2a2a;
+	font-size: 18px;
+	font-weight: 600;
 }
 
 .cnx-resumo__linha {
@@ -3389,7 +3436,8 @@ body.cnx-sem-rolagem {
 	justify-content: space-between;
 	gap: 16px;
 	padding: 8px 0;
-	font-size: 14px;
+	font-size: 16px;
+	font-weight: 500;
 	border-bottom: 1px solid var(--cnx-borda);
 }
 
@@ -3443,7 +3491,9 @@ body.cnx-sem-rolagem {
 
 .cnx-accordion summary {
 	padding: 14px 0;
-	font-size: 15px;
+	color: #2a2a2a;
+	font-size: 18px;
+	font-weight: 600;
 	list-style: none;
 	cursor: pointer;
 }
@@ -3465,5 +3515,6 @@ body.cnx-sem-rolagem {
 .cnx-accordion__conteudo {
 	padding-bottom: 16px;
 	color: var(--cnx-cinza);
-	font-size: 14px;
+	font-size: 16px;
+	font-weight: 500;
 }
