@@ -1352,14 +1352,14 @@ body.cnx-sem-rolagem {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 120px;
-	height: 120px;
+	width: 90px;
+	height: 90px;
 	background: var(--cnx-laranja);
 	border-radius: 50%;
 }
 
 .cnx-etapa__circulo img {
-	width: 44px;
+	width: 34px;
 	height: auto;
 }
 
@@ -1373,7 +1373,7 @@ body.cnx-sem-rolagem {
 .cnx-etapas__seta {
 	display: flex;
 	align-items: center;
-	height: 150px;
+	height: 90px;
 	color: #c9c9c9;
 }
 
@@ -3036,8 +3036,8 @@ body.cnx-sem-rolagem {
 }
 
 .cnx-rodape__selo svg {
-	width: 18px;
-	height: 18px;
+	width: 30px;
+	height: 30px;
 }
 
 /* O selo existe duas vezes na marcação (desktop e mobile); só uma é visível
