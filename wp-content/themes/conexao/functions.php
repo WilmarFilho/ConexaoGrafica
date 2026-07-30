@@ -193,6 +193,21 @@ function cnx_asset_ver( string $relativo ): string {
 		: CNX_THEME_VERSION;
 }
 
+/**
+ * Sem Cache-Control o navegador aplica cache heurístico ao HTML e segura
+ * páginas antigas — que apontam para CSS antigo, mesmo com URL versionada.
+ * no-cache obriga a revalidar o HTML a cada visita; os assets continuam
+ * plenamente cacheáveis porque a versão na URL muda a cada alteração.
+ */
+add_action(
+	'send_headers',
+	static function (): void {
+		if ( ! is_admin() ) {
+			header( 'Cache-Control: no-cache, must-revalidate' );
+		}
+	}
+);
+
 add_action( 'wp_enqueue_scripts', 'cnx_theme_assets' );
 
 function cnx_theme_assets(): void {
