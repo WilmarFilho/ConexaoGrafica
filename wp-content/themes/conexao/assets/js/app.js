@@ -237,11 +237,50 @@
 		}, true );
 	}
 
+	/**
+	 * Página de resultados: seletor de ordenação recarrega com o parâmetro, e o
+	 * par grade/lista só troca classe — sem nova requisição.
+	 */
+	function busca() {
+		var ordem = document.querySelector( '[data-cnx-ordem]' );
+
+		if ( ordem ) {
+			ordem.addEventListener( 'change', function () {
+				var url = new URL( window.location.href );
+
+				if ( ordem.value ) {
+					url.searchParams.set( 'ordem', ordem.value );
+				} else {
+					url.searchParams.delete( 'ordem' );
+				}
+
+				window.location.href = url.toString();
+			} );
+		}
+
+		var resultados = document.querySelector( '[data-cnx-resultados]' );
+
+		document.querySelectorAll( '[data-cnx-vista]' ).forEach( function ( botao ) {
+			botao.addEventListener( 'click', function () {
+				if ( ! resultados ) {
+					return;
+				}
+
+				resultados.classList.toggle( 'esta-em-lista', 'lista' === botao.dataset.cnxVista );
+
+				document.querySelectorAll( '[data-cnx-vista]' ).forEach( function ( outro ) {
+					outro.setAttribute( 'aria-pressed', String( outro === botao ) );
+				} );
+			} );
+		} );
+	}
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		botaoVoltarAoTopo();
 		menuMobile();
 		compartilhar();
 		rastreamento();
 		consentimento();
+		busca();
 	} );
 } )();

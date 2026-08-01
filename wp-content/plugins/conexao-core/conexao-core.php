@@ -31,6 +31,7 @@ define( 'CNX_TAX_SOLUCAO', 'cnx_solucao' );
 require_once CNX_PATH . 'includes/helpers.php';
 require_once CNX_PATH . 'includes/post-types.php';
 require_once CNX_PATH . 'includes/taxonomies.php';
+require_once CNX_PATH . 'includes/busca.php';
 require_once CNX_PATH . 'includes/meta-produto.php';
 require_once CNX_PATH . 'includes/meta-slide.php';
 require_once CNX_PATH . 'includes/meta-banner.php';
