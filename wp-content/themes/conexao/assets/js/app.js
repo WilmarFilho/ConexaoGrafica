@@ -258,6 +258,51 @@
 			} );
 		}
 
+		// No celular os filtros abrem como painel sobre a página (botão funil).
+		var filtros = document.querySelector( '[data-cnx-filtros]' );
+		var fundo   = document.querySelector( '[data-cnx-filtros-fundo]' );
+		var abrirF  = document.querySelector( '[data-cnx-filtros-abrir]' );
+
+		function fecharFiltros() {
+			if ( filtros ) {
+				filtros.classList.remove( 'esta-aberto' );
+			}
+
+			if ( fundo ) {
+				fundo.hidden = true;
+			}
+
+			document.body.classList.remove( 'cnx-sem-rolagem' );
+		}
+
+		if ( abrirF && filtros ) {
+			abrirF.addEventListener( 'click', function () {
+				filtros.classList.add( 'esta-aberto' );
+
+				if ( fundo ) {
+					fundo.hidden = false;
+				}
+
+				document.body.classList.add( 'cnx-sem-rolagem' );
+			} );
+
+			var fecharF = filtros.querySelector( '[data-cnx-filtros-fechar]' );
+
+			if ( fecharF ) {
+				fecharF.addEventListener( 'click', fecharFiltros );
+			}
+
+			if ( fundo ) {
+				fundo.addEventListener( 'click', fecharFiltros );
+			}
+
+			document.addEventListener( 'keydown', function ( e ) {
+				if ( 'Escape' === e.key ) {
+					fecharFiltros();
+				}
+			} );
+		}
+
 		var resultados = document.querySelector( '[data-cnx-resultados]' );
 
 		document.querySelectorAll( '[data-cnx-vista]' ).forEach( function ( botao ) {

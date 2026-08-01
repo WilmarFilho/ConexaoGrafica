@@ -74,15 +74,25 @@ foreach ( $cnx_faixas as $cnx_chave => $cnx_faixa ) {
 <div class="cnx-secao__inner cnx-busca-pagina">
 
 	<header class="cnx-busca-pagina__cabecalho">
-		<h1 class="cnx-busca-pagina__titulo">
-			<?php
-			printf(
-				/* translators: %s: termo buscado */
-				esc_html__( 'Resultados para “%s”', 'conexao' ),
-				esc_html( $cnx_termo )
-			);
-			?>
-		</h1>
+		<div class="cnx-busca-pagina__topo">
+			<h1 class="cnx-busca-pagina__titulo">
+				<?php
+				printf(
+					/* translators: %s: termo buscado */
+					esc_html__( 'Resultados para “%s”', 'conexao' ),
+					esc_html( $cnx_termo )
+				);
+				?>
+			</h1>
+
+			<button type="button" class="cnx-busca-pagina__abrir-filtros" data-cnx-filtros-abrir
+				aria-label="<?php esc_attr_e( 'Abrir filtros', 'conexao' ); ?>">
+				<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+					<path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/>
+				</svg>
+			</button>
+		</div>
 
 		<p class="cnx-busca-pagina__contagem">
 			<?php
@@ -110,7 +120,17 @@ foreach ( $cnx_faixas as $cnx_chave => $cnx_faixa ) {
 
 	<div class="cnx-busca-pagina__grade">
 
-		<form class="cnx-filtros" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+		<div class="cnx-filtros-fundo" data-cnx-filtros-fundo hidden></div>
+
+		<form class="cnx-filtros" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>" data-cnx-filtros>
+			<button type="button" class="cnx-filtros__fechar" data-cnx-filtros-fechar
+				aria-label="<?php esc_attr_e( 'Fechar filtros', 'conexao' ); ?>">
+				<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" aria-hidden="true" focusable="false">
+					<path d="M6 6l12 12M18 6L6 18"/>
+				</svg>
+			</button>
+
 			<input type="hidden" name="s" value="<?php echo esc_attr( $cnx_termo ); ?>">
 			<?php if ( '' !== $cnx_ordem ) : ?>
 				<input type="hidden" name="ordem" value="<?php echo esc_attr( $cnx_ordem ); ?>">

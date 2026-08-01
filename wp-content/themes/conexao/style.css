@@ -2763,11 +2763,48 @@ body.cnx-sem-rolagem {
 
 /* --- Resultados de busca -------------------------------------------------- */
 
+.cnx-busca-pagina__topo {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+	justify-content: space-between;
+}
+
 .cnx-busca-pagina__titulo {
 	margin: 6px 0 4px;
 	color: var(--cnx-tinta);
 	font-size: clamp(22px, 2.4vw, 28px);
 	font-weight: 600;
+}
+
+/* O funil só existe no celular, onde os filtros viram painel sobreposto. */
+.cnx-busca-pagina__abrir-filtros {
+	display: none;
+	flex-shrink: 0;
+	padding: 4px;
+	color: var(--cnx-laranja);
+	background: none;
+	border: 0;
+	cursor: pointer;
+}
+
+.cnx-filtros__fechar {
+	display: none;
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	padding: 6px;
+	color: #b5b5b5;
+	background: none;
+	border: 0;
+	cursor: pointer;
+}
+
+.cnx-filtros-fundo {
+	position: fixed;
+	inset: 0;
+	z-index: 70;
+	background: rgba(11, 4, 0, 0.6);
 }
 
 .cnx-busca-pagina__contagem {
@@ -2924,9 +2961,9 @@ body.cnx-sem-rolagem {
 	justify-content: center;
 	width: 38px;
 	height: 38px;
-	color: #b5b5b5;
-	background: #fff;
-	border: 1px solid var(--cnx-borda);
+	color: var(--cnx-laranja);
+	background: #ffece1;
+	border: 0;
 	border-radius: 3px;
 	cursor: pointer;
 }
@@ -2960,6 +2997,35 @@ body.cnx-sem-rolagem {
 	.cnx-busca-pagina__grade {
 		grid-template-columns: 1fr;
 		gap: 24px;
+	}
+
+	.cnx-busca-pagina__abrir-filtros {
+		display: flex;
+	}
+
+	/* No celular o formulário sai do fluxo e vira painel sobre a página. */
+	.cnx-filtros {
+		display: none;
+	}
+
+	.cnx-filtros.esta-aberto {
+		display: block;
+		position: fixed;
+		top: 20px;
+		right: 14px;
+		bottom: auto;
+		left: 14px;
+		z-index: 71;
+		max-height: calc(100vh - 40px);
+		max-height: calc(100dvh - 40px);
+		overflow-y: auto;
+		padding: 28px 22px 22px;
+		background: #fff;
+		border-radius: 6px;
+	}
+
+	.cnx-filtros.esta-aberto .cnx-filtros__fechar {
+		display: block;
 	}
 }
 
