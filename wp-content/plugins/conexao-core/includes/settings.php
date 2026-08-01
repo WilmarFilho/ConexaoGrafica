@@ -56,6 +56,7 @@ function cnx_register_settings(): void {
 		'cnx_seo_descricao'   => 'sanitize_textarea_field',
 		'cnx_ga4_id'          => 'sanitize_text_field',
 		'cnx_gtm_id'          => 'sanitize_text_field',
+		'cnx_google_verificacao' => 'sanitize_text_field',
 	);
 
 	foreach ( $campos_texto as $chave => $sanitizer ) {
@@ -182,6 +183,19 @@ function cnx_render_settings_page(): void {
 							placeholder="GTM-XXXXXXX">
 						<p class="description">
 							<?php esc_html_e( 'ID do contêiner GTM. As tags respeitam o aviso de cookies (Consent Mode): nada grava cookie antes de o visitante aceitar.', 'conexao' ); ?>
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="cnx_google_verificacao"><?php esc_html_e( 'Verificação do Google', 'conexao' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="cnx_google_verificacao" name="cnx_google_verificacao" class="large-text"
+							value="<?php echo esc_attr( get_option( 'cnx_google_verificacao', '' ) ); ?>"
+							placeholder="código do método 'Tag HTML' do Search Console">
+						<p class="description">
+							<?php esc_html_e( 'Cole só o código (o conteúdo do content), não a tag inteira. Vira a meta google-site-verification no site.', 'conexao' ); ?>
 						</p>
 					</td>
 				</tr>

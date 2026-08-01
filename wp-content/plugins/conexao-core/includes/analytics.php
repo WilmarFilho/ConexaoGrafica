@@ -23,6 +23,26 @@ function cnx_gtm_id(): string {
 }
 
 /**
+ * Meta de verificação do Search Console (método "Tag HTML").
+ */
+add_action(
+	'wp_head',
+	static function (): void {
+		$codigo = trim( (string) get_option( 'cnx_google_verificacao', '' ) );
+
+		// Aceita colar a tag inteira: extrai só o content.
+		if ( preg_match( '/content=["\']([^"\']+)["\']/', $codigo, $m ) ) {
+			$codigo = $m[1];
+		}
+
+		if ( '' !== $codigo && preg_match( '/^[A-Za-z0-9_-]{20,}$/', $codigo ) ) {
+			printf( '<meta name="google-site-verification" content="%s">' . "\n", esc_attr( $codigo ) );
+		}
+	},
+	1
+);
+
+/**
  * Consentimento padrão + tags. Prioridade 2: antes de tudo que imprime script.
  */
 add_action( 'wp_head', 'cnx_analytics_head', 2 );
