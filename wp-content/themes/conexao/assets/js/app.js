@@ -133,6 +133,61 @@
 		}
 	}
 
+	// produto.js reaproveita para os eventos de funil.
+	window.cnxRastrear = rastrear;
+
+	/**
+	 * Aviso de cookies + Consent Mode.
+	 *
+	 * O padrão "negado" já foi definido no <head> antes das tags; aqui só entra
+	 * a decisão do visitante — aplicada na hora e lembrada nas próximas visitas.
+	 */
+	function consentimento() {
+		var aviso = document.querySelector( '[data-cnx-cookies]' );
+
+		if ( ! aviso ) {
+			return;
+		}
+
+		var escolha = null;
+
+		try {
+			escolha = localStorage.getItem( 'cnx_consentimento' );
+		} catch ( e ) {}
+
+		if ( escolha ) {
+			return; // Já decidiu: o head reaplicou; o aviso continua escondido.
+		}
+
+		aviso.hidden = false;
+
+		function decidir( aceitou ) {
+			try {
+				localStorage.setItem( 'cnx_consentimento', aceitou ? 'granted' : 'denied' );
+			} catch ( e ) {}
+
+			if ( aceitou && typeof window.gtag === 'function' ) {
+				window.gtag( 'consent', 'update', {
+					ad_storage: 'granted',
+					ad_user_data: 'granted',
+					ad_personalization: 'granted',
+					analytics_storage: 'granted'
+				} );
+			}
+
+			rastrear( 'cnx_consentimento', { escolha: aceitou ? 'aceitou' : 'recusou' } );
+			aviso.hidden = true;
+		}
+
+		aviso.querySelector( '[data-cnx-cookies-aceitar]' ).addEventListener( 'click', function () {
+			decidir( true );
+		} );
+
+		aviso.querySelector( '[data-cnx-cookies-recusar]' ).addEventListener( 'click', function () {
+			decidir( false );
+		} );
+	}
+
 	function rastreamento() {
 		document.addEventListener( 'click', function ( e ) {
 			var alvo = e.target.closest( 'a, button' );
@@ -153,6 +208,15 @@
 				rastrear( 'abriu_orcamento', { pagina: window.location.pathname } );
 			} else if ( alvo.classList.contains( 'cnx-topbar__cta' ) || alvo.classList.contains( 'cnx-btn--primario' ) ) {
 				rastrear( 'clique_solicitar_orcamento', { pagina: window.location.pathname } );
+			} else if ( alvo.classList.contains( 'cnx-card-produto' ) || alvo.classList.contains( 'cnx-card-simples' ) ) {
+				// Clique num card de produto: select_item, nome do funil GA4.
+				var nomeEl = alvo.querySelector( 'strong, .cnx-card-simples__nome' );
+				var nome   = nomeEl ? nomeEl.textContent.trim() : '';
+
+				rastrear( 'select_item', {
+					item_list_name: window.location.pathname,
+					items: [ { item_name: nome.replace( /:$/, '' ) } ]
+				} );
 			}
 		}, true );
 
@@ -163,8 +227,10 @@
 				rastrear( 'enviou_orcamento_produto', { pagina: window.location.pathname } );
 			} else if ( form.classList.contains( 'cnx-form-contato' ) ) {
 				rastrear( 'enviou_contato', {} );
+				rastrear( 'generate_lead', { lead_source: 'contato' } );
 			} else if ( form.classList.contains( 'cnx-form' ) ) {
 				rastrear( 'enviou_desconto', {} );
+				rastrear( 'generate_lead', { lead_source: 'desconto_rodape' } );
 			} else if ( form.classList.contains( 'cnx-busca' ) || form.classList.contains( 'cnx-busca-lateral' ) ) {
 				rastrear( 'buscou', { termo: ( form.querySelector( 'input[name="s"]' ) || {} ).value || '' } );
 			}
@@ -176,5 +242,6 @@
 		menuMobile();
 		compartilhar();
 		rastreamento();
+		consentimento();
 	} );
 } )();

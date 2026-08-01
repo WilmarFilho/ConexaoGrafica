@@ -2761,6 +2761,81 @@ body.cnx-sem-rolagem {
 	line-height: 1.65;
 }
 
+/* --- Aviso de cookies ----------------------------------------------------- */
+
+.cnx-cookies {
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	left: 20px;
+	z-index: 70;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px 24px;
+	align-items: center;
+	justify-content: space-between;
+	max-width: 720px;
+	margin: 0 auto;
+	padding: 18px 22px;
+	background: #fff;
+	border: 1px solid var(--cnx-borda);
+	border-radius: 4px;
+	box-shadow: 0 10px 34px rgba(0, 0, 0, .16);
+}
+
+.cnx-cookies[hidden] {
+	display: none;
+}
+
+.cnx-cookies__texto {
+	margin: 0;
+	color: var(--cnx-tinta-suave);
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.5;
+}
+
+.cnx-cookies__texto a {
+	color: var(--cnx-laranja);
+}
+
+.cnx-cookies__acoes {
+	display: flex;
+	gap: 10px;
+	margin-left: auto;
+}
+
+.cnx-cookies__aceitar,
+.cnx-cookies__recusar {
+	padding: 10px 18px;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 700;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.cnx-cookies__aceitar {
+	color: #fff;
+	background: var(--cnx-laranja);
+	border: 0;
+}
+
+.cnx-cookies__aceitar:hover {
+	background: var(--cnx-laranja-escuro);
+}
+
+.cnx-cookies__recusar {
+	color: var(--cnx-tinta-suave);
+	background: #fff;
+	border: 1px solid var(--cnx-borda);
+}
+
+.cnx-cookies__recusar:hover {
+	color: var(--cnx-tinta);
+	border-color: var(--cnx-tinta);
+}
+
 /* --- Página 404 ---------------------------------------------------------- */
 
 .cnx-404 {

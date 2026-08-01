@@ -7,6 +7,24 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'CNX_THEME_VERSION', '0.1.0' );
 
+/**
+ * Preload das fontes: todo texto do site depende da Nunito, e sem preload o
+ * navegador só a descobre depois de baixar e ler o CSS — em 4G isso é FOUT
+ * visível. A latin-ext cobre os acentos do português.
+ */
+add_action(
+	'wp_head',
+	static function (): void {
+		foreach ( array( 'nunito-latin.woff2', 'nunito-latin-ext.woff2' ) as $fonte ) {
+			printf(
+				'<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n",
+				esc_url( get_theme_file_uri( 'assets/fonts/' . $fonte ) )
+			);
+		}
+	},
+	1
+);
+
 add_action( 'after_setup_theme', 'cnx_theme_setup' );
 
 function cnx_theme_setup(): void {

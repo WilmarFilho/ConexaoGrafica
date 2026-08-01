@@ -37,6 +37,8 @@ require_once CNX_PATH . 'includes/meta-banner.php';
 require_once CNX_PATH . 'includes/term-meta.php';
 require_once CNX_PATH . 'includes/leads.php';
 require_once CNX_PATH . 'includes/seo.php';
+require_once CNX_PATH . 'includes/analytics.php';
+require_once CNX_PATH . 'includes/performance.php';
 require_once CNX_PATH . 'includes/shortcodes.php';
 require_once CNX_PATH . 'includes/admin-columns.php';
 require_once CNX_PATH . 'includes/admin-assets.php';

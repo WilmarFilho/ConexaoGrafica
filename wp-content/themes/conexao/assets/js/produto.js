@@ -173,8 +173,39 @@
 		atualizar();
 	}
 
+	/**
+	 * Funil GA4 da página de produto: quem chega vê (view_item), quem abre o
+	 * modal inicia o pedido (begin_checkout) e quem envia vira lead
+	 * (generate_lead). O envio real ao Google respeita o Consent Mode.
+	 */
+	function funil() {
+		var rastrear = window.cnxRastrear;
+		var titulo   = document.querySelector( '.cnx-produto__titulo' );
+
+		if ( ! rastrear || ! titulo ) {
+			return;
+		}
+
+		var item = { item_name: titulo.textContent.trim() };
+
+		rastrear( 'view_item', { items: [ item ] } );
+
+		document.addEventListener( 'click', function ( e ) {
+			if ( e.target.closest( '[data-cnx-abrir-modal]' ) ) {
+				rastrear( 'begin_checkout', { items: [ item ] } );
+			}
+		}, true );
+
+		document.addEventListener( 'submit', function ( e ) {
+			if ( e.target.matches( '[data-cnx-modal-form]' ) ) {
+				rastrear( 'generate_lead', { lead_source: 'orcamento_produto', items: [ item ] } );
+			}
+		}, true );
+	}
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		iniciarGaleria();
 		iniciarProduto();
+		funil();
 	} );
 } )();

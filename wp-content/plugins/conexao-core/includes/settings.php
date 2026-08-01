@@ -55,6 +55,7 @@ function cnx_register_settings(): void {
 		'cnx_seo_titulo'      => 'sanitize_text_field',
 		'cnx_seo_descricao'   => 'sanitize_textarea_field',
 		'cnx_ga4_id'          => 'sanitize_text_field',
+		'cnx_gtm_id'          => 'sanitize_text_field',
 	);
 
 	foreach ( $campos_texto as $chave => $sanitizer ) {
@@ -168,6 +169,19 @@ function cnx_render_settings_page(): void {
 							placeholder="G-XXXXXXXXXX">
 						<p class="description">
 							<?php esc_html_e( 'ID de medição do GA4. Vazio desliga o Analytics; os cliques principais (WhatsApp, orçamento, formulários) são enviados como eventos.', 'conexao' ); ?>
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="cnx_gtm_id"><?php esc_html_e( 'Google Tag Manager', 'conexao' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="cnx_gtm_id" name="cnx_gtm_id" class="regular-text"
+							value="<?php echo esc_attr( get_option( 'cnx_gtm_id', '' ) ); ?>"
+							placeholder="GTM-XXXXXXX">
+						<p class="description">
+							<?php esc_html_e( 'ID do contêiner GTM. As tags respeitam o aviso de cookies (Consent Mode): nada grava cookie antes de o visitante aceitar.', 'conexao' ); ?>
 						</p>
 					</td>
 				</tr>

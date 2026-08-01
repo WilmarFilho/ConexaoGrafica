@@ -146,31 +146,6 @@ add_filter(
 );
 
 /* -------------------------------------------------------------------------
- * Google Analytics 4
- *
- * Só entra com o ID preenchido em Configurações → Conexão. O tema empurra os
- * cliques principais para o dataLayer (assets/js/app.js); com o gtag presente,
- * eles viram eventos no GA4 automaticamente.
- * ------------------------------------------------------------------------- */
-
-add_action( 'wp_head', 'cnx_ga4', 3 );
-
-function cnx_ga4(): void {
-	$id = trim( (string) get_option( 'cnx_ga4_id', '' ) );
-
-	// Aceita apenas o formato G-XXXX: qualquer outra coisa não vira script.
-	if ( ! preg_match( '/^G-[A-Z0-9]{4,}$/i', $id ) ) {
-		return;
-	}
-
-	printf(
-		"<script async src=\"https://www.googletagmanager.com/gtag/js?id=%1\$s\"></script>\n" .
-		"<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','%1\$s');</script>\n",
-		esc_attr( $id )
-	);
-}
-
-/* -------------------------------------------------------------------------
  * JSON-LD
  * ------------------------------------------------------------------------- */
 

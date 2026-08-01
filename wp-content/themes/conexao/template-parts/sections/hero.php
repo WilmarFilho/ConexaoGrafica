@@ -100,11 +100,12 @@ $cnx_fundo_padrao = get_theme_file_uri( 'assets/img/hero-bg.png' );
 									$cnx_id,
 									'large',
 									array(
-										'class'    => 'cnx-hero__produto',
+										'class'         => 'cnx-hero__produto',
 										// O primeiro slide é LCP; os outros podem esperar.
-										'loading'  => 0 === $cnx_i ? 'eager' : 'lazy',
-										'decoding' => 'async',
-										'alt'      => '',
+										'loading'       => 0 === $cnx_i ? 'eager' : 'lazy',
+										'fetchpriority' => 0 === $cnx_i ? 'high' : 'auto',
+										'decoding'      => 'async',
+										'alt'           => '',
 									)
 								);
 								?>
