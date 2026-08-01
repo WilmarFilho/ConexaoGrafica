@@ -8,6 +8,25 @@ defined( 'ABSPATH' ) || exit;
 define( 'CNX_THEME_VERSION', '0.1.0' );
 
 /**
+ * Favicon da marca. has_site_icon() ganha se um icone for definido no
+ * Personalizar; sem ele, servimos o arquivo do tema.
+ */
+add_action(
+	'wp_head',
+	static function (): void {
+		if ( has_site_icon() ) {
+			return;
+		}
+
+		$fav = esc_url( get_theme_file_uri( 'assets/img/favicon.png' ) );
+
+		printf( '<link rel="icon" type="image/png" href="%s">' . "\n", $fav );
+		printf( '<link rel="apple-touch-icon" href="%s">' . "\n", $fav );
+	},
+	1
+);
+
+/**
  * Preload das fontes: todo texto do site depende da Nunito, e sem preload o
  * navegador só a descobre depois de baixar e ler o CSS — em 4G isso é FOUT
  * visível. A latin-ext cobre os acentos do português.
