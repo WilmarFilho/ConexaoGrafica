@@ -238,35 +238,27 @@
 	}
 
 	/**
-	 * Página de resultados: seletor de ordenação recarrega com o parâmetro, e o
-	 * par grade/lista só troca classe — sem nova requisição.
+	 * Página de resultados: filtros e ordenação aplicam na hora, buscando a
+	 * própria página filtrada e trocando só o miolo de resultados — sem
+	 * recarregar. A URL acompanha, então dá para compartilhar e recarregar.
+	 *
+	 * Os controles (ordenar, grade/lista) vivem dentro do miolo trocado, por
+	 * isso os handlers são delegados no documento em vez de presos aos nós.
 	 */
 	function busca() {
-		var ordem = document.querySelector( '[data-cnx-ordem]' );
+		var filtros = document.querySelector( '[data-cnx-filtros]' );
 
-		if ( ordem ) {
-			ordem.addEventListener( 'change', function () {
-				var url = new URL( window.location.href );
-
-				if ( ordem.value ) {
-					url.searchParams.set( 'ordem', ordem.value );
-				} else {
-					url.searchParams.delete( 'ordem' );
-				}
-
-				window.location.href = url.toString();
-			} );
+		if ( ! filtros ) {
+			return;
 		}
 
-		// No celular os filtros abrem como painel sobre a página (botão funil).
-		var filtros = document.querySelector( '[data-cnx-filtros]' );
-		var fundo   = document.querySelector( '[data-cnx-filtros-fundo]' );
-		var abrirF  = document.querySelector( '[data-cnx-filtros-abrir]' );
+		var fundo    = document.querySelector( '[data-cnx-filtros-fundo]' );
+		var abrirF   = document.querySelector( '[data-cnx-filtros-abrir]' );
+		var emLista  = false;
+		var pedido   = 0; // Descarta respostas fora de ordem em cliques rápidos.
 
 		function fecharFiltros() {
-			if ( filtros ) {
-				filtros.classList.remove( 'esta-aberto' );
-			}
+			filtros.classList.remove( 'esta-aberto' );
 
 			if ( fundo ) {
 				fundo.hidden = true;
@@ -275,7 +267,111 @@
 			document.body.classList.remove( 'cnx-sem-rolagem' );
 		}
 
-		if ( abrirF && filtros ) {
+		function urlDosFiltros() {
+			var url    = new URL( filtros.getAttribute( 'action' ), window.location.href );
+			var ordem  = document.querySelector( '[data-cnx-ordem]' );
+
+			url.search = new URLSearchParams( new FormData( filtros ) ).toString();
+
+			if ( ordem && ordem.value ) {
+				url.searchParams.set( 'ordem', ordem.value );
+			} else {
+				url.searchParams.delete( 'ordem' );
+			}
+
+			return url.toString();
+		}
+
+		function aplicarVista() {
+			var lista = document.querySelector( '[data-cnx-resultados]' );
+
+			if ( lista ) {
+				lista.classList.toggle( 'esta-em-lista', emLista );
+			}
+
+			document.querySelectorAll( '[data-cnx-vista]' ).forEach( function ( botao ) {
+				botao.setAttribute( 'aria-pressed', String( ( 'lista' === botao.dataset.cnxVista ) === emLista ) );
+			} );
+		}
+
+		function atualizar() {
+			var url  = urlDosFiltros();
+			var este = ++pedido;
+
+			document.querySelector( '.cnx-busca-pagina__resultados' ).setAttribute( 'aria-busy', 'true' );
+
+			window.fetch( url ).then( function ( resposta ) {
+				return resposta.text();
+			} ).then( function ( html ) {
+				if ( este !== pedido ) {
+					return;
+				}
+
+				var doc   = new DOMParser().parseFromString( html, 'text/html' );
+				var novo  = doc.querySelector( '.cnx-busca-pagina__resultados' );
+				var atual = document.querySelector( '.cnx-busca-pagina__resultados' );
+
+				if ( ! novo || ! atual ) {
+					window.location.href = url;
+					return;
+				}
+
+				atual.replaceWith( novo );
+
+				var contagem = doc.querySelector( '.cnx-busca-pagina__contagem' );
+				var alvo     = document.querySelector( '.cnx-busca-pagina__contagem' );
+
+				if ( contagem && alvo ) {
+					alvo.textContent = contagem.textContent;
+				}
+
+				aplicarVista();
+				window.history.replaceState( null, '', url );
+			} ).catch( function () {
+				window.location.href = url; // Sem fetch, a navegação resolve.
+			} );
+		}
+
+		// Marcar qualquer opção aplica na hora.
+		filtros.addEventListener( 'change', atualizar );
+
+		// "Aplicar filtros": no celular confirma e fecha o painel.
+		filtros.addEventListener( 'submit', function ( e ) {
+			e.preventDefault();
+			fecharFiltros();
+			atualizar();
+		} );
+
+		// "Limpar filtros" desmarca tudo e volta à listagem inicial do termo.
+		var limpar = filtros.querySelector( '.cnx-filtros__limpar' );
+
+		if ( limpar ) {
+			limpar.addEventListener( 'click', function ( e ) {
+				e.preventDefault();
+				filtros.querySelectorAll( 'input[type="checkbox"]' ).forEach( function ( caixa ) {
+					caixa.checked = false;
+				} );
+				atualizar();
+			} );
+		}
+
+		document.addEventListener( 'change', function ( e ) {
+			if ( e.target.matches( '[data-cnx-ordem]' ) ) {
+				atualizar();
+			}
+		} );
+
+		document.addEventListener( 'click', function ( e ) {
+			var botao = e.target.closest( '[data-cnx-vista]' );
+
+			if ( botao ) {
+				emLista = 'lista' === botao.dataset.cnxVista;
+				aplicarVista();
+			}
+		} );
+
+		// No celular os filtros abrem como painel sobre a página (botão funil).
+		if ( abrirF ) {
 			abrirF.addEventListener( 'click', function () {
 				filtros.classList.add( 'esta-aberto' );
 
@@ -303,20 +399,9 @@
 			} );
 		}
 
-		var resultados = document.querySelector( '[data-cnx-resultados]' );
-
-		document.querySelectorAll( '[data-cnx-vista]' ).forEach( function ( botao ) {
-			botao.addEventListener( 'click', function () {
-				if ( ! resultados ) {
-					return;
-				}
-
-				resultados.classList.toggle( 'esta-em-lista', 'lista' === botao.dataset.cnxVista );
-
-				document.querySelectorAll( '[data-cnx-vista]' ).forEach( function ( outro ) {
-					outro.setAttribute( 'aria-pressed', String( outro === botao ) );
-				} );
-			} );
+		// Voltar/avançar do navegador restaura o estado daquela URL.
+		window.addEventListener( 'popstate', function () {
+			window.location.reload();
 		} );
 	}
 

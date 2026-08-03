@@ -21,7 +21,10 @@ function cnx_admin_assets( string $hook ): void {
 	$telas_de_termo = in_array( $hook, array( 'term.php', 'edit-tags.php' ), true )
 		&& in_array( $screen->taxonomy, array( CNX_TAX_CATEGORIA, CNX_TAX_SOLUCAO ), true );
 
-	if ( ! $telas_de_post && ! $telas_de_termo ) {
+	// O perfil tem o campo de foto do autor: também precisa do seletor.
+	$telas_de_perfil = in_array( $hook, array( 'profile.php', 'user-edit.php' ), true );
+
+	if ( ! $telas_de_post && ! $telas_de_termo && ! $telas_de_perfil ) {
 		return;
 	}
 

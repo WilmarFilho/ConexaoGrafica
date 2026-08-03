@@ -41,7 +41,7 @@ $cnx_cats  = get_the_category();
 
 		<footer class="cnx-post-card__meta">
 			<span class="cnx-post-card__autor">
-				<?php echo get_avatar( get_the_author_meta( 'ID' ), 26, '', '', array( 'class' => 'cnx-avatar' ) ); ?>
+				<?php echo get_avatar( get_the_author_meta( 'ID' ), 26, '', $cnx_autor, array( 'class' => 'cnx-avatar' ) ); ?>
 				<?php echo esc_html( $cnx_autor ); ?>
 			</span>
 

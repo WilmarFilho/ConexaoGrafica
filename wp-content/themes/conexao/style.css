@@ -1906,7 +1906,18 @@ body.cnx-sem-rolagem {
 }
 
 .cnx-avatar {
+	flex-shrink: 0;
+	width: 26px;
+	height: 26px;
+	object-fit: cover;
 	border-radius: 50%;
+}
+
+/* Fallback com o símbolo da marca: um respiro para o desenho não encostar. */
+.cnx-avatar--marca {
+	padding: 4px;
+	object-fit: contain;
+	background: #f1f0ef;
 }
 
 .cnx-post-card__cats {
@@ -2984,6 +2995,13 @@ body.cnx-sem-rolagem {
 	grid-template-columns: 180px 1fr;
 	gap: 20px;
 	align-items: center;
+}
+
+/* Enquanto o fetch dos filtros responde, os resultados atuais esmaecem. */
+.cnx-busca-pagina__resultados[aria-busy="true"] {
+	opacity: 0.5;
+	transition: opacity 0.15s ease;
+	pointer-events: none;
 }
 
 .cnx-busca-pagina__vazio {
