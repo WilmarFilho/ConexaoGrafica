@@ -143,8 +143,8 @@ $cnx_redes = array_filter(
 			<ul class="cnx-redes">
 				<?php foreach ( $cnx_redes as $cnx_rede => $cnx_url ) : ?>
 					<li>
-						<a href="<?php echo esc_url( $cnx_url ); ?>" target="_blank" rel="noopener"
-							aria-label="<?php echo esc_attr( ucfirst( $cnx_rede ) ); ?>">
+						<a href="<?php echo esc_url( $cnx_url ); ?>" target="_blank" rel="noopener noreferrer"
+							aria-label="<?php echo esc_attr( sprintf( /* translators: %s: rede social */ __( '%s da Conexão Gráfica (abre em nova aba)', 'conexao' ), ucfirst( $cnx_rede ) ) ); ?>">
 							<?php echo cnx_icone_rede( $cnx_rede ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</a>
 					</li>

@@ -137,8 +137,8 @@ $cnx_tel_link = static fn( string $tel ): string => (string) preg_replace( '/\D/
 				<ul class="cnx-redes">
 					<?php foreach ( $cnx_redes as $cnx_rede => $cnx_url ) : ?>
 						<li>
-							<a href="<?php echo esc_url( $cnx_url ); ?>" target="_blank" rel="noopener"
-								aria-label="<?php echo esc_attr( ucfirst( $cnx_rede ) ); ?>">
+							<a href="<?php echo esc_url( $cnx_url ); ?>" target="_blank" rel="noopener noreferrer"
+								aria-label="<?php echo esc_attr( sprintf( /* translators: %s: rede social */ __( '%s da Conexão Gráfica (abre em nova aba)', 'conexao' ), ucfirst( $cnx_rede ) ) ); ?>">
 								<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
 									stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 									<?php

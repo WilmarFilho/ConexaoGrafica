@@ -1325,7 +1325,9 @@ body.cnx-sem-rolagem {
 /* --- Como funciona ------------------------------------------------------- */
 
 .cnx-etapas .cnx-secao__inner {
-	padding-top: 40px;
+	/* Um respiro maior separa as etapas da seção anterior (banner na home,
+	   contato no orçamento) sem exagerar no celular. */
+	padding-top: clamp(48px, 7vw, 96px);
 	padding-bottom: 20px;
 }
 
@@ -1513,6 +1515,11 @@ body.cnx-sem-rolagem {
 	.cnx-banner .cnx-secao__inner,
 	.cnx-etapas .cnx-secao__inner {
 		border-top: 0;
+	}
+
+	/* O respiro antes das etapas encolhe no celular, mas não some. */
+	.cnx-secao + .cnx-etapas .cnx-secao__inner {
+		padding-top: 48px;
 	}
 
 	.cnx-banner .cnx-secao__inner {
