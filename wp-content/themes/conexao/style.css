@@ -79,6 +79,14 @@ Text Domain: conexao
 	box-sizing: border-box;
 }
 
+/* Âncoras (ex.: cupom do header → 10% OFF) rolam suave, exceto para quem
+   pediu menos movimento no sistema. */
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
 body {
 	margin: 0;
 	color: var(--cnx-texto);
@@ -1510,6 +1518,12 @@ body.cnx-sem-rolagem {
 	.cnx-secao + .cnx-secao .cnx-secao__inner {
 		padding-top: 24px;
 		border-top: 1px solid var(--cnx-borda);
+	}
+
+	/* A régua pertence à seção seguinte: quem vem antes precisa terminar com
+	   o mesmo respiro, senão a linha cola no último texto. */
+	.cnx-secao:not(.cnx-banner):has(+ .cnx-secao) .cnx-secao__inner {
+		padding-bottom: 24px;
 	}
 
 	.cnx-banner .cnx-secao__inner,
@@ -3221,6 +3235,8 @@ body.cnx-sem-rolagem {
 .cnx-cta {
 	position: relative;
 	margin-top: 44px;
+	/* Chegando por âncora (cupom do header), a seção não encosta no topo. */
+	scroll-margin-top: 20px;
 	overflow: hidden;
 	color: #fff;
 	background-color: #140b06;

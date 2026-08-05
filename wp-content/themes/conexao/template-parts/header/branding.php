@@ -29,12 +29,13 @@ defined( 'ABSPATH' ) || exit;
 		<?php get_search_form(); ?>
 
 		<div class="cnx-branding__acoes">
-			<a class="cnx-acao" href="<?php echo esc_url( wp_login_url() ); ?>"
-				aria-label="<?php esc_attr_e( 'Minha conta', 'conexao' ); ?>">
+			<?php // Sem área de usuário nesta fase: o lugar é do cupom de 10% OFF do rodapé. ?>
+			<a class="cnx-acao" href="#cnx-desconto"
+				aria-label="<?php esc_attr_e( 'Cupom de 10% de desconto no primeiro pedido', 'conexao' ); ?>">
 				<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
 					stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-					<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-					<circle cx="12" cy="7" r="4"/>
+					<path d="M2 9a3 3 0 0 1 0 6v1a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-1a3 3 0 0 1 0-6V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+					<path d="M8.5 12h1.6M13.9 12h1.6"/>
 				</svg>
 			</a>
 
