@@ -32,20 +32,22 @@ defined( 'ABSPATH' ) || exit;
 			<?php // Sem área de usuário nesta fase: o lugar é do cupom de 10% OFF do rodapé. ?>
 			<a class="cnx-acao" href="#cnx-desconto"
 				aria-label="<?php esc_attr_e( 'Cupom de 10% de desconto no primeiro pedido', 'conexao' ); ?>">
+				<?php // Cupom com mordidas laterais e picote central, como a arte do Figma. ?>
 				<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-					stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-					<path d="M2 9a3 3 0 0 1 0 6v1a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-1a3 3 0 0 1 0-6V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
-					<path d="M8.5 12h1.6M13.9 12h1.6"/>
+					stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+					<path d="M5.2 6.8h13.6a1.8 1.8 0 0 1 1.8 1.8v1.2a2.7 2.7 0 0 0 0 4.9v0.7a1.8 1.8 0 0 1-1.8 1.8H5.2a1.8 1.8 0 0 1-1.8-1.8v-0.7a2.7 2.7 0 0 0 0-4.9V8.6a1.8 1.8 0 0 1 1.8-1.8Z"/>
+					<path d="M12 10.4v3.2"/>
 				</svg>
 			</a>
 
 			<a class="cnx-acao" href="<?php echo esc_url( home_url( '/orcamento/' ) ); ?>"
 				aria-label="<?php esc_attr_e( 'Meu orçamento', 'conexao' ); ?>">
+				<?php // Recibo com linhas e abas recortadas embaixo, como a arte do Figma. ?>
 				<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-					stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-					<circle cx="9" cy="21" r="1"/>
-					<circle cx="20" cy="21" r="1"/>
-					<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+					stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+					<rect x="5.5" y="4.5" width="13" height="15.5" rx="2.4"/>
+					<path d="M9.3 9.6h5.4M9.3 12.8h5.4"/>
+					<path d="M9.6 20v-2.2M14.4 20v-2.2"/>
 				</svg>
 			</a>
 
