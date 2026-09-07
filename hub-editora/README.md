@@ -55,6 +55,19 @@ app/Integrations/
 Cada integração é isolada: mudar uma API não derruba as outras. Todo canal
 tem webhook **e** varredura periódica — o webhook nunca é 100%.
 
+### Cadastro dos webhooks
+
+O webhook só avisa "o pedido X mudou"; o hub rebusca o pedido na API do
+canal com a própria credencial e enfileira (`ImportChannelOrder`). Rajadas
+do mesmo pedido em 60 s viram uma importação só.
+
+| Canal | URL | Como configurar |
+|---|---|---|
+| WooCommerce | `POST /webhooks/woocommerce` | WooCommerce → Configurações → Avançado → Webhooks. Um para "Pedido criado" e outro para "Pedido atualizado", status Ativo, API v3. Segredo = `WOO_WEBHOOK_SECRET` (o Woo assina o corpo com HMAC-SHA256). |
+| Pagar.me | `POST /webhooks/pagarme` | Dash → Configurações → Webhooks. Eventos `order.*` e `charge.paid/refunded/chargedback/payment_failed`. Ativar autenticação Basic com senha = `PAGARME_WEBHOOK_SECRET` (usuário livre). Alternativa: `?token=` na URL. |
+
+Sem o segredo configurado no `.env` a rota responde 503 e não processa nada.
+
 ## Regras que valem desde o primeiro dia
 
 - Pedido-filho de vendor (MVX no WooCommerce) **não** entra: só `parent = 0`.
