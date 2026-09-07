@@ -1,0 +1,60 @@
+/*
+ * Identidade do Hub Editora aplicada por cima do tema padrao do Filament,
+ * sem build: e registrado como asset CSS puro. As cores batem com o canvas
+ * de design (sidebar azul-claro, fundo papel quente, texto azul-marinho).
+ */
+
+:root {
+    --hub-sidebar: #E9F1FA;
+    --hub-sidebar-border: #D6E1EE;
+    --hub-sidebar-active: #D3E3F5;
+    --hub-navy: #1E3A5F;
+    --hub-paper: #F6F5F2;
+    --hub-border: #E6E3DD;
+}
+
+/* Fundo geral em papel quente; cartoes continuam brancos. */
+.fi-body,
+.fi-main {
+    background-color: var(--hub-paper);
+}
+
+/* Sidebar azul-claro com texto escuro (o padrao do Filament e branco). */
+.fi-sidebar,
+.fi-sidebar-header {
+    background-color: var(--hub-sidebar) !important;
+    border-color: var(--hub-sidebar-border) !important;
+}
+
+.fi-sidebar-item-label,
+.fi-sidebar-group-label {
+    color: #3F4E66;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-button,
+.fi-sidebar-item-active > .fi-sidebar-item-button {
+    background-color: var(--hub-sidebar-active) !important;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-label {
+    color: var(--hub-navy) !important;
+}
+
+/* Topbar branca sobre o papel, borda suave. */
+.fi-topbar > nav {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid var(--hub-border);
+}
+
+/* Cartoes e tabelas com a borda quente da identidade. */
+.fi-section,
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat {
+    border-color: var(--hub-border) !important;
+}
+
+/* Valores, IDs e rastreios em monoespacada (classe usada pelas colunas). */
+.hub-mono {
+    font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+}

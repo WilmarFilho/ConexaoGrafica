@@ -1,0 +1,63 @@
+services:
+  app:
+    # Espelha a producao: cPanel com EA-PHP 8.3 + MariaDB 10.11.
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: hub_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8095:80"
+    environment:
+      APP_ENV: local
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: hub
+      DB_USERNAME: hub
+      DB_PASSWORD: hub
+    volumes:
+      - .:/var/www/html
+      - ./docker/php.ini:/usr/local/etc/php/conf.d/hub.ini
+
+  db:
+    image: mariadb:10.11
+    container_name: hub_db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: hub
+      MARIADB_USER: hub
+      MARIADB_PASSWORD: hub
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Fila e agendador rodam como processos separados, como farao em producao
+  # (cron do cPanel chamando `php artisan schedule:run` e `queue:work`).
+  queue:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: hub_queue
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    command: php artisan queue:work database --sleep=3 --tries=3 --timeout=120
+    environment:
+      DB_HOST: db
+      DB_DATABASE: hub
+      DB_USERNAME: hub
+      DB_PASSWORD: hub
+    volumes:
+      - .:/var/www/html
+
+volumes:
+  db_data:

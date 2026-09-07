@@ -2,9 +2,12 @@ name: Deploy para produção
 
 # Todo push na main publica o plugin e o tema em graficaconexao.com.br.
 # workflow_dispatch permite disparar manualmente pela aba Actions.
+# O Hub Editora (pasta hub-editora/) tem deploy próprio e não passa por aqui.
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'hub-editora/**'
   workflow_dispatch:
 
 concurrency:
