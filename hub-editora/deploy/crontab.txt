@@ -1,0 +1,6 @@
+# Crontab do usuário da conta cPanel do hub (crontab -e como o usuário, ou WHM/cPanel > Cron Jobs).
+# Duas entradas: o agendador do Laravel (sync/rastreio) e a fila (etiquetas, webhooks).
+# flock evita dois workers ao mesmo tempo; --stop-when-empty encerra quando a fila esvazia.
+
+* * * * * cd $HOME/hub/hub-editora && /opt/cpanel/ea-php83/root/usr/bin/php artisan schedule:run >> $HOME/logs/hub-schedule.log 2>&1
+* * * * * cd $HOME/hub/hub-editora && flock -n $HOME/.hub-queue.lock /opt/cpanel/ea-php83/root/usr/bin/php artisan queue:work database --stop-when-empty --sleep=3 --tries=3 --timeout=120 --max-time=50 >> $HOME/logs/hub-queue.log 2>&1

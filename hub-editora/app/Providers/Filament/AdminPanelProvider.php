@@ -29,6 +29,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->passwordReset() // "esqueci a senha" por e-mail: ninguem precisa repassar senha
+            ->profile()
             ->brandName('Hub Editora')
             ->brandLogo(fn () => view('filament.brand'))
             ->brandLogoHeight('2.1rem')
