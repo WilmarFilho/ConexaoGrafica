@@ -10,7 +10,9 @@
 set -euo pipefail
 
 PHP=${PHP:-/opt/cpanel/ea-php83/root/usr/bin/php}
-COMPOSER=${COMPOSER:-/opt/cpanel/composer/bin/composer}
+# Composer fica em ~/bin (o cPanel não traz um). allow_url_fopen é desligado no
+# php.ini global; o Composer precisa dele, então liga só nesta chamada.
+COMPOSER=${COMPOSER:-$HOME/bin/composer}
 APP=${APP:-$HOME/hub/hub-editora}
 
 cd "$APP/.."
@@ -19,7 +21,7 @@ git pull --ff-only
 
 cd "$APP"
 echo "== composer install (sem dev)"
-"$PHP" "$COMPOSER" install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress 2>&1 | tail -3
+"$PHP" -d allow_url_fopen=1 "$COMPOSER" install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress 2>&1 | tail -3
 
 echo "== migrações"
 "$PHP" artisan migrate --force
