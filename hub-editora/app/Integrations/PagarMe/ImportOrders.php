@@ -32,8 +32,9 @@ class ImportOrders
 
         try {
             foreach ($this->client->ordersCreatedSince(now()->subDays($days)) as $payload) {
-                $this->upsert($payload);
-                $count++;
+                if ($this->upsert($payload)) {
+                    $count++;
+                }
             }
 
             $this->channel->update([
@@ -54,13 +55,48 @@ class ImportOrders
         return $count;
     }
 
-    public function one(string $orderId): Order
+    public function one(string $orderId): ?Order
     {
         return $this->upsert($this->client->order($orderId));
     }
 
-    public function upsert(array $payload): Order
+    /**
+     * A loja Pubcon cobra pelo módulo do Pagar.me, então cada pedido do
+     * WooCommerce também existe no Pagar.me. O dono desse pedido é o
+     * WooCommerce; aqui só entram os checkouts diretos (landing pages).
+     */
+    public static function cameFromWooCommerce(array $payload): bool
     {
+        $meta = $payload['metadata'] ?? [];
+        if (! is_array($meta)) {
+            return false;
+        }
+
+        return isset($meta['moduleVersion'])
+            || str_contains(strtolower((string) ($meta['platformVersion'] ?? '')), 'woocommerce');
+    }
+
+    /** Grava o pedido; devolve null quando ele pertence a outro canal (loja). */
+    public function upsert(array $payload): ?Order
+    {
+        if (self::cameFromWooCommerce($payload)) {
+            // Se alguma versão anterior chegou a importar, remove: o pedido vive no canal WooCommerce.
+            $stale = Order::query()
+                ->where('channel_id', $this->channel->id)
+                ->where('external_id', (string) $payload['id'])
+                ->first();
+
+            if ($stale) {
+                $stale->items()->delete();
+                $stale->shipment()->delete();
+                $stale->delete();
+                SyncLog::record($this->channel, 'in', 'order.removed_duplicate', null,
+                    "{$payload['id']} (pedido #{$payload['code']} da loja) removido: já existe no canal WooCommerce");
+            }
+
+            return null;
+        }
+
         return DB::transaction(function () use ($payload) {
             $customer = Customer::findOrCreateFrom(OrderMapper::customer($payload));
             $data = OrderMapper::order($payload);
