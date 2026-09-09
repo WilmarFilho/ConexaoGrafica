@@ -32,6 +32,10 @@ class OrdersPanelSnapshotTest extends TestCase
         $exp = $this->actingAs($user)->get('/admin/expedicao');
         $exp->assertOk()->assertSee('Central de Expedição')->assertSee('Gerar etiquetas em lote');
 
+        $prod = $this->actingAs($user)->get('/admin/products');
+        $prod->assertOk()->assertSee('Produtos');
+        Storage::disk('local')->put('snapshots/products.html', $prod->getContent());
+
         Storage::disk('local')->put('snapshots/orders-list.html', $list->getContent());
         Storage::disk('local')->put('snapshots/order-view.html', $view->getContent());
         Storage::disk('local')->put('snapshots/expedicao.html', $exp->getContent());

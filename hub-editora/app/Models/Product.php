@@ -22,9 +22,24 @@ class Product extends Model
         return $this->hasMany(ProductChannelRef::class);
     }
 
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     /** Sem peso e dimensões não dá para cotar frete: a Central de Expedição sinaliza. */
     public function hasShippingDimensions(): bool
     {
         return $this->weight_grams && $this->width_cm && $this->height_cm && $this->depth_cm;
+    }
+
+    /** "16 × 23 × 3 cm" ou null quando incompleto. */
+    public function getDimensionsLabelAttribute(): ?string
+    {
+        if (! $this->width_cm || ! $this->height_cm || ! $this->depth_cm) {
+            return null;
+        }
+
+        return "{$this->width_cm} × {$this->height_cm} × {$this->depth_cm} cm";
     }
 }

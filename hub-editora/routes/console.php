@@ -17,6 +17,12 @@ Schedule::command('hub:sync pagarme')
     ->withoutOverlapping()
     ->onOneServer();
 
+// Catálogo muda pouco: uma vez por dia, de madrugada.
+Schedule::command('hub:sync-products woocommerce')
+    ->dailyAt('04:10')
+    ->withoutOverlapping()
+    ->onOneServer();
+
 // Rastreio: o Melhor Envio não empurra eventos; a cada hora perguntamos.
 Schedule::command('hub:tracking')
     ->hourly()

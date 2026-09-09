@@ -75,6 +75,43 @@ class WooCommerceClient
     }
 
     /**
+     * Catálogo completo (produtos publicados), paginando.
+     *
+     * @return \Generator<int, array>
+     */
+    public function products(int $perPage = 100): \Generator
+    {
+        $page = 1;
+
+        do {
+            $response = $this->http()->get('/products', [
+                'status' => 'publish',
+                'per_page' => $perPage,
+                'page' => $page,
+                'orderby' => 'id',
+                'order' => 'asc',
+            ]);
+
+            $response->throw();
+
+            foreach ((array) $response->json() as $product) {
+                yield $product;
+            }
+
+            $totalPages = (int) $response->header('X-WP-TotalPages');
+            $page++;
+        } while ($page <= $totalPages);
+    }
+
+    /** Valor de uma opção da loja (ex.: unidade de peso: kg | g). */
+    public function setting(string $group, string $id): ?string
+    {
+        $res = $this->http()->get("/settings/{$group}/{$id}");
+
+        return $res->successful() ? (string) ($res->json()['value'] ?? '') : null;
+    }
+
+    /**
      * Devolve o rastreio ao pedido e o marca como concluído.
      * O rastreio vai como nota do pedido (visível ao cliente) e em meta_data,
      * que plugins de rastreamento costumam ler.

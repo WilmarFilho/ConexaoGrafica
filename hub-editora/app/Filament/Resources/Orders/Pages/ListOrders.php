@@ -23,21 +23,21 @@ class ListOrders extends ListRecords
             'a_expedir' => Tab::make('A expedir')
                 ->badge(fn () => Order::query()->awaitingShipment()->count() ?: null)
                 ->badgeColor('warning')
-                ->modifyQueryUsing(fn (Builder $q) => $q->awaitingShipment()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->awaitingShipment()),
 
             'aguardando_pagamento' => Tab::make('Aguardando pagamento')
-                ->modifyQueryUsing(fn (Builder $q) => $q->whereIn('status', [OrderStatus::New, OrderStatus::AwaitingPayment])),
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereIn('status', [OrderStatus::New, OrderStatus::AwaitingPayment])),
 
             'em_transito' => Tab::make('Em trânsito')
-                ->modifyQueryUsing(fn (Builder $q) => $q->whereIn('status', [OrderStatus::LabelGenerated, OrderStatus::ReadyToShip, OrderStatus::Shipped])),
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereIn('status', [OrderStatus::LabelGenerated, OrderStatus::ReadyToShip, OrderStatus::Shipped])),
 
             'problemas' => Tab::make('Problemas')
                 ->badge(fn () => Order::query()->where('status', OrderStatus::Problem)->count() ?: null)
                 ->badgeColor('danger')
-                ->modifyQueryUsing(fn (Builder $q) => $q->where('status', OrderStatus::Problem)),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', OrderStatus::Problem)),
 
             'digitais' => Tab::make('Digitais')
-                ->modifyQueryUsing(fn (Builder $q) => $q->where('requires_shipping', false)),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('requires_shipping', false)),
         ];
     }
 
