@@ -65,10 +65,10 @@ class WebhooksTest extends TestCase
             'HTTP_X_WC_WEBHOOK_SIGNATURE' => $this->wooSign($child),
         ], $child)->assertOk()->assertJson(['ignored' => 'pedido-filho']);
 
+        // O ping do Woo vem sem assinatura.
         $ping = http_build_query(['webhook_id' => 12]);
         $this->call('POST', '/webhooks/woocommerce', [], [], [], [
             'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
-            'HTTP_X_WC_WEBHOOK_SIGNATURE' => $this->wooSign($ping),
         ], $ping)->assertOk()->assertJson(['ping' => true]);
 
         Queue::assertNothingPushed();

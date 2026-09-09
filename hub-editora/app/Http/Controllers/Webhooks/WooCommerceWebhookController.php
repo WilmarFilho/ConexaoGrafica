@@ -26,20 +26,21 @@ class WooCommerceWebhookController extends Controller
             return response()->json(['error' => 'webhook não configurado'], 503);
         }
 
-        $expected = base64_encode(hash_hmac('sha256', $request->getContent(), $secret, true));
-        $given = (string) $request->header('X-WC-Webhook-Signature', '');
-
-        if ($given === '' || ! hash_equals($expected, $given)) {
-            return response()->json(['error' => 'assinatura inválida'], 401);
-        }
-
-        // Ao salvar o webhook, o Woo manda um "ping" form-encoded só com webhook_id.
+        // Ao salvar o webhook, o Woo manda um "ping" form-encoded só com webhook_id,
+        // sem assinatura. Não carrega dado nenhum, então responde 200 e pronto.
         $form = [];
         if (str_contains((string) $request->header('Content-Type'), 'form-urlencoded')) {
             parse_str($request->getContent(), $form);
         }
         if (($request->input('webhook_id') ?? $form['webhook_id'] ?? null) && ! $request->filled('id')) {
             return response()->json(['ok' => true, 'ping' => true]);
+        }
+
+        $expected = base64_encode(hash_hmac('sha256', $request->getContent(), $secret, true));
+        $given = (string) $request->header('X-WC-Webhook-Signature', '');
+
+        if ($given === '' || ! hash_equals($expected, $given)) {
+            return response()->json(['error' => 'assinatura inválida'], 401);
         }
 
         $orderId = (int) $request->input('id');
