@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Enums\OrderStatus;
+use App\Filament\Actions\ChangeOrderStatusAction;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Integrations\MelhorEnvio\MelhorEnvioClient;
 use App\Integrations\MelhorEnvio\ShipmentService;
@@ -187,6 +188,8 @@ class Expedicao extends Page implements HasTable
                             ? Notification::make()->title('Etiqueta gerada')->body($shipment->carrier.' '.$shipment->service.' · '.$shipment->tracking_code)->success()->send()
                             : Notification::make()->title('Não foi possível gerar')->body($shipment->problem)->danger()->persistent()->send();
                     }),
+
+                ChangeOrderStatusAction::make()->label('Etapa'),
 
                 Action::make('etiqueta')
                     ->label('Etiqueta')

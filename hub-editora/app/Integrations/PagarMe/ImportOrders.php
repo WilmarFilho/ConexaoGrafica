@@ -107,12 +107,14 @@ class ImportOrders
             ]);
 
             $isNew = ! $order->exists;
+            $from = $isNew ? null : $order->status;
 
-            if (! $isNew && $order->status->value !== $data['status']->value && $this->hubIsAhead($order)) {
+            if (! $isNew && $order->status->value !== $data['status']->value && ($order->status_manual || $this->hubIsAhead($order))) {
                 unset($data['status']);
             }
 
             $order->fill([...$data, 'customer_id' => $customer->id])->save();
+            $changed = $from && $from !== $order->status;
 
             $order->items()->delete();
 
@@ -126,13 +128,18 @@ class ImportOrders
                 $order->items()->create([...$item, 'product_id' => $productId]);
             }
 
-            SyncLog::record(
-                $this->channel,
-                'in',
-                $isNew ? 'order.imported' : 'order.updated',
-                $order,
-                "{$order->external_number} · {$order->status->label()}",
-            );
+            if ($isNew || $changed) {
+                SyncLog::record(
+                    $this->channel,
+                    SyncLog::IN,
+                    $isNew ? 'order.imported' : 'order.updated',
+                    $order,
+                    $isNew
+                        ? "{$order->external_number} · {$order->status->label()}"
+                        : "{$order->external_number} · {$from->label()} → {$order->status->label()}",
+                    ['from' => $from?->value, 'to' => $order->status->value, 'channel_status' => $order->channel_status],
+                );
+            }
 
             return $order;
         });

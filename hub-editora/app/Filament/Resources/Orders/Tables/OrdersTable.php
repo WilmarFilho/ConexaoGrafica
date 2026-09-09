@@ -3,10 +3,12 @@
 namespace App\Filament\Resources\Orders\Tables;
 
 use App\Enums\OrderStatus;
+use App\Filament\Actions\ChangeOrderStatusAction;
 use App\Models\Order;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -91,6 +93,8 @@ class OrdersTable
                 TextColumn::make('status')
                     ->label('Expedição')
                     ->badge()
+                    ->icon(fn (Order $record) => $record->status_manual ? Heroicon::OutlinedLockClosed : null)
+                    ->tooltip(fn (Order $record) => $record->status_manual ? 'Etapa definida manualmente; o canal não a altera' : null)
                     ->sortable(),
 
                 TextColumn::make('shipment.tracking_code')
@@ -151,6 +155,7 @@ class OrdersTable
             ->filtersFormColumns(2)
             ->recordActions([
                 ViewAction::make()->label('Abrir'),
+                ChangeOrderStatusAction::make()->label('Etapa')->iconButton()->tooltip('Alterar etapa'),
             ])
             ->emptyStateHeading('Nenhum pedido por aqui')
             ->emptyStateDescription('Os pedidos entram sozinhos pelos canais conectados. Rode "hub:sync" para importar agora.');

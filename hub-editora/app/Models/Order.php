@@ -18,6 +18,7 @@ class Order extends Model
     {
         return [
             'status' => OrderStatus::class,
+            'status_manual' => 'boolean',
             'requires_shipping' => 'boolean',
             'placed_at' => 'datetime',
             'paid_at' => 'datetime',

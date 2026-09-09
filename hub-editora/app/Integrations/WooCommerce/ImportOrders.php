@@ -89,13 +89,16 @@ class ImportOrders
             ]);
 
             $isNew = ! $order->exists;
+            $from = $isNew ? null : $order->status;
 
-            // Não regride um pedido que o hub já levou adiante na expedição.
-            if (! $isNew && $order->status->value !== $data['status']->value && $this->hubIsAhead($order)) {
+            // Não regride um pedido que o hub já levou adiante na expedição,
+            // nem mexe numa etapa definida à mão no painel.
+            if (! $isNew && $order->status->value !== $data['status']->value && ($order->status_manual || $this->hubIsAhead($order))) {
                 unset($data['status']);
             }
 
             $order->fill([...$data, 'customer_id' => $customer->id])->save();
+            $changed = $from && $from !== $order->status;
 
             $order->items()->delete();
 
@@ -109,13 +112,19 @@ class ImportOrders
                 $order->items()->create([...$item, 'product_id' => $productId]);
             }
 
-            SyncLog::record(
-                $this->channel,
-                'in',
-                $isNew ? 'order.imported' : 'order.updated',
-                $order,
-                "#{$order->external_number} · {$order->status->label()}",
-            );
+            // Atualização sem mudança de etapa não vira ruído no histórico.
+            if ($isNew || $changed) {
+                SyncLog::record(
+                    $this->channel,
+                    SyncLog::IN,
+                    $isNew ? 'order.imported' : 'order.updated',
+                    $order,
+                    $isNew
+                        ? "#{$order->external_number} · {$order->status->label()}"
+                        : "#{$order->external_number} · {$from->label()} → {$order->status->label()}",
+                    ['from' => $from?->value, 'to' => $order->status->value, 'channel_status' => $order->channel_status],
+                );
+            }
 
             return $order;
         });

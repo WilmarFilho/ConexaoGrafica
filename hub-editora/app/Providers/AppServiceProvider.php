@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\HubSettings;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
         // assets sempre em https, mesmo se alguém entrar por http.
         if ($this->app->isProduction()) {
             URL::forceScheme('https');
+        }
+
+        // Chaves gravadas pela tela Integrações vencem o .env.
+        if (! $this->app->runningUnitTests()) {
+            HubSettings::applyToConfig();
         }
     }
 }

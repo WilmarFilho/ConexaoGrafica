@@ -2,9 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Widgets\ChannelsHealth;
+use App\Filament\Widgets\LatestOrders;
+use App\Filament\Widgets\OrdersChart;
+use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\TopProducts;
 use App\Models\Order;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 /**
@@ -35,6 +42,27 @@ class OrdersPanelSnapshotTest extends TestCase
         $prod = $this->actingAs($user)->get('/admin/products');
         $prod->assertOk()->assertSee('Produtos');
         Storage::disk('local')->put('snapshots/products.html', $prod->getContent());
+
+        // Os widgets carregam por Livewire (lazy): a página só traz a casca.
+        $dash = $this->actingAs($user)->get('/admin');
+        $dash->assertOk()->assertSee('Visão geral');
+        Storage::disk('local')->put('snapshots/dashboard.html', $dash->getContent());
+
+        $this->actingAs($user);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        Livewire::test(StatsOverview::class)->assertOk()->assertSee('Vendas no mês')->assertSee('A expedir');
+        Livewire::test(OrdersChart::class)->assertOk();
+        Livewire::test(ChannelsHealth::class)->assertOk()->assertSee('Canais')->assertSee('WooCommerce');
+        Livewire::test(LatestOrders::class)->assertOk()->assertSee('Últimos pedidos');
+        Livewire::test(TopProducts::class)->assertOk()->assertSee('Mais vendidos');
+
+        $int = $this->actingAs($user)->get('/admin/integracoes');
+        $int->assertOk()->assertSee('Testar conexão')->assertSee('Salvar integrações');
+        Storage::disk('local')->put('snapshots/integracoes.html', $int->getContent());
+
+        $logs = $this->actingAs($user)->get('/admin/logs');
+        $logs->assertOk()->assertSee('Auditoria');
+        Storage::disk('local')->put('snapshots/logs.html', $logs->getContent());
 
         Storage::disk('local')->put('snapshots/orders-list.html', $list->getContent());
         Storage::disk('local')->put('snapshots/order-view.html', $view->getContent());
