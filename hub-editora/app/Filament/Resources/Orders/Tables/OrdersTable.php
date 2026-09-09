@@ -41,6 +41,7 @@ class OrdersTable
                 TextColumn::make('channel.name')
                     ->label('Origem')
                     ->badge()
+                    ->description(fn (Order $record) => $record->source_label)
                     ->color(fn (Order $record) => match ($record->channel?->slug) {
                         'woocommerce' => 'primary',
                         'pagarme' => 'success',

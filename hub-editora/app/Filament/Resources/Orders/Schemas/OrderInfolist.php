@@ -89,6 +89,7 @@ class OrderInfolist
                         Section::make('Identificadores')
                             ->collapsed()
                             ->schema([
+                                TextEntry::make('source_label')->label('Loja / landing')->placeholder('—'),
                                 TextEntry::make('external_id')->label('ID no canal')->copyable()->extraAttributes(['class' => 'hub-mono']),
                                 TextEntry::make('external_number')->label('Número')->placeholder('—')->extraAttributes(['class' => 'hub-mono']),
                                 TextEntry::make('updated_at')->label('Última sincronização')->since(),

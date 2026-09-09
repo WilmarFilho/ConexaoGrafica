@@ -87,7 +87,7 @@ class Expedicao extends Page implements HasTable
                     ->weight(FontWeight::SemiBold)
                     ->extraAttributes(['class' => 'hub-mono'])
                     ->formatStateUsing(fn (?string $state) => $state ? '#'.$state : '—')
-                    ->description(fn (Order $r) => $r->channel?->name)
+                    ->description(fn (Order $r) => trim(($r->channel?->name ?? '').($r->source_label ? ' · '.$r->source_label : '')))
                     ->searchable(['external_number', 'external_id']),
 
                 TextColumn::make('customer.name')

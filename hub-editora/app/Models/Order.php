@@ -71,6 +71,17 @@ class Order extends Model
         return 'R$ ' . number_format($this->total_cents / 100, 2, ',', '.');
     }
 
+    /**
+     * De qual loja/landing o pedido veio dentro do canal (ex.: Pagar.me →
+     * "ovacuodopoder"). As landings mandam isso em metadata.store.
+     */
+    public function getSourceLabelAttribute(): ?string
+    {
+        $store = $this->raw['metadata']['store'] ?? $this->raw['metadata']['origin'] ?? null;
+
+        return is_string($store) && $store !== '' ? $store : null;
+    }
+
     /** Endereço em uma linha, para tabelas. */
     public function getShipCityStateAttribute(): ?string
     {
