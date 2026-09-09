@@ -33,10 +33,10 @@ class ImportOrders
         return new self(WooCommerceClient::fromConfig(), Channel::bySlug(Channel::WOOCOMMERCE));
     }
 
-    /** Varredura periódica: tudo que mudou nos últimos N dias. */
-    public function sinceLookback(): int
+    /** Varredura periódica: tudo que mudou nos últimos N dias (padrão: WOO_LOOKBACK_DAYS). */
+    public function sinceLookback(?int $days = null): int
     {
-        $since = now()->subDays((int) config('hub.woocommerce.lookback_days', 3));
+        $since = now()->subDays($days ?? (int) config('hub.woocommerce.lookback_days', 3));
         $count = 0;
 
         try {
