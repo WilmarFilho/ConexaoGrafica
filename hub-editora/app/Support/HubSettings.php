@@ -64,7 +64,19 @@ class HubSettings
                     return [];
                 }
 
-                return Setting::query()->pluck('value', 'key')->filter(fn ($v) => $v !== null && $v !== '')->all();
+                $out = [];
+                foreach (Setting::query()->get() as $row) {
+                    try {
+                        $v = $row->value; // descriptografa; uma linha corrompida não derruba as outras
+                    } catch (Throwable) {
+                        continue;
+                    }
+                    if ($v !== null && $v !== '') {
+                        $out[$row->key] = $v;
+                    }
+                }
+
+                return $out;
             });
         } catch (Throwable) {
             return [];

@@ -68,7 +68,10 @@ class BlingImportTest extends TestCase
 
     public function test_renews_the_token_when_expired(): void
     {
-        Setting::where('key', 'bling.expires_at')->update(['value' => (string) now()->subMinute()->timestamp]);
+        // Pelo model, para passar pelo cast "encrypted".
+        $s = Setting::where('key', 'bling.expires_at')->firstOrFail();
+        $s->value = (string) now()->subMinute()->timestamp;
+        $s->save();
         cache()->forget('hub.settings.v1');
 
         Http::fake([
