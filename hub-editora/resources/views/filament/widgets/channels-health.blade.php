@@ -1,23 +1,18 @@
 <x-filament-widgets::widget>
     <x-filament::section heading="Canais" description="Configuração e última sincronização">
         @php
-            $tone = [
-                'ok' => ['#15803D', 'Ativo'],
-                'off' => ['#B45309', 'Sem credenciais'],
-                'error' => ['#B91C1C', 'Com erro'],
-                'soon' => ['#9AA0A6', 'Em breve'],
-            ];
+            $dot = ['ok' => '#15803D', 'off' => '#B45309', 'error' => '#B91C1C'];
         @endphp
         <div style="display:flex;flex-direction:column;gap:10px;">
             @foreach ($this->getRows() as $r)
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #EEEBE6;">
                     <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                        <span style="flex:none;width:9px;height:9px;border-radius:50%;background:{{ $tone[$r['state']][0] }};"></span>
+                        <span style="flex:none;width:9px;height:9px;border-radius:50%;background:{{ $dot[$r['state']] }};"></span>
                         <div style="min-width:0;">
                             <div style="font-weight:600;color:#24292F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $r['name'] }}</div>
                             <div style="font-size:12px;color:#6A6F7A;">
-                                {{ $tone[$r['state']][1] }}@if ($r['sync']) · sync {{ $r['sync'] }}@endif
-                                @if ($r['errors']) · <span style="color:#B91C1C">{{ $r['errors'] }} erro(s) em 24h</span>@endif
+                                {{ $r['label'] }}@if ($r['sync']) · sync {{ $r['sync'] }}@endif
+                                @if ($r['errors']) · <span style="color:#B91C1C">{{ $r['errors'] }} erro(s) desde o último sucesso</span>@endif
                             </div>
                         </div>
                     </div>

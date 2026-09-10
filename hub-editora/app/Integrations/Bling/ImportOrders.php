@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\ProductChannelRef;
 use App\Models\SyncLog;
+use App\Support\IntegrationAlerts;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -42,9 +43,11 @@ class ImportOrders
             }
 
             $this->channel->update(['last_sync_at' => now(), 'last_sync_status' => 'ok', 'last_sync_message' => "{$count} pedido(s) processado(s)"]);
+            IntegrationAlerts::recovered(Channel::AMAZON);
         } catch (\Throwable $e) {
             $this->channel->update(['last_sync_at' => now(), 'last_sync_status' => 'error', 'last_sync_message' => $e->getMessage()]);
             SyncLog::record($this->channel, SyncLog::IN, 'orders.sync', null, $e->getMessage(), [], 'error');
+            IntegrationAlerts::down(Channel::AMAZON, $e->getMessage());
             throw $e;
         }
 

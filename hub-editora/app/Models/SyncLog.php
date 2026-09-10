@@ -53,6 +53,7 @@ class SyncLog extends Model
             'tracking.failed' => 'Envio de rastreio falhou',
             'settings.changed' => 'Integração alterada',
             'settings.tested' => 'Integração testada',
+            'alert.sent' => 'Aviso de queda enviado',
             default => $this->action,
         };
     }

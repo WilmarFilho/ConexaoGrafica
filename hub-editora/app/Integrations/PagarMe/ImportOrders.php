@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\ProductChannelRef;
 use App\Models\SyncLog;
+use App\Support\IntegrationAlerts;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -42,6 +43,7 @@ class ImportOrders
                 'last_sync_status' => 'ok',
                 'last_sync_message' => "{$count} pedido(s) processado(s)",
             ]);
+            IntegrationAlerts::recovered(Channel::PAGARME);
         } catch (\Throwable $e) {
             $this->channel->update([
                 'last_sync_at' => now(),
@@ -49,6 +51,7 @@ class ImportOrders
                 'last_sync_message' => $e->getMessage(),
             ]);
             SyncLog::record($this->channel, 'in', 'orders.sync', null, $e->getMessage(), [], 'error');
+            IntegrationAlerts::down(Channel::PAGARME, $e->getMessage());
             throw $e;
         }
 

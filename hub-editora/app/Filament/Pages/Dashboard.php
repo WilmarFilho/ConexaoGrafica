@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\AlertsBanner;
 use App\Filament\Widgets\ChannelsHealth;
 use App\Filament\Widgets\LatestOrders;
 use App\Filament\Widgets\OrdersChart;
@@ -23,6 +24,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            AlertsBanner::class,
             StatsOverview::class,
             OrdersChart::class,
             ChannelsHealth::class,

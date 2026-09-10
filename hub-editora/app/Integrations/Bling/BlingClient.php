@@ -6,6 +6,7 @@ use App\Models\Channel;
 use App\Models\Setting;
 use App\Models\SyncLog;
 use App\Support\HubSettings;
+use App\Support\IntegrationAlerts;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -82,6 +83,7 @@ class BlingClient
                 Cache::forget('hub.settings.v1');
                 SyncLog::record(Channel::bySlug(Channel::BLING), SyncLog::IN, 'settings.tested', null,
                     'Bling desconectou: '.$e->getMessage().' — reconecte em Integrações.', [], 'error');
+                IntegrationAlerts::down(Channel::BLING, 'O Bling recusou a renovação do acesso ('.$e->getMessage().'). É preciso reconectar.');
             }
 
             throw $e;
