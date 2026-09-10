@@ -42,5 +42,8 @@ class IntegracoesPageTest extends TestCase
             ->assertNotified('Nada mudou');
 
         $this->assertSame('segredo-xyz', Setting::where('key', 'bling.client_secret')->first()->value);
+
+        // Ao reabrir, o texto salvo aparece preenchido (caminho aninhado no estado).
+        Livewire::test(Integracoes::class)->assertFormSet(['bling.client_id' => 'cid-123']);
     }
 }

@@ -51,11 +51,12 @@ class Integracoes extends Page implements HasSchemas
 
     public function mount(): void
     {
+        // Nomes com ponto viram caminhos aninhados no estado do formulário.
         $fill = [];
         foreach (HubSettings::definitions() as $key => $def) {
-            $fill[$key] = $def['secret'] ? null : HubSettings::effective($key);
+            data_set($fill, $key, $def['secret'] ? null : HubSettings::effective($key));
         }
-        $fill['melhor_envio.sandbox'] = (bool) config('hub.melhor_envio.sandbox');
+        data_set($fill, 'melhor_envio.sandbox', (bool) config('hub.melhor_envio.sandbox'));
         $this->form->fill($fill);
     }
 

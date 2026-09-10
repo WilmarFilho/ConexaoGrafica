@@ -2,7 +2,9 @@
 
 namespace App\Integrations\Bling;
 
+use App\Models\Channel;
 use App\Models\Setting;
+use App\Models\SyncLog;
 use App\Support\HubSettings;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
@@ -70,7 +72,20 @@ class BlingClient
             throw new RuntimeException('Bling não conectado: autorize pelo botão "Conectar ao Bling".');
         }
 
-        $this->storeTokens($this->tokenRequest(['grant_type' => 'refresh_token', 'refresh_token' => $refresh]));
+        try {
+            $this->storeTokens($this->tokenRequest(['grant_type' => 'refresh_token', 'refresh_token' => $refresh]));
+        } catch (RuntimeException $e) {
+            // Refresh recusado (revogado, app apagado, 30 dias sem uso): derruba a
+            // conexão para a tela Integrações e o painel mostrarem "falta autorizar".
+            if (str_contains($e->getMessage(), 'invalid_grant') || str_contains($e->getMessage(), '(400)') || str_contains($e->getMessage(), '(401)')) {
+                Setting::query()->whereIn('key', ['bling.access_token', 'bling.refresh_token', 'bling.expires_at'])->delete();
+                Cache::forget('hub.settings.v1');
+                SyncLog::record(Channel::bySlug(Channel::BLING), SyncLog::IN, 'settings.tested', null,
+                    'Bling desconectou: '.$e->getMessage().' — reconecte em Integrações.', [], 'error');
+            }
+
+            throw $e;
+        }
     }
 
     private function tokenRequest(array $form): array
