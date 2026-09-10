@@ -56,17 +56,19 @@ class HubSettings
     /** Valores gravados no banco (já descriptografados), indexados pela chave. */
     public static function stored(): array
     {
-        return Cache::remember(self::CACHE_KEY, 300, function () {
-            try {
+        // Roda no boot da aplicação: sem banco, sem cache ou sem a tabela
+        // (instalação nova, composer install, testes) tem que falhar em silêncio.
+        try {
+            return Cache::remember(self::CACHE_KEY, 300, function () {
                 if (! Schema::hasTable('settings')) {
                     return [];
                 }
 
                 return Setting::query()->pluck('value', 'key')->filter(fn ($v) => $v !== null && $v !== '')->all();
-            } catch (Throwable) {
-                return [];
-            }
-        });
+            });
+        } catch (Throwable) {
+            return [];
+        }
     }
 
     /** Valor efetivo (banco → .env), como o sistema o enxerga. */
