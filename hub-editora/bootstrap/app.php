@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Webhooks vêm de servidores, não de formulários: sem token CSRF.
         $middleware->validateCsrfTokens(except: ['webhooks/*']);
+
+        // Rotas fora do painel (OAuth do Bling) mandam o visitante ao login do Filament.
+        $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
