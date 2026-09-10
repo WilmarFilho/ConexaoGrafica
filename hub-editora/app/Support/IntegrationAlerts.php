@@ -58,7 +58,10 @@ class IntegrationAlerts
     public static function openIssues(): array
     {
         $issues = [];
-        $add = fn (string $channel, string $message, string $action = 'Abrir Integrações') => $issues[] = compact('channel', 'message', 'action');
+        // function + use (&$issues): arrow fn capturaria a lista por valor e nada seria acumulado.
+        $add = function (string $channel, string $message, string $action = 'Abrir Integrações') use (&$issues): void {
+            $issues[] = compact('channel', 'message', 'action');
+        };
 
         if (! filled(config('hub.woocommerce.url')) || ! filled(config('hub.woocommerce.key'))) {
             $add('WooCommerce', 'sem credenciais: pedidos da loja não estão sendo importados');
