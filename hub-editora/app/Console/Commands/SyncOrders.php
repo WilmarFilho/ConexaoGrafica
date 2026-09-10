@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Integrations\Bling\BlingClient;
+use App\Integrations\Bling\ImportOrders as BlingImport;
 use App\Integrations\PagarMe\ImportOrders as PagarMeImport;
 use App\Integrations\WooCommerce\ImportOrders as WooImport;
 use Illuminate\Console\Command;
@@ -28,6 +30,7 @@ class SyncOrders extends Command
         $configured = match ($channel) {
             'woocommerce' => filled(config('hub.woocommerce.url')) && filled(config('hub.woocommerce.key')),
             'pagarme' => filled(config('hub.pagarme.secret_key')),
+            'amazon' => BlingClient::isConfigured() && BlingClient::isConnected(),
             default => false,
         };
 
@@ -40,6 +43,7 @@ class SyncOrders extends Command
         $count = match ($channel) {
             'woocommerce' => WooImport::make()->sinceLookback($days),
             'pagarme' => PagarMeImport::make()->sinceLookback($days ?? 3),
+            'amazon' => BlingImport::make()->sinceLookback($days ?? 3),
             default => null,
         };
 

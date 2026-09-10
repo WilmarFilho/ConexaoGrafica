@@ -17,6 +17,12 @@ Schedule::command('hub:sync pagarme')
     ->withoutOverlapping()
     ->onOneServer();
 
+// Amazon chega pelo Bling, que não tem webhook para nós: varredura a cada 15 min.
+Schedule::command('hub:sync amazon')
+    ->everyFifteenMinutes()
+    ->withoutOverlapping()
+    ->onOneServer();
+
 // Catálogo muda pouco: uma vez por dia, de madrugada.
 Schedule::command('hub:sync-products woocommerce')
     ->dailyAt('04:10')

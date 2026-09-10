@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Integrations\Bling\BlingClient;
 use App\Integrations\MelhorEnvio\MelhorEnvioClient;
 use App\Integrations\PagarMe\PagarMeClient;
 use App\Integrations\WooCommerce\WooCommerceClient;
@@ -98,7 +99,15 @@ class Integracoes extends Page implements HasSchemas
                     $this->section('Amazon via Bling', Channel::BLING, 'bling', [
                         $this->text('bling.client_id'),
                         $this->secret('bling.client_secret'),
-                    ], 'Fase seguinte: pedidos da Amazon chegam pelo Bling. Guardar as chaves já deixa o terreno pronto.'),
+                        Actions::make([
+                            Action::make('conectar_bling')
+                                ->label(BlingClient::isConnected() ? 'Reconectar ao Bling' : 'Conectar ao Bling')
+                                ->icon(Heroicon::OutlinedLink)
+                                ->color(BlingClient::isConnected() ? 'gray' : 'primary')
+                                ->url(route('bling.connect'))
+                                ->disabled(! BlingClient::isConfigured()),
+                        ]),
+                    ], 'Aplicativo privado em developer.bling.com.br com redirecionamento '.url('/bling/callback').'. Salve as chaves e clique em Conectar: o Bling pede autorização uma vez e o hub renova o acesso sozinho. Só entram pedidos com número da Amazon.'),
                 ]),
             ]);
     }
@@ -154,12 +163,20 @@ class Integracoes extends Page implements HasSchemas
             Channel::WOOCOMMERCE => filled(config('hub.woocommerce.url')) && filled(config('hub.woocommerce.key')) && filled(config('hub.woocommerce.secret')),
             Channel::PAGARME => filled(config('hub.pagarme.secret_key')),
             Channel::MELHOR_ENVIO => MelhorEnvioClient::isConfigured(),
-            Channel::BLING => filled(config('hub.bling.client_id')) && filled(config('hub.bling.client_secret')),
+            Channel::BLING => BlingClient::isConfigured(),
             default => false,
         };
 
         $dot = $configured ? '#15803D' : '#B45309';
         $label = $configured ? 'Configurado' : 'Sem credenciais';
+
+        if ($slug === Channel::BLING && $configured) {
+            $connected = BlingClient::isConnected();
+            $dot = $connected ? '#15803D' : '#B45309';
+            $label = $connected
+                ? 'Conectado'.(BlingClient::connectedAt() ? ' em '.BlingClient::connectedAt()->format('d/m/Y H:i') : '')
+                : 'Chaves salvas · falta autorizar (Conectar ao Bling)';
+        }
         $sync = $channel?->last_sync_at
             ? ' · última sincronização '.$channel->last_sync_at->diffForHumans().($channel->last_sync_status === 'error' ? ' <span style="color:#B91C1C">com erro</span>' : '')
             : '';
@@ -193,6 +210,14 @@ class Integracoes extends Page implements HasSchemas
 
                     return 'Melhor Envio respondeu. Saldo: R$ '.number_format((float) ($b['balance'] ?? 0), 2, ',', '.').(config('hub.melhor_envio.sandbox') ? ' (sandbox)' : '');
                 })(),
+                Channel::BLING => (function () {
+                    if (! BlingClient::isConnected()) {
+                        throw new \RuntimeException('Chaves salvas, mas a conta ainda não foi autorizada. Clique em "Conectar ao Bling".');
+                    }
+                    $r = BlingClient::fromConfig()->get('/pedidos/vendas', ['limite' => 1]);
+
+                    return 'Bling respondeu; leitura de pedidos de venda OK'.(isset($r['data'][0]['numero']) ? ' (último nº '.$r['data'][0]['numero'].')' : '').'.';
+                })(),
                 default => throw new \RuntimeException('Teste ainda não disponível para este canal.'),
             };
 
@@ -210,7 +235,8 @@ class Integracoes extends Page implements HasSchemas
         $changed = [];
 
         foreach (HubSettings::definitions() as $key => $def) {
-            $value = $state[$key] ?? null;
+            // As chaves têm ponto (ex.: bling.client_id) e o formulário devolve o estado aninhado.
+            $value = data_get($state, $key);
 
             if ($key === 'melhor_envio.sandbox') {
                 $value = $value ? '1' : '0';

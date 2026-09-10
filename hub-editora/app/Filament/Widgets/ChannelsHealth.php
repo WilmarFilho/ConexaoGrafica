@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Integrations\Bling\BlingClient;
 use App\Integrations\MelhorEnvio\MelhorEnvioClient;
 use App\Models\Channel;
 use App\Models\Order;
@@ -28,13 +29,10 @@ class ChannelsHealth extends Widget
                 Channel::WOOCOMMERCE => filled(config('hub.woocommerce.url')) && filled(config('hub.woocommerce.key')),
                 Channel::PAGARME => filled(config('hub.pagarme.secret_key')),
                 Channel::MELHOR_ENVIO => MelhorEnvioClient::isConfigured(),
-                Channel::BLING => filled(config('hub.bling.client_id')),
+                Channel::BLING => BlingClient::isConfigured() && BlingClient::isConnected(),
+                Channel::AMAZON => BlingClient::isConfigured() && BlingClient::isConnected(),
                 default => false,
             };
-
-            if ($c->slug === Channel::AMAZON) {
-                $configured = null; // ainda não integrado
-            }
 
             $errors = SyncLog::query()->where('channel_id', $c->id)->where('level', 'error')->where('created_at', '>=', now()->subDay())->count();
             $orders30 = in_array($c->slug, [Channel::WOOCOMMERCE, Channel::PAGARME, Channel::AMAZON], true)
