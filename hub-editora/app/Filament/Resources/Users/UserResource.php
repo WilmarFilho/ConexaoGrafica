@@ -9,6 +9,8 @@ use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Auth\Notifications\ResetPassword;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -70,11 +72,9 @@ class UserResource extends Resource
                     ->modalHeading(fn (User $record) => 'Enviar link de definição de senha para '.$record->email.'?')
                     ->modalDescription('A pessoa recebe um e-mail para escolher a própria senha. O link vale por 60 minutos.')
                     ->action(function (User $record) {
-                        $status = Password::broker()->sendResetLink(['email' => $record->email]);
-
-                        $status === Password::RESET_LINK_SENT
+                        self::sendResetLink($record)
                             ? Notification::make()->title('Link enviado para '.$record->email)->success()->send()
-                            : Notification::make()->title('Não foi possível enviar')->body(__($status))->danger()->send();
+                            : Notification::make()->title('Não foi possível enviar o e-mail')->danger()->send();
                     }),
                 EditAction::make()->label('Editar')->slideOver(),
                 DeleteAction::make()
@@ -103,13 +103,30 @@ class UserResource extends Resource
                 return $data;
             })
             ->after(function (User $record) {
-                $status = Password::broker()->sendResetLink(['email' => $record->email]);
-                if ($status === Password::RESET_LINK_SENT) {
+                if (self::sendResetLink($record)) {
                     Notification::make()->title('Usuário criado')->body('Link para definir a senha enviado a '.$record->email)->success()->send();
                 } else {
-                    Notification::make()->title('Usuário criado, mas o e-mail não saiu')->body(__($status).' Use "Enviar link de senha" para tentar de novo.')->warning()->persistent()->send();
+                    Notification::make()->title('Usuário criado, mas o e-mail não saiu')->body('Use "Enviar link de senha" para tentar de novo.')->warning()->persistent()->send();
                 }
             })
             ->successNotification(null);
+    }
+
+    /**
+     * Mesmo e-mail e mesma página de redefinição que o "Esqueci a senha" do painel:
+     * o link precisa apontar para a rota do Filament, não para a rota padrão do Laravel.
+     */
+    public static function sendResetLink(User $user): bool
+    {
+        try {
+            $token = Password::broker()->createToken($user);
+            $notification = new ResetPassword($token);
+            $notification->url = Filament::getResetPasswordUrl($token, $user);
+            $user->notify($notification);
+
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 }

@@ -6,7 +6,6 @@ use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\User;
 use App\Notifications\IntegrationDown;
 use Filament\Facades\Filament;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
@@ -32,7 +31,7 @@ class UsersResourceTest extends TestCase
 
         $u = User::where('email', 'comercial@exemplo.com')->firstOrFail();
         $this->assertNotEmpty($u->password);
-        Notification::assertSentTo($u, fn ($n) => $n instanceof ResetPassword || $n instanceof \Filament\Auth\Notifications\ResetPassword);
+        Notification::assertSentTo($u, \Filament\Auth\Notifications\ResetPassword::class);
         Notification::assertNotSentTo($u, IntegrationDown::class);
     }
 
@@ -47,6 +46,6 @@ class UsersResourceTest extends TestCase
             ->callTableAction('enviar_senha', $other)
             ->assertHasNoTableActionErrors();
 
-        Notification::assertSentTo($other, fn ($n) => $n instanceof ResetPassword || $n instanceof \Filament\Auth\Notifications\ResetPassword);
+        Notification::assertSentTo($other, \Filament\Auth\Notifications\ResetPassword::class);
     }
 }
