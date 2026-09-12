@@ -62,6 +62,8 @@ class OrdersPanelSnapshotTest extends TestCase
 
         $logs = $this->actingAs($user)->get('/admin/logs');
         $logs->assertOk()->assertSee('Auditoria');
+
+        $this->actingAs($user)->get('/admin/usuarios')->assertOk()->assertSee('Usuários')->assertSee($user->email);
         Storage::disk('local')->put('snapshots/logs.html', $logs->getContent());
 
         Storage::disk('local')->put('snapshots/orders-list.html', $list->getContent());
