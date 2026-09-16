@@ -27,7 +27,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     {
         // Troca de senha (reset, perfil, criação) zera o relógio da expiração.
         static::saving(function (User $user) {
-            if ($user->isDirty('password')) {
+            if ($user->isDirty('password') && ! $user->isDirty('password_changed_at')) {
                 $user->password_changed_at = now();
             }
         });
