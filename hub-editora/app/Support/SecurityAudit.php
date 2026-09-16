@@ -40,13 +40,19 @@ class SecurityAudit
         SyncLog::record(null, SyncLog::MANUAL, 'auth.failed', null,
             "Tentativa de login falhou para {$email} · IP {$ip}", ['ip' => $ip, 'email' => $email], 'warning');
 
-        foreach (['email:'.$email, 'ip:'.$ip] as $key) {
+        $hits = [];
+        foreach (['e-mail '.$email => 'email:'.$email, 'IP '.$ip => 'ip:'.$ip] as $label => $key) {
             $count = (int) Cache::get("hub.auth.failed.{$key}", 0) + 1;
             Cache::put("hub.auth.failed.{$key}", $count, now()->addMinutes(self::FAILED_WINDOW_MINUTES));
 
             if ($count === self::FAILED_THRESHOLD) {
-                self::alert("{$count} tentativas de login falhas em ".self::FAILED_WINDOW_MINUTES." minutos para {$key}. Última origem: IP {$ip}.");
+                $hits[] = $label;
             }
+        }
+
+        // Um aviso só por rajada, mesmo que e-mail e IP estourem juntos.
+        if ($hits) {
+            self::alert(self::FAILED_THRESHOLD.' tentativas de login falhas em '.self::FAILED_WINDOW_MINUTES.' minutos ('.implode(' e ', $hits).').');
         }
     }
 
