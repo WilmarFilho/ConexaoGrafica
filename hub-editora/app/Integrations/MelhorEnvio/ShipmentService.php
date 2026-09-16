@@ -129,6 +129,19 @@ class ShipmentService
             return $shipment; // idempotente: nunca compra duas vezes
         }
 
+        // Já existe um envio no carrinho do Melhor Envio (compra falhou antes, ou foi
+        // paga por fora no painel do ME): retoma de onde parou em vez de criar outro.
+        if ($shipment->exists && $shipment->melhor_envio_id) {
+            $resumed = $this->resume($shipment);
+            if (in_array($resumed->status, [Shipment::LABEL_GENERATED, Shipment::SHIPPED, Shipment::DELIVERED], true)) {
+                return $resumed;
+            }
+            if ($resumed->status !== Shipment::CANCELLED) {
+                return $resumed; // continua pendente no ME (ex.: sem saldo); motivo já registrado
+            }
+            // cancelado no ME: segue e compra um novo
+        }
+
         try {
             $options = $this->quote($order);
             $chosen = $serviceId
@@ -184,11 +197,88 @@ class ShipmentService
         }
     }
 
+    /**
+     * Retoma um envio que ficou no meio do caminho no Melhor Envio: pago por fora
+     * no painel do ME, ou compra que falhou por saldo. Completa o que faltar
+     * (checkout → gerar → imprimir) e traz rastreio e PDF para o hub.
+     */
+    public function resume(Shipment $shipment): Shipment
+    {
+        $order = $shipment->order()->with(['channel'])->firstOrFail();
+        $meId = $shipment->melhor_envio_id;
+
+        if (! $meId) {
+            return $shipment;
+        }
+
+        try {
+            $t = $this->client()->tracking([$meId])[$meId] ?? null;
+            if (! $t) {
+                throw new RuntimeException('Envio não encontrado no Melhor Envio.');
+            }
+
+            if (! empty($t['canceled_at']) || ($t['status'] ?? '') === 'canceled') {
+                $shipment->update(['status' => Shipment::CANCELLED, 'problem' => 'Cancelado no Melhor Envio']);
+                SyncLog::record($this->channel(), 'in', 'label.failed', $order, 'Envio cancelado no Melhor Envio; gere um novo', ['me_id' => $meId], 'warning');
+
+                return $shipment->refresh();
+            }
+
+            if (empty($t['paid_at'])) {
+                // Ainda no carrinho: tenta pagar (o saldo pode existir agora).
+                $this->client()->checkout([$meId]);
+                $t = $this->client()->tracking([$meId])[$meId] ?? $t;
+            }
+            $shipment->update(['status' => Shipment::PURCHASED, 'problem' => null]);
+
+            if (empty($t['generated_at'])) {
+                $gen = $this->client()->generate([$meId]);
+                if (isset($gen[$meId]['status']) && $gen[$meId]['status'] === false) {
+                    throw new RuntimeException('Falha ao gerar etiqueta: '.($gen[$meId]['message'] ?? 'sem detalhe'));
+                }
+                $t = $this->client()->tracking([$meId])[$meId] ?? $t;
+            }
+
+            $labelUrl = $this->client()->printUrl([$meId]);
+
+            DB::transaction(function () use ($shipment, $labelUrl, $t, $order) {
+                $shipment->update([
+                    'status' => Shipment::LABEL_GENERATED,
+                    'label_url' => $labelUrl,
+                    'tracking_code' => $t['tracking'] ?? $shipment->tracking_code,
+                    'label_generated_at' => $shipment->label_generated_at ?? now(),
+                    'problem' => null,
+                    'raw' => array_merge($shipment->raw ?? [], ['tracking' => $t]),
+                ]);
+                $movable = in_array($order->status, [...OrderStatus::awaitingShipment(), OrderStatus::Problem], true);
+                if ($movable && ! $order->status_manual) {
+                    $order->update(['status' => OrderStatus::LabelGenerated]);
+                }
+            });
+
+            SyncLog::record($this->channel(), 'out', 'label.generated', $order,
+                "Etiqueta {$shipment->carrier} {$shipment->service} retomada do Melhor Envio".(! empty($t['tracking']) ? " · {$t['tracking']}" : ''),
+                ['me_id' => $meId, 'resumed' => true]);
+
+            return $shipment->refresh();
+        } catch (Throwable $e) {
+            return $this->fail($order, $e->getMessage(), $shipment);
+        }
+    }
+
     /** Atualiza rastreio/situação de um envio já comprado; move o pedido quando postado/entregue. */
     public function refreshTracking(Shipment $shipment): void
     {
         if (! $shipment->melhor_envio_id) {
             return;
+        }
+
+        // Envio que parou antes da etiqueta: primeiro tenta completar no ME.
+        if (in_array($shipment->status, [Shipment::QUOTED, Shipment::PURCHASED, Shipment::PROBLEM], true)) {
+            $shipment = $this->resume($shipment);
+            if ($shipment->status !== Shipment::LABEL_GENERATED) {
+                return;
+            }
         }
 
         $t = $this->client()->tracking([$shipment->melhor_envio_id])[$shipment->melhor_envio_id] ?? null;

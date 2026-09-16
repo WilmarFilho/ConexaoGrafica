@@ -189,6 +189,21 @@ class Expedicao extends Page implements HasTable
                             : Notification::make()->title('Não foi possível gerar')->body($shipment->problem)->danger()->persistent()->send();
                     }),
 
+                Action::make('retomar')
+                    ->label('Retomar do ME')
+                    ->icon(Heroicon::OutlinedArrowPathRoundedSquare)
+                    ->color('warning')
+                    ->tooltip('O envio existe no Melhor Envio (pago ou no carrinho): completa e traz a etiqueta')
+                    ->visible(fn (Order $r) => filled($r->shipment?->melhor_envio_id)
+                        && in_array($r->shipment->status, [Shipment::QUOTED, Shipment::PURCHASED, Shipment::PROBLEM], true))
+                    ->action(function (Order $record) use ($service) {
+                        $shipment = $service->resume($record->shipment);
+
+                        $shipment->status === Shipment::LABEL_GENERATED
+                            ? Notification::make()->title('Etiqueta recuperada')->body(trim($shipment->carrier.' '.$shipment->service.' · '.$shipment->tracking_code))->success()->send()
+                            : Notification::make()->title('Ainda pendente no Melhor Envio')->body($shipment->problem)->warning()->persistent()->send();
+                    }),
+
                 ChangeOrderStatusAction::make()->label('Etapa'),
 
                 Action::make('etiqueta')

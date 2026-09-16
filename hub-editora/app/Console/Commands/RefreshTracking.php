@@ -24,7 +24,8 @@ class RefreshTracking extends Command
 
         $open = Shipment::query()
             ->whereNotNull('melhor_envio_id')
-            ->whereIn('status', [Shipment::PURCHASED, Shipment::LABEL_GENERATED, Shipment::SHIPPED])
+            // Inclui os que pararam antes da etiqueta: podem ter sido pagos no painel do ME.
+            ->whereIn('status', [Shipment::QUOTED, Shipment::PROBLEM, Shipment::PURCHASED, Shipment::LABEL_GENERATED, Shipment::SHIPPED])
             ->orderBy('updated_at')
             ->limit((int) $this->option('limit'))
             ->get();
