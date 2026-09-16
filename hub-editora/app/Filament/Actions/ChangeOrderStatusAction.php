@@ -51,7 +51,8 @@ class ChangeOrderStatusAction
             ])
             ->action(function (Order $record, array $data) {
                 $from = $record->status;
-                $to = OrderStatus::from($data['status']);
+                // O Select com enum pode devolver o caso já convertido ou o valor cru.
+                $to = $data['status'] instanceof OrderStatus ? $data['status'] : OrderStatus::from($data['status']);
                 $lock = (bool) ($data['lock'] ?? true);
 
                 $record->update(['status' => $to, 'status_manual' => $lock]);
