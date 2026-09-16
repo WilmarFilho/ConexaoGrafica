@@ -87,7 +87,7 @@ class Expedicao extends Page implements HasTable
                 ->with(['channel', 'customer', 'items', 'shipment'])
                 ->where('requires_shipping', true)
                 ->whereIn('status', [...OrderStatus::awaitingShipment(), OrderStatus::LabelGenerated, OrderStatus::ReadyToShip, OrderStatus::Problem]))
-            ->defaultSort('placed_at')
+            ->defaultSort('placed_at', 'desc')
             ->poll('30s')
             ->recordUrl(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record]))
             ->columns([
