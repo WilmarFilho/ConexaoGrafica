@@ -34,7 +34,8 @@ class SecurityPolicyTest extends TestCase
 
     public function test_password_change_resets_the_clock_and_expired_users_are_sent_to_the_profile(): void
     {
-        $user = User::factory()->create(['password_changed_at' => now()->subDays(400)]);
+        // MFA já configurado (obrigatório no painel); o que se testa aqui é a expiração da senha.
+        $user = User::factory()->create(['password_changed_at' => now()->subDays(400), 'app_authentication_secret' => 'segredo-teste']);
         $this->assertTrue($user->passwordIsExpired());
 
         $this->actingAs($user)->get('/admin/orders')->assertRedirect(route('filament.admin.auth.profile'));
@@ -51,7 +52,8 @@ class SecurityPolicyTest extends TestCase
         $user = User::factory()->create();
 
         event(new Login('web', $user, false));
-        $this->assertSame(1, SyncLog::where('action', 'auth.login')->where('subject_id', $user->id)->count());
+        $rows = SyncLog::where('action', 'auth.login')->get();
+        $this->assertCount(1, $rows, 'linhas: '.$rows->map(fn ($r) => $r->message.' ['.json_encode($r->context).']')->implode(' | '));
 
         for ($i = 0; $i < SecurityAudit::FAILED_THRESHOLD + 1; $i++) {
             event(new Failed('web', null, ['email' => 'x@y.com', 'password' => 'bad']));

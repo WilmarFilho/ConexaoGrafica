@@ -28,6 +28,8 @@ class OrdersPanelSnapshotTest extends TestCase
         }
 
         $user = User::query()->firstOrFail();
+        // MFA é obrigatório no painel; marca como configurado para o teste não cair na tela de setup.
+        $user->forceFill(['app_authentication_secret' => 'ci'])->saveQuietly();
         $order = Order::query()->with('items')->firstOrFail();
 
         $list = $this->actingAs($user)->get('/admin/orders');
