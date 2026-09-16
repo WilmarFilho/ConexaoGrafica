@@ -43,8 +43,10 @@ class SecurityPolicyTest extends TestCase
         $user->password = 'Nova-Senha-Forte-2026!';
         $user->save();
         $this->assertFalse($user->fresh()->passwordIsExpired());
-        $res = $this->actingAs($user->fresh())->get('/admin/orders');
-        $this->assertSame(200, $res->getStatusCode(), 'redirecionou para: '.$res->headers->get('Location'));
+
+        // Trocar a senha derruba a sessão antiga (proteção do Laravel); entra de novo.
+        $this->flushSession();
+        $this->actingAs($user->fresh())->get('/admin/orders')->assertOk();
     }
 
     public function test_logins_and_failures_are_audited_and_brute_force_alerts_once(): void
