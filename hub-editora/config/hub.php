@@ -62,6 +62,16 @@ return [
         'non_commercial' => (bool) env('ME_NON_COMMERCIAL', true),
     ],
 
+    // Amazon Seller Central (SP-API, autorização própria via Login with Amazon).
+    'amazon' => [
+        'client_id' => env('AMAZON_LWA_CLIENT_ID'),
+        'client_secret' => env('AMAZON_LWA_CLIENT_SECRET'),
+        'refresh_token' => env('AMAZON_REFRESH_TOKEN'),
+        'marketplace_id' => env('AMAZON_MARKETPLACE_ID', 'A2Q3Y263D00KWC'), // Brasil
+        'endpoint' => env('AMAZON_SP_ENDPOINT', 'https://sellingpartnerapi-na.amazon.com'),
+        'token_url' => 'https://api.amazon.com/auth/o2/token',
+    ],
+
     'bling' => [
         'client_id' => env('BLING_CLIENT_ID'),
         'client_secret' => env('BLING_CLIENT_SECRET'),

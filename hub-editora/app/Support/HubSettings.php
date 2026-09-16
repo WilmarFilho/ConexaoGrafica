@@ -48,6 +48,11 @@ class HubSettings
             'melhor_envio.from.state' => ['label' => 'UF', 'secret' => false, 'config' => 'hub.melhor_envio.from.state'],
             'melhor_envio.from.postal_code' => ['label' => 'CEP de origem', 'secret' => false, 'config' => 'hub.melhor_envio.from.postal_code'],
 
+            'amazon.client_id' => ['label' => 'LWA Client ID', 'secret' => false, 'config' => 'hub.amazon.client_id', 'help' => 'Seller Central → Desenvolver aplicativos → credenciais do app'],
+            'amazon.client_secret' => ['label' => 'LWA Client Secret', 'secret' => true, 'config' => 'hub.amazon.client_secret'],
+            'amazon.refresh_token' => ['label' => 'Refresh token', 'secret' => true, 'config' => 'hub.amazon.refresh_token', 'help' => 'Gerado ao autorizar o app na própria conta (self-authorize)'],
+            'amazon.marketplace_id' => ['label' => 'Marketplace ID', 'secret' => false, 'config' => 'hub.amazon.marketplace_id', 'help' => 'Brasil = A2Q3Y263D00KWC'],
+
             'bling.client_id' => ['label' => 'Client ID', 'secret' => false, 'config' => 'hub.bling.client_id'],
             'bling.client_secret' => ['label' => 'Client secret', 'secret' => true, 'config' => 'hub.bling.client_secret'],
         ];

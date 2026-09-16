@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Integrations\Amazon\AmazonClient;
 use App\Integrations\Bling\BlingClient;
 use App\Integrations\MelhorEnvio\MelhorEnvioClient;
 use App\Integrations\PagarMe\PagarMeClient;
@@ -97,6 +98,13 @@ class Integracoes extends Page implements HasSchemas
                         ]),
                     ], 'Token em Integrações → Tokens. O remetente sai impresso na etiqueta e o CEP de origem define a cotação.'),
 
+                    $this->section('Amazon (Seller Central)', Channel::AMAZON, 'amazon', [
+                        $this->text('amazon.client_id'),
+                        $this->secret('amazon.client_secret'),
+                        $this->secret('amazon.refresh_token'),
+                        $this->text('amazon.marketplace_id'),
+                    ], 'App privado em Seller Central → Apps e serviços → Desenvolver aplicativos. O hub usa para o "Confirmar envio" com rastreio assim que a etiqueta sai; os pedidos continuam chegando pelo Bling.'),
+
                     $this->section('Amazon via Bling', Channel::BLING, 'bling', [
                         $this->text('bling.client_id'),
                         $this->secret('bling.client_secret'),
@@ -165,6 +173,7 @@ class Integracoes extends Page implements HasSchemas
             Channel::PAGARME => filled(config('hub.pagarme.secret_key')),
             Channel::MELHOR_ENVIO => MelhorEnvioClient::isConfigured(),
             Channel::BLING => BlingClient::isConfigured(),
+            Channel::AMAZON => AmazonClient::isConfigured(),
             default => false,
         };
 
@@ -210,6 +219,14 @@ class Integracoes extends Page implements HasSchemas
                     $b = MelhorEnvioClient::make()->balance();
 
                     return 'Melhor Envio respondeu. Saldo: R$ '.number_format((float) ($b['balance'] ?? 0), 2, ',', '.').(config('hub.melhor_envio.sandbox') ? ' (sandbox)' : '');
+                })(),
+                Channel::AMAZON => (function () {
+                    if (! AmazonClient::isConfigured()) {
+                        throw new \RuntimeException('Preencha Client ID, Client Secret e Refresh token da Amazon.');
+                    }
+                    $orders = AmazonClient::fromConfig()->recentOrders(30, 3);
+
+                    return 'Amazon respondeu; '.count($orders).' pedido(s) nos últimos 30 dias'.(isset($orders[0]['AmazonOrderId']) ? ' (ex.: '.$orders[0]['AmazonOrderId'].')' : '').'.';
                 })(),
                 Channel::BLING => (function () {
                     if (! BlingClient::isConnected()) {
