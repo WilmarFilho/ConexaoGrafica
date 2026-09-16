@@ -191,7 +191,9 @@ class ShipmentService
             SyncLog::record($this->channel(), 'out', 'label.generated', $order,
                 "Etiqueta {$chosen['company']} {$chosen['name']} gerada", ['me_id' => $meId, 'cost_cents' => $chosen['price_cents']]);
 
-            return $shipment->refresh();
+            $this->notifyChannelIfTracked($shipment->refresh());
+
+            return $shipment;
         } catch (Throwable $e) {
             return $this->fail($order, $e->getMessage(), $shipment);
         }
@@ -260,7 +262,9 @@ class ShipmentService
                 "Etiqueta {$shipment->carrier} {$shipment->service} retomada do Melhor Envio".(! empty($t['tracking']) ? " · {$t['tracking']}" : ''),
                 ['me_id' => $meId, 'resumed' => true]);
 
-            return $shipment->refresh();
+            $this->notifyChannelIfTracked($shipment->refresh());
+
+            return $shipment;
         } catch (Throwable $e) {
             return $this->fail($order, $e->getMessage(), $shipment);
         }
@@ -308,6 +312,17 @@ class ShipmentService
         $shipment->update($updates);
 
         // Avisa o canal uma única vez, assim que houver rastreio.
+        if ($shipment->tracking_code && ! $shipment->channel_notified) {
+            NotifyChannelShipped::dispatch($shipment->id);
+        }
+    }
+
+    /**
+     * Com etiqueta e rastreio em mãos, já avisa o canal (Amazon exige o
+     * "confirmar envio" logo após gerar a etiqueta, senão cancela o pedido).
+     */
+    private function notifyChannelIfTracked(Shipment $shipment): void
+    {
         if ($shipment->tracking_code && ! $shipment->channel_notified) {
             NotifyChannelShipped::dispatch($shipment->id);
         }

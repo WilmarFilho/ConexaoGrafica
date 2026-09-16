@@ -202,6 +202,72 @@ class BlingClient
         return $this->get("/pedidos/vendas/{$id}")['data'] ?? [];
     }
 
+    /** Serviços da logística "Melhor Envio" do Bling, indexados pelo nome (PAC, SEDEX...). */
+    public function logisticsServices(): array
+    {
+        $out = [];
+        foreach ($this->get('/logisticas/servicos')['data'] ?? [] as $s) {
+            $out[mb_strtoupper((string) ($s['descricao'] ?? ''))] = [
+                'id' => $s['id'],
+                'alias' => $s['aliases'][0] ?? null,
+                'carrier' => $s['nomeTransportador'] ?? null,
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Devolve o rastreio ao pedido e o marca como atendido (situação 9).
+     * É isso que faz o Bling confirmar o envio na Amazon.
+     *
+     * O Bling só aceita o rastreio em duas etapas: primeiro cria o volume com o
+     * alias do serviço (ex.: ME_PAC_1), depois grava o código no volume criado.
+     */
+    public function markShipped(int $orderId, string $trackingCode, string $serviceName = 'PAC'): array
+    {
+        $services = $this->logisticsServices();
+        $svc = $services[mb_strtoupper($serviceName)] ?? $services['PAC'] ?? reset($services);
+        if (! $svc || empty($svc['alias'])) {
+            throw new RuntimeException('Bling: nenhum serviço de logística configurado (integração Melhor Envio no Bling).');
+        }
+
+        $order = $this->order($orderId);
+        if (! $order) {
+            throw new RuntimeException("Bling: pedido {$orderId} não encontrado.");
+        }
+
+        $body = fn (array $volumes) => array_merge(
+            array_diff_key($order, array_flip(['id', 'notaFiscal', 'taxas'])),
+            ['transporte' => array_merge($order['transporte'] ?? [], ['quantidadeVolumes' => 1, 'volumes' => $volumes])],
+        );
+
+        $existing = collect($order['transporte']['volumes'] ?? [])->first();
+        if (! $existing) {
+            $res = $this->put("/pedidos/vendas/{$orderId}", $body([['servico' => $svc['alias'], 'codigoRastreamento' => $trackingCode]]));
+            $volumeId = $res['data']['tracking']['volumes'][0]['id'] ?? $res['data']['tracking']['idsVolumes'][0] ?? null;
+            usleep(500000);
+        } else {
+            $volumeId = $existing['id'];
+        }
+
+        if (! $volumeId) {
+            throw new RuntimeException('Bling: não foi possível criar o volume do pedido.');
+        }
+
+        if (($existing['codigoRastreamento'] ?? '') !== $trackingCode) {
+            $this->put("/pedidos/vendas/{$orderId}", $body([['id' => $volumeId, 'servico' => $svc['alias'], 'codigoRastreamento' => $trackingCode]]));
+            usleep(500000);
+        }
+
+        $situacao = (int) ($order['situacao']['id'] ?? 0);
+        if ($situacao !== 9) {
+            $this->patch("/pedidos/vendas/{$orderId}/situacoes/9");
+        }
+
+        return ['volume_id' => $volumeId, 'service' => $svc['alias'], 'situacao_antes' => $situacao];
+    }
+
     private function unwrap($res, string $path): array
     {
         if ($res->successful()) {

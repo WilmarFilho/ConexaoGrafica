@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Integrations\Bling\BlingClient;
 use App\Integrations\WooCommerce\WooCommerceClient;
 use App\Models\Channel;
 use App\Models\Shipment;
@@ -34,9 +35,17 @@ class NotifyChannelShipped implements ShouldQueue
         $order = $shipment->order;
         $channel = $order->channel;
 
+        // Amazon depende do Bling autorizado; sem ele, deixa para a próxima verificação de rastreio.
+        if ($channel?->slug === Channel::AMAZON && ! (BlingClient::isConfigured() && BlingClient::isConnected())) {
+            SyncLog::record($channel, 'out', 'tracking.failed', $order, 'Bling não conectado: confirmação de envio na Amazon adiada', [], 'warning');
+
+            return;
+        }
+
         try {
             $sent = match ($channel?->slug) {
                 Channel::WOOCOMMERCE => $this->woo($order->external_id, $shipment),
+                Channel::AMAZON => $this->amazonViaBling($order->external_id, $shipment),
                 default => false, // sem destino: marca como notificado para não insistir
             };
 
@@ -49,6 +58,21 @@ class NotifyChannelShipped implements ShouldQueue
             SyncLog::record($channel, 'out', 'tracking.failed', $order, $e->getMessage(), [], 'error');
             throw $e; // deixa a fila tentar de novo
         }
+    }
+
+    /**
+     * Amazon: grava o rastreio no pedido do Bling e o marca como atendido; a
+     * integração Bling ↔ Amazon faz o "Confirmar envio" no Seller Central.
+     */
+    private function amazonViaBling(string $externalId, Shipment $shipment): bool
+    {
+        BlingClient::fromConfig()->markShipped(
+            (int) $externalId,
+            $shipment->tracking_code,
+            $shipment->service ?: 'PAC',
+        );
+
+        return true;
     }
 
     private function woo(string $externalId, Shipment $shipment): bool
