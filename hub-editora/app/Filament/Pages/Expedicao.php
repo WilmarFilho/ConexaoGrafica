@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Enums\OrderStatus;
 use App\Filament\Actions\ChangeOrderStatusAction;
+use App\Filament\Actions\SyncNowAction;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Integrations\MelhorEnvio\MelhorEnvioClient;
 use App\Integrations\MelhorEnvio\ShipmentService;
@@ -52,6 +53,13 @@ class Expedicao extends Page implements HasTable
         $n = Order::query()->awaitingShipment()->count();
 
         return $n ? (string) $n : null;
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            SyncNowAction::make(),
+        ];
     }
 
     /** Números do topo da página. */
@@ -207,8 +215,9 @@ class Expedicao extends Page implements HasTable
                 ChangeOrderStatusAction::make()->label('Etapa'),
 
                 Action::make('etiqueta')
-                    ->label('Etiqueta')
+                    ->label('Imprimir')
                     ->icon(Heroicon::OutlinedPrinter)
+                    ->tooltip('Abre a página de impressão do Melhor Envio (precisa estar logado lá). Ligue "Imprimir etiquetas" e clique em IMPRIMIR para gerar o PDF.')
                     ->url(fn (Order $r) => $r->shipment?->label_url, shouldOpenInNewTab: true)
                     ->visible(fn (Order $r) => filled($r->shipment?->label_url)),
             ])

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Orders\Pages;
 
 use App\Enums\OrderStatus;
+use App\Filament\Actions\SyncNowAction;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Models\Order;
 use Filament\Resources\Pages\ListRecords;
@@ -14,6 +15,13 @@ class ListOrders extends ListRecords
     protected static string $resource = OrderResource::class;
 
     protected static ?string $title = 'Central de Pedidos';
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            SyncNowAction::make(),
+        ];
+    }
 
     public function getTabs(): array
     {

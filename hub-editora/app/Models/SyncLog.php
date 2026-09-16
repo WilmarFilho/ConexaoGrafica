@@ -54,6 +54,7 @@ class SyncLog extends Model
             'settings.changed' => 'Integração alterada',
             'settings.tested' => 'Integração testada',
             'alert.sent' => 'Aviso de queda enviado',
+            'sync.manual' => 'Sincronização manual',
             default => $this->action,
         };
     }
