@@ -15,6 +15,11 @@ PHP=${PHP:-/opt/cpanel/ea-php83/root/usr/bin/php}
 COMPOSER=${COMPOSER:-$HOME/bin/composer}
 APP=${APP:-$HOME/hub/hub-editora}
 
+# Sem verificação aprovada, não publica (SKIP_CHECK=1 só em emergência, e fica no log).
+if [ "${SKIP_CHECK:-0}" != "1" ] && [ -x "$HOME/hub-ci/hub-editora/deploy/check.sh" ]; then
+    bash "$HOME/hub-ci/hub-editora/deploy/check.sh"
+fi
+
 cd "$APP/.."
 echo "== git pull"
 git pull --ff-only

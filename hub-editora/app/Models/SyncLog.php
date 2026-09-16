@@ -55,6 +55,11 @@ class SyncLog extends Model
             'settings.tested' => 'Integração testada',
             'alert.sent' => 'Aviso de queda enviado',
             'sync.manual' => 'Sincronização manual',
+            'auth.login' => 'Login',
+            'auth.logout' => 'Saída',
+            'auth.failed' => 'Login falhou',
+            'pii.purged' => 'Dados pessoais apagados',
+            'security.digest' => 'Resumo de segurança enviado',
             default => $this->action,
         };
     }

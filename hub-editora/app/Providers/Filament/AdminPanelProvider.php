@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\EnsurePasswordIsFresh;
+use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -28,6 +30,11 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->passwordReset() // "esqueci a senha" por e-mail: ninguem precisa repassar senha
             ->profile()
+            // Dois fatores por aplicativo autenticador, obrigatorio para todos
+            // (exigencia da Amazon para dados de compradores).
+            ->multiFactorAuthentication([
+                AppAuthentication::make()->recoverable(),
+            ], isRequired: true)
             ->brandName('Hub Editora')
             ->brandLogo(fn () => view('filament.brand'))
             ->brandLogoHeight('2.1rem')
@@ -73,6 +80,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                EnsurePasswordIsFresh::class,
             ]);
     }
 }

@@ -29,6 +29,16 @@ Schedule::command('hub:sync-products woocommerce')
     ->withoutOverlapping()
     ->onOneServer();
 
+// Retenção de dados pessoais (Amazon): apaga 30 dias após o envio.
+Schedule::command('hub:purge-pii')
+    ->dailyAt('03:30')
+    ->onOneServer();
+
+// Revisão quinzenal de segurança por e-mail (dias 1 e 16).
+Schedule::command('hub:security-digest')
+    ->twiceMonthly(1, 16, '08:00')
+    ->onOneServer();
+
 // Rastreio: o Melhor Envio não empurra eventos; a cada hora perguntamos.
 Schedule::command('hub:tracking')
     ->hourly()

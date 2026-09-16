@@ -62,6 +62,13 @@ return [
         'non_commercial' => (bool) env('ME_NON_COMMERCIAL', true),
     ],
 
+    // Retenção de dados pessoais de compradores da Amazon. A Política de
+    // Proteção de Dados da Amazon exige apagar em até 30 dias após o envio;
+    // por isso o valor efetivo nunca passa de 30 (o hub aplica min()).
+    'retention' => [
+        'amazon_pii_days' => min(30, max(1, (int) env('AMAZON_PII_RETENTION_DAYS', 30))),
+    ],
+
     // Amazon Seller Central (SP-API, autorização própria via Login with Amazon).
     'amazon' => [
         'client_id' => env('AMAZON_LWA_CLIENT_ID'),
