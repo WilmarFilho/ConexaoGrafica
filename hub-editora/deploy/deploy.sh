@@ -16,8 +16,13 @@ COMPOSER=${COMPOSER:-$HOME/bin/composer}
 APP=${APP:-$HOME/hub/hub-editora}
 
 # Sem verificação aprovada, não publica (SKIP_CHECK=1 só em emergência, e fica no log).
-if [ "${SKIP_CHECK:-0}" != "1" ] && [ -x "$HOME/hub-ci/hub-editora/deploy/check.sh" ]; then
-    bash "$HOME/hub-ci/hub-editora/deploy/check.sh"
+if [ "${SKIP_CHECK:-0}" != "1" ]; then
+    if [ -f "$HOME/hub-ci/hub-editora/deploy/check.sh" ]; then
+        bash "$HOME/hub-ci/hub-editora/deploy/check.sh"
+    else
+        echo "!! clone de verificação (~/hub-ci) ausente: publicação bloqueada. Use SKIP_CHECK=1 só em emergência."
+        exit 1
+    fi
 fi
 
 cd "$APP/.."
