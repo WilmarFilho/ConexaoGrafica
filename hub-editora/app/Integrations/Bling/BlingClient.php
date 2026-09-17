@@ -83,7 +83,7 @@ class BlingClient
                 Cache::forget('hub.settings.v1');
                 SyncLog::record(Channel::bySlug(Channel::BLING), SyncLog::IN, 'settings.tested', null,
                     'Bling desconectou: '.$e->getMessage().' — reconecte em Integrações.', [], 'error');
-                IntegrationAlerts::down(Channel::BLING, 'O Bling recusou a renovação do acesso ('.$e->getMessage().'). É preciso reconectar.');
+                IntegrationAlerts::down(Channel::BLING, 'O Bling recusou a renovação do acesso ('.$e->getMessage().'). É preciso reconectar.', immediate: true);
             }
 
             throw $e;

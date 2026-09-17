@@ -19,12 +19,30 @@ class IntegrationAlerts
 {
     public const THROTTLE_HOURS = 6;
 
-    /** Chamado por quem detectou a queda (refresh do Bling, varreduras). */
-    public static function down(string $slug, string $reason): void
+    /**
+     * Falhas consecutivas antes de avisar. As APIs (Bling em especial) devolvem
+     * erros passageiros; com varredura a cada 15 min, 3 seguidas = ~45 min fora.
+     */
+    public const CONSECUTIVE_FAILURES = 3;
+
+    /**
+     * Chamado por quem detectou a queda (refresh do Bling, varreduras).
+     * $immediate = true pula a contagem (ex.: token revogado, que não volta sozinho).
+     */
+    public static function down(string $slug, string $reason, bool $immediate = false): void
     {
         $channel = Channel::bySlug($slug);
         $name = $channel?->name ?? $slug;
         $key = "hub.alert.down.{$slug}";
+
+        if (! $immediate) {
+            $failures = (int) Cache::get("hub.alert.failures.{$slug}", 0) + 1;
+            Cache::put("hub.alert.failures.{$slug}", $failures, now()->addHours(24));
+            if ($failures < self::CONSECUTIVE_FAILURES) {
+                return; // pode ser passageiro; espera a próxima varredura
+            }
+            $reason = "{$failures} falhas seguidas. Última: {$reason}";
+        }
 
         if (Cache::has($key)) {
             return; // já avisado nas últimas horas
@@ -48,6 +66,7 @@ class IntegrationAlerts
     public static function recovered(string $slug): void
     {
         Cache::forget("hub.alert.down.{$slug}");
+        Cache::forget("hub.alert.failures.{$slug}");
     }
 
     /**
