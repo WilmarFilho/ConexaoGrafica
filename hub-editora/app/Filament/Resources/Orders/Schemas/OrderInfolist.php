@@ -4,12 +4,15 @@ namespace App\Filament\Resources\Orders\Schemas;
 
 use App\Filament\Resources\Orders\Tables\OrdersTable;
 use App\Models\Order;
+use App\Models\Shipment;
+use Filament\Actions\Action;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Icons\Heroicon;
 
 /**
  * Detalhe do pedido: coluna larga com cliente, entrega e itens; coluna
@@ -82,7 +85,18 @@ class OrderInfolist
                                 TextEntry::make('channel_status')->label('Status no canal')->placeholder('—')->extraAttributes(['class' => 'hub-mono']),
                                 TextEntry::make('shipment.carrier')->label('Transportadora')->placeholder('Sem etiqueta ainda'),
                                 TextEntry::make('shipment.service')->label('Serviço')->placeholder('—'),
-                                TextEntry::make('shipment.tracking_code')->label('Rastreio')->placeholder('—')->copyable()->extraAttributes(['class' => 'hub-mono']),
+                                TextEntry::make('shipment.tracking_code')
+                                    ->label('Rastreio')
+                                    ->placeholder('—')
+                                    ->copyable()
+                                    ->extraAttributes(['class' => 'hub-mono'])
+                                    ->hintAction(
+                                        Action::make('abrirRastreio')
+                                            ->label('Abrir rastreio')
+                                            ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                            ->url(fn (Order $record) => Shipment::trackingUrl($record->shipment?->tracking_code), shouldOpenInNewTab: true)
+                                            ->visible(fn (Order $record) => Shipment::trackingUrl($record->shipment?->tracking_code) !== null)
+                                    ),
                                 TextEntry::make('shipment.cost_cents')->label('Custo do frete')->money('BRL', divideBy: 100)->placeholder('—')->extraAttributes(['class' => 'hub-mono']),
                             ]),
 

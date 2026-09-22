@@ -18,6 +18,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Enums\IconPosition;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -138,7 +139,11 @@ class Expedicao extends Page implements HasTable
                     ->label('Rastreio')
                     ->extraAttributes(['class' => 'hub-mono'])
                     ->placeholder('—')
-                    ->copyable(),
+                    ->url(fn (Order $record) => Shipment::trackingUrl($record->shipment?->tracking_code), shouldOpenInNewTab: true)
+                    ->icon(fn (Order $record) => Shipment::trackingUrl($record->shipment?->tracking_code) ? Heroicon::OutlinedArrowTopRightOnSquare : null)
+                    ->iconPosition(IconPosition::After)
+                    ->color('primary')
+                    ->tooltip('Abrir rastreio em nova aba'),
 
                 TextColumn::make('placed_at')
                     ->label('Aguardando há')

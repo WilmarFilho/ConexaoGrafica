@@ -5,9 +5,11 @@ namespace App\Filament\Resources\Orders\Tables;
 use App\Enums\OrderStatus;
 use App\Filament\Actions\ChangeOrderStatusAction;
 use App\Models\Order;
+use App\Models\Shipment;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Enums\IconPosition;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -101,7 +103,11 @@ class OrdersTable
                     ->label('Rastreio')
                     ->extraAttributes(['class' => 'hub-mono'])
                     ->placeholder('—')
-                    ->copyable()
+                    ->url(fn (Order $record) => Shipment::trackingUrl($record->shipment?->tracking_code), shouldOpenInNewTab: true)
+                    ->icon(fn (Order $record) => Shipment::trackingUrl($record->shipment?->tracking_code) ? Heroicon::OutlinedArrowTopRightOnSquare : null)
+                    ->iconPosition(IconPosition::After)
+                    ->color('primary')
+                    ->tooltip('Abrir rastreio em nova aba')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('placed_at')

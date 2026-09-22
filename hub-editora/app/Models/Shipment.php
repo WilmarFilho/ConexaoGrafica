@@ -32,4 +32,17 @@ class Shipment extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    /**
+     * Página pública de rastreio. Melhor Rastreio abre sem captcha e cobre
+     * Correios, Jadlog e as demais transportadoras do Melhor Envio.
+     */
+    public static function trackingUrl(?string $code): ?string
+    {
+        $code = trim((string) $code);
+
+        return preg_match('/^[A-Za-z0-9-]{6,40}$/', $code)
+            ? 'https://www.melhorrastreio.com.br/rastreio/'.rawurlencode(strtoupper($code))
+            : null;
+    }
 }
