@@ -7,7 +7,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('CONEXAO_VERSION', '0.1.1');
+define('CONEXAO_VERSION', '0.1.2');
 
 require_once get_template_directory().'/inc/icons.php';
 require_once get_template_directory().'/inc/template-tags.php';
