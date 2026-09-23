@@ -36,6 +36,16 @@ $CLI option update woocommerce_price_thousand_sep "."
 $CLI option update woocommerce_price_decimal_sep ","
 $CLI option update woocommerce_currency_pos "left_space"
 $CLI option update woocommerce_enable_reviews "yes"
+$CLI option update woocommerce_enable_myaccount_registration "yes"
+$CLI option update woocommerce_registration_generate_password "no"
+$CLI option update woocommerce_registration_generate_username "yes"
+
+# páginas do WooCommerce em português
+for par in "woocommerce_myaccount_page_id:minha-conta:Minha conta"            "woocommerce_cart_page_id:carrinho:Carrinho"            "woocommerce_checkout_page_id:finalizar-compra:Finalizar compra"            "woocommerce_shop_page_id:loja:Livros"; do
+  opcao="${par%%:*}"; resto="${par#*:}"; slug="${resto%%:*}"; titulo="${resto#*:}"
+  id=$($CLI option get "$opcao" | tr -d '')
+  [ -n "$id" ] && $CLI post update "$id" --post_name="$slug" --post_title="$titulo" >/dev/null
+done
 
 echo "== páginas"
 criar_pagina() {

@@ -40,6 +40,7 @@ function conexao_icon(string $nome, int $tamanho = 20): string
         'cartao' => '<rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19M6 14.5h4"/>',
         'pix' => '<path d="M12 3.2l3.6 3.6-3.6 3.6-3.6-3.6z"/><path d="M12 13.6l3.6 3.6-3.6 3.6-3.6-3.6z"/><path d="M6.8 8.4L3.2 12l3.6 3.6L10.4 12z"/><path d="M17.2 8.4L20.8 12l-3.6 3.6L13.6 12z"/>',
         'boleto' => '<path d="M4 5.5v13M7 5.5v13M10 5.5v13M13.5 5.5v13M16.5 5.5v13M20 5.5v13"/>',
+        'google' => '<path d="M21.6 12.2c0-.7-.1-1.3-.2-1.9H12v3.6h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.2z" fill="#4285F4" stroke="none"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z" fill="#34A853" stroke="none"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z" fill="#FBBC05" stroke="none"/><path d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.4 3-4.1 5.6-4.1z" fill="#EA4335" stroke="none"/>',
         // redes sociais
         'instagram' => '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1.1" fill="currentColor" stroke="none"/>',
         'facebook' => '<path d="M14.5 21v-8h2.6l.5-3h-3.1V8.2c0-.9.3-1.5 1.6-1.5h1.6V4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4.1V10H9v3h2.3v8z" fill="currentColor" stroke="none"/>',

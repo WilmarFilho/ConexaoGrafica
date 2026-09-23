@@ -52,6 +52,26 @@ function conexao_logo(string $variacao = 'topo'): void
     echo '</a>';
 }
 
+/** Caminho curto no topo da página: Home / página atual. */
+function conexao_trilha(?string $atual = null): void
+{
+    if ($atual === null) {
+        if (function_exists('is_account_page') && is_account_page()) {
+            $atual = is_user_logged_in() ? 'Minha conta' : 'Login | Cadastro';
+        } elseif (is_singular() || is_page()) {
+            $atual = get_the_title();
+        } else {
+            $atual = wp_strip_all_tags(get_the_archive_title());
+        }
+    }
+
+    printf(
+        '<nav class="trilha" aria-label="Você está em"><a href="%s">Home</a><span aria-hidden="true">/</span><span>%s</span></nav>',
+        esc_url(home_url('/')),
+        esc_html($atual)
+    );
+}
+
 /** Botão do carrinho no cabeçalho; também é usado para atualizá-lo por AJAX. */
 function conexao_cart_button(): void
 {
