@@ -94,6 +94,7 @@ done
 echo "== livros de exemplo"
 bash "$(dirname "$0")/seed-produtos.sh"
 bash "$(dirname "$0")/seed-capas.sh"
+bash "$(dirname "$0")/seed-conteudos.sh"
 
 echo "== menus"
 menu_item_pagina() {

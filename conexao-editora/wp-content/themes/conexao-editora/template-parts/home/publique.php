@@ -9,12 +9,19 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+$img = get_template_directory_uri().'/assets/img/';
 $banner = get_template_directory().'/assets/img/publique-banner.png';
+$selo = get_template_directory().'/assets/img/selo.png';
 ?>
 <section class="publique<?php echo file_exists($banner) ? ' publique--banner' : ''; ?>"
     <?php if (file_exists($banner)) : ?>
-        style="background-image: url('<?php echo esc_url(get_template_directory_uri().'/assets/img/publique-banner.png'); ?>')"
+        style="background-image: url('<?php echo esc_url($img.'publique-banner.png'); ?>')"
     <?php endif; ?>>
+    <?php if (file_exists($selo)) : ?>
+        <img class="publique__selo publique__selo--esq" src="<?php echo esc_url($img.'selo.png'); ?>" alt="" aria-hidden="true" loading="lazy">
+        <img class="publique__selo publique__selo--dir" src="<?php echo esc_url($img.'selo.png'); ?>" alt="" aria-hidden="true" loading="lazy">
+    <?php endif; ?>
+
     <div class="container publique__grade">
         <div class="publique__texto">
             <h2>Publique conosco</h2>
