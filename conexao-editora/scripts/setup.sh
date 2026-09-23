@@ -53,9 +53,15 @@ done
 
 echo "== páginas"
 criar_pagina() {
-  local titulo="$1" slug="$2"
-  if [ -z "$($CLI post list --post_type=page --name="$slug" --field=ID)" ]; then
+  local titulo="$1" slug="$2" id
+  # o WordPress já cria um rascunho de política de privacidade com esse endereço;
+  # nesse caso a página é reaproveitada, em vez de nascer uma segunda
+  id=$($CLI post list --post_type=page --post_status=any --name="$slug" --field=ID | tr -d '' | head -1)
+
+  if [ -z "$id" ]; then
     $CLI post create --post_type=page --post_status=publish --post_title="$titulo" --post_name="$slug" >/dev/null
+  else
+    $CLI post update "$id" --post_status=publish --post_title="$titulo" >/dev/null
   fi
 }
 
