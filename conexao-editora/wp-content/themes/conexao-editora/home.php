@@ -15,7 +15,7 @@ global $wp_query;
 <div class="container pagina pagina--blog">
     <?php conexao_trilha($pagina ? get_the_title($pagina) : 'Blog'); ?>
 
-    <div class="blog">
+    <div class="blog-grade">
         <div class="blog__principal">
             <header class="blog__cabecalho">
                 <h1><?php echo esc_html($pagina ? get_the_title($pagina) : 'Blog'); ?></h1>
