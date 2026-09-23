@@ -13,7 +13,7 @@
   --papel: #FAFAFA;
   --banda: #EAF0F3;
   --branco: #FFFFFF;
-  --cinza-topo: #EFEFEF;
+  --cinza-topo: #EEEEEE;
 
   --tinta: #1F2A33;
   --tinta-media: #55606B;
@@ -24,7 +24,7 @@
   --estrela: #F5A623;
   --zap: #25D366;
 
-  --fonte: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --fonte: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
 
   --container: 1200px;
   --raio: 10px;
@@ -119,21 +119,23 @@ button { font: inherit; cursor: pointer; }
 .barra-topo {
   background: var(--cinza-topo);
   color: var(--tinta-media);
-  font-size: 12.5px;
+  font-size: 16px;
+  font-weight: 600;
 }
 .barra-topo__grade {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  min-height: 38px;
+  min-height: 80px;
 }
 .barra-topo p, .barra-topo a { margin: 0; color: inherit; }
-.barra-topo__frete, .barra-topo__pedido { display: inline-flex; align-items: center; gap: 8px; }
-.barra-topo__frete .icone, .barra-topo__pedido .icone { color: var(--azul); }
+.barra-topo__frete, .barra-topo__pedido { display: inline-flex; align-items: center; gap: 10px; }
+.barra-topo__frete img, .barra-topo__pedido img { flex: none; width: auto; height: 20px; }
+.barra-topo__pedido img { height: 21px; }
 .barra-topo .menu-topo { display: flex; gap: 0; }
 .barra-topo .menu-topo li + li { border-left: 1px solid var(--linha-forte); }
-.barra-topo .menu-topo a { padding-inline: 14px; }
+.barra-topo .menu-topo a { padding-inline: 18px; }
 
 /* ---------- cabeçalho ---------- */
 .cabecalho { background: var(--papel); border-bottom: 1px solid var(--linha); }

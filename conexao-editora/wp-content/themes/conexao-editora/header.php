@@ -21,7 +21,10 @@ if (! defined('ABSPATH')) {
 
 <div class="barra-topo">
     <div class="container barra-topo__grade">
-        <p class="barra-topo__frete"><?php conexao_the_icon('caminhao', 18); ?> Frete grátis acima de R$499</p>
+        <p class="barra-topo__frete">
+            <img src="<?php echo esc_url(get_template_directory_uri().'/assets/img/icone-frete.png'); ?>" alt="" width="27" height="20">
+            Frete grátis acima de R$499
+        </p>
 
         <?php
         if (has_nav_menu('topo')) {
@@ -36,7 +39,8 @@ if (! defined('ABSPATH')) {
         ?>
 
         <a class="barra-topo__pedido" href="<?php echo esc_url(home_url('/acompanhe-seu-pedido/')); ?>">
-            <?php conexao_the_icon('pin', 18); ?> Acompanhe seu pedido
+            <img src="<?php echo esc_url(get_template_directory_uri().'/assets/img/icone-pedido.png'); ?>" alt="" width="16" height="21">
+            Acompanhe seu pedido
         </a>
     </div>
 </div>

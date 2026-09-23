@@ -7,7 +7,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('CONEXAO_VERSION', '0.1.0');
+define('CONEXAO_VERSION', '0.1.1');
 
 require_once get_template_directory().'/inc/icons.php';
 require_once get_template_directory().'/inc/template-tags.php';
@@ -40,7 +40,7 @@ add_action('after_setup_theme', function () {
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style(
         'conexao-fonts',
-        'https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..800;1,400&display=swap',
+        'https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300..900;1,400&display=swap',
         [],
         null
     );
