@@ -1,26 +1,29 @@
 <?php
 /**
- * Carrossel de livros em destaque, com capa grande e compra direta.
+ * Vitrine que acompanha as categorias: capa grande e compra direta.
+ * Cada cartão guarda as categorias do livro, para o filtro do bloco de cima.
  */
 
 if (! defined('ABSPATH')) {
     exit;
 }
 
-$produtos = conexao_produtos('destaque', 6);
+$produtos = conexao_produtos('destaque', 12);
 
 if (! $produtos) {
     return;
 }
 ?>
 <section class="destaque">
-    <div class="destaque__trilho" data-arrastavel>
+    <div class="destaque__trilho" data-arrastavel data-vitrine-categorias>
         <?php foreach ($produtos as $produto) : ?>
             <?php
-            $categorias = get_the_terms($produto->get_id(), 'product_cat');
-            $categoria = (! is_wp_error($categorias) && $categorias) ? $categorias[0] : null;
+            $termos = get_the_terms($produto->get_id(), 'product_cat');
+            $termos = (! is_wp_error($termos) && $termos) ? $termos : [];
+            $categoria = $termos[0] ?? null;
+            $slugs = implode(' ', wp_list_pluck($termos, 'slug'));
             ?>
-            <article class="destaque__card">
+            <article class="destaque__card" data-categorias="<?php echo esc_attr($slugs); ?>">
                 <a class="destaque__capa" href="<?php echo esc_url($produto->get_permalink()); ?>" tabindex="-1" aria-hidden="true">
                     <?php echo $produto->get_image('woocommerce_thumbnail'); // phpcs:ignore WordPress.Security.EscapeOutput ?>
                 </a>
@@ -55,5 +58,7 @@ if (! $produtos) {
                 </div>
             </article>
         <?php endforeach; ?>
+
+        <p class="destaque__vazio" hidden>Nenhum livro desta categoria por aqui ainda.</p>
     </div>
 </section>

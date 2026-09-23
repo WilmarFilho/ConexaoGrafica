@@ -178,10 +178,16 @@ function conexao_produtos(string $tipo, int $quantidade = 5): array
 
     $produtos = wc_get_products($args);
 
-    // Sem produtos em destaque cadastrados, a vitrine mostra os mais recentes.
-    if ($tipo === 'destaque' && ! $produtos) {
+    // Poucos destaques cadastrados: a vitrine completa com os mais recentes,
+    // para o filtro por categoria ter o que mostrar.
+    if ($tipo === 'destaque' && count($produtos) < $quantidade) {
         unset($args['featured']);
-        $produtos = wc_get_products($args);
+        $args['orderby'] = 'date';
+        $args['order'] = 'DESC';
+        $args['exclude'] = array_map(fn (WC_Product $p) => $p->get_id(), $produtos);
+        $args['limit'] = $quantidade - count($produtos);
+
+        $produtos = array_merge($produtos, wc_get_products($args));
     }
 
     return $produtos;

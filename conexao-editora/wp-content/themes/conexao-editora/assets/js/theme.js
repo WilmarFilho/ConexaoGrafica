@@ -101,6 +101,52 @@
         });
     });
 
+    /* clicar numa categoria filtra a vitrine logo abaixo */
+    var listaCategorias = document.querySelector('[data-filtro-categorias]');
+    var vitrine = document.querySelector('[data-vitrine-categorias]');
+
+    if (listaCategorias && vitrine) {
+        var cartoes = Array.prototype.slice.call(vitrine.querySelectorAll('[data-categorias]'));
+        var aviso = vitrine.querySelector('.destaque__vazio');
+
+        var aplicar = function (categoria) {
+            var visiveis = 0;
+
+            cartoes.forEach(function (cartao) {
+                var pertence = !categoria || (' ' + cartao.dataset.categorias + ' ').indexOf(' ' + categoria + ' ') > -1;
+                cartao.hidden = !pertence;
+
+                if (pertence) {
+                    visiveis++;
+                }
+            });
+
+            if (aviso) {
+                aviso.hidden = visiveis > 0;
+            }
+
+            listaCategorias.querySelectorAll('[data-categoria]').forEach(function (link) {
+                link.setAttribute('aria-pressed', link.dataset.categoria === categoria ? 'true' : 'false');
+            });
+
+            vitrine.scrollTo({ left: 0, behavior: 'smooth' });
+        };
+
+        listaCategorias.addEventListener('click', function (evento) {
+            var link = evento.target.closest('[data-categoria]');
+
+            if (!link) {
+                return;
+            }
+
+            evento.preventDefault();
+
+            // clicar de novo na categoria já escolhida mostra tudo outra vez
+            var selecionada = link.getAttribute('aria-pressed') === 'true' ? '' : link.dataset.categoria;
+            aplicar(selecionada);
+        });
+    }
+
     /* voltar ao topo */
     var topo = document.querySelector('.flutuante--topo');
 

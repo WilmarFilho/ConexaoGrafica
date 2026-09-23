@@ -736,6 +736,18 @@ button {
   transition: background-color .15s ease, color .15s ease;
 }
 
+.categoria .icone--categoria {
+  width: auto;
+  height: 34px;
+  color: currentColor;
+}
+
+.categoria[aria-pressed="true"] {
+  background: var(--azul);
+  border-color: var(--azul);
+  color: #fff;
+}
+
 .categoria:hover {
   background: var(--azul);
   color: #fff;
@@ -751,19 +763,30 @@ button {
   display: flex;
   gap: 24px;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 18px 20px 26px;
+  scroll-snap-type: x proximity;
+  /* começa alinhado com o conteúdo da página e segue até a borda da tela */
+  padding: 18px 0 30px;
+  padding-left: max(20px, calc((100% - var(--container)) / 2));
   scrollbar-width: none;
+  /* o fade na direita mostra que dá para rolar */
+  -webkit-mask-image: linear-gradient(to right, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 82%, transparent 100%);
 }
 
 .destaque__trilho::-webkit-scrollbar {
   display: none;
 }
 
+.destaque__vazio {
+  align-self: center;
+  margin: 40px 0;
+  color: var(--tinta-fraca);
+}
+
 .destaque__card {
   flex: 0 0 auto;
   width: min(640px, 86vw);
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   display: grid;
   grid-template-columns: 180px minmax(0, 1fr);
   gap: 26px;
@@ -877,32 +900,67 @@ button {
 
 /* ---------- publique conosco ---------- */
 .publique {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-height: 500px;
   background: var(--azul-lavado);
+  overflow: hidden;
+}
+
+/* os dois selos decorativos ficam nas bordas, atrás do conteúdo */
+.publique__selo {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 0;
+  width: 120px;
+  height: auto;
+  pointer-events: none;
+}
+
+.publique__selo--esq {
+  left: 2%;
+}
+
+.publique__selo--dir {
+  right: 2%;
 }
 
 .publique__grade {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
   align-items: center;
   gap: 40px;
   padding-block: 40px;
 }
 
+/* em tela larga o texto começa depois do selo da esquerda */
+@media (min-width: 1100px) {
+  .publique__grade {
+    padding-left: 100px;
+  }
+}
+
 .publique__texto h2 {
   font-size: 24px;
-  color: var(--azul);
-  margin-bottom: 14px;
+  color: var(--azul-escuro);
+  margin-bottom: 18px;
 }
 
 .publique__texto p {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--tinta-media);
-  max-width: 46ch;
-  margin-bottom: 24px;
+  max-width: 44ch;
+  margin-bottom: 28px;
 }
 
 .publique__arte img {
   margin-inline: auto;
+  max-height: 420px;
+  width: auto;
 }
 
 /* ---------- conteúdos ---------- */
@@ -1437,7 +1495,13 @@ button {
     padding-block: 36px;
   }
 
-  .destaque__card {
+  .destaque__vazio {
+  align-self: center;
+  margin: 40px 0;
+  color: var(--tinta-fraca);
+}
+
+.destaque__card {
     grid-template-columns: 140px minmax(0, 1fr);
     padding: 20px;
   }
@@ -1488,7 +1552,13 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .destaque__card {
+  .destaque__vazio {
+  align-self: center;
+  margin: 40px 0;
+  color: var(--tinta-fraca);
+}
+
+.destaque__card {
     grid-template-columns: minmax(0, 1fr);
     width: 84vw;
   }

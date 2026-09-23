@@ -56,6 +56,23 @@ function conexao_the_icon(string $nome, int $tamanho = 20): void
 }
 
 /**
+ * Ícone da categoria enviado pela editora (assets/img/categorias/<slug>.svg).
+ * A cor vem do CSS, então o ícone acompanha o cartão quando ele fica azul.
+ */
+function conexao_svg_categoria(string $slug): string
+{
+    $caminho = get_template_directory().'/assets/img/categorias/'.sanitize_file_name($slug).'.svg';
+
+    if (! file_exists($caminho)) {
+        return '';
+    }
+
+    $svg = (string) file_get_contents($caminho);
+
+    return str_replace('<svg ', '<svg class="icone icone--categoria" aria-hidden="true" focusable="false" ', $svg);
+}
+
+/**
  * Ícone de cada categoria de livro, pelo slug. Sem correspondência, usa o livro.
  */
 function conexao_icone_categoria(string $slug): string
