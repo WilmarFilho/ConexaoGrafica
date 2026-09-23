@@ -163,8 +163,10 @@ function conexao_produtos(string $tipo, int $quantidade = 5): array
     if ($tipo === 'mais-vendidos') {
         $args['orderby'] = 'popularity';
     } elseif ($tipo === 'destaque') {
+        // a editora define a ordem pelo campo de ordenação do produto
         $args['featured'] = true;
-        $args['orderby'] = 'date';
+        $args['orderby'] = 'menu_order';
+        $args['order'] = 'ASC';
     } else {
         $args['orderby'] = 'date';
         $args['order'] = 'DESC';
