@@ -9,6 +9,17 @@ if (! defined('ABSPATH')) {
 
 require_once get_template_directory().'/inc/post-types.php';
 
+/**
+ * Versão de um arquivo do tema pela data de gravação: editou o CSS, salvou,
+ * atualizou a página e a mudança aparece, sem limpar cache.
+ */
+function conexao_versao_arquivo(string $relativo): string
+{
+    $caminho = get_template_directory().$relativo;
+
+    return file_exists($caminho) ? (string) filemtime($caminho) : CONEXAO_VERSION;
+}
+
 /** Marca no cabeçalho e no rodapé. */
 function conexao_logo(string $variacao = 'topo'): void
 {
@@ -24,10 +35,14 @@ function conexao_logo(string $variacao = 'topo'): void
     printf('<a class="marca marca--%1$s" href="%2$s" rel="home">', esc_attr($variacao), esc_url(home_url('/')));
 
     if (file_exists($caminho)) {
+        $medidas = @getimagesize($caminho);
+        $url = add_query_arg('v', filemtime($caminho), get_template_directory_uri().'/assets/img/'.$arquivo);
+
         printf(
-            '<img src="%s" alt="%s">',
-            esc_url(get_template_directory_uri().'/assets/img/'.$arquivo),
-            esc_attr(get_bloginfo('name'))
+            '<img src="%s" alt="%s"%s>',
+            esc_url($url),
+            esc_attr(get_bloginfo('name')),
+            $medidas ? sprintf(' width="%d" height="%d"', $medidas[0], $medidas[1]) : ''
         );
     } else {
         // Sem o logo oficial ainda; o nome segura o lugar dele.

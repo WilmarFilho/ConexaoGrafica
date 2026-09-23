@@ -152,7 +152,7 @@ button { font: inherit; cursor: pointer; }
 }
 
 .marca { display: inline-flex; align-items: center; }
-.marca img { height: 60px; width: auto; max-height: none; }
+.marca img { height: 60px; width: auto; max-height: none; image-rendering: -webkit-optimize-contrast; }
 .marca__texto {
   font-size: 22px; font-weight: 700; letter-spacing: .04em;
   color: var(--azul); text-transform: uppercase;
