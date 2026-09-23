@@ -5,7 +5,7 @@ set -euo pipefail
 
 REPO="${REPO:-$HOME/hub}"
 RAIZ="${RAIZ:-$HOME/sites/conexaoeditora}"
-PHP="${PHP:-/opt/cpanel/ea-php83/root/usr/bin/php}"
+PHP="${PHP:-/opt/cpanel/ea-php83/root/usr/bin/php -d memory_limit=768M}"
 WP="$PHP /usr/local/bin/wp --path=$RAIZ"
 
 echo "== código"
