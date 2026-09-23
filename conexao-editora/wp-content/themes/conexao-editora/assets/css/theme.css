@@ -645,7 +645,11 @@ button {
   overflow-x: auto;
   scroll-snap-type: x proximity;
   padding-bottom: 8px;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+}
+
+.vitrine__trilho::-webkit-scrollbar {
+  display: none;
 }
 
 .card-livro {
