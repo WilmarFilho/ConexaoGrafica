@@ -147,6 +147,73 @@
         });
     }
 
+    /* quantidade no carrinho: os botões mudam o número e o carrinho se atualiza */
+    var carrinho = document.querySelector('[data-carrinho]');
+
+    if (carrinho) {
+        var atualizar = null;
+
+        var pedirAtualizacao = function () {
+            clearTimeout(atualizar);
+            atualizar = setTimeout(function () {
+                var botao = carrinho.querySelector('[name="update_cart"]');
+
+                if (botao) {
+                    botao.disabled = false;
+                    botao.click();
+                }
+            }, 600);
+        };
+
+        carrinho.addEventListener('click', function (evento) {
+            var botao = evento.target.closest('[data-passo]');
+
+            if (!botao) {
+                return;
+            }
+
+            var campo = botao.parentElement.querySelector('.passo__campo');
+            var minimo = Number(campo.min || 0);
+            var maximo = campo.max ? Number(campo.max) : Infinity;
+            var novo = Number(campo.value || 0) + Number(botao.dataset.passo);
+
+            campo.value = Math.min(maximo, Math.max(minimo, novo));
+            pedirAtualizacao();
+        });
+
+        carrinho.addEventListener('change', function (evento) {
+            if (evento.target.classList.contains('passo__campo')) {
+                pedirAtualizacao();
+            }
+        });
+    }
+
+    /* compartilhar post: usa o compartilhamento do celular, ou copia o link */
+    document.addEventListener('click', function (evento) {
+        var botao = evento.target.closest('[data-compartilhar]');
+
+        if (!botao) {
+            return;
+        }
+
+        var dados = { title: botao.dataset.titulo, url: botao.dataset.url };
+
+        if (navigator.share) {
+            navigator.share(dados).catch(function () {});
+            return;
+        }
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(dados.url).then(function () {
+                var antes = botao.getAttribute('aria-label');
+                botao.setAttribute('aria-label', 'Link copiado');
+                setTimeout(function () {
+                    botao.setAttribute('aria-label', antes);
+                }, 2000);
+            });
+        }
+    });
+
     /* voltar ao topo */
     var topo = document.querySelector('.flutuante--topo');
 

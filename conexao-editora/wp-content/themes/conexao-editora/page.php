@@ -11,6 +11,13 @@ if (! defined('ABSPATH')) {
 $pagina_loja = function_exists('is_account_page')
     && (is_account_page() || is_cart() || is_checkout());
 
+// páginas de política e termos ganham a formatação de texto longo
+$paginas_legais = [
+    'politica-de-privacidade', 'termos-de-uso', 'politica-de-cookies',
+    'direitos-autorais', 'codigo-de-conduta',
+];
+$pagina_legal = in_array(get_post_field('post_name', get_queried_object_id()), $paginas_legais, true);
+
 get_header();
 
 while (have_posts()) :
@@ -25,7 +32,7 @@ while (have_posts()) :
             </header>
         <?php endif; ?>
 
-        <div class="<?php echo $pagina_loja ? 'conteudo-loja' : 'texto'; ?>">
+        <div class="<?php echo $pagina_loja ? 'conteudo-loja' : ('texto'.($pagina_legal ? ' texto-legal' : '')); ?>">
             <?php the_content(); ?>
         </div>
     </article>

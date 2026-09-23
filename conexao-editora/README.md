@@ -11,6 +11,7 @@ bash scripts/setup.sh        # primeira vez: instala WP, WooCommerce, páginas e
 ```
 
 Loja: http://localhost:8092 · Painel: http://localhost:8092/wp-admin
+E-mails do ambiente (contato, cadastro, recuperação de senha): http://localhost:8026
 (usuário e senha ficam no fim de `scripts/setup.sh`, valem só neste ambiente local).
 
 ## Comandos do dia a dia

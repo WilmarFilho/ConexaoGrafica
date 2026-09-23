@@ -8,6 +8,10 @@ command -v wp >/dev/null 2>&1 || CLI="docker compose exec -T -u 33 cli wp"
 export MSYS_NO_PATHCONV=1
 export MSYS2_ARG_CONV_EXCL='*'
 
+# os posts saem em nome da editora, como no layout
+autor=$($CLI user list --role=administrator --field=ID | tr -d '' | head -1)
+$CLI user update "$autor" --display_name="Conexão Editora" >/dev/null
+
 # título do post|categoria|arquivo da foto|data (o mais novo vira o destaque grande)
 POSTS='A importância da leitura na educação familiar|Educação Familiar|post-educacao-familiar.png|2026-08-05 09:00:00
 Do manuscrito ao livro: como funciona o processo editorial|Literatura|post-manuscrito.png|2026-07-21 09:00:00
@@ -23,7 +27,7 @@ while IFS='|' read -r titulo categoria foto data <&3; do
     continue
   fi
 
-  $CLI post update "$id" --post_date="$data" >/dev/null
+  $CLI post update "$id" --post_date="$data" --post_author="$autor" >/dev/null
   $CLI term create category "$categoria" >/dev/null 2>&1 || true
   $CLI post term set "$id" category "$categoria" >/dev/null 2>&1 || true
 

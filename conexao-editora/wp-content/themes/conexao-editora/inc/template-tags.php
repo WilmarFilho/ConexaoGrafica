@@ -72,6 +72,14 @@ function conexao_trilha(?string $atual = null): void
     );
 }
 
+/** Tempo de leitura em minutos, a 200 palavras por minuto. */
+function conexao_tempo_leitura(int $post_id): int
+{
+    $palavras = str_word_count(wp_strip_all_tags((string) get_post_field('post_content', $post_id)));
+
+    return max(1, (int) ceil($palavras / 200));
+}
+
 /** Botão do carrinho no cabeçalho; também é usado para atualizá-lo por AJAX. */
 function conexao_cart_button(): void
 {
