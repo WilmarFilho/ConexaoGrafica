@@ -912,40 +912,21 @@ button {
   overflow: hidden;
 }
 
-/* os dois selos decorativos ficam nas bordas, atrás do conteúdo */
-.publique__selo {
-  position: absolute;
-  top: 50%;
-  translate: 0 -50%;
-  z-index: 0;
-  width: 120px;
-  height: auto;
-  pointer-events: none;
-}
-
-.publique__selo--esq {
-  left: 2%;
-}
-
-.publique__selo--dir {
-  right: 2%;
+/* banner exportado do layout: ilustração e selos já vêm na arte */
+.publique--banner {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .publique__grade {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
-  align-items: center;
-  gap: 40px;
   padding-block: 40px;
 }
 
-/* em tela larga o texto começa depois do selo da esquerda */
-@media (min-width: 1100px) {
-  .publique__grade {
-    padding-left: 100px;
-  }
+.publique__texto {
+  max-width: 420px;
 }
 
 .publique__texto h2 {
@@ -957,14 +938,7 @@ button {
 .publique__texto p {
   font-size: 15px;
   color: var(--tinta-media);
-  max-width: 44ch;
   margin-bottom: 28px;
-}
-
-.publique__arte img {
-  margin-inline: auto;
-  max-height: 420px;
-  width: auto;
 }
 
 /* ---------- conteúdos ---------- */
@@ -1514,8 +1488,9 @@ button {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .publique__grade {
-    grid-template-columns: minmax(0, 1fr);
+  .publique {
+    background-size: auto 100%;
+    background-position: right center;
   }
 
   .newsletter__grade {
