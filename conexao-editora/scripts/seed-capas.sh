@@ -11,6 +11,10 @@ command -v wp >/dev/null 2>&1 || CLI="docker compose exec -T -u 33 cli wp"
 export MSYS_NO_PATHCONV=1
 export MSYS2_ARG_CONV_EXCL='*'
 
+# no container as imagens estão em /scripts/capas; no servidor, ao lado deste arquivo
+CAPAS="${CAPAS:-/scripts/capas}"
+[ -d "$CAPAS" ] || CAPAS="$(cd "$(dirname "$0")" && pwd)/capas"
+
 # título|preço|categoria|autores|arquivo da capa
 LIVROS='A História da Faculdade de Medicina da UFG|297|História|Antônio Fernando Carneiro, Waldemar Naves do Amaral|faculdade-medicina-ufg.png
 A História da SBUS 30|249|Medicina|Rui Gilberto Ferreira, Waldemar Naves do Amaral, Sang Choon Cha|sbus-30.png
@@ -51,7 +55,7 @@ while IFS='|' read -r titulo preco categoria autores capa <&3; do
 
   # a capa só é importada uma vez
   if [ -z "$($CLI post meta get "$id" _thumbnail_id 2>/dev/null | tr -d '\r')" ]; then
-    $CLI media import "/scripts/capas/$capa" --post_id="$id" --featured_image --title="$titulo" >/dev/null
+    $CLI media import "$CAPAS/$capa" --post_id="$id" --featured_image --title="$titulo" >/dev/null
   fi
 
   $CLI post term add "$id" product_visibility featured >/dev/null 2>&1 || true

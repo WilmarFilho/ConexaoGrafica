@@ -3,11 +3,14 @@
 # conteúdo de exemplo. Pode rodar de novo sem duplicar nada.
 set -euo pipefail
 
-CLI="docker compose exec -T -u 33 cli wp"
-URL="http://localhost:8092"
-ADMIN_USER="conexao"
-ADMIN_PASS="conexao-local-2026"
-ADMIN_MAIL="dev@conexaoeditora.local"
+# no servidor existe o wp-cli; na máquina de desenvolvimento, usa o container
+CLI="wp"
+command -v wp >/dev/null 2>&1 || CLI="docker compose exec -T -u 33 cli wp"
+
+URL="${SITE_URL:-http://localhost:8092}"
+ADMIN_USER="${ADMIN_USER:-conexao}"
+ADMIN_PASS="${ADMIN_PASS:-conexao-local-2026}"
+ADMIN_MAIL="${ADMIN_MAIL:-dev@conexaoeditora.local}"
 
 echo "== WordPress"
 if ! $CLI core is-installed 2>/dev/null; then
@@ -43,7 +46,8 @@ $CLI option update woocommerce_registration_generate_username "yes"
 # páginas do WooCommerce em português
 for par in "woocommerce_myaccount_page_id:minha-conta:Minha conta"            "woocommerce_cart_page_id:carrinho:Carrinho"            "woocommerce_checkout_page_id:finalizar-compra:Finalizar compra"            "woocommerce_shop_page_id:loja:Livros"; do
   opcao="${par%%:*}"; resto="${par#*:}"; slug="${resto%%:*}"; titulo="${resto#*:}"
-  id=$($CLI option get "$opcao" | tr -d '')
+  id=$($CLI option get "$opcao" | tr -d '
+')
   [ -n "$id" ] && $CLI post update "$id" --post_name="$slug" --post_title="$titulo" >/dev/null
 done
 
@@ -183,4 +187,4 @@ $CLI cache flush >/dev/null 2>&1 || true
 echo
 echo "Pronto."
 echo "  Loja:   $URL"
-echo "  Painel: $URL/wp-admin  ($ADMIN_USER / $ADMIN_PASS — só vale neste ambiente local)"
+echo "  Painel: $URL/wp-admin"

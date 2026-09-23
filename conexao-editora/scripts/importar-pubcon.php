@@ -14,7 +14,10 @@ require_once ABSPATH.'wp-admin/includes/media.php';
 require_once ABSPATH.'wp-admin/includes/file.php';
 require_once ABSPATH.'wp-admin/includes/image.php';
 
-$arquivo = '/scripts/dados/pubcon-produtos.json';
+$arquivo = getenv('CONEXAO_DADOS')
+    ?: (file_exists('/scripts/dados/pubcon-produtos.json')
+        ? '/scripts/dados/pubcon-produtos.json'
+        : __DIR__.'/dados/pubcon-produtos.json');
 
 if (! file_exists($arquivo)) {
     WP_CLI::error("não achei {$arquivo}");
