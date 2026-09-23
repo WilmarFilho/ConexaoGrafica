@@ -8,7 +8,7 @@ if (! defined('ABSPATH')) {
 }
 
 $whatsapp = get_theme_mod('conexao_whatsapp', '5562998228022');
-$telefones = get_theme_mod('conexao_telefones', '62 99822-8022 / 62 3229.8147');
+$telefones = get_theme_mod('conexao_telefones', '62 99822-8022 / 62 3229.6147');
 $email_contato = get_theme_mod('conexao_email', 'contato@conexaoeditora.com.br');
 ?>
 </main>
@@ -96,27 +96,38 @@ $email_contato = get_theme_mod('conexao_email', 'contato@conexaoeditora.com.br')
 
             <h3 class="rodape__titulo-secundario">Pagamento</h3>
             <ul class="rodape__pagamento">
-                <li>Cartão de crédito</li>
-                <li>Pix</li>
-                <li>Boleto</li>
+                <li title="Cartão de crédito"><?php conexao_the_icon('cartao', 26); ?><span class="tela-leitor">Cartão de crédito</span></li>
+                <li title="Pix"><?php conexao_the_icon('pix', 26); ?><span class="tela-leitor">Pix</span></li>
+                <li title="Boleto"><?php conexao_the_icon('boleto', 26); ?><span class="tela-leitor">Boleto</span></li>
             </ul>
-            <p class="rodape__seguro"><?php conexao_the_icon('cadeado', 18); ?> Compra segura</p>
+            <p class="rodape__seguro"><?php conexao_the_icon('cadeado', 20); ?> Compra segura</p>
         </div>
 
         <div class="rodape__coluna">
             <h3>Contato</h3>
             <ul class="rodape__links rodape__links--contato">
-                <li><?php echo esc_html($telefones); ?></li>
+                <li class="rodape__telefones">
+                    <?php
+                    foreach (array_map('trim', explode('/', $telefones)) as $i => $telefone) {
+                        printf(
+                            '%s<a href="tel:+55%s">%s</a>',
+                            $i ? ' / ' : '',
+                            esc_attr(preg_replace('/\D/', '', $telefone)),
+                            esc_html($telefone)
+                        );
+                    }
+                    ?>
+                </li>
                 <li><a href="mailto:<?php echo esc_attr($email_contato); ?>"><?php echo esc_html($email_contato); ?></a></li>
-                <li>Seg. a sex. 8h às 18h</li>
+                <li>Seg. a sex: 8h às 18h</li>
                 <li>Goiânia - GO</li>
             </ul>
 
             <h3 class="rodape__titulo-secundario">Redes sociais</h3>
             <ul class="rodape__sociais">
-                <li><a href="#" aria-label="Instagram">in</a></li>
-                <li><a href="#" aria-label="Facebook">f</a></li>
-                <li><a href="#" aria-label="YouTube">yt</a></li>
+                <li><a href="<?php echo esc_url(get_theme_mod('conexao_instagram', '#')); ?>" aria-label="Instagram"><?php conexao_the_icon('instagram', 16); ?></a></li>
+                <li><a href="<?php echo esc_url(get_theme_mod('conexao_facebook', '#')); ?>" aria-label="Facebook"><?php conexao_the_icon('facebook', 16); ?></a></li>
+                <li><a href="<?php echo esc_url(get_theme_mod('conexao_youtube', '#')); ?>" aria-label="YouTube"><?php conexao_the_icon('youtube', 16); ?></a></li>
             </ul>
         </div>
     </div>

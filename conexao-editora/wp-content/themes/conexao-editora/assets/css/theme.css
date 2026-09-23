@@ -1231,39 +1231,50 @@ button {
 /* ---------- rodapé ---------- */
 .rodape {
   background: var(--papel);
-  padding-top: 46px;
+  padding-top: 54px;
 }
 
 .rodape__grade {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) repeat(4, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.25fr) repeat(5, minmax(0, 1fr));
   gap: 30px;
-  padding-bottom: 36px;
+  padding-bottom: 44px;
+}
+
+.rodape__marca .marca--rodape {
+  display: block;
+}
+
+.rodape__marca img {
+  width: 170px;
+  height: auto;
+  max-height: none;
 }
 
 .rodape__marca p {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--tinta-media);
-  max-width: 34ch;
-  margin-top: 18px;
+  max-width: 28ch;
+  margin-top: 22px;
 }
 
 .rodape h3 {
-  font-size: 12px;
-  letter-spacing: .1em;
+  font-size: 13px;
+  letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--tinta);
-  margin-bottom: 18px;
+  color: var(--tinta-forte);
+  margin-bottom: 26px;
 }
 
 .rodape__titulo-secundario {
-  margin-top: 28px;
+  margin-top: 34px;
 }
 
 .rodape__links {
   display: grid;
-  gap: 9px;
-  font-size: 13px;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--tinta-media);
 }
 
 .rodape__links a {
@@ -1275,53 +1286,67 @@ button {
   text-decoration: none;
 }
 
-.rodape__links--contato {
-  color: var(--tinta-media);
+.rodape__telefones a {
+  text-decoration: underline;
 }
 
+/* formas de pagamento */
 .rodape__pagamento {
+  display: flex;
+  gap: 12px;
+  color: var(--tinta-fraca);
+}
+
+.rodape__pagamento li {
   display: grid;
-  gap: 7px;
-  font-size: 13px;
-  color: var(--tinta-media);
+  place-items: center;
+  width: 42px;
+  height: 30px;
+  border-radius: 5px;
+  background: #EDEFF1;
 }
 
 .rodape__seguro {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 9px;
+  margin-top: 18px;
+  font-size: 11.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
   color: var(--tinta-fraca);
-  margin-top: 14px;
 }
 
+/* redes sociais */
 .rodape__sociais {
   display: flex;
   gap: 8px;
 }
 
 .rodape__sociais a {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   display: grid;
   place-items: center;
   background: var(--azul);
   color: #fff;
   border-radius: 4px;
-  font-size: 11px;
-  text-transform: uppercase;
+}
+
+.rodape__sociais a:hover {
+  background: var(--azul-escuro);
 }
 
 .rodape__base {
   border-top: 1px solid var(--linha);
-  padding-block: 18px;
+  padding-block: 22px;
 }
 
 .rodape__base p {
   margin: 0;
   text-align: center;
-  font-size: 12px;
-  color: var(--tinta-fraca);
+  font-size: 13px;
+  color: var(--tinta-media);
 }
 
 /* ---------- botões flutuantes ---------- */

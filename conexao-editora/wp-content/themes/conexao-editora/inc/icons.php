@@ -36,6 +36,14 @@ function conexao_icon(string $nome, int $tamanho = 20): string
         'literatura' => '<path d="M6 4h12v16l-6-3.2L6 20z"/>',
         'religiao' => '<path d="M12 4v16M6.5 9.5h11"/>',
         'livro' => '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15"/>',
+        // pagamento
+        'cartao' => '<rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19M6 14.5h4"/>',
+        'pix' => '<path d="M12 3.2l3.6 3.6-3.6 3.6-3.6-3.6z"/><path d="M12 13.6l3.6 3.6-3.6 3.6-3.6-3.6z"/><path d="M6.8 8.4L3.2 12l3.6 3.6L10.4 12z"/><path d="M17.2 8.4L20.8 12l-3.6 3.6L13.6 12z"/>',
+        'boleto' => '<path d="M4 5.5v13M7 5.5v13M10 5.5v13M13.5 5.5v13M16.5 5.5v13M20 5.5v13"/>',
+        // redes sociais
+        'instagram' => '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1.1" fill="currentColor" stroke="none"/>',
+        'facebook' => '<path d="M14.5 21v-8h2.6l.5-3h-3.1V8.2c0-.9.3-1.5 1.6-1.5h1.6V4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4.1V10H9v3h2.3v8z" fill="currentColor" stroke="none"/>',
+        'youtube' => '<path d="M21.6 8.2a2.5 2.5 0 0 0-1.8-1.8C18.2 6 12 6 12 6s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 8.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 3.8 2.5 2.5 0 0 0 1.8 1.8C5.8 18 12 18 12 18s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-3.8z" fill="currentColor" stroke="none"/><path d="M10.2 14.6V9.4L14.6 12z" fill="#fff" stroke="none"/>',
     ];
 
     if (! isset($svgs[$nome])) {
