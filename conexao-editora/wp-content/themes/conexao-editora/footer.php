@@ -16,7 +16,7 @@ $email_contato = get_theme_mod('conexao_email', 'contato@conexaoeditora.com.br')
 <section class="corporativo">
     <div class="container corporativo__grade">
         <div class="corporativo__marca">
-            <?php conexao_the_icon('predio', 56); ?>
+            <img class="corporativo__icone" src="<?php echo esc_url(get_template_directory_uri().'/assets/img/icone-corporativo.png'); ?>" alt="" aria-hidden="true" width="139" height="125" loading="lazy">
             <div>
                 <h2>Vendas Corporativas</h2>
                 <p>Soluções completas em livros para empresas, instituições de ensino, bibliotecas e órgãos públicos.</p>
@@ -35,7 +35,7 @@ $email_contato = get_theme_mod('conexao_email', 'contato@conexaoeditora.com.br')
 
 <section class="newsletter">
     <div class="container newsletter__grade">
-        <?php conexao_the_icon('envelope', 56); ?>
+        <img class="newsletter__icone" src="<?php echo esc_url(get_template_directory_uri().'/assets/img/icone-newsletter.png'); ?>" alt="" aria-hidden="true" width="109" height="87" loading="lazy">
         <div class="newsletter__texto">
             <h2>Receba novidades e lançamentos</h2>
             <p>Assine nossa newsletter e fique por dentro de tudo.</p>

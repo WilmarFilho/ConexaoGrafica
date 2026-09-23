@@ -1113,52 +1113,64 @@ button {
 
 /* ---------- vendas corporativas ---------- */
 .corporativo {
-  background: var(--azul);
+  display: grid;
+  align-items: center;
+  min-height: 300px;
+  background: var(--hero-escuro);
   color: #fff;
 }
 
 .corporativo__grade {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) auto auto;
+  grid-template-columns: minmax(0, 1.15fr) auto auto;
   align-items: center;
-  gap: 34px;
-  padding-block: 34px;
+  gap: 40px;
+  padding-block: 30px;
 }
 
 .corporativo__marca {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 26px;
+}
+
+.corporativo__icone {
+  flex: none;
+  width: auto;
+  height: 100px;
 }
 
 .corporativo__marca h2 {
   font-size: 26px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .corporativo__marca p {
-  font-size: 13.5px;
-  color: rgba(255, 255, 255, .9);
-  max-width: 44ch;
+  font-size: 14px;
+  color: rgba(255, 255, 255, .92);
+  max-width: 40ch;
   margin: 0;
 }
 
 .corporativo__vantagens {
   display: grid;
-  gap: 12px;
-  padding-left: 34px;
-  border-left: 1px solid rgba(255, 255, 255, .45);
-  font-size: 14px;
+  gap: 14px;
+  padding-left: 40px;
+  border-left: 1px solid rgba(255, 255, 255, .5);
+  font-size: 15px;
 }
 
 .corporativo__vantagens li {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 /* ---------- newsletter ---------- */
 .newsletter {
+  display: grid;
+  align-items: center;
+  min-height: 300px;
   background: var(--azul-escuro);
   color: #fff;
 }
@@ -1167,8 +1179,14 @@ button {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 24px;
-  padding-block: 40px;
+  gap: 26px;
+  padding-block: 30px;
+}
+
+.newsletter__icone {
+  flex: none;
+  width: auto;
+  height: 64px;
 }
 
 .newsletter h2 {
@@ -1177,7 +1195,7 @@ button {
 }
 
 .newsletter p {
-  font-size: 13.5px;
+  font-size: 14px;
   color: rgba(255, 255, 255, .85);
   margin: 0;
 }
@@ -1188,18 +1206,22 @@ button {
   gap: 8px;
   background: #fff;
   border-radius: 999px;
-  padding: 6px 6px 6px 22px;
+  padding: 6px 6px 6px 24px;
   min-width: min(430px, 100%);
 }
 
 .newsletter__form input {
   flex: 1;
   border: 0;
-  font: inherit;
-  font-size: 14px;
+  font-family: var(--fonte);
+  font-size: 15px;
   color: var(--tinta);
   background: transparent;
   padding-block: 10px;
+}
+
+.newsletter__form input::placeholder {
+  color: var(--cinza-busca);
 }
 
 .newsletter__form input:focus {
