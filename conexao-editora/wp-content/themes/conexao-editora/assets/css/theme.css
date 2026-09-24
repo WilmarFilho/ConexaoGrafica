@@ -2696,7 +2696,7 @@ button {
   .menu-principal .menu > li.menu-item-has-children > a::after,
   .menu-principal .menu > li.painel-autores > a::after {
     margin-left: auto;
-    border-color: rgba(255, 255, 255, .8);
+    border-color: #fff;
   }
 
   /* sanfona: abre e fecha com animação */
@@ -2724,7 +2724,7 @@ button {
   }
 
   .menu-principal .sub-menu a {
-    color: rgba(255, 255, 255, .85);
+    color: #fff;
     font-size: 14.5px;
   }
 
@@ -2869,17 +2869,6 @@ button {
     border: 0;
     background: transparent;
     padding: 0 0 6px 14px;
-  }
-
-  .menu-principal .sub-menu a {
-    color: #0B4F73;
-    font-size: 14px;
-  }
-
-  .menu-principal .sub-menu .botao {
-    margin-top: 10px;
-    padding-top: 12px;
-    border-top-color: var(--linha-forte);
   }
 
   .hero__grade {
