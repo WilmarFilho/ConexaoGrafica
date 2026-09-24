@@ -52,6 +52,8 @@ html {
 
 body {
   margin: 0;
+  /* sem o realce azul que o celular pinta ao tocar */
+  -webkit-tap-highlight-color: transparent;
   background: var(--papel);
   color: var(--tinta);
   font-family: var(--fonte);
@@ -2697,23 +2699,28 @@ button {
     border-color: rgba(255, 255, 255, .8);
   }
 
-  /* sanfona: o painel só aparece quando o item é tocado */
+  /* sanfona: abre e fecha com animação */
+  .menu-principal li:not(.aberto) > .sub-menu,
   .menu-principal .sub-menu {
     position: static;
+    display: block;
     visibility: visible;
-    opacity: 1;
     pointer-events: auto;
     clip-path: none;
-    transition: none;
     min-height: 0;
-    display: none;
-    padding: 0 0 14px 14px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 0 0 14px;
     background: transparent;
     box-shadow: none;
+    transition: max-height .3s ease, opacity .25s ease, padding-bottom .3s ease;
   }
 
   .menu-principal li.aberto > .sub-menu {
-    display: block;
+    max-height: 640px;
+    opacity: 1;
+    padding-bottom: 14px;
   }
 
   .menu-principal .sub-menu a {
@@ -2721,11 +2728,22 @@ button {
     font-size: 14.5px;
   }
 
+  /* dentro do menu de celular o botão vira link de texto */
   .menu-principal .sub-menu .botao {
-    margin-top: 12px;
+    margin-top: 10px;
     padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, .25);
     max-width: none;
+  }
+
+  .menu-principal .sub-menu .botao a {
+    padding: 4px 0;
+    border-radius: 0;
+    background: transparent;
+    color: #fff;
+    font-size: 14.5px;
+    letter-spacing: 0;
+    text-transform: none;
   }
 
   /* no celular os autores viram lista de nomes */
@@ -2759,6 +2777,7 @@ button {
   .menu-mobile__atalhos {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 22px;
     padding-bottom: 34px;
     font-size: 13.5px;
