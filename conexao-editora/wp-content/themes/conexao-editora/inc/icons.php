@@ -119,7 +119,10 @@ function conexao_the_icon(string $nome, int $tamanho = 20): void
  * a vir do CSS, para o mesmo desenho servir ao atalho ativo (branco) e ao
  * quadrinho do cartão (azul escuro).
  */
-function conexao_svg_pasta(string $pasta, string $nome, int $altura = 30): string
+/**
+ * @param string[] $cores cores do arquivo que passam a sair do CSS
+ */
+function conexao_svg_pasta(string $pasta, string $nome, int $altura = 30, array $cores = ['#00448B', '#0197D4', '#0095D3']): string
 {
     $caminho = get_template_directory().'/assets/img/'.$pasta.'/'.sanitize_file_name($nome).'.svg';
 
@@ -128,7 +131,7 @@ function conexao_svg_pasta(string $pasta, string $nome, int $altura = 30): strin
     }
 
     $svg = (string) file_get_contents($caminho);
-    $svg = str_ireplace(['#00448B', '#0197D4', '#0095D3'], 'currentColor', $svg);
+    $svg = str_ireplace($cores, 'currentColor', $svg);
 
     // sem width/height próprios a largura acompanha o viewBox
     $svg = preg_replace('/\s(?:width|height)="[^"]*"/i', '', $svg, 2);
@@ -153,6 +156,15 @@ function conexao_a_svg_ajuda(string $nome, int $altura = 30): void
 function conexao_a_svg_editora(string $nome, int $altura = 30): void
 {
     echo conexao_svg_pasta('editora', $nome, $altura); // phpcs:ignore WordPress.Security.EscapeOutput
+}
+
+/**
+ * Ícones da tela de conta. Só o cinza dos campos vira currentColor: as marcas
+ * do Google e do Facebook mantêm a cor que vieram do layout.
+ */
+function conexao_a_svg_conta(string $nome, int $altura = 20): void
+{
+    echo conexao_svg_pasta('conta', $nome, $altura, ['#CCCCCC']); // phpcs:ignore WordPress.Security.EscapeOutput
 }
 
 function conexao_svg_categoria(string $slug): string

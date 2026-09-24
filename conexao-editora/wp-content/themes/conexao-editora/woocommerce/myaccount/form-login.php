@@ -19,19 +19,21 @@ $sociais = apply_filters('conexao_login_social', [
 
     <section class="conta__lado" id="conta-entrar">
         <h1 class="conta__titulo">Acesse sua conta</h1>
-        <p class="conta__apoio">Entre para aproveitar uma experiência completa no Conexão Editora.</p>
+        <p class="conta__apoio">Entre para aproveitar uma experiência completa no Conexão Editora</p>
 
         <form class="conta__form woocommerce-form woocommerce-form-login login" method="post">
             <?php do_action('woocommerce_login_form_start'); ?>
 
-            <p class="campo">
+            <p class="campo campo--icone">
                 <label class="tela-leitor" for="username">E-mail</label>
+                <span class="campo__icone" aria-hidden="true"><?php conexao_a_svg_conta('email', 18); ?></span>
                 <input type="text" class="campo__entrada" name="username" id="username" autocomplete="username"
                        placeholder="E-mail" value="<?php echo ! empty($_POST['username']) ? esc_attr(wp_unslash($_POST['username'])) : ''; // phpcs:ignore ?>" required>
             </p>
 
-            <p class="campo">
+            <p class="campo campo--icone">
                 <label class="tela-leitor" for="password">Senha</label>
+                <span class="campo__icone" aria-hidden="true"><?php conexao_a_svg_conta('senha', 18); ?></span>
                 <input class="campo__entrada" type="password" name="password" id="password"
                        autocomplete="current-password" placeholder="Senha" required>
             </p>
@@ -39,7 +41,7 @@ $sociais = apply_filters('conexao_login_social', [
             <div class="conta__linha">
                 <label class="caixa">
                     <input class="woocommerce-form__input woocommerce-form__input-checkbox" name="rememberme" type="checkbox" id="rememberme" value="forever">
-                    <span>Lembre-me</span>
+                    <span>Lembrar-me</span>
                 </label>
                 <a class="conta__link" href="<?php echo esc_url(wp_lostpassword_url()); ?>">Esqueci minha senha</a>
             </div>
@@ -59,13 +61,13 @@ $sociais = apply_filters('conexao_login_social', [
                 <?php foreach ($sociais as $chave => $rede) : ?>
                     <?php if ($rede['url']) : ?>
                         <a class="botao-social botao-social--<?php echo esc_attr($chave); ?>" href="<?php echo esc_url($rede['url']); ?>">
-                            <?php conexao_the_icon($chave === 'google' ? 'google' : 'facebook', 18); ?>
+                            <?php conexao_a_svg_conta($chave, 20); ?>
                             <?php echo esc_html($rede['rotulo']); ?>
                         </a>
                     <?php else : ?>
                         <button class="botao-social botao-social--<?php echo esc_attr($chave); ?>" type="button" disabled
                                 title="Entrar com <?php echo esc_attr($rede['rotulo']); ?> ainda não está configurado">
-                            <?php conexao_the_icon($chave === 'google' ? 'google' : 'facebook', 18); ?>
+                            <?php conexao_a_svg_conta($chave, 20); ?>
                             <?php echo esc_html($rede['rotulo']); ?>
                         </button>
                     <?php endif; ?>
@@ -74,7 +76,7 @@ $sociais = apply_filters('conexao_login_social', [
         <?php endif; ?>
 
         <?php if ($cadastro_aberto) : ?>
-            <p class="conta__rodape">Ainda não tem conta? <a class="conta__link" href="#conta-cadastrar">Cadastre-se</a></p>
+            <p class="conta__rodape">Ainda não tem uma conta? <a class="conta__link" href="#conta-cadastrar">Cadastre-se</a></p>
         <?php endif; ?>
     </section>
 
@@ -88,27 +90,31 @@ $sociais = apply_filters('conexao_login_social', [
             <form method="post" class="conta__form woocommerce-form woocommerce-form-register register" <?php do_action('woocommerce_register_form_tag'); ?>>
                 <?php do_action('woocommerce_register_form_start'); ?>
 
-                <p class="campo">
+                <p class="campo campo--icone">
                     <label class="tela-leitor" for="reg_conexao_nome">Nome</label>
+                    <span class="campo__icone" aria-hidden="true"><?php conexao_the_icon('usuario', 18); ?></span>
                     <input type="text" class="campo__entrada" name="conexao_nome" id="reg_conexao_nome" autocomplete="name"
                            placeholder="Nome" value="<?php echo ! empty($_POST['conexao_nome']) ? esc_attr(wp_unslash($_POST['conexao_nome'])) : ''; // phpcs:ignore ?>" required>
                 </p>
 
-                <p class="campo">
+                <p class="campo campo--icone">
                     <label class="tela-leitor" for="reg_email">E-mail</label>
+                    <span class="campo__icone" aria-hidden="true"><?php conexao_a_svg_conta('email', 18); ?></span>
                     <input type="email" class="campo__entrada" name="email" id="reg_email" autocomplete="email"
                            placeholder="E-mail" value="<?php echo ! empty($_POST['email']) ? esc_attr(wp_unslash($_POST['email'])) : ''; // phpcs:ignore ?>" required>
                 </p>
 
                 <?php if ('no' === get_option('woocommerce_registration_generate_password')) : ?>
-                    <p class="campo">
+                    <p class="campo campo--icone">
                         <label class="tela-leitor" for="reg_password">Senha</label>
+                        <span class="campo__icone" aria-hidden="true"><?php conexao_a_svg_conta('senha', 18); ?></span>
                         <input type="password" class="campo__entrada" name="password" id="reg_password"
                                autocomplete="new-password" placeholder="Senha" required>
                     </p>
 
-                    <p class="campo">
+                    <p class="campo campo--icone">
                         <label class="tela-leitor" for="reg_password2">Confirmar senha</label>
+                        <span class="campo__icone" aria-hidden="true"><?php conexao_a_svg_conta('senha', 18); ?></span>
                         <input type="password" class="campo__entrada" name="conexao_password2" id="reg_password2"
                                autocomplete="new-password" placeholder="Confirmar senha" required>
                     </p>

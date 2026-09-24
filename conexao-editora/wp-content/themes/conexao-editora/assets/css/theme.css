@@ -2150,6 +2150,12 @@ button {
 }
 
 .trilha a {
+  color: var(--tinta-media);
+  text-decoration: underline;
+}
+
+/* a página atual é o único item azul, como nos layouts */
+.trilha__atual {
   color: var(--azul);
 }
 
@@ -2196,7 +2202,26 @@ button {
   display: grid;
   place-items: center;
   width: 1px;
+}
+
+/* a linha para antes da bolinha do OU, em cima e embaixo */
+.conta__divisor::before,
+.conta__divisor::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 1px;
   background: var(--linha);
+}
+
+.conta__divisor::before {
+  top: 0;
+  bottom: calc(50% + 32px);
+}
+
+.conta__divisor::after {
+  top: calc(50% + 32px);
+  bottom: 0;
 }
 
 .conta__divisor span {
@@ -2218,13 +2243,33 @@ button {
 .campo__entrada {
   width: 100%;
   border: 1px solid var(--linha-forte);
-  border-radius: 8px;
-  padding: 14px 18px;
+  border-radius: 999px;
+  padding: 15px 22px;
   font-family: var(--fonte);
   font-size: 14px;
   font-weight: 600;
   color: var(--tinta);
   background: #fff;
+}
+
+/* ícone dentro do campo, como no layout da conta */
+.campo--icone {
+  position: relative;
+}
+
+.campo--icone .campo__entrada {
+  padding-left: 48px;
+}
+
+.campo__icone {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  color: #CCCCCC;
+  pointer-events: none;
 }
 
 .campo__entrada::placeholder {
@@ -2257,8 +2302,21 @@ button {
 }
 
 .caixa input {
+  flex: none;
+  width: 16px;
+  height: 16px;
   margin: 2px 0 0;
-  accent-color: var(--azul);
+  appearance: none;
+  border: 1px solid var(--linha-forte);
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+
+.caixa input:checked {
+  border-color: var(--azul);
+  background: var(--azul);
+  box-shadow: inset 0 0 0 3px #fff;
 }
 
 .caixa--termos {
@@ -2268,6 +2326,19 @@ button {
 
 .conta__link {
   color: var(--azul);
+  text-decoration: underline;
+}
+
+/* o WooCommerce embrulha login e cadastro numa caixa própria (borda, padding
+   e margem); aqui quem desenha a caixa é a página */
+.woocommerce form.login,
+.woocommerce form.register,
+.woocommerce-page form.login,
+.woocommerce-page form.register {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
 }
 
 .btn--bloco {
@@ -2309,9 +2380,9 @@ button {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 12px 16px;
+  padding: 13px 16px;
   border: 1px solid var(--linha-forte);
-  border-radius: 8px;
+  border-radius: 999px;
   background: #fff;
   color: var(--tinta);
   font-size: 14px;
@@ -2341,13 +2412,40 @@ button {
 @media (max-width: 860px) {
   .conta {
     grid-template-columns: minmax(0, 1fr);
-    padding-inline: 24px;
+    gap: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
   }
 
+  .conta__lado {
+    padding: 30px 22px;
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-grande);
+    background: #fff;
+  }
+
+  /* o divisor deita: linha, bolinha do OU, linha */
   .conta__divisor {
+    position: relative;
     width: auto;
     height: 1px;
-    margin-block: 10px;
+    margin-block: 30px;
+    background: var(--linha);
+  }
+
+  .conta__divisor::before,
+  .conta__divisor::after {
+    content: none;
+  }
+
+  /* o formulário usa a largura do cartão */
+  .conta__form {
+    padding: 0;
+  }
+
+  .conta__divisor span {
+    background: var(--papel);
   }
 }
 

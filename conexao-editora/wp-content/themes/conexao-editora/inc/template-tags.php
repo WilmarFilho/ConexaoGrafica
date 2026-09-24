@@ -60,7 +60,7 @@ function conexao_trilha(?string $atual = null, array $meio = []): void
 {
     if ($atual === null) {
         if (function_exists('is_account_page') && is_account_page()) {
-            $atual = is_user_logged_in() ? 'Minha conta' : 'Login | Cadastro';
+            $atual = is_user_logged_in() ? 'Minha conta' : 'Login / Cadastro';
         } elseif (is_singular() || is_page()) {
             $atual = get_the_title();
         } else {
