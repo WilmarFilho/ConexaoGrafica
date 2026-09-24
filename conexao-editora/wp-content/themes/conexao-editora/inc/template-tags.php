@@ -53,7 +53,10 @@ function conexao_logo(string $variacao = 'topo'): void
 }
 
 /** Caminho curto no topo da página: Home / página atual. */
-function conexao_trilha(?string $atual = null): void
+/**
+ * @param array<int, array{url: string, texto: string}> $meio
+ */
+function conexao_trilha(?string $atual = null, array $meio = []): void
 {
     if ($atual === null) {
         if (function_exists('is_account_page') && is_account_page()) {
@@ -65,11 +68,16 @@ function conexao_trilha(?string $atual = null): void
         }
     }
 
-    printf(
-        '<nav class="trilha" aria-label="Você está em"><a href="%s">Home</a><span aria-hidden="true">/</span><span>%s</span></nav>',
-        esc_url(home_url('/')),
-        esc_html($atual)
-    );
+    echo '<nav class="trilha" aria-label="Você está em">';
+    printf('<a href="%s">Home</a>', esc_url(home_url('/')));
+
+    // níveis intermediários (o post passa pelo blog, por exemplo)
+    foreach ($meio as $passo) {
+        echo '<span aria-hidden="true">›</span>';
+        printf('<a href="%s">%s</a>', esc_url($passo['url']), esc_html($passo['texto']));
+    }
+
+    printf('<span aria-hidden="true">›</span><span class="trilha__atual">%s</span></nav>', esc_html($atual));
 }
 
 /** Tempo de leitura em minutos, a 200 palavras por minuto. */

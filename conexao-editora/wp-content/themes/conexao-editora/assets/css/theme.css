@@ -2810,7 +2810,141 @@ button {
   background: var(--linha);
 }
 
-/* paginação */
+/* ---------- post por dentro ---------- */
+.post-unico__titulo {
+  font-size: clamp(22px, 2.6vw, 28px);
+  line-height: 1.3;
+  color: var(--tinta-forte);
+  margin-bottom: 14px;
+}
+
+.post-unico__resumo {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--tinta-fraca);
+  max-width: 86ch;
+  margin-bottom: 18px;
+}
+
+/* autor, data, tempo, categorias e o compartilhar na mesma linha */
+.post-unico__cabecalho {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin-bottom: 26px;
+}
+
+.post-unico__cabecalho .post-card__meta {
+  grid-area: auto;
+}
+
+.post-unico__cabecalho .post-card__cats {
+  grid-area: auto;
+}
+
+.post-unico__cabecalho .compartilhar {
+  grid-area: auto;
+  margin-left: auto;
+}
+
+.post-unico__capa {
+  margin: 0 0 30px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.post-unico__capa img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* corpo do texto: subtítulos curtos e escuros, como no layout */
+.texto-post {
+  max-width: none;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.texto-post h2,
+.texto-post h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+  margin: 28px 0 10px;
+}
+
+.texto-post p {
+  margin-bottom: 16px;
+}
+
+/* relacionados */
+.relacionados {
+  margin-top: 46px;
+  padding-top: 34px;
+  border-top: 1px solid var(--linha);
+}
+
+.relacionados h2 {
+  font-size: 19px;
+  color: var(--tinta-forte);
+  margin-bottom: 22px;
+}
+
+.relacionados__grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 26px;
+}
+
+.relacionado__foto {
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.relacionado__foto img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+}
+
+.relacionado h3 {
+  font-size: 15px;
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.relacionado h3 a {
+  color: var(--tinta-forte);
+}
+
+.relacionado h3 a:hover {
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.relacionado p {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--tinta-fraca);
+  margin-bottom: 10px;
+}
+
+.relacionado__mais {
+  font-size: 13px;
+  color: var(--tinta-forte);
+  text-decoration: underline;
+}
+
+.relacionado__mais:hover {
+  color: var(--azul);
+}
+
+/* ---------- paginação ---------- */
 .pagination .nav-links,
 .woocommerce-pagination ul {
   display: flex;
@@ -3682,6 +3816,55 @@ button {
     height: 28px;
     padding-inline: 6px;
     font-size: 12px;
+  }
+
+  /* post por dentro: a lateral segue o texto, começando pelo banner */
+  .pagina--post .lateral__banner {
+    order: 1;
+  }
+
+  .pagina--post .lateral__bloco--busca {
+    order: 2;
+  }
+
+  .pagina--post .lateral__bloco--categorias {
+    order: 3;
+  }
+
+  .pagina--post .lateral__bloco--lidos {
+    order: 4;
+  }
+
+  .pagina--post .lateral__bloco--tags {
+    order: 5;
+  }
+
+  .pagina--post .lateral__bloco--redes {
+    order: 6;
+  }
+
+  .relacionados__grade {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+  }
+
+  .post-unico__resumo {
+    font-size: 13px;
+  }
+
+  .post-unico__capa {
+    margin-bottom: 22px;
+  }
+
+  /* a trilha cabe numa linha só, cortando o título comprido */
+  .trilha {
+    flex-wrap: nowrap;
+  }
+
+  .trilha__atual {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* 404: tudo numa coluna, com a arte entre o texto e os botões */
