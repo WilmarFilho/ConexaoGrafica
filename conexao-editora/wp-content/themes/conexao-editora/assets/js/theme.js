@@ -552,6 +552,83 @@
         }
     });
 
+    /* abas da página do livro */
+    var abas = document.querySelector('[data-abas]');
+
+    if (abas) {
+        abas.querySelectorAll('[data-aba]').forEach(function (botao) {
+            botao.addEventListener('click', function () {
+                abas.querySelectorAll('[data-aba]').forEach(function (outro) {
+                    var ativa = outro === botao;
+                    outro.classList.toggle('abas__botao--ativa', ativa);
+                    outro.setAttribute('aria-selected', ativa ? 'true' : 'false');
+                });
+
+                abas.querySelectorAll('[data-painel]').forEach(function (painel) {
+                    painel.hidden = painel.dataset.painel !== botao.dataset.aba;
+                });
+            });
+        });
+    }
+
+    /* frete e prazo na página do livro */
+    var caixaFrete = document.querySelector('[data-frete]');
+
+    if (caixaFrete) {
+        var campoCep = caixaFrete.querySelector('[data-frete-cep]');
+        var resposta = caixaFrete.querySelector('[data-frete-resposta]');
+        var botaoFrete = caixaFrete.querySelector('[data-frete-calcular]');
+
+        campoCep.addEventListener('input', function () {
+            var numeros = campoCep.value.replace(/\D/g, '').slice(0, 8);
+            campoCep.value = numeros.length > 5 ? numeros.slice(0, 5) + '-' + numeros.slice(5) : numeros;
+        });
+
+        var calcular = function () {
+            resposta.textContent = 'Calculando...';
+
+            var dados = new FormData();
+            dados.append('action', 'conexao_frete');
+            dados.append('nonce', caixaFrete.dataset.nonce);
+            dados.append('produto', caixaFrete.dataset.produto);
+            dados.append('cep', campoCep.value);
+
+            fetch(conexaoTema.ajax, { method: 'POST', body: dados, credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (retorno) {
+                    if (!retorno.success) {
+                        resposta.textContent = retorno.data && retorno.data.mensagem ? retorno.data.mensagem : 'Não foi possível calcular agora.';
+                        return;
+                    }
+
+                    var lista = document.createElement('ul');
+
+                    retorno.data.opcoes.forEach(function (opcao) {
+                        var item = document.createElement('li');
+                        item.innerHTML = '<span></span><b></b>';
+                        item.querySelector('span').textContent = opcao.nome;
+                        item.querySelector('b').textContent = opcao.valor;
+                        lista.appendChild(item);
+                    });
+
+                    resposta.textContent = '';
+                    resposta.appendChild(lista);
+                })
+                .catch(function () {
+                    resposta.textContent = 'Não foi possível calcular agora.';
+                });
+        };
+
+        botaoFrete.addEventListener('click', calcular);
+
+        campoCep.addEventListener('keydown', function (evento) {
+            if (evento.key === 'Enter') {
+                evento.preventDefault();
+                calcular();
+            }
+        });
+    }
+
     /* voltar ao topo */
     var topo = document.querySelector('.flutuante--topo');
 

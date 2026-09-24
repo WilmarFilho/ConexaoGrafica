@@ -18,6 +18,7 @@ require_once get_template_directory().'/inc/faq.php';
 require_once get_template_directory().'/inc/ajuda.php';
 require_once get_template_directory().'/inc/manuscrito.php';
 require_once get_template_directory().'/inc/catalogo.php';
+require_once get_template_directory().'/inc/produto.php';
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
@@ -66,6 +67,9 @@ add_action('wp_enqueue_scripts', function () {
         conexao_versao_arquivo('/assets/js/theme.js'),
         true
     );
+
+    // endereço do admin-ajax para o cálculo de frete da página do livro
+    wp_localize_script('conexao', 'conexaoTema', ['ajax' => admin_url('admin-ajax.php')]);
 }, 20);
 
 /** O carrinho do cabeçalho atualiza sem recarregar a página. */

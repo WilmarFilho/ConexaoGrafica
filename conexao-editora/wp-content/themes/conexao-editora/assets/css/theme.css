@@ -1021,6 +1021,304 @@ button {
   color: var(--azul);
 }
 
+/* ---------- página do livro ---------- */
+.produto {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr) 280px;
+  align-items: start;
+  gap: 26px;
+  margin-bottom: 40px;
+}
+
+.produto__capa {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 24px;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.produto__capa img {
+  width: 100%;
+  height: auto;
+  box-shadow: var(--sombra-capa);
+}
+
+.produto__texto h1 {
+  font-size: clamp(19px, 2.1vw, 23px);
+  line-height: 1.35;
+  color: var(--tinta-forte);
+  margin-bottom: 14px;
+}
+
+.produto__resumo {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--tinta-media);
+  max-width: 58ch;
+  margin-bottom: 18px;
+}
+
+.produto__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--linha);
+  font-size: 13px;
+  color: var(--tinta-media);
+}
+
+.produto__estrelas {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.produto__avaliacoes {
+  margin-left: 6px;
+  color: var(--tinta-media);
+}
+
+.produto__meta .compartilhar {
+  margin-left: auto;
+}
+
+/* ficha técnica, em duas linhas de quatro */
+.produto__ficha {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px 14px;
+  margin-top: 22px;
+}
+
+.produto__ficha li {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  text-align: center;
+  color: var(--azul);
+}
+
+.produto__ficha strong {
+  font-size: 11.5px;
+  color: var(--tinta-forte);
+}
+
+.produto__ficha span {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--tinta-fraca);
+}
+
+/* caixa de compra */
+.produto__compra {
+  display: grid;
+  gap: 14px;
+}
+
+.compra,
+.frete {
+  padding: 20px;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.compra__preco {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+  margin-bottom: 4px;
+}
+
+.compra__preco del {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--tinta-fraca);
+}
+
+.compra__parcelas {
+  font-size: 12.5px;
+  color: var(--tinta-media);
+  margin-bottom: 18px;
+}
+
+.compra__form {
+  display: grid;
+  gap: 12px;
+}
+
+.compra__form .passo {
+  justify-self: start;
+}
+
+.compra__seguro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--tinta-fraca);
+}
+
+.compra__indisponivel {
+  margin: 0;
+  font-size: 13px;
+  color: var(--tinta-media);
+}
+
+/* frete e prazo */
+.frete__titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--tinta-forte);
+}
+
+.frete__linha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 16px;
+  border-radius: 999px;
+  background: var(--papel);
+}
+
+.frete__linha input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--fonte);
+  font-size: 13px;
+  color: var(--tinta);
+}
+
+.frete__linha input:focus {
+  outline: none;
+}
+
+.frete__resposta {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--tinta-media);
+}
+
+.frete__resposta ul {
+  display: grid;
+  gap: 6px;
+}
+
+.frete__resposta li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.frete__resposta b {
+  color: var(--tinta-forte);
+}
+
+/* abas */
+.abas {
+  margin-bottom: 50px;
+}
+
+.abas__botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  border-bottom: 1px solid var(--linha);
+}
+
+.abas__botao {
+  position: relative;
+  padding: 0 0 14px;
+  border: 0;
+  background: none;
+  font-family: var(--fonte);
+  font-size: 14px;
+  color: var(--tinta-media);
+  cursor: pointer;
+}
+
+.abas__botao--ativa {
+  color: var(--azul);
+  font-weight: 600;
+}
+
+.abas__botao--ativa::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--azul);
+}
+
+.abas__painel {
+  padding-top: 26px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--tinta-media);
+}
+
+.produto__detalhes {
+  display: grid;
+  gap: 8px;
+}
+
+.produto-autor {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.produto-autor__foto {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.produto-autor h3 {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+/* sugestões */
+.produto-sugestoes {
+  margin-bottom: 60px;
+}
+
+.produto-sugestoes__grade {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.card-catalogo--limpo {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.card-catalogo--limpo .card-catalogo__titulo {
+  font-size: 13px;
+}
+
 /* ---------- catálogo ---------- */
 .catalogo-topo {
   display: grid;
@@ -1391,6 +1689,23 @@ button {
 
   .busca--catalogo {
     grid-column: 1 / -1;
+  }
+}
+
+/* abaixo de 1100px a caixa de compra desce para baixo da capa e do texto */
+@media (max-width: 1099px) {
+  .produto {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  .produto__compra {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .produto-sugestoes__grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -4984,6 +5299,37 @@ button {
 
   .catalogo__grade--lista .card-catalogo .btn {
     grid-column: 1 / -1;
+  }
+
+  /* página do livro: capa, texto e compra empilhados */
+  .produto {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .produto__compra {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .produto__ficha {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 12px;
+  }
+
+  .abas__botoes {
+    gap: 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+
+  .abas__botoes::-webkit-scrollbar {
+    display: none;
+  }
+
+  .produto-sugestoes__grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
   }
 
   /* 404: tudo numa coluna, com a arte entre o texto e os botões */

@@ -175,6 +175,11 @@ function conexao_a_svg_carrinho(string $nome, int $altura = 20): void
  * Ícones da tela de conta. Só o cinza dos campos vira currentColor: as marcas
  * do Google e do Facebook mantêm a cor que vieram do layout.
  */
+function conexao_a_svg_produto(string $nome, int $altura = 24): void
+{
+    echo conexao_svg_pasta('produto', $nome, $altura, ['#00448B', '#0197D4', '#0095D3', '#FFC107', '#F5C518']); // phpcs:ignore WordPress.Security.EscapeOutput
+}
+
 function conexao_a_svg_conta(string $nome, int $altura = 20): void
 {
     echo conexao_svg_pasta('conta', $nome, $altura, ['#CCCCCC']); // phpcs:ignore WordPress.Security.EscapeOutput

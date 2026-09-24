@@ -7,6 +7,13 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+// a página do livro também tem layout próprio
+if (function_exists('is_product') && is_product()) {
+    get_template_part('template-parts/produto/pagina');
+
+    return;
+}
+
 // o catálogo tem layout próprio (filtros, banner e grade)
 if (function_exists('is_shop') && (is_shop() || is_product_taxonomy())) {
     get_template_part('template-parts/catalogo/pagina');
