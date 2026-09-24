@@ -729,6 +729,11 @@ button {
   background: var(--linha);
 }
 
+/* nas vitrines de livro a régua acompanha a cor do título */
+.vitrine .secao-regua {
+  background: var(--azul);
+}
+
 .secao-rodape {
   display: none;
   margin-top: 30px;
