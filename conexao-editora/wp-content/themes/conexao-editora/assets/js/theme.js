@@ -487,14 +487,37 @@
             caixaFiltros.open = false;
         }
 
+        var noCelular = function () {
+            return window.matchMedia('(max-width: 760px)').matches;
+        };
+
+        var mostrarFiltros = function (abrir) {
+            caixaFiltros.open = abrir;
+            // no celular o painel cobre a página, então a página atrás trava
+            document.body.classList.toggle('filtros-abertos', abrir && noCelular());
+
+            if (abrir && !noCelular()) {
+                caixaFiltros.scrollIntoView({ behavior: semMovimento.matches ? 'auto' : 'smooth', block: 'start' });
+            }
+        };
+
         document.querySelectorAll('[data-abrir-filtros]').forEach(function (botao) {
             botao.addEventListener('click', function () {
-                caixaFiltros.open = !caixaFiltros.open;
-
-                if (caixaFiltros.open) {
-                    caixaFiltros.scrollIntoView({ behavior: semMovimento.matches ? 'auto' : 'smooth', block: 'start' });
-                }
+                mostrarFiltros(!caixaFiltros.open);
             });
+        });
+
+        // tocar fora do painel fecha
+        caixaFiltros.addEventListener('click', function (evento) {
+            if (noCelular() && evento.target === caixaFiltros) {
+                mostrarFiltros(false);
+            }
+        });
+
+        document.addEventListener('keydown', function (evento) {
+            if (evento.key === 'Escape' && caixaFiltros.open && noCelular()) {
+                mostrarFiltros(false);
+            }
         });
     }
 

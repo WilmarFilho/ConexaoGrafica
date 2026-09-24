@@ -1043,6 +1043,17 @@ button {
   margin: 0;
 }
 
+/* estado de busca: título em preto e a contagem embaixo */
+.catalogo-topo__resultado {
+  font-size: clamp(20px, 2.2vw, 24px);
+  color: var(--tinta-forte);
+}
+
+.catalogo-topo__conta {
+  font-size: 13.5px;
+  color: var(--tinta-media);
+}
+
 /* faixa de chamada para publicar: a arte vem pronta do layout */
 .catalogo-banner {
   display: block;
@@ -1107,9 +1118,17 @@ button {
   text-align: center;
 }
 
-.catalogo-destaque:hover,
-.catalogo-destaque--ativa {
+.catalogo-destaque:hover {
   background: var(--banda);
+  text-decoration: none;
+}
+
+/* a categoria escolhida fica cheia, com ícone e rótulo em branco */
+.catalogo-destaque--ativa,
+.catalogo-destaque--ativa:hover {
+  background: var(--azul);
+  border-color: var(--azul);
+  color: #fff;
   text-decoration: none;
 }
 
@@ -4781,13 +4800,49 @@ button {
     gap: 14px;
   }
 
-  /* a coluna de filtros abre pelos funis; o resumo do details não aparece */
+  /* a coluna de filtros abre pelos funis, por cima da página */
   .filtros-caixa__resumo {
     display: none;
   }
 
   .filtros-caixa:not([open]) {
     display: none;
+  }
+
+  .filtros-caixa[open] {
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    background: rgba(10, 32, 45, .45);
+    animation: filtros-fundo .18s ease;
+  }
+
+  .filtros-caixa[open] .filtros {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(330px, 88%);
+    margin: 0;
+    padding-bottom: 40px;
+    overflow-y: auto;
+    border-radius: 0;
+    animation: filtros-entrar .22s ease;
+  }
+
+  /* com o painel aberto a página atrás não rola */
+  body.filtros-abertos {
+    overflow: hidden;
+  }
+
+  @keyframes filtros-fundo {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes filtros-entrar {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
   }
 
   .catalogo-funil {
@@ -4892,13 +4947,6 @@ button {
     white-space: nowrap;
   }
 
-  /* a categoria escolhida fica preenchida */
-  .catalogo-destaque--ativa,
-  .catalogo-destaque--ativa:hover {
-    background: var(--azul);
-    border-color: var(--azul);
-    color: #fff;
-  }
 
   /* em lista, capa menor e sem a coluna de preço à direita */
   .catalogo__grade--lista .card-catalogo {

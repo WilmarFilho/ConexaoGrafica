@@ -25,22 +25,65 @@ $busca = isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : ''; /
 $visao = (isset($_GET['visao']) && $_GET['visao'] === 'lista') ? 'lista' : 'grade'; // phpcs:ignore WordPress.Security.NonceVerification
 $faixa = conexao_faixa_precos();
 $publique = get_page_by_path('publique-conosco');
+
+// com busca ou filtro a página vira "Resultados para ...", como no layout
+$rotulo_filtro = '';
+
+foreach (conexao_filtros_taxonomia() as $chave => $grupo) {
+    $escolhidos = conexao_filtro_selecionado($chave);
+
+    if (! $escolhidos || ! taxonomy_exists($grupo['taxonomia'])) {
+        continue;
+    }
+
+    $termo = get_term_by('slug', $escolhidos[0], $grupo['taxonomia']);
+
+    if ($termo) {
+        $rotulo_filtro = $termo->name;
+        break;
+    }
+}
+
+$procurado = $busca ?: $rotulo_filtro;
+$encontrados = (int) $wp_query->found_posts;
 $arte_banner = get_template_directory().'/assets/img/catalogo-banner.png';
 ?>
 <div class="container pagina pagina--catalogo">
-    <?php conexao_trilha('Catálogo'); ?>
+    <?php
+    if ($procurado) {
+        conexao_trilha($procurado, [[
+            'url' => wc_get_page_permalink('shop'),
+            'texto' => 'Busca',
+        ]]);
+    } else {
+        conexao_trilha('Catálogo');
+    }
+    ?>
 
     <div class="catalogo-topo">
         <div class="catalogo-topo__texto">
             <div class="catalogo-topo__linha">
-                <h1>Catálogo</h1>
+                <h1<?php echo $procurado ? ' class="catalogo-topo__resultado"' : ''; ?>>
+                    <?php
+                    echo $procurado
+                        ? esc_html(sprintf('Resultados para “%s”', $procurado))
+                        : 'Catálogo';
+                    ?>
+                </h1>
 
                 <button class="catalogo-funil" type="button" data-abrir-filtros aria-label="Filtros">
                     <?php conexao_the_icon('funil', 26); ?>
                 </button>
             </div>
-            <p>Explore nosso catálogo completo e encontre livros por tema, autor, coleção ou palavra-chave.<br>
-                Use os filtros para refinar sua busca e descobrir conteúdos que conectam conhecimento e pessoas.</p>
+
+            <?php if ($procurado) : ?>
+                <p class="catalogo-topo__conta">
+                    <?php printf('%02d %s', $encontrados, $encontrados === 1 ? 'livro encontrado' : 'livros encontrados'); ?>
+                </p>
+            <?php else : ?>
+                <p>Explore nosso catálogo completo e encontre livros por tema, autor, coleção ou palavra-chave.<br>
+                    Use os filtros para refinar sua busca e descobrir conteúdos que conectam conhecimento e pessoas.</p>
+            <?php endif; ?>
         </div>
 
         <?php if (file_exists($arte_banner)) : ?>
