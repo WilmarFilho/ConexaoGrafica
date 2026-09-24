@@ -56,7 +56,8 @@ criar_pagina() {
   local titulo="$1" slug="$2" id
   # o WordPress já cria um rascunho de política de privacidade com esse endereço;
   # nesse caso a página é reaproveitada, em vez de nascer uma segunda
-  id=$($CLI post list --post_type=page --post_status=any --name="$slug" --field=ID | tr -d '' | head -1)
+  id=$($CLI post list --post_type=page --post_status=any --name="$slug" --field=ID | tr -d '
+' | head -1)
 
   if [ -z "$id" ]; then
     $CLI post create --post_type=page --post_status=publish --post_title="$titulo" --post_name="$slug" >/dev/null
@@ -114,7 +115,6 @@ done
 echo "== livros de exemplo"
 bash "$(dirname "$0")/seed-produtos.sh"
 bash "$(dirname "$0")/seed-capas.sh"
-bash "$(dirname "$0")/seed-conteudos.sh"
 
 echo "== menus"
 menu_item_pagina() {
@@ -186,6 +186,14 @@ criar_post() {
 criar_post "A importância da leitura na educação familiar" "Educação Familiar"
 criar_post "Do manuscrito ao livro: como funciona o processo editorial" "Literatura"
 criar_post "Livros de saúde: conhecimento que transforma o cuidado" "Mercado"
+
+# fotos, datas e autoria dos posts: só depois que eles existem
+bash "$(dirname "$0")/seed-conteudos.sh"
+
+# o post padrão do WordPress não faz parte do site
+OLA=$($CLI post list --post_type=post --name=ola-mundo --field=ID | tr -d '' | head -1)
+[ -z "$OLA" ] && OLA=$($CLI post list --post_type=post --name=hello-world --field=ID | tr -d '' | head -1)
+[ -n "$OLA" ] && $CLI post delete "$OLA" --force >/dev/null && echo "  post padrão removido"
 
 $CLI rewrite flush --hard
 $CLI cache flush >/dev/null 2>&1 || true
