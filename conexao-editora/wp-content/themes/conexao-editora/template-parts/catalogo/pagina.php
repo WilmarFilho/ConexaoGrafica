@@ -25,7 +25,7 @@ $busca = isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : ''; /
 $visao = (isset($_GET['visao']) && $_GET['visao'] === 'lista') ? 'lista' : 'grade'; // phpcs:ignore WordPress.Security.NonceVerification
 $faixa = conexao_faixa_precos();
 $publique = get_page_by_path('publique-conosco');
-$arte_banner = get_template_directory().'/assets/img/catalogo-banner.svg';
+$arte_banner = get_template_directory().'/assets/img/catalogo-banner.png';
 ?>
 <div class="container pagina pagina--catalogo">
     <?php conexao_trilha('Catálogo'); ?>
@@ -37,19 +37,13 @@ $arte_banner = get_template_directory().'/assets/img/catalogo-banner.svg';
                 Use os filtros para refinar sua busca e descobrir conteúdos que conectam conhecimento e pessoas.</p>
         </div>
 
-        <aside class="catalogo-banner">
-            <?php conexao_logo('rodape'); ?>
-
-            <div class="catalogo-banner__texto">
-                <p class="catalogo-banner__titulo">Publique conosco</p>
-                <p>Transforme seu original em livro com a Conexão Editora.</p>
-                <a class="btn btn--azul btn--pequeno" href="<?php echo esc_url($publique ? get_permalink($publique) : home_url('/publique-conosco/')); ?>">Quero publicar meu livro</a>
-            </div>
-
-            <?php if (file_exists($arte_banner)) : ?>
-                <img class="catalogo-banner__arte" src="<?php echo esc_url(get_template_directory_uri().'/assets/img/catalogo-banner.svg'); ?>" alt="" aria-hidden="true">
-            <?php endif; ?>
-        </aside>
+        <?php if (file_exists($arte_banner)) : ?>
+            <a class="catalogo-banner" href="<?php echo esc_url($publique ? get_permalink($publique) : home_url('/publique-conosco/')); ?>">
+                <img src="<?php echo esc_url(get_template_directory_uri().'/assets/img/catalogo-banner.png'); ?>"
+                     alt="Publique conosco: transforme seu original em livro com a Conexão Editora"
+                     width="702" height="152" decoding="async">
+            </a>
+        <?php endif; ?>
     </div>
 
     <?php if ($categorias_destaque && ! is_wp_error($categorias_destaque)) : ?>
