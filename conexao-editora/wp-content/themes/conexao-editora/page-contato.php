@@ -25,38 +25,29 @@ $estado = isset($_GET['contato']) ? sanitize_key(wp_unslash($_GET['contato'])) :
             <h1 class="contato__titulo">Fale com a Conexão Editora</h1>
             <p class="contato__texto">Estamos prontos para entender seu projeto e entregar resultados que conectam.</p>
 
+            <?php /* o endereço fica por conta do mapa, como no layout */ ?>
             <div class="canais">
                 <a class="canais__zap" href="https://wa.me/<?php echo esc_attr($whatsapp); ?>" target="_blank" rel="noopener">
-                    <span class="canal__icone"><?php conexao_the_icon('whatsapp', 26); ?></span>
+                    <span class="canal__icone"><?php conexao_a_icone_arte('zap', 28); ?></span>
                     <strong>WhatsApp</strong>
-                    <?php foreach (array_map('trim', explode('/', $telefones)) as $telefone) : ?>
-                        <span><?php echo esc_html($telefone); ?></span>
-                    <?php endforeach; ?>
+                    <span class="canais__fones">
+                        <?php foreach (array_map('trim', explode('/', $telefones)) as $telefone) : ?>
+                            <span><?php echo esc_html($telefone); ?></span>
+                        <?php endforeach; ?>
+                    </span>
                 </a>
 
                 <div class="canais__coluna">
                     <div class="canal">
-                        <span class="canal__icone"><?php conexao_the_icon('envelope', 19); ?></span>
-                        <span>
-                            <strong>E-mail</strong>
-                            <a href="mailto:<?php echo esc_attr($email_contato); ?>"><?php echo esc_html($email_contato); ?></a>
-                        </span>
+                        <span class="canal__icone"><?php conexao_a_icone_arte('email', 20); ?></span>
+                        <strong>E-mail</strong>
+                        <a class="canal__valor" href="mailto:<?php echo esc_attr($email_contato); ?>"><?php echo esc_html($email_contato); ?></a>
                     </div>
 
                     <div class="canal">
-                        <span class="canal__icone"><?php conexao_the_icon('relogio', 19); ?></span>
-                        <span>
-                            <strong>Horários</strong>
-                            <span><?php echo esc_html($horario); ?></span>
-                        </span>
-                    </div>
-
-                    <div class="canal">
-                        <span class="canal__icone"><?php conexao_the_icon('pin', 19); ?></span>
-                        <span>
-                            <strong>Endereço</strong>
-                            <span><?php echo esc_html($endereco); ?></span>
-                        </span>
+                        <span class="canal__icone"><?php conexao_a_icone_arte('horario', 22); ?></span>
+                        <strong>Horários</strong>
+                        <span class="canal__valor"><?php echo esc_html($horario); ?></span>
                     </div>
                 </div>
             </div>
@@ -108,7 +99,7 @@ $estado = isset($_GET['contato']) ? sanitize_key(wp_unslash($_GET['contato'])) :
             <?php endif; ?>
         </div>
 
-        <div class="contato__coluna">
+        <div class="contato__coluna contato__coluna--mapa">
             <iframe class="mapa" src="<?php echo esc_url($mapa); ?>" title="Localização da Conexão Editora"
                     loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
         </div>
