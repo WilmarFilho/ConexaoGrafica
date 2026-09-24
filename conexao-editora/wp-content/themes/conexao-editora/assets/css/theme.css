@@ -531,6 +531,47 @@ button {
   text-decoration: none;
 }
 
+/* painel de categorias: lista mais junta que a de livros */
+.menu-principal .sub-menu a {
+  padding: 7px 0;
+}
+
+/* painel de autores: foto e nome */
+.menu-principal .sub-menu--autores .autores-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 26px;
+  max-width: 900px;
+}
+
+.menu-principal .sub-menu--autores .autor-destaque a {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: 96px;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.menu-principal .sub-menu--autores .autor-destaque img {
+  width: 93px;
+  height: 93px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.menu-principal .sub-menu--autores .autor-destaque a:hover img {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.menu-principal .sub-menu--autores .botao {
+  margin-top: 46px;
+}
+
 /* a seta do item aberto vira para cima */
 .menu-principal .menu > li.menu-item-has-children:hover > a::after,
 .menu-principal .menu > li.menu-item-has-children:focus-within > a::after {

@@ -87,6 +87,7 @@ if (! defined('ABSPATH')) {
             'menu_class' => 'menu',
             'depth' => 2,
             'fallback_cb' => false,
+            'walker' => new Conexao_Menu_Walker(),
         ]);
         ?>
     </div>

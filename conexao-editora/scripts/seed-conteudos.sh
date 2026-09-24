@@ -8,9 +8,13 @@ command -v wp >/dev/null 2>&1 || CLI="docker compose exec -T -u 33 cli wp"
 export MSYS_NO_PATHCONV=1
 export MSYS2_ARG_CONV_EXCL='*'
 
-# no container as imagens estão em /scripts/capas; no servidor, ao lado deste arquivo
-CAPAS="${CAPAS:-/scripts/capas}"
-[ -d "$CAPAS" ] || CAPAS="$(cd "$(dirname "$0")" && pwd)/capas"
+# dentro do container as imagens ficam em /scripts/capas; no servidor,
+# ao lado deste arquivo
+if [ "$CLI" = "wp" ]; then
+  CAPAS="${CAPAS:-$(cd "$(dirname "$0")" && pwd)/capas}"
+else
+  CAPAS="${CAPAS:-/scripts/capas}"
+fi
 
 # os posts saem em nome da editora, como no layout
 autor=$($CLI user list --role=administrator --field=ID | tr -d '

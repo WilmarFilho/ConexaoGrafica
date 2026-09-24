@@ -11,9 +11,13 @@ command -v wp >/dev/null 2>&1 || CLI="docker compose exec -T -u 33 cli wp"
 export MSYS_NO_PATHCONV=1
 export MSYS2_ARG_CONV_EXCL='*'
 
-# no container as imagens estão em /scripts/capas; no servidor, ao lado deste arquivo
-CAPAS="${CAPAS:-/scripts/capas}"
-[ -d "$CAPAS" ] || CAPAS="$(cd "$(dirname "$0")" && pwd)/capas"
+# dentro do container as imagens ficam em /scripts/capas; no servidor,
+# ao lado deste arquivo
+if [ "$CLI" = "wp" ]; then
+  CAPAS="${CAPAS:-$(cd "$(dirname "$0")" && pwd)/capas}"
+else
+  CAPAS="${CAPAS:-/scripts/capas}"
+fi
 
 # título|preço|categoria|autores|arquivo da capa
 LIVROS='A História da Faculdade de Medicina da UFG|297|História|Antônio Fernando Carneiro, Waldemar Naves do Amaral|faculdade-medicina-ufg.png

@@ -7,6 +7,10 @@ set -euo pipefail
 CLI="wp"
 command -v wp >/dev/null 2>&1 || CLI="docker compose exec -T -u 33 cli wp"
 
+# no Git Bash do Windows, caminhos e valores começando com / viram C:\...
+export MSYS_NO_PATHCONV=1
+export MSYS2_ARG_CONV_EXCL='*'
+
 URL="${SITE_URL:-http://localhost:8092}"
 ADMIN_USER="${ADMIN_USER:-conexao}"
 ADMIN_PASS="${ADMIN_PASS:-conexao-local-2026}"
@@ -141,12 +145,29 @@ $CLI menu item add-post principal "$LOJA_ID" --title="Livros" >/dev/null
 LIVROS_ITEM=$($CLI menu item list principal --fields=db_id,title --format=csv | awk -F, '$2=="Livros"{print $1}' | head -1)
 if [ -n "$LIVROS_ITEM" ]; then
   for slug in pre-vendas lancamentos mais-vendidos; do
-    id=$($CLI post list --post_type=page --name="$slug" --field=ID | tr -d '' | head -1)
+    id=$($CLI post list --post_type=page --name="$slug" --field=ID | tr -d '
+' | head -1)
     [ -n "$id" ] && $CLI menu item add-post principal "$id" --parent-id="$LIVROS_ITEM" >/dev/null
   done
   BOTAO=$($CLI menu item add-custom principal "Todos os livros" "/loja/" --parent-id="$LIVROS_ITEM" --porcelain)
   $CLI post meta update "$BOTAO" _menu_item_classes '["botao"]' --format=json >/dev/null
 fi
+
+# submenu de Categorias: as oito do layout
+CATEGORIAS_ITEM=$($CLI menu item list principal --fields=db_id,title --format=csv | awk -F, '$2=="Categorias"{print $1}' | head -1)
+if [ -n "$CATEGORIAS_ITEM" ]; then
+  for cat in "Biografia" "Crônica" "Direito" "Educação Familiar" "História" "Medicina" "Literatura" "Religião"; do
+    tid=$($CLI term list product_cat --name="$cat" --field=term_id | tr -d '' | head -1)
+    [ -n "$tid" ] && $CLI menu item add-term principal product_cat "$tid" --parent-id="$CATEGORIAS_ITEM" >/dev/null
+  done
+  BOTAO=$($CLI menu item add-custom principal "Todos os livros" "/loja/" --parent-id="$CATEGORIAS_ITEM" --porcelain)
+  $CLI post meta update "$BOTAO" _menu_item_classes '["botao"]' --format=json >/dev/null
+fi
+
+# o item Autores recebe a grade com foto, montada pelo tema
+AUTORES_ITEM=$($CLI menu item list principal --fields=db_id,title --format=csv | awk -F, '$2=="Autores"{print $1}' | head -1)
+[ -n "$AUTORES_ITEM" ] && $CLI post meta update "$AUTORES_ITEM" _menu_item_classes '["painel-autores"]' --format=json >/dev/null
+bash "$(dirname "$0")/seed-autores.sh"
 $CLI menu item add-custom principal "Categorias" "/loja/" >/dev/null
 $CLI menu item add-custom principal "Autores" "/autores/" >/dev/null
 menu_item_pagina principal "publique-conosco" "Publique conosco"
