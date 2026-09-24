@@ -1647,6 +1647,247 @@ button {
   line-height: 1.6;
 }
 
+/* ---------- a editora ---------- */
+.editora-hero {
+  background: var(--azul-escuro) url("../img/ajuda-banner.png") center/cover no-repeat;
+  color: #fff;
+}
+
+.editora-hero__grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 20px;
+  padding-block: 24px 40px;
+}
+
+/* a trilha fica dentro do banner, sobre o azul */
+.editora-hero .trilha {
+  grid-column: 1 / -1;
+  color: rgba(255, 255, 255, .75);
+  margin-bottom: 18px;
+}
+
+.editora-hero .trilha a {
+  color: #fff;
+}
+
+.editora-hero h1 {
+  font-size: clamp(26px, 3.2vw, 38px);
+  line-height: 1.25;
+  margin-bottom: 16px;
+}
+
+.editora-hero__texto p {
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, .9);
+  max-width: 52ch;
+  margin-bottom: 26px;
+}
+
+.editora-hero__arte {
+  width: min(420px, 38vw);
+  height: auto;
+}
+
+/* topo das seções, centralizado */
+.editora-topo {
+  text-align: center;
+  margin-bottom: 34px;
+}
+
+.editora-etiqueta {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--azul);
+  margin-bottom: 12px;
+}
+
+.editora-topo h2 {
+  font-size: clamp(21px, 2.4vw, 27px);
+  color: var(--tinta-forte);
+}
+
+.editora-topo__texto {
+  max-width: 62ch;
+  margin: 14px auto 0;
+  font-size: 14px;
+  color: var(--tinta-media);
+}
+
+.editora-essencia,
+.editora-areas {
+  padding-block: 56px;
+  background: var(--papel);
+}
+
+/* pilares */
+.editora-pilares {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.editora-pilar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  padding: 22px 20px;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.editora-pilar__icone {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--banda);
+  color: var(--azul);
+}
+
+.editora-pilar h3 {
+  font-size: 14.5px;
+  color: var(--azul);
+  margin-bottom: 6px;
+}
+
+.editora-pilar p {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--tinta-media);
+  margin: 0;
+}
+
+/* faixas com arte de um lado e texto do outro */
+.editora-historia,
+.editora-publicar {
+  padding-block: 44px;
+  background: var(--banda);
+}
+
+.editora-dupla {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 40px;
+}
+
+.editora-dupla--invertida {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+}
+
+.editora-dupla__arte {
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  justify-self: center;
+}
+
+.editora-dupla__texto h2 {
+  font-size: clamp(21px, 2.4vw, 27px);
+  line-height: 1.3;
+  color: var(--tinta-forte);
+  margin-bottom: 14px;
+}
+
+.editora-dupla__texto p {
+  font-size: 14px;
+  color: var(--tinta-media);
+  max-width: 52ch;
+  margin-bottom: 26px;
+}
+
+/* áreas de atuação */
+.editora-areas__lista {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 20px;
+  text-align: center;
+}
+
+.editora-areas__lista li {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  color: var(--azul-escuro);
+}
+
+.editora-areas__lista span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--azul);
+}
+
+/* prateleira de livros */
+.editora-livros {
+  padding-block: 56px 64px;
+  background: var(--papel);
+}
+
+.editora-livros__trilho {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.editora-livro__capa {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.editora-livro__capa img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: var(--sombra-card);
+}
+
+.editora-livro h3 {
+  font-size: 13.5px;
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.editora-livro h3 a {
+  color: var(--tinta-forte);
+}
+
+.editora-livro__autores {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--tinta-fraca);
+  margin-bottom: 12px;
+}
+
+.editora-livro__preco {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+  margin: 0;
+}
+
+.editora-livros__acao {
+  margin: 40px 0 0;
+  text-align: center;
+}
+
+/* setas do carrossel dos pilares: só no celular */
+.editora-carrossel {
+  position: relative;
+}
+
+.editora-seta {
+  display: none;
+}
+
 /* ---------- central de ajuda ---------- */
 .ajuda-hero {
   display: grid;
@@ -3083,6 +3324,127 @@ button {
 
   .faq__resposta {
     padding: 14px 20px 20px;
+  }
+
+  /* a editora: banner com a arte entre o texto e o botão */
+  .editora-hero__grade {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    padding-block: 20px 32px;
+  }
+
+  .editora-hero__texto {
+    display: contents;
+  }
+
+  .editora-hero h1 {
+    order: 1;
+    margin-bottom: 0;
+  }
+
+  .editora-hero__texto p {
+    order: 2;
+    max-width: none;
+    margin-bottom: 0;
+  }
+
+  .editora-hero__arte {
+    order: 3;
+    justify-self: center;
+    width: min(300px, 86%);
+  }
+
+  .editora-hero__texto .btn {
+    order: 4;
+    width: 100%;
+  }
+
+  .editora-essencia,
+  .editora-areas,
+  .editora-livros {
+    padding-block: 40px;
+  }
+
+  .editora-topo {
+    margin-bottom: 24px;
+  }
+
+  .editora-seta {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin-top: -17px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--azul);
+    box-shadow: var(--sombra-card);
+  }
+
+  .editora-seta--ant {
+    left: -10px;
+  }
+
+  .editora-seta--prox {
+    right: -10px;
+  }
+
+  /* pilares e livros passam a rolar na horizontal */
+  .editora-pilares,
+  .editora-livros__trilho {
+    display: flex;
+    grid-auto-flow: row;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .editora-pilares::-webkit-scrollbar,
+  .editora-livros__trilho::-webkit-scrollbar {
+    display: none;
+  }
+
+  .editora-pilar {
+    flex: 0 0 min(300px, 86%);
+    scroll-snap-align: center;
+  }
+
+  .editora-livro {
+    flex: 0 0 min(190px, 52%);
+    scroll-snap-align: start;
+  }
+
+  /* faixas empilhadas */
+  .editora-dupla,
+  .editora-dupla--invertida {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .editora-dupla__arte {
+    max-width: 320px;
+  }
+
+  .editora-dupla__texto p {
+    max-width: none;
+  }
+
+  .editora-dupla__texto .btn {
+    width: 100%;
+  }
+
+  .editora-areas__lista {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px 12px;
+  }
+
+  .editora-areas__lista span {
+    font-size: 12px;
   }
 
   /* ajuda: banner em pé, com a arte entre o texto e a busca */

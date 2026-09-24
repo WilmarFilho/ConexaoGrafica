@@ -119,9 +119,9 @@ function conexao_the_icon(string $nome, int $tamanho = 20): void
  * a vir do CSS, para o mesmo desenho servir ao atalho ativo (branco) e ao
  * quadrinho do cartão (azul escuro).
  */
-function conexao_svg_ajuda(string $nome, int $altura = 30): string
+function conexao_svg_pasta(string $pasta, string $nome, int $altura = 30): string
 {
-    $caminho = get_template_directory().'/assets/img/ajuda/'.sanitize_file_name($nome).'.svg';
+    $caminho = get_template_directory().'/assets/img/'.$pasta.'/'.sanitize_file_name($nome).'.svg';
 
     if (! file_exists($caminho)) {
         return '';
@@ -135,14 +135,24 @@ function conexao_svg_ajuda(string $nome, int $altura = 30): string
 
     return str_replace(
         '<svg ',
-        sprintf('<svg class="icone icone--ajuda" height="%d" aria-hidden="true" focusable="false" ', $altura),
+        sprintf('<svg class="icone icone--%s" height="%d" aria-hidden="true" focusable="false" ', esc_attr($pasta), $altura),
         $svg
     );
+}
+
+function conexao_svg_ajuda(string $nome, int $altura = 30): string
+{
+    return conexao_svg_pasta('ajuda', $nome, $altura);
 }
 
 function conexao_a_svg_ajuda(string $nome, int $altura = 30): void
 {
     echo conexao_svg_ajuda($nome, $altura); // phpcs:ignore WordPress.Security.EscapeOutput
+}
+
+function conexao_a_svg_editora(string $nome, int $altura = 30): void
+{
+    echo conexao_svg_pasta('editora', $nome, $altura); // phpcs:ignore WordPress.Security.EscapeOutput
 }
 
 function conexao_svg_categoria(string $slug): string
