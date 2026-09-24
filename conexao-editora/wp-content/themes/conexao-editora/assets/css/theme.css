@@ -729,6 +729,11 @@ button {
   background: var(--linha);
 }
 
+.secao-rodape {
+  display: none;
+  margin-top: 30px;
+}
+
 /* ---------- vitrines de livro ---------- */
 .vitrine {
   padding-block: 44px;
@@ -2915,6 +2920,41 @@ button {
   .corporativo__vantagens {
     padding-left: 0;
     border-left: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  /* o "ver todos" sai do topo e vira botão largo no fim da seção */
+  .secao-topo .btn {
+    display: none;
+  }
+
+  .secao-rodape {
+    display: block;
+  }
+
+  .secao-rodape .btn {
+    width: 100%;
+    max-width: 420px;
+    margin-inline: auto;
+    padding-block: 16px;
+    font-size: 13px;
+  }
+
+  .secao-titulo {
+    font-size: 26px;
+  }
+
+  .card-livro__titulo {
+    font-size: 16px;
+  }
+
+  .card-livro__autores {
+    font-size: 13.5px;
+  }
+
+  .card-livro__preco {
+    font-size: 21px;
   }
 }
 

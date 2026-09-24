@@ -113,6 +113,23 @@ function conexao_secao_titulo(string $titulo, string $url = '', string $rotulo =
     echo '</div>';
 }
 
+/**
+ * No celular o "ver todos" sai do cabeçalho da seção e vira um botão largo
+ * embaixo da vitrine, como no layout.
+ */
+function conexao_secao_rodape(string $url, string $rotulo = 'Ver todos'): void
+{
+    if (! $url) {
+        return;
+    }
+
+    printf(
+        '<div class="secao-rodape"><a class="btn btn--contorno btn--bloco" href="%s">%s</a></div>',
+        esc_url($url),
+        esc_html($rotulo)
+    );
+}
+
 /** Lista de autores de um livro, já formatada. */
 function conexao_autores(WC_Product $produto): string
 {

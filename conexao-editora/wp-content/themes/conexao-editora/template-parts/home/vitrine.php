@@ -27,5 +27,7 @@ if (! $produtos) {
                 <?php conexao_card_produto($produto); ?>
             <?php endforeach; ?>
         </div>
+
+        <?php conexao_secao_rodape($url); ?>
     </div>
 </section>

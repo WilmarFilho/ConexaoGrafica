@@ -35,5 +35,7 @@ $img = get_template_directory_uri().'/assets/img/';
                 <?php endforeach; ?>
             </div>
         </div>
+
+        <?php conexao_secao_rodape(get_permalink(get_option('page_for_posts')) ?: home_url('/conteudos/')); ?>
     </div>
 </section>
