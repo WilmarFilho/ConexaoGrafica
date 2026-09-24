@@ -2633,9 +2633,66 @@ button {
   }
 }
 
+/* rodapé do celular: marca centralizada, blocos em duas colunas e contato inteiro */
 @media (max-width: 760px) {
   .rodape__grade {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 34px 24px;
+  }
+
+  .rodape__marca {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--linha);
+  }
+
+  .rodape__marca img {
+    display: block;
+    margin-inline: auto;
+  }
+
+  .rodape__marca p {
+    max-width: 36ch;
+    margin-inline: auto;
+  }
+
+  /* solta os blocos internos na grade, para posicionar cada um */
+  .rodape__coluna--dupla {
+    display: contents;
+  }
+
+  .rodape__coluna--catalogo {
+    grid-area: 2 / 1;
+  }
+
+  .rodape__coluna--editora {
+    grid-area: 2 / 2;
+  }
+
+  .rodape__coluna--ajuda {
+    grid-area: 3 / 1;
+  }
+
+  .rodape__bloco--politicas {
+    grid-area: 3 / 2;
+  }
+
+  .rodape__bloco--contato {
+    grid-area: 4 / 1 / auto / -1;
+  }
+
+  .rodape__bloco--pagamento {
+    grid-area: 5 / 1;
+  }
+
+  .rodape__bloco--redes {
+    grid-area: 5 / 2;
+  }
+
+  /* o respiro entre os blocos agora vem do espaçamento da grade */
+  .rodape__bloco .rodape__titulo-secundario {
+    margin-top: 0;
   }
 }
 
@@ -3401,10 +3458,6 @@ button {
   .barra-topo__links,
   .barra-topo__pedido {
     display: none;
-  }
-
-  .rodape__grade {
-    grid-template-columns: 1fr;
   }
 
   .vitrine__trilho {

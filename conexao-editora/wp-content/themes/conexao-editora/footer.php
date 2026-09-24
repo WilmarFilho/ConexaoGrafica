@@ -68,7 +68,7 @@ $email_contato = get_theme_mod('conexao_email', 'contato@conexaoeditora.com.br')
                 continue;
             }
             ?>
-            <nav class="rodape__coluna" aria-label="<?php echo esc_attr($titulo); ?>">
+            <nav class="rodape__coluna rodape__coluna--<?php echo esc_attr(str_replace('rodape-', '', $local)); ?>" aria-label="<?php echo esc_attr($titulo); ?>">
                 <h3><?php echo esc_html($titulo); ?></h3>
                 <?php
                 wp_nav_menu([
@@ -81,54 +81,63 @@ $email_contato = get_theme_mod('conexao_email', 'contato@conexaoeditora.com.br')
             </nav>
         <?php endforeach; ?>
 
-        <div class="rodape__coluna">
+        <?php /* os blocos internos viram itens da grade no celular, por isso os invólucros */ ?>
+        <div class="rodape__coluna rodape__coluna--dupla">
             <?php if (has_nav_menu('rodape-politicas')) : ?>
-                <h3>Políticas</h3>
-                <?php
-                wp_nav_menu([
-                    'theme_location' => 'rodape-politicas',
-                    'container' => false,
-                    'menu_class' => 'rodape__links',
-                    'depth' => 1,
-                ]);
-                ?>
+                <div class="rodape__bloco rodape__bloco--politicas">
+                    <h3>Políticas</h3>
+                    <?php
+                    wp_nav_menu([
+                        'theme_location' => 'rodape-politicas',
+                        'container' => false,
+                        'menu_class' => 'rodape__links',
+                        'depth' => 1,
+                    ]);
+                    ?>
+                </div>
             <?php endif; ?>
 
-            <h3 class="rodape__titulo-secundario">Pagamento</h3>
-            <ul class="rodape__pagamento">
-                <li title="Cartão de crédito"><?php conexao_the_icon('cartao', 26); ?><span class="tela-leitor">Cartão de crédito</span></li>
-                <li title="Pix"><?php conexao_the_icon('pix', 26); ?><span class="tela-leitor">Pix</span></li>
-                <li title="Boleto"><?php conexao_the_icon('boleto', 26); ?><span class="tela-leitor">Boleto</span></li>
-            </ul>
-            <p class="rodape__seguro"><?php conexao_the_icon('cadeado', 20); ?> Compra segura</p>
+            <div class="rodape__bloco rodape__bloco--pagamento">
+                <h3 class="rodape__titulo-secundario">Pagamento</h3>
+                <ul class="rodape__pagamento">
+                    <li title="Cartão de crédito"><?php conexao_the_icon('cartao', 26); ?><span class="tela-leitor">Cartão de crédito</span></li>
+                    <li title="Pix"><?php conexao_the_icon('pix', 26); ?><span class="tela-leitor">Pix</span></li>
+                    <li title="Boleto"><?php conexao_the_icon('boleto', 26); ?><span class="tela-leitor">Boleto</span></li>
+                </ul>
+                <p class="rodape__seguro"><?php conexao_the_icon('cadeado', 20); ?> Compra segura</p>
+            </div>
         </div>
 
-        <div class="rodape__coluna">
-            <h3>Contato</h3>
-            <ul class="rodape__links rodape__links--contato">
-                <li class="rodape__telefones">
-                    <?php
-                    foreach (array_map('trim', explode('/', $telefones)) as $i => $telefone) {
-                        printf(
-                            '%s<a href="tel:+55%s">%s</a>',
-                            $i ? ' / ' : '',
-                            esc_attr(preg_replace('/\D/', '', $telefone)),
-                            esc_html($telefone)
-                        );
-                    }
-                    ?>
-                </li>
-                <li><a href="mailto:<?php echo esc_attr($email_contato); ?>"><?php echo esc_html($email_contato); ?></a></li>
-                <li>Seg. a sex: 8h às 18h</li>
-                <li>Goiânia - GO</li>
-            </ul>
+        <div class="rodape__coluna rodape__coluna--dupla">
+            <div class="rodape__bloco rodape__bloco--contato">
+                <h3>Contato</h3>
+                <ul class="rodape__links rodape__links--contato">
+                    <li class="rodape__telefones">
+                        <?php
+                        foreach (array_map('trim', explode('/', $telefones)) as $i => $telefone) {
+                            printf(
+                                '%s<a href="tel:+55%s">%s</a>',
+                                $i ? ' / ' : '',
+                                esc_attr(preg_replace('/\D/', '', $telefone)),
+                                esc_html($telefone)
+                            );
+                        }
+                        ?>
+                    </li>
+                    <li><a href="mailto:<?php echo esc_attr($email_contato); ?>"><?php echo esc_html($email_contato); ?></a></li>
+                    <li>Seg. a sex: 8h às 18h</li>
+                    <li>Goiânia - GO</li>
+                </ul>
+            </div>
 
-            <h3 class="rodape__titulo-secundario">Redes sociais</h3>
-            <ul class="rodape__sociais">
-                <li><a href="<?php echo esc_url(get_theme_mod('conexao_instagram', '#')); ?>" aria-label="Instagram"><?php conexao_the_icon('instagram', 16); ?></a></li>
-                <li><a href="<?php echo esc_url(get_theme_mod('conexao_facebook', '#')); ?>" aria-label="Facebook"><?php conexao_the_icon('facebook', 16); ?></a></li>
-                <li><a href="<?php echo esc_url(get_theme_mod('conexao_youtube', '#')); ?>" aria-label="YouTube"><?php conexao_the_icon('youtube', 16); ?></a></li>
-            </ul>
+            <div class="rodape__bloco rodape__bloco--redes">
+                <h3 class="rodape__titulo-secundario">Redes sociais</h3>
+                <ul class="rodape__sociais">
+                    <li><a href="<?php echo esc_url(get_theme_mod('conexao_instagram', '#')); ?>" aria-label="Instagram"><?php conexao_the_icon('instagram', 16); ?></a></li>
+                    <li><a href="<?php echo esc_url(get_theme_mod('conexao_facebook', '#')); ?>" aria-label="Facebook"><?php conexao_the_icon('facebook', 16); ?></a></li>
+                    <li><a href="<?php echo esc_url(get_theme_mod('conexao_youtube', '#')); ?>" aria-label="YouTube"><?php conexao_the_icon('youtube', 16); ?></a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
