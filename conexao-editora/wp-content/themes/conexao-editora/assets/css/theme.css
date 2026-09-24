@@ -3000,9 +3000,10 @@ button {
     margin-top: 6px;
   }
 
-  /* cartão do destaque no celular: 302 x 229, como no layout */
+  /* cartão do destaque no celular: um pouco mais largo que os 302 do layout,
+     para o botão de comprar não ser cortado */
   .destaque__card {
-    width: min(302px, 88vw);
+    width: min(348px, 92vw);
     height: 229px;
     grid-template-columns: 112px minmax(0, 1fr);
     gap: 12px;
