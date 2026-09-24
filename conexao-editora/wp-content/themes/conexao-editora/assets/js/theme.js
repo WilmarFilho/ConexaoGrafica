@@ -171,6 +171,18 @@
         window.addEventListener('resize', alinhar);
     });
 
+    /* setas do carrossel de conteúdos, no celular */
+    var trilhoConteudos = document.querySelector('[data-conteudos-trilho]');
+
+    if (trilhoConteudos) {
+        document.querySelectorAll('[data-conteudo]').forEach(function (seta) {
+            seta.addEventListener('click', function () {
+                var passo = Number(seta.dataset.conteudo) * trilhoConteudos.clientWidth;
+                trilhoConteudos.scrollBy({ left: passo, behavior: 'smooth' });
+            });
+        });
+    }
+
     /* clicar numa categoria filtra a vitrine logo abaixo */
     var listaCategorias = document.querySelector('[data-filtro-categorias]');
     var vitrine = document.querySelector('[data-vitrine-categorias]');

@@ -17,6 +17,8 @@ function conexao_icon(string $nome, int $tamanho = 20): string
         'carrinho' => '<circle cx="9.5" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/><path d="M3 4h2.2l2.4 11h11l2-8H6.2"/>',
         'coracao' => '<path d="M12 20.4S3.8 15.4 3.8 9.9A4.6 4.6 0 0 1 12 7.2a4.6 4.6 0 0 1 8.2 2.7c0 5.5-8.2 10.5-8.2 10.5z" fill="currentColor" stroke="none"/>',
         'seta-baixo' => '<path d="M6 9.5l6 5 6-5"/>',
+        'seta-esquerda' => '<path d="M14.5 5.5L8 12l6.5 6.5"/>',
+        'seta-direita' => '<path d="M9.5 5.5L16 12l-6.5 6.5"/>',
         'calendario' => '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3.5v3M16 3.5v3"/>',
         'mais' => '<path d="M12 5.5v13M5.5 12h13"/>',
         'envelope' => '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6.5L21 7"/>',

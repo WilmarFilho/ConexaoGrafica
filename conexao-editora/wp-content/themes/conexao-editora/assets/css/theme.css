@@ -2333,6 +2333,14 @@ button {
   text-decoration: none;
 }
 
+.conteudos__carrossel {
+  position: relative;
+}
+
+.conteudos__seta {
+  display: none;
+}
+
 /* ---------- contato ---------- */
 .contato {
   display: grid;
@@ -2964,6 +2972,118 @@ button {
 
   .card-livro__preco {
     font-size: 21px;
+  }
+
+  /* conteúdos: um post por vez, com setas sobre a foto */
+  .conteudos .secao-topo {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .conteudos .secao-regua {
+    display: none;
+  }
+
+  .conteudos__grade {
+    display: flex;
+    grid-template-columns: none;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .conteudos__grade::-webkit-scrollbar {
+    display: none;
+  }
+
+  .conteudos__coluna {
+    display: contents;
+  }
+
+  .card-post,
+  .card-post--grande {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    aspect-ratio: auto;
+    min-height: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .card-post__foto {
+    position: static;
+    height: auto;
+  }
+
+  .card-post__foto img,
+  .card-post--grande .card-post__foto img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 11;
+    min-height: 0;
+    object-fit: cover;
+  }
+
+  /* a data vira uma faixa azul, na largura toda */
+  .card-post__data,
+  .card-post--grande .card-post__data {
+    position: static;
+    display: flex;
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: 0;
+    font-size: 13.5px;
+  }
+
+  .card-post__legenda,
+  .card-post--grande .card-post__legenda {
+    position: static;
+    width: 100%;
+    padding: 16px 76px 20px 18px;
+    border-radius: 0;
+  }
+
+  .card-post__categoria {
+    font-size: 14px;
+  }
+
+  .card-post__legenda h3,
+  .card-post--grande .card-post__legenda h3 {
+    font-size: 17px;
+  }
+
+  .card-post__mais,
+  .card-post--grande .card-post__mais {
+    width: 48px;
+    height: 48px;
+    right: 18px;
+    bottom: 22px;
+    border-radius: 50%;
+  }
+
+  .conteudos__seta {
+    position: absolute;
+    top: 130px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--azul);
+    color: #fff;
+    box-shadow: var(--sombra-card);
+  }
+
+  .conteudos__seta--ant {
+    left: -14px;
+  }
+
+  .conteudos__seta--prox {
+    right: -14px;
   }
 
   /* publique conosco: texto, botão vazado e a arte embaixo */
