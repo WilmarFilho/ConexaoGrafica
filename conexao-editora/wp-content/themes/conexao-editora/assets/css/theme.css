@@ -2989,7 +2989,125 @@ button {
 
   .destaque {
     background: var(--banda);
-    padding-block: 0 10px;
+    padding-block: 0 40px;
+  }
+
+  .destaque .secao-rodape {
+    margin-top: 6px;
+  }
+
+  /* cartão do destaque no celular: 302 x 229, como no layout */
+  .destaque__card {
+    width: min(302px, 88vw);
+    height: 229px;
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--papel);
+    align-items: center;
+    overflow: hidden;
+  }
+
+  /* a capa acompanha a altura do cartão, sem passar dele */
+  .destaque__capa {
+    align-self: stretch;
+    height: auto;
+  }
+
+  .destaque__capa img {
+    width: 112px;
+    /* altura útil do cartão: 229 menos os 14 de cada lado */
+    height: 201px;
+    max-width: none;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  .destaque__conteudo {
+    min-width: 0;
+  }
+
+  .destaque__meta {
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+
+  .etiqueta {
+    padding: 2px 10px;
+    font-size: 9.5px;
+  }
+
+  .estrelas {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .avaliacoes {
+    font-size: 9.5px;
+  }
+
+  /* título em duas linhas, para o conteúdo caber na altura do cartão */
+  .destaque__conteudo h3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.25;
+    margin-bottom: 5px;
+  }
+
+  .destaque__resumo {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+
+  .destaque__preco {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+
+  .destaque__preco del {
+    font-size: 11px;
+  }
+
+  .destaque__acoes {
+    gap: 6px 8px;
+  }
+
+  .destaque__acoes .btn {
+    padding: 9px 10px;
+    font-size: 9px;
+    letter-spacing: .03em;
+    gap: 5px;
+    white-space: nowrap;
+  }
+
+  .destaque__acoes .btn .icone {
+    width: 13px;
+    height: 13px;
+  }
+
+  .botao-favorito {
+    width: 28px;
+    height: 28px;
+  }
+
+  .botao-favorito .icone {
+    width: 14px;
+    height: 14px;
+  }
+
+  .destaque__detalhes {
+    width: 100%;
+    text-align: center;
+    font-size: 10.5px;
   }
 
   .destaque__trilho {
@@ -2997,29 +3115,6 @@ button {
     padding-block: 10px 20px;
   }
 
-  .destaque__card {
-    width: min(560px, 88vw);
-    grid-template-columns: 130px minmax(0, 1fr);
-    gap: 18px;
-    padding: 18px;
-  }
-
-  .destaque__conteudo h3 {
-    font-size: 18px;
-  }
-
-  .destaque__preco {
-    font-size: 22px;
-  }
-
-  .destaque__acoes {
-    gap: 12px;
-  }
-
-  .destaque__detalhes {
-    width: 100%;
-    text-align: center;
-  }
 }
 
 @media (max-width: 640px) {
@@ -3031,52 +3126,6 @@ button {
 
   .rodape__grade {
     grid-template-columns: 1fr;
-  }
-
-  /* capa e texto continuam lado a lado, como no layout do celular */
-  .destaque__card {
-    grid-template-columns: 104px minmax(0, 1fr);
-    width: min(560px, 90vw);
-    gap: 12px;
-    padding: 14px;
-  }
-
-  /* em tela estreita o botão ocupa a linha toda e o coração desce com o link */
-  .destaque__acoes {
-    display: grid;
-    grid-template-columns: 38px minmax(0, 1fr);
-    gap: 10px 12px;
-  }
-
-  .destaque__acoes .btn {
-    grid-column: 1 / -1;
-    width: 100%;
-    padding-inline: 14px;
-    font-size: 12px;
-  }
-
-  .botao-favorito {
-    width: 38px;
-    height: 38px;
-  }
-
-  .destaque__detalhes {
-    width: auto;
-    text-align: left;
-    align-self: center;
-  }
-
-  .destaque__capa img {
-    max-width: none;
-  }
-
-  .destaque__resumo {
-    font-size: 12.5px;
-  }
-
-  .destaque__acoes .btn {
-    padding-inline: 18px;
-    font-size: 12px;
   }
 
   .vitrine__trilho {
