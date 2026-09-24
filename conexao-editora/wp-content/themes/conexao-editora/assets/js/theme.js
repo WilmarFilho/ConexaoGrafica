@@ -296,6 +296,23 @@
         }
     });
 
+    /* F.A.Q: uma pergunta aberta por vez (toggle não borbulha, daí a captura) */
+    var faq = document.querySelector('.faq');
+
+    if (faq) {
+        faq.addEventListener('toggle', function (evento) {
+            if (!evento.target.open) {
+                return;
+            }
+
+            faq.querySelectorAll('.faq__item[open]').forEach(function (item) {
+                if (item !== evento.target) {
+                    item.open = false;
+                }
+            });
+        }, true);
+    }
+
     /* voltar ao topo */
     var topo = document.querySelector('.flutuante--topo');
 

@@ -1560,6 +1560,136 @@ button {
   color: var(--tinta-media);
 }
 
+/* título com a régua embaixo, como no F.A.Q e no 404 */
+.pagina__topo--regua {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--linha);
+  margin-bottom: 20px;
+}
+
+.pagina__intro {
+  color: var(--tinta-media);
+  font-size: 15px;
+  max-width: 70ch;
+  margin-bottom: 28px;
+}
+
+/* ---------- perguntas frequentes ---------- */
+.pagina--faq .busca {
+  margin-bottom: 44px;
+}
+
+.faq {
+  display: grid;
+  gap: 12px;
+}
+
+.faq__item {
+  position: relative;
+}
+
+.faq__pergunta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 26px;
+  border-radius: 999px;
+  background: var(--azul);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  transition: background-color .15s ease;
+}
+
+.faq__pergunta::-webkit-details-marker {
+  display: none;
+}
+
+.faq__pergunta:hover {
+  background: var(--azul-escuro);
+}
+
+.faq__texto {
+  flex: 1;
+}
+
+.faq__pergunta .icone {
+  flex: none;
+  transition: transform .2s ease;
+}
+
+.faq__item[open] .faq__pergunta .icone {
+  transform: rotate(180deg);
+}
+
+/* o painel desliza por baixo da pílula, como no layout */
+.faq__resposta {
+  margin-top: -22px;
+  padding: 34px 28px 22px;
+  border-radius: 0 0 16px 16px;
+  background: #F1F2F3;
+}
+
+.faq__resposta p {
+  margin: 0;
+  color: var(--tinta-media);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ---------- 404 ---------- */
+.erro404__grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: 30px;
+  padding-bottom: 20px;
+}
+
+.erro404__numero {
+  font-size: clamp(60px, 8vw, 96px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--azul);
+  margin-bottom: 6px;
+}
+
+.erro404__texto h1 {
+  font-size: clamp(24px, 3vw, 32px);
+  margin-bottom: 14px;
+}
+
+.erro404__resumo {
+  color: var(--tinta-media);
+  font-size: 15px;
+  max-width: 46ch;
+  margin-bottom: 28px;
+}
+
+.erro404__acoes {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.erro404 .busca {
+  max-width: 380px;
+}
+
+.erro404__arte {
+  margin: 0;
+}
+
+.erro404__arte img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* ---------- trilha e entrar/cadastrar ---------- */
 .trilha {
   display: flex;
@@ -2695,6 +2825,72 @@ button {
   /* o respiro entre os blocos agora vem do espaçamento da grade */
   .rodape__bloco .rodape__titulo-secundario {
     margin-top: 0;
+  }
+
+  /* F.A.Q: a pergunta ocupa duas linhas, então a pílula vira retângulo */
+  .faq__pergunta {
+    align-items: flex-start;
+    padding: 15px 20px;
+    border-radius: 24px;
+    font-size: 14px;
+  }
+
+  .faq__pergunta .icone {
+    margin-top: 2px;
+  }
+
+  .faq__resposta {
+    margin-top: -26px;
+    padding: 38px 20px 20px;
+  }
+
+  /* 404: tudo numa coluna, com a arte entre o texto e os botões */
+  .erro404__grade {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  /* solta os filhos na grade para a arte entrar no meio */
+  .erro404__texto {
+    display: contents;
+  }
+
+  .erro404__numero {
+    order: 1;
+    margin-bottom: 0;
+  }
+
+  .erro404__texto h1 {
+    order: 2;
+    margin-bottom: 0;
+  }
+
+  .erro404__resumo {
+    order: 3;
+    max-width: none;
+    margin-bottom: 0;
+  }
+
+  .erro404__arte {
+    order: 4;
+    padding-block: 6px;
+  }
+
+  .erro404__acoes {
+    order: 5;
+    display: grid;
+    gap: 14px;
+    margin-bottom: 0;
+  }
+
+  .erro404__acoes .btn {
+    width: 100%;
+    padding-block: 16px;
+  }
+
+  .erro404 .busca {
+    order: 6;
+    max-width: none;
   }
 }
 
