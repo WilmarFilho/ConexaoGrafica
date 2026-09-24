@@ -101,7 +101,7 @@
         });
     });
 
-    /* o painel do menu alinha o conteúdo com o item que o abriu */
+    /* o painel do menu cobre a faixa de abertura inteira */
     document.querySelectorAll('.menu-principal .menu > li.menu-item-has-children').forEach(function (item) {
         var painel = item.querySelector('.sub-menu');
 
@@ -112,18 +112,12 @@
         var hero = document.querySelector('.hero');
 
         var alinhar = function () {
-            if (window.innerWidth <= 900) {
-                painel.style.removeProperty('--recuo');
+            if (window.innerWidth <= 900 || !hero) {
                 painel.style.removeProperty('--altura-hero');
                 return;
             }
 
-            painel.style.setProperty('--recuo', Math.round(item.getBoundingClientRect().left) + 'px');
-
-            // o painel cobre exatamente a faixa de abertura
-            if (hero) {
-                painel.style.setProperty('--altura-hero', Math.round(hero.getBoundingClientRect().height) + 'px');
-            }
+            painel.style.setProperty('--altura-hero', Math.round(hero.getBoundingClientRect().height) + 'px');
         };
 
         item.addEventListener('mouseenter', alinhar);
