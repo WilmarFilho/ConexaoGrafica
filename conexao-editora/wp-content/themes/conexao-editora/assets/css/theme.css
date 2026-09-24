@@ -2723,7 +2723,14 @@ button {
   min-width: 0;
 }
 
+.item-carrinho__capa,
+.item-carrinho__capa a {
+  display: block;
+  flex: none;
+}
+
 .item-carrinho__capa img {
+  display: block;
   width: 74px;
   height: auto;
   border-radius: 4px;
@@ -2826,25 +2833,46 @@ button {
 
 /* resumo do pedido */
 .resumo {
+  position: relative;
+  overflow: hidden;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 40px;
   margin: 34px 0 60px;
-  padding: 34px 40px 38px;
+  padding: 40px 44px 44px;
   border-radius: 12px;
   background: var(--azul-lavado);
 }
 
-.resumo h2 {
-  font-size: 20px;
-  color: var(--tinta-forte);
-  margin-bottom: 14px;
+/* o carrinho gigante de marca d'água, atrás do texto */
+.resumo::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  /* auto 100%: a arte acompanha a altura do cartão e sobra para a direita */
+  background: url("../img/carrinho-marca.png") left center/auto 100% no-repeat;
+  pointer-events: none;
 }
 
-.resumo p {
+.resumo__esquerda,
+.resumo__direita {
+  position: relative;
+  z-index: 1;
+}
+
+.resumo h2 {
+  font-size: clamp(21px, 2.4vw, 26px);
+  color: var(--tinta-forte);
+  margin-bottom: 20px;
+}
+
+.resumo__esquerda p {
   font-size: 14px;
   color: var(--tinta-media);
-  max-width: 34ch;
+  max-width: 40ch;
 }
 
 .resumo__cupom-rotulo {
@@ -2913,8 +2941,7 @@ button {
   align-items: baseline;
   justify-content: space-between;
   gap: 20px;
-  padding-block: 12px;
-  border-bottom: 1px solid var(--linha);
+  padding-block: 10px;
 }
 
 .resumo__valores dt {
@@ -2930,8 +2957,10 @@ button {
 }
 
 .resumo__valores .resumo__total {
-  border-bottom: 0;
-  font-size: 17px;
+  margin-top: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--azul);
+  font-size: 19px;
 }
 
 .resumo__frete dd {
@@ -2942,6 +2971,12 @@ button {
 .resumo__continuar {
   margin: 16px 0 0;
   text-align: center;
+}
+
+.resumo__continuar a {
+  color: var(--azul);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .carrinho-vazio {
@@ -2961,13 +2996,46 @@ button {
     display: none;
   }
 
+  /* no celular o cartão vira: produto, quantidade à direita e,
+     na última linha, preço à esquerda e valor total à direita */
   .item-carrinho {
+    position: relative;
     grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 14px;
+    row-gap: 12px;
+    padding: 16px 16px 18px;
   }
 
   .item-carrinho__produto {
     grid-column: 1 / -1;
+    padding-right: 28px;
+  }
+
+  .item-carrinho__capa img {
+    width: 84px;
+    height: auto;
+  }
+
+  .item-carrinho__quantidade {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
+
+  .item-carrinho__preco {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .item-carrinho__total {
+    grid-column: 2;
+    justify-self: end;
+    text-align: right;
+  }
+
+  /* a lixeira sai do fluxo e fica no canto do cartão */
+  .item-carrinho__remover {
+    position: absolute;
+    top: 14px;
+    right: 14px;
   }
 
   .item-carrinho__preco::before,
@@ -2979,7 +3047,31 @@ button {
 
   .resumo {
     grid-template-columns: minmax(0, 1fr);
-    padding-inline: 24px;
+    gap: 24px;
+    padding: 28px 22px 30px;
+  }
+
+  /* sem espaço para a marca d'água no celular */
+  .resumo::before {
+    display: none;
+  }
+
+  .resumo__esquerda p {
+    max-width: none;
+  }
+
+  /* o campo do cupom ocupa a linha, com o botão ao lado */
+  .resumo__cupom-campo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .resumo__cupom-campo input {
+    width: 100%;
+  }
+
+  .resumo__cupom button {
+    flex: none;
   }
 }
 

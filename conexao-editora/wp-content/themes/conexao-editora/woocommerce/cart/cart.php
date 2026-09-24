@@ -160,7 +160,7 @@ do_action('woocommerce_before_cart');
             <?php if (WC()->cart->needs_shipping() && WC()->cart->show_shipping()) : ?>
                 <div class="resumo__frete">
                     <dt>Frete</dt>
-                    <dd><?php wc_cart_totals_shipping_html(); ?></dd>
+                    <dd><?php conexao_frete_resumo(); ?></dd>
                 </div>
             <?php endif; ?>
 

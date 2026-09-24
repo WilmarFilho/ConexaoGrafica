@@ -80,6 +80,31 @@ function conexao_trilha(?string $atual = null, array $meio = []): void
     printf('<span aria-hidden="true">›</span><span class="trilha__atual">%s</span></nav>', esc_html($atual));
 }
 
+/**
+ * Valor do frete no resumo do carrinho. Com uma única opção disponível, mostra
+ * só o preço (como no layout); com mais de uma, devolve a lista do WooCommerce
+ * para o cliente escolher.
+ */
+function conexao_frete_resumo(): void
+{
+    $pacotes = WC()->shipping() ? WC()->shipping()->get_packages() : [];
+
+    if (count($pacotes) === 1) {
+        $taxas = $pacotes[0]['rates'] ?? [];
+
+        if (count($taxas) === 1) {
+            $taxa = reset($taxas);
+            $custo = (float) $taxa->get_cost() + (float) array_sum($taxa->get_taxes());
+
+            echo wp_kses_post($custo > 0 ? wc_price($custo) : '<span class="resumo__gratis">Grátis</span>');
+
+            return;
+        }
+    }
+
+    wc_cart_totals_shipping_html();
+}
+
 /** Tempo de leitura em minutos, a 200 palavras por minuto. */
 function conexao_tempo_leitura(int $post_id): int
 {
