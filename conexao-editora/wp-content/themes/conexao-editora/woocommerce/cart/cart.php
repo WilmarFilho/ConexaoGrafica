@@ -127,7 +127,7 @@ do_action('woocommerce_before_cart');
             <form class="resumo__cupom" action="<?php echo esc_url(wc_get_cart_url()); ?>" method="post">
                 <label class="tela-leitor" for="coupon_code">Código do cupom</label>
                 <span class="resumo__cupom-campo">
-                    <?php conexao_the_icon('cupom', 20); ?>
+                    <?php conexao_a_svg_carrinho('cupom', 17); ?>
                     <input type="text" name="coupon_code" id="coupon_code" placeholder="Digite o número do cupom" value="">
                 </span>
                 <button type="submit" name="apply_coupon" value="Aplicar cupom" aria-label="Aplicar cupom">→</button>
