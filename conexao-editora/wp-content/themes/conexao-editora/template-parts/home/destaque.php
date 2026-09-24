@@ -47,11 +47,11 @@ if (! $produtos) {
                             <a class="btn btn--azul" href="<?php echo esc_url($produto->add_to_cart_url()); ?>"
                                data-quantity="1" data-product_id="<?php echo esc_attr($produto->get_id()); ?>"
                                rel="nofollow">
-                                <?php conexao_the_icon('carrinho', 20); ?> Adicionar no carrinho
+                                <?php conexao_a_icone_arte('cesta', 18); ?> Adicionar no carrinho
                             </a>
                         <?php endif; ?>
 
-                        <button class="botao-favorito" type="button" aria-label="Salvar nos favoritos"><?php conexao_the_icon('coracao', 20); ?></button>
+                        <button class="botao-favorito" type="button" aria-label="Salvar nos favoritos"><?php conexao_a_icone_arte('coracao', 20); ?></button>
 
                         <a class="destaque__detalhes" href="<?php echo esc_url($produto->get_permalink()); ?>">Ver detalhes</a>
                     </div>

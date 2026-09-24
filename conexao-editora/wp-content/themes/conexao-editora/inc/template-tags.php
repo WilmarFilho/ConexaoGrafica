@@ -251,8 +251,9 @@ function conexao_estrelas(WC_Product $produto): void
     echo '<span class="estrelas" role="img" aria-label="'.esc_attr(sprintf('%s de 5 estrelas', number_format_i18n($nota, 1))).'">';
     for ($i = 1; $i <= 5; $i++) {
         printf(
-            '<span class="estrela%s">★</span>',
-            $i <= round($nota) ? ' estrela--cheia' : ''
+            '<span class="estrela%s">%s</span>',
+            $i <= round($nota) ? ' estrela--cheia' : '',
+            conexao_icone_arte('estrela', 15) // phpcs:ignore WordPress.Security.EscapeOutput
         );
     }
     echo '</span>';
