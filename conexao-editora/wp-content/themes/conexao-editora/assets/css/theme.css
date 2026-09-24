@@ -444,7 +444,8 @@ button {
   text-transform: uppercase;
 }
 
-.menu-principal .menu>li.menu-item-has-children>a::after {
+.menu-principal .menu>li.menu-item-has-children>a::after,
+.menu-principal .menu>li.painel-autores>a::after {
   content: "";
   width: 7px;
   height: 7px;
@@ -575,7 +576,9 @@ button {
 
 /* a seta do item aberto vira para cima */
 .menu-principal .menu > li.menu-item-has-children:hover > a::after,
-.menu-principal .menu > li.menu-item-has-children:focus-within > a::after {
+.menu-principal .menu > li.menu-item-has-children:focus-within > a::after,
+.menu-principal .menu > li.painel-autores:hover > a::after,
+.menu-principal .menu > li.painel-autores:focus-within > a::after {
   transform: translateY(2px) rotate(-135deg);
 }
 
@@ -2593,6 +2596,13 @@ button {
   }
 }
 
+/* abaixo de 965px a barra do topo sai; o essencial dela está no cabeçalho */
+@media (max-width: 964px) {
+  .barra-topo {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .rodape__grade {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2613,10 +2623,14 @@ button {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 920px) {
+  /* logo à esquerda, ações e menu à direita, busca embaixo */
   .cabecalho__grade {
     grid-template-columns: auto 1fr;
-    row-gap: 14px;
+    align-items: center;
+    row-gap: 16px;
+    min-height: 0;
+    padding-block: 18px;
   }
 
   .busca {
@@ -2624,12 +2638,39 @@ button {
     order: 3;
   }
 
+  .marca img {
+    height: 46px;
+  }
+
+  .cabecalho__acoes {
+    justify-self: end;
+    gap: 14px;
+  }
+
   .hdr-acao__texto {
     display: none;
   }
 
+  .hdr-acao__icone {
+    width: 42px;
+    height: 42px;
+    color: var(--tinta-media);
+  }
+
+  /* menu sanduíche: três traços azuis, sem moldura */
   .menu-botao {
     display: inline-flex;
+    width: auto;
+    height: auto;
+    padding: 6px 2px;
+    border: 0;
+    color: var(--azul);
+  }
+
+  .menu-botao .icone {
+    width: 30px;
+    height: 24px;
+    stroke-width: 2.6;
   }
 
   .menu-principal .menu {
