@@ -602,6 +602,12 @@ button {
   border-radius: 999px;
 }
 
+/* botão de fechar e extras do menu de celular: escondidos no computador */
+.menu-fechar,
+.menu-mobile__extra {
+  display: none;
+}
+
 /* ---------- hero ---------- */
 .hero {
   background-color: var(--hero-escuro);
@@ -2624,6 +2630,150 @@ button {
 }
 
 @media (max-width: 920px) {
+  /* menu de celular: ocupa a tela inteira e entra com animação */
+  .menu-principal {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    overflow-y: auto;
+    padding-block: 70px 30px;
+    background: radial-gradient(120% 90% at 100% 0%, #0A4A66 0%, #071A24 45%, #0B0400 100%);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-14px);
+    transition: opacity .25s ease, transform .25s ease, visibility 0s linear .25s;
+  }
+
+  .menu-principal.aberto {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity .25s ease, transform .25s ease, visibility 0s;
+  }
+
+  body.menu-aberto {
+    overflow: hidden;
+  }
+
+  .menu-fechar {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    color: var(--azul);
+  }
+
+  .menu-principal .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .menu-principal .menu > li {
+    border-bottom: 1px solid rgba(255, 255, 255, .18);
+  }
+
+  .menu-principal .menu > li > a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-block: 18px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .menu-principal .menu > li.menu-item-has-children > a::after,
+  .menu-principal .menu > li.painel-autores > a::after {
+    margin-left: auto;
+    border-color: rgba(255, 255, 255, .8);
+  }
+
+  /* sanfona: o painel só aparece quando o item é tocado */
+  .menu-principal .sub-menu {
+    position: static;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    clip-path: none;
+    transition: none;
+    min-height: 0;
+    display: none;
+    padding: 0 0 14px 14px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .menu-principal li.aberto > .sub-menu {
+    display: block;
+  }
+
+  .menu-principal .sub-menu a {
+    color: rgba(255, 255, 255, .85);
+    font-size: 14.5px;
+  }
+
+  .menu-principal .sub-menu .botao {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, .25);
+    max-width: none;
+  }
+
+  /* no celular os autores viram lista de nomes */
+  .menu-principal .sub-menu--autores .autores-lista {
+    display: grid;
+    gap: 0;
+  }
+
+  .menu-principal .sub-menu--autores .autor-destaque img {
+    display: none;
+  }
+
+  .menu-principal .sub-menu--autores .autor-destaque a {
+    display: block;
+    width: auto;
+    text-align: left;
+    padding-block: 7px;
+  }
+
+  /* o selo de novidade atrapalha a lista no celular */
+  .menu-principal .menu .destacado > a::before {
+    display: none;
+  }
+
+  /* atalhos e botão do fim do menu */
+  .menu-mobile__extra {
+    display: block;
+    margin-top: 28px;
+  }
+
+  .menu-mobile__atalhos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    padding-bottom: 34px;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+
+  .menu-mobile__atalhos a {
+    color: #fff;
+  }
+
+  .menu-mobile__extra .btn {
+    max-width: 320px;
+    margin-inline: auto;
+  }
+
   /* logo à esquerda, ações e menu à direita, busca embaixo */
   .cabecalho__grade {
     grid-template-columns: auto 1fr;

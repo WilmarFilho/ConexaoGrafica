@@ -5,14 +5,60 @@
 (function () {
     'use strict';
 
-    /* menu no celular */
+    /* menu no celular: tela cheia, com sanfona nos itens que têm painel */
     var botao = document.querySelector('.menu-botao');
     var menu = document.getElementById('menu-principal');
+    var fechar = document.querySelector('.menu-fechar');
 
     if (botao && menu) {
-        botao.addEventListener('click', function () {
-            var aberto = menu.classList.toggle('aberto');
+        var mostrar = function (aberto) {
+            menu.classList.toggle('aberto', aberto);
+            document.body.classList.toggle('menu-aberto', aberto);
             botao.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+
+            if (aberto && fechar) {
+                fechar.focus();
+            } else {
+                botao.focus();
+            }
+        };
+
+        botao.addEventListener('click', function () {
+            mostrar(!menu.classList.contains('aberto'));
+        });
+
+        if (fechar) {
+            fechar.addEventListener('click', function () {
+                mostrar(false);
+            });
+        }
+
+        document.addEventListener('keydown', function (evento) {
+            if (evento.key === 'Escape' && menu.classList.contains('aberto')) {
+                mostrar(false);
+            }
+        });
+
+        // no celular, tocar no item com painel abre e fecha a sanfona
+        menu.addEventListener('click', function (evento) {
+            if (window.innerWidth > 920) {
+                return;
+            }
+
+            var link = evento.target.closest('.menu > li > a');
+
+            if (!link) {
+                return;
+            }
+
+            var item = link.parentElement;
+
+            if (!item.querySelector('.sub-menu')) {
+                return;
+            }
+
+            evento.preventDefault();
+            item.classList.toggle('aberto');
         });
     }
 

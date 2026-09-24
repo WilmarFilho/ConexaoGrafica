@@ -79,6 +79,10 @@ if (! defined('ABSPATH')) {
 </header>
 
 <nav class="menu-principal" id="menu-principal" aria-label="Menu principal">
+    <button class="menu-fechar" type="button" aria-label="Fechar o menu">
+        <?php conexao_the_icon('fechar', 26); ?>
+    </button>
+
     <div class="container">
         <?php
         wp_nav_menu([
@@ -90,6 +94,17 @@ if (! defined('ABSPATH')) {
             'walker' => new Conexao_Menu_Walker(),
         ]);
         ?>
+
+        <div class="menu-mobile__extra">
+            <ul class="menu-mobile__atalhos">
+                <li><a href="<?php echo esc_url(class_exists('WooCommerce') ? wc_get_page_permalink('shop') : home_url('/loja/')); ?>">Catálogo</a></li>
+                <li><a href="<?php echo esc_url(home_url('/central-de-ajuda/')); ?>">Ajuda</a></li>
+                <li><a href="<?php echo esc_url(get_permalink(get_option('page_for_posts')) ?: home_url('/conteudos/')); ?>">Blog</a></li>
+                <li><a href="<?php echo esc_url(home_url('/contato/')); ?>">Contato</a></li>
+            </ul>
+
+            <a class="btn btn--azul btn--bloco" href="<?php echo esc_url(class_exists('WooCommerce') ? wc_get_page_permalink('shop') : home_url('/loja/')); ?>">Navegar em categorias</a>
+        </div>
     </div>
 </nav>
 
