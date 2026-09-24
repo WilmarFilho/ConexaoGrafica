@@ -1584,8 +1584,16 @@ button {
   gap: 12px;
 }
 
+/* o item aberto ganha a caixa cinza; a pílula fica por cima dela, e é isso
+   que desenha o encaixe do layout sem margem negativa atrapalhar a animação */
 .faq__item {
   position: relative;
+  border-radius: 28px;
+  transition: background-color .2s ease;
+}
+
+.faq__item[open] {
+  background: #F1F2F3;
 }
 
 .faq__pergunta {
@@ -1626,12 +1634,10 @@ button {
   transform: rotate(180deg);
 }
 
-/* o painel desliza por baixo da pílula, como no layout */
+/* overflow escondido: é o que o JS anima ao abrir e fechar */
 .faq__resposta {
-  margin-top: -22px;
-  padding: 34px 28px 22px;
-  border-radius: 0 0 16px 16px;
-  background: #F1F2F3;
+  overflow: hidden;
+  padding: 16px 28px 24px;
 }
 
 .faq__resposta p {
@@ -2840,8 +2846,7 @@ button {
   }
 
   .faq__resposta {
-    margin-top: -26px;
-    padding: 38px 20px 20px;
+    padding: 14px 20px 20px;
   }
 
   /* 404: tudo numa coluna, com a arte entre o texto e os botões */

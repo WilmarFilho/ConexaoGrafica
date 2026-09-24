@@ -296,21 +296,92 @@
         }
     });
 
-    /* F.A.Q: uma pergunta aberta por vez (toggle não borbulha, daí a captura) */
+    /* F.A.Q: uma pergunta aberta por vez, abrindo e fechando com altura animada
+       (o <details> sozinho troca de estado sem transição nenhuma) */
     var faq = document.querySelector('.faq');
 
     if (faq) {
-        faq.addEventListener('toggle', function (evento) {
-            if (!evento.target.open) {
+        var perguntas = [].slice.call(faq.querySelectorAll('.faq__item'));
+        var semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        var duracao = 240;
+
+        var animar = function (painel, de, para, aoTerminar) {
+            var encerrado = false;
+
+            var encerrar = function () {
+                if (encerrado) {
+                    return;
+                }
+
+                encerrado = true;
+                var corrente = painel.animacao;
+                painel.animacao = null;
+
+                // pelo relógio a animação ainda pode estar rodando; sem largar
+                // dela o painel ficaria preso na altura do meio do caminho
+                if (corrente && corrente.playState === 'running') {
+                    corrente.cancel();
+                }
+
+                aoTerminar();
+            };
+
+            if (painel.animacao) {
+                painel.animacao.cancel();
+            }
+
+            if (semMovimento.matches) {
+                encerrar();
                 return;
             }
 
-            faq.querySelectorAll('.faq__item[open]').forEach(function (item) {
-                if (item !== evento.target) {
-                    item.open = false;
-                }
+            painel.animacao = painel.animate(
+                { height: [de + 'px', para + 'px'], opacity: [de ? 1 : 0, para ? 1 : 0] },
+                { duration: duracao, easing: 'ease' }
+            );
+
+            painel.animacao.onfinish = encerrar;
+
+            // se outro clique cancelar esta animação, o estado é de quem cancelou
+            painel.animacao.oncancel = function () {
+                encerrado = true;
+            };
+
+            // em aba de segundo plano os quadros não rodam e o onfinish nunca
+            // chega; o relógio continua andando e fecha o item mesmo assim
+            setTimeout(encerrar, duracao + 30);
+        };
+
+        var fechar = function (item) {
+            var painel = item.querySelector('.faq__resposta');
+
+            animar(painel, painel.offsetHeight, 0, function () {
+                item.open = false;
             });
-        }, true);
+        };
+
+        perguntas.forEach(function (item) {
+            item.querySelector('.faq__pergunta').addEventListener('click', function (evento) {
+                // o clique abriria o details na hora, sem passar pela animação
+                evento.preventDefault();
+
+                if (item.open) {
+                    fechar(item);
+                    return;
+                }
+
+                perguntas.forEach(function (outro) {
+                    if (outro !== item && outro.open) {
+                        fechar(outro);
+                    }
+                });
+
+                item.open = true;
+                var painel = item.querySelector('.faq__resposta');
+                animar(painel, 0, painel.offsetHeight, function () {});
+            });
+        });
     }
 
     /* voltar ao topo */
