@@ -434,6 +434,50 @@
         });
     }
 
+    /* envio do manuscrito: arrastar o arquivo e mostrar o nome escolhido */
+    var areaArquivo = document.querySelector('[data-arquivo]');
+
+    if (areaArquivo) {
+        var entrada = areaArquivo.querySelector('input[type="file"]');
+        var chamada = areaArquivo.querySelector('.arquivo__chamada');
+        var textoOriginal = chamada.innerHTML;
+
+        var mostrarEscolhido = function () {
+            chamada.textContent = entrada.files && entrada.files.length
+                ? entrada.files[0].name
+                : '';
+
+            if (!chamada.textContent) {
+                chamada.innerHTML = textoOriginal;
+            }
+        };
+
+        entrada.addEventListener('change', mostrarEscolhido);
+
+        ['dragenter', 'dragover'].forEach(function (evento) {
+            areaArquivo.addEventListener(evento, function (e) {
+                e.preventDefault();
+                areaArquivo.classList.add('arquivo--sobre');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(function (evento) {
+            areaArquivo.addEventListener(evento, function (e) {
+                e.preventDefault();
+                areaArquivo.classList.remove('arquivo--sobre');
+            });
+        });
+
+        areaArquivo.addEventListener('drop', function (e) {
+            if (!e.dataTransfer || !e.dataTransfer.files.length) {
+                return;
+            }
+
+            entrada.files = e.dataTransfer.files;
+            mostrarEscolhido();
+        });
+    }
+
     /* voltar ao topo */
     var topo = document.querySelector('.flutuante--topo');
 

@@ -158,6 +158,11 @@ function conexao_a_svg_editora(string $nome, int $altura = 30): void
     echo conexao_svg_pasta('editora', $nome, $altura); // phpcs:ignore WordPress.Security.EscapeOutput
 }
 
+function conexao_a_svg_publique(string $nome, int $altura = 30): void
+{
+    echo conexao_svg_pasta('publique', $nome, $altura); // phpcs:ignore WordPress.Security.EscapeOutput
+}
+
 /**
  * Ícones da tela de conta. Só o cinza dos campos vira currentColor: as marcas
  * do Google e do Facebook mantêm a cor que vieram do layout.

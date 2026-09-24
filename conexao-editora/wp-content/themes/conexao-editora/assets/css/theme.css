@@ -1647,6 +1647,236 @@ button {
   line-height: 1.6;
 }
 
+/* ---------- publique conosco ---------- */
+.pagina--publique .secao-topo {
+  margin-bottom: 22px;
+}
+
+.publique-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  min-height: 236px;
+  margin-bottom: 44px;
+  padding: 34px 40px;
+  border-radius: 10px;
+  background: var(--azul-escuro) url("../img/ajuda-banner.png") center/cover no-repeat;
+  color: #fff;
+}
+
+.publique-hero h1 {
+  font-size: clamp(22px, 2.6vw, 28px);
+  font-weight: 400;
+  line-height: 1.35;
+  margin-bottom: 14px;
+}
+
+.publique-hero h1 strong {
+  font-weight: 700;
+}
+
+.publique-hero__texto p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, .9);
+  max-width: 52ch;
+  margin-bottom: 26px;
+}
+
+.publique-hero__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* botão vazado sobre o azul */
+.btn--vazado {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.btn--vazado:hover {
+  background: #fff;
+  color: var(--azul-escuro);
+}
+
+.publique-hero__arte {
+  width: min(380px, 38vw);
+  height: auto;
+}
+
+/* por que publicar conosco */
+.publique-motivos {
+  margin-bottom: 44px;
+}
+
+.publique-motivos__grade {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.publique-motivo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  padding: 20px 18px;
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.publique-motivo__icone {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--banda);
+  color: var(--azul);
+}
+
+.publique-motivo h3 {
+  font-size: 13px;
+  color: var(--azul);
+  margin-bottom: 6px;
+}
+
+.publique-motivo p {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--tinta-media);
+  margin: 0;
+}
+
+/* como funciona */
+.publique-etapas {
+  margin-bottom: 48px;
+}
+
+.publique-etapas__lista {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 26px 0 0;
+  list-style: none;
+}
+
+.publique-etapa {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding-inline: 12px;
+  text-align: center;
+  color: var(--azul-escuro);
+}
+
+.publique-etapa h3 {
+  font-size: 13px;
+  color: var(--azul);
+  margin: 6px 0 0;
+}
+
+.publique-etapa p {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--tinta-media);
+  margin: 0;
+}
+
+/* a setinha entre uma etapa e a seguinte */
+.publique-etapa__seta {
+  position: absolute;
+  top: 46px;
+  right: -8px;
+  color: var(--tinta-fraca);
+}
+
+/* formulário */
+.publique-form {
+  margin-bottom: 60px;
+}
+
+.publique-form__apoio {
+  font-size: 13.5px;
+  color: var(--tinta-media);
+  margin-bottom: 24px;
+}
+
+.form-manuscrito {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  align-items: start;
+  gap: 24px;
+}
+
+.form-manuscrito__campos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* gênero ocupa uma coluna; título, as outras duas; mensagem, a linha toda */
+.form-manuscrito__campos #manuscrito-obra {
+  grid-column: span 2;
+}
+
+.form-manuscrito__campos textarea {
+  grid-column: 1 / -1;
+  min-height: 120px;
+  border-radius: 12px;
+  resize: vertical;
+}
+
+.form-manuscrito__lado {
+  display: grid;
+  gap: 18px;
+}
+
+/* área de arrastar o arquivo */
+.arquivo {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+  min-height: 160px;
+  padding: 24px 20px;
+  border: 1px dashed var(--azul);
+  border-radius: 10px;
+  color: var(--azul);
+  text-align: center;
+  cursor: pointer;
+}
+
+.arquivo:hover,
+.arquivo--sobre {
+  background: var(--banda);
+}
+
+.arquivo__chamada {
+  font-size: 13.5px;
+  color: var(--tinta-media);
+}
+
+.arquivo__regras {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--tinta-fraca);
+}
+
+.arquivo input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
 /* ---------- a editora ---------- */
 .editora-hero {
   background: var(--azul-escuro) url("../img/ajuda-banner.png") center/cover no-repeat;
@@ -3969,6 +4199,56 @@ button {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  /* publique conosco: tudo empilhado */
+  .publique-hero {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    padding: 26px 20px 30px;
+  }
+
+  .publique-hero h1 {
+    font-size: 20px;
+  }
+
+  .publique-hero__texto p {
+    max-width: none;
+    margin-bottom: 22px;
+  }
+
+  .publique-hero__acoes .btn {
+    width: 100%;
+  }
+
+  .publique-hero__arte {
+    justify-self: center;
+    width: min(300px, 86%);
+    margin-top: 20px;
+  }
+
+  .publique-motivos__grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .publique-etapas__lista {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+    padding-top: 20px;
+  }
+
+  /* empilhado, a seta entre as etapas não faz sentido */
+  .publique-etapa__seta {
+    display: none;
+  }
+
+  .form-manuscrito,
+  .form-manuscrito__campos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-manuscrito__campos #manuscrito-obra {
+    grid-column: auto;
   }
 
   /* 404: tudo numa coluna, com a arte entre o texto e os botões */
