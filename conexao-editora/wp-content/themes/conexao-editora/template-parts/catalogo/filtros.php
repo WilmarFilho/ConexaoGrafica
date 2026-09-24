@@ -16,7 +16,7 @@ $mostrar = 8;
 ?>
 <?php /* no celular a coluna vira uma sanfona; no desktop o resumo fica escondido */ ?>
 <details class="filtros-caixa" open>
-    <summary class="filtros-caixa__resumo"><?php conexao_the_icon('menu', 18); ?> Filtros</summary>
+    <summary class="filtros-caixa__resumo" aria-label="Filtros"><?php conexao_the_icon('funil', 20); ?></summary>
 
 <form class="filtros" method="get" action="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">
     <?php foreach (conexao_filtros_taxonomia() as $chave => $grupo) : ?>
