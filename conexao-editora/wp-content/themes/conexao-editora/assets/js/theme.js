@@ -101,6 +101,27 @@
         });
     });
 
+    /* o painel do menu alinha o conteúdo com o item que o abriu */
+    document.querySelectorAll('.menu-principal .menu > li.menu-item-has-children').forEach(function (item) {
+        var painel = item.querySelector('.sub-menu');
+
+        if (!painel) {
+            return;
+        }
+
+        var alinhar = function () {
+            if (window.innerWidth <= 900) {
+                painel.style.removeProperty('--recuo');
+                return;
+            }
+
+            painel.style.setProperty('--recuo', Math.round(item.getBoundingClientRect().left) + 'px');
+        };
+
+        item.addEventListener('mouseenter', alinhar);
+        item.addEventListener('focusin', alinhar);
+    });
+
     /* clicar numa categoria filtra a vitrine logo abaixo */
     var listaCategorias = document.querySelector('[data-filtro-categorias]');
     var vitrine = document.querySelector('[data-vitrine-categorias]');

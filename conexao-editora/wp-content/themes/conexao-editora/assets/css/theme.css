@@ -414,6 +414,7 @@ button {
 
 /* ---------- menu principal ---------- */
 .menu-principal {
+  position: relative;
   background: var(--azul-nav);
 }
 
@@ -424,8 +425,9 @@ button {
   gap: 34px;
 }
 
+/* o painel abre na largura da faixa, não na do item */
 .menu-principal .menu>li {
-  position: relative;
+  position: static;
 }
 
 .menu-principal .menu>li>a {
@@ -457,35 +459,72 @@ button {
   transition: .5s;
 }
 
+/* painel que abre ao passar o mouse no item do menu */
 .menu-principal .sub-menu {
   position: absolute;
   left: 0;
+  right: 0;
   top: 100%;
   z-index: 30;
-  min-width: 230px;
-  padding: 10px 0;
-  background: #fff;
-  border: 1px solid var(--linha);
-  border-radius: var(--raio);
-  box-shadow: var(--sombra-card);
   display: none;
+  min-height: 340px;
+  padding-block: 46px 44px;
+  /* o conteúdo começa embaixo do item do menu; sem JavaScript, na margem da página */
+  padding-left: var(--recuo, max(20px, calc((100% - var(--container)) / 2 + 20px)));
+  padding-right: 20px;
+  background: var(--azul-escuro) url("../img/menu-painel.png") right center / cover no-repeat;
+  box-shadow: 0 18px 30px rgba(15, 45, 70, .18);
 }
 
-.menu-principal li:hover>.sub-menu,
-.menu-principal li:focus-within>.sub-menu {
+.menu-principal li:hover > .sub-menu,
+.menu-principal li:focus-within > .sub-menu {
   display: block;
 }
 
 .menu-principal .sub-menu a {
-  display: block;
-  padding: 8px 18px;
-  color: var(--tinta);
-  font-size: 14px;
+  display: inline-block;
+  padding: 7px 0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
-.menu-principal .sub-menu a:hover {
-  background: var(--azul-lavado);
+.menu-principal .sub-menu a:hover,
+.menu-principal .sub-menu a:focus-visible {
+  text-decoration: underline;
+  background: transparent;
+}
+
+/* o último item do painel é o botão, com a régua acima */
+.menu-principal .sub-menu .botao {
+  margin-top: 54px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, .45);
+  max-width: 670px;
+}
+
+.menu-principal .sub-menu .botao a {
+  padding: 13px 30px;
+  border-radius: 999px;
+  background: var(--azul);
+  color: #fff;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.menu-principal .sub-menu .botao a:hover {
+  background: #fff;
+  color: var(--azul-escuro);
   text-decoration: none;
+}
+
+/* a seta do item aberto vira para cima */
+.menu-principal .menu > li.menu-item-has-children:hover > a::after,
+.menu-principal .menu > li.menu-item-has-children:focus-within > a::after {
+  transform: translateY(2px) rotate(-135deg);
 }
 
 /* destaque "novo" em um item do menu */
@@ -2530,10 +2569,22 @@ button {
   .menu-principal .sub-menu {
     position: static;
     display: block;
+    min-height: 0;
     box-shadow: none;
     border: 0;
     background: transparent;
     padding: 0 0 6px 14px;
+  }
+
+  .menu-principal .sub-menu a {
+    color: #0B4F73;
+    font-size: 14px;
+  }
+
+  .menu-principal .sub-menu .botao {
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top-color: var(--linha-forte);
   }
 
   .hero__grade {

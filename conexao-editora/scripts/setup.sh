@@ -136,6 +136,17 @@ done
 
 LOJA_ID=$($CLI option get woocommerce_shop_page_id)
 $CLI menu item add-post principal "$LOJA_ID" --title="Livros" >/dev/null
+
+# submenu de Livros: abre ao passar o mouse, com o botão no fim
+LIVROS_ITEM=$($CLI menu item list principal --fields=db_id,title --format=csv | awk -F, '$2=="Livros"{print $1}' | head -1)
+if [ -n "$LIVROS_ITEM" ]; then
+  for slug in pre-vendas lancamentos mais-vendidos; do
+    id=$($CLI post list --post_type=page --name="$slug" --field=ID | tr -d '' | head -1)
+    [ -n "$id" ] && $CLI menu item add-post principal "$id" --parent-id="$LIVROS_ITEM" >/dev/null
+  done
+  BOTAO=$($CLI menu item add-custom principal "Todos os livros" "/loja/" --parent-id="$LIVROS_ITEM" --porcelain)
+  $CLI post meta update "$BOTAO" _menu_item_classes '["botao"]' --format=json >/dev/null
+fi
 $CLI menu item add-custom principal "Categorias" "/loja/" >/dev/null
 $CLI menu item add-custom principal "Autores" "/autores/" >/dev/null
 menu_item_pagina principal "publique-conosco" "Publique conosco"
@@ -191,8 +202,10 @@ criar_post "Livros de saúde: conhecimento que transforma o cuidado" "Mercado"
 bash "$(dirname "$0")/seed-conteudos.sh"
 
 # o post padrão do WordPress não faz parte do site
-OLA=$($CLI post list --post_type=post --name=ola-mundo --field=ID | tr -d '' | head -1)
-[ -z "$OLA" ] && OLA=$($CLI post list --post_type=post --name=hello-world --field=ID | tr -d '' | head -1)
+OLA=$($CLI post list --post_type=post --name=ola-mundo --field=ID | tr -d '
+' | head -1)
+[ -z "$OLA" ] && OLA=$($CLI post list --post_type=post --name=hello-world --field=ID | tr -d '
+' | head -1)
 [ -n "$OLA" ] && $CLI post delete "$OLA" --force >/dev/null && echo "  post padrão removido"
 
 $CLI rewrite flush --hard
