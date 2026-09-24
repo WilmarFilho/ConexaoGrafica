@@ -291,6 +291,8 @@ button {
   height: 60px;
   width: auto;
   max-height: none;
+  /* em telas estreitas a coluna aperta a logo; contain mantém a proporção */
+  object-fit: contain;
   image-rendering: -webkit-optimize-contrast;
 }
 
@@ -2886,7 +2888,9 @@ button {
     order: 3;
   }
 
-  .marca img {
+  /* só a logo do cabeçalho encolhe; a do rodapé tem largura própria e
+     perderia a proporção se a altura fosse forçada aqui */
+  .marca:not(.marca--rodape) img {
     height: 46px;
   }
 
