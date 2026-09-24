@@ -4807,24 +4807,29 @@ button {
     grid-column: 1 / -1;
   }
 
-  /* a grade rola na horizontal, em três linhas, como no layout */
+  /* no celular são três livros por linha, rolando para baixo */
   .catalogo__grade--grade {
-    grid-template-columns: none;
-    grid-template-rows: repeat(3, auto);
-    grid-auto-flow: column;
-    grid-auto-columns: 130px;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    padding-bottom: 4px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
   }
 
-  .catalogo__grade--grade::-webkit-scrollbar {
-    display: none;
+  .card-catalogo {
+    padding: 10px;
   }
 
-  .catalogo__grade--grade .card-catalogo {
-    scroll-snap-align: start;
+  .card-catalogo__titulo {
+    font-size: 11.5px;
+  }
+
+  .card-catalogo__autores {
+    -webkit-line-clamp: 2;
+  }
+
+  .card-catalogo .btn {
+    padding: 9px 6px;
+    font-size: 9.5px;
+    letter-spacing: .04em;
+    white-space: nowrap;
   }
 
   /* a categoria escolhida fica preenchida */
