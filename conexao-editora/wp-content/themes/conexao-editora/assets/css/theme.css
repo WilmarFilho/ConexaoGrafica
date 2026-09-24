@@ -1345,6 +1345,17 @@ button {
   font-size: 10.5px;
 }
 
+/* abaixo de 1000px o banner desce para baixo do texto */
+@media (max-width: 999px) {
+  .catalogo-topo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .catalogo-banner {
+    max-width: 620px;
+  }
+}
+
 /* abaixo de 1200px cabem três livros por linha, não cinco */
 @media (max-width: 1199px) {
   .catalogo__grade--grade {
