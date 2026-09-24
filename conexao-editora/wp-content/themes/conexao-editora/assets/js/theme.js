@@ -109,17 +109,26 @@
             return;
         }
 
+        var hero = document.querySelector('.hero');
+
         var alinhar = function () {
             if (window.innerWidth <= 900) {
                 painel.style.removeProperty('--recuo');
+                painel.style.removeProperty('--altura-hero');
                 return;
             }
 
             painel.style.setProperty('--recuo', Math.round(item.getBoundingClientRect().left) + 'px');
+
+            // o painel cobre exatamente a faixa de abertura
+            if (hero) {
+                painel.style.setProperty('--altura-hero', Math.round(hero.getBoundingClientRect().height) + 'px');
+            }
         };
 
         item.addEventListener('mouseenter', alinhar);
         item.addEventListener('focusin', alinhar);
+        window.addEventListener('resize', alinhar);
     });
 
     /* clicar numa categoria filtra a vitrine logo abaixo */

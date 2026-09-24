@@ -466,8 +466,14 @@ button {
   right: 0;
   top: 100%;
   z-index: 30;
-  display: none;
-  min-height: 340px;
+  /* fica sempre no HTML, escondido, para poder abrir animado */
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  clip-path: inset(0 0 100% 0);
+  transition: opacity .25s ease, clip-path .3s ease, visibility 0s linear .3s;
+  /* cobre a faixa de abertura inteira */
+  min-height: var(--altura-hero, 560px);
   padding-block: 46px 44px;
   /* o conteúdo começa embaixo do item do menu; sem JavaScript, na margem da página */
   padding-left: var(--recuo, max(20px, calc((100% - var(--container)) / 2 + 20px)));
@@ -478,7 +484,11 @@ button {
 
 .menu-principal li:hover > .sub-menu,
 .menu-principal li:focus-within > .sub-menu {
-  display: block;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  clip-path: inset(0 0 0 0);
+  transition: opacity .25s ease, clip-path .3s ease, visibility 0s;
 }
 
 .menu-principal .sub-menu a {
@@ -2568,7 +2578,11 @@ button {
 
   .menu-principal .sub-menu {
     position: static;
-    display: block;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    clip-path: none;
+    transition: none;
     min-height: 0;
     box-shadow: none;
     border: 0;
