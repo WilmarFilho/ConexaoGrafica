@@ -7,6 +7,7 @@
   --azul-claro: #33ADDE;
   --azul-nav: #D3EEF9;
   --azul-lavado: #EAF4FB;
+  --banda-publique: #E9F0F3;
   --azul-escuro: #00448B;
 
   /* faixa de abertura: gradiente radial do layout */
@@ -998,17 +999,11 @@ button {
   display: grid;
   align-items: center;
   min-height: 500px;
-  background: var(--azul-lavado);
+  background: var(--banda-publique);
   overflow: hidden;
 }
 
-/* banner exportado do layout; os selos entram soltos, junto das bordas */
-.publique--banner {
-  background-repeat: no-repeat;
-  background-position: right center;
-  background-size: auto 100%;
-}
-
+/* selos decorativos nas bordas, atrás do conteúdo */
 .publique__selo {
   position: absolute;
   top: 50%;
@@ -1027,14 +1022,15 @@ button {
   right: 2%;
 }
 
+/* duas colunas: o texto nunca fica por cima da ilustração */
 .publique__grade {
   position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(280px, 30%) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 60px);
   padding-block: 40px;
-}
-
-.publique__texto {
-  max-width: 420px;
 }
 
 .publique__texto h2 {
@@ -1047,6 +1043,18 @@ button {
   font-size: 15px;
   color: var(--tinta-media);
   margin-bottom: 28px;
+}
+
+.publique__arte {
+  min-width: 0;
+}
+
+.publique__arte img {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  margin-inline: auto;
 }
 
 /* ---------- conteúdos ---------- */
@@ -2662,9 +2670,12 @@ button {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .publique {
-    background-size: auto 100%;
-    background-position: right center;
+  .publique__grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .publique__selo {
+    display: none;
   }
 
   .newsletter__grade {
