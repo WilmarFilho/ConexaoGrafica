@@ -61,4 +61,8 @@ if (! $produtos) {
 
         <p class="destaque__vazio" hidden>Nenhum livro desta categoria por aqui ainda.</p>
     </div>
+
+    <div class="container">
+        <?php conexao_secao_rodape(class_exists('WooCommerce') ? wc_get_page_permalink('shop') : ''); ?>
+    </div>
 </section>

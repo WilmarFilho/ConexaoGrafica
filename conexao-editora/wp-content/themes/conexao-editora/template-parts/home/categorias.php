@@ -61,7 +61,5 @@ if (is_wp_error($categorias) || ! $categorias) {
                 </li>
             <?php endforeach; ?>
         </ul>
-
-        <?php conexao_secao_rodape(class_exists('WooCommerce') ? wc_get_page_permalink('shop') : ''); ?>
     </div>
 </section>

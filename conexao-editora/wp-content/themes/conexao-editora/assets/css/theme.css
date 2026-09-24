@@ -2956,6 +2956,70 @@ button {
   .card-livro__preco {
     font-size: 21px;
   }
+
+  /* categorias rolam na horizontal, com a próxima aparecendo pela metade */
+  .categorias__lista {
+    display: flex;
+    grid-template-columns: none;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+  }
+
+  .categorias__lista::-webkit-scrollbar {
+    display: none;
+  }
+
+  .categorias__lista li {
+    flex: 0 0 auto;
+    width: 112px;
+    scroll-snap-align: start;
+  }
+
+  .categoria {
+    min-height: 112px;
+  }
+
+  /* o destaque continua na mesma faixa clara das categorias */
+  .categorias {
+    padding-bottom: 20px;
+  }
+
+  .destaque {
+    background: var(--banda);
+    padding-block: 0 10px;
+  }
+
+  .destaque__trilho {
+    padding-left: 20px;
+    padding-block: 10px 20px;
+  }
+
+  .destaque__card {
+    width: min(560px, 88vw);
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .destaque__conteudo h3 {
+    font-size: 18px;
+  }
+
+  .destaque__preco {
+    font-size: 22px;
+  }
+
+  .destaque__acoes {
+    gap: 12px;
+  }
+
+  .destaque__detalhes {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 @media (max-width: 640px) {
@@ -2965,28 +3029,54 @@ button {
     display: none;
   }
 
-  .categorias__lista {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .rodape__grade {
     grid-template-columns: 1fr;
   }
 
-  .destaque__vazio {
-  align-self: center;
-  margin: 40px 0;
-  color: var(--tinta-fraca);
-}
+  /* capa e texto continuam lado a lado, como no layout do celular */
+  .destaque__card {
+    grid-template-columns: 104px minmax(0, 1fr);
+    width: min(560px, 90vw);
+    gap: 12px;
+    padding: 14px;
+  }
 
-.destaque__card {
-    grid-template-columns: minmax(0, 1fr);
-    width: 84vw;
+  /* em tela estreita o botão ocupa a linha toda e o coração desce com o link */
+  .destaque__acoes {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 10px 12px;
+  }
+
+  .destaque__acoes .btn {
+    grid-column: 1 / -1;
+    width: 100%;
+    padding-inline: 14px;
+    font-size: 12px;
+  }
+
+  .botao-favorito {
+    width: 38px;
+    height: 38px;
+  }
+
+  .destaque__detalhes {
+    width: auto;
+    text-align: left;
+    align-self: center;
   }
 
   .destaque__capa img {
-    max-width: 180px;
-    margin-inline: auto;
+    max-width: none;
+  }
+
+  .destaque__resumo {
+    font-size: 12.5px;
+  }
+
+  .destaque__acoes .btn {
+    padding-inline: 18px;
+    font-size: 12px;
   }
 
   .vitrine__trilho {
