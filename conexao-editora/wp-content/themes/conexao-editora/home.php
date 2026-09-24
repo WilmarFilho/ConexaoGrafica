@@ -33,17 +33,44 @@ global $wp_query;
                 </div>
 
                 <?php
-                the_posts_pagination([
-                    'mid_size' => 2,
-                    'prev_text' => 'Anterior',
-                    'next_text' => 'Próxima',
-                    'screen_reader_text' => 'Navegação dos posts',
+                $atual = max(1, (int) get_query_var('paged'));
+                $paginas = max(1, (int) $wp_query->max_num_pages);
+                $numeros = paginate_links([
+                    'mid_size' => 4,
+                    'prev_next' => false,
+                    'type' => 'plain',
                 ]);
                 ?>
 
+                <?php if ($paginas > 1) : ?>
+                    <?php /* Anterior e Próxima aparecem sempre; nas pontas viram texto apagado */ ?>
+                    <nav class="navigation pagination" aria-label="Navegação dos posts">
+                        <div class="nav-links">
+                            <?php if ($atual > 1) : ?>
+                                <a class="prev page-numbers" href="<?php echo esc_url(get_pagenum_link($atual - 1)); ?>">Anterior</a>
+                            <?php else : ?>
+                                <span class="prev page-numbers desativado" aria-hidden="true">Anterior</span>
+                            <?php endif; ?>
+
+                            <?php echo wp_kses_post($numeros); ?>
+
+                            <?php if ($atual < $paginas) : ?>
+                                <a class="next page-numbers" href="<?php echo esc_url(get_pagenum_link($atual + 1)); ?>">Próxima</a>
+                            <?php else : ?>
+                                <span class="next page-numbers desativado" aria-hidden="true">Próxima</span>
+                            <?php endif; ?>
+                        </div>
+                    </nav>
+                <?php endif; ?>
+
                 <p class="blog__contador">
-                    Pág. <?php echo esc_html(max(1, (int) get_query_var('paged'))); ?>
-                    de <?php echo esc_html(max(1, (int) $wp_query->max_num_pages)); ?>
+                    <?php
+                    printf(
+                        'Pág. %d-%d',
+                        max(1, (int) get_query_var('paged')),
+                        max(1, (int) $wp_query->max_num_pages)
+                    );
+                    ?>
                 </p>
             <?php else : ?>
                 <p class="vazio">Nenhum conteúdo publicado ainda.</p>

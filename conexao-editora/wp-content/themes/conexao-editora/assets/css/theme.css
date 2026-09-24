@@ -2691,14 +2691,20 @@ button {
   object-fit: cover;
 }
 
-.post-card__topo {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
+/* título e compartilhar na primeira linha; meta e categorias na última */
+.post-card__corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 18px;
+}
+
+.post-card__acoes {
+  display: contents;
 }
 
 .post-card__titulo {
+  grid-area: 1 / 1;
   font-size: 20px;
   line-height: 1.32;
   margin-bottom: 10px;
@@ -2714,6 +2720,8 @@ button {
 }
 
 .compartilhar {
+  grid-area: 1 / 2;
+  justify-self: end;
   flex: none;
   width: 34px;
   height: 34px;
@@ -2730,12 +2738,14 @@ button {
 }
 
 .post-card__resumo {
+  grid-area: 2 / 1 / auto / -1;
   font-size: 14px;
   color: var(--tinta-media);
   margin-bottom: 14px;
 }
 
 .post-card__meta {
+  grid-area: 3 / 1;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -2757,16 +2767,17 @@ button {
 }
 
 .post-card__cats {
+  grid-area: 3 / 2;
   display: inline-flex;
   gap: 8px;
-  margin-left: auto;
+  justify-self: end;
 }
 
 .post-card__cats a,
 .etiquetas a {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 999px;
+  padding: 6px 12px;
+  border-radius: 4px;
   background: var(--azul-lavado);
   color: var(--azul);
   font-size: 11.5px;
@@ -2780,10 +2791,23 @@ button {
 }
 
 .blog__contador {
-  margin-top: 14px;
+  position: relative;
+  margin-top: 26px;
+  padding-top: 14px;
   text-align: center;
   font-size: 12.5px;
   color: var(--tinta-fraca);
+}
+
+.blog__contador::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 44px;
+  height: 1px;
+  margin-left: -22px;
+  background: var(--linha);
 }
 
 /* paginação */
@@ -2814,6 +2838,30 @@ button {
   background: #fff;
 }
 
+/* anterior, próxima e as reticências ficam soltos, sem caixa */
+.pagination .prev,
+.pagination .next,
+.pagination .page-numbers.dots {
+  border-color: transparent;
+  background: transparent;
+}
+
+.pagination .next {
+  color: var(--azul);
+  font-weight: 600;
+}
+
+/* nas pontas o link vira texto apagado, sem virar clique morto */
+.pagination .desativado {
+  color: var(--tinta-fraca);
+  opacity: .6;
+}
+
+.pagination .desativado:hover {
+  border-color: transparent;
+  color: var(--tinta-fraca);
+}
+
 .pagination .page-numbers.current,
 .woocommerce-pagination .page-numbers li span.current {
   background: var(--azul);
@@ -2832,14 +2880,23 @@ button {
 .lateral {
   display: grid;
   gap: 30px;
-  position: sticky;
-  top: 20px;
 }
 
 .lateral__titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 16px;
   color: var(--azul);
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+}
+
+/* a régua fininha que acompanha o título, como no layout */
+.lateral__titulo::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--linha);
 }
 
 .busca-lateral {
@@ -2879,8 +2936,16 @@ button {
 
 .lateral__lista {
   display: grid;
-  gap: 14px;
   font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.lateral__lista li {
+  padding-block: 12px;
+}
+
+.lateral__lista li + li {
+  border-top: 1px solid var(--linha);
 }
 
 .lateral__lista a {
@@ -2907,6 +2972,11 @@ button {
 
 .nuvem a {
   color: var(--tinta-media);
+}
+
+.nuvem a.nuvem--forte {
+  color: var(--azul);
+  font-weight: 600;
 }
 
 .nuvem a:hover {
@@ -3123,10 +3193,6 @@ button {
   .blog-grade,
   .contato {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .lateral {
-    position: static;
   }
 
   /* empilhado, o mapa volta a ter altura própria */
@@ -3525,6 +3591,97 @@ button {
     grid-column: 1 / -1;
     width: 100%;
     padding-block: 15px;
+  }
+
+  /* blog no celular: a busca sobe para depois do título e o banner entra
+     logo abaixo da paginação, como no layout */
+  .blog__principal,
+  .lateral {
+    display: contents;
+  }
+
+  .blog-grade {
+    gap: 26px;
+  }
+
+  .blog__cabecalho {
+    order: 1;
+    margin-bottom: 0;
+  }
+
+  .lateral__bloco--busca {
+    order: 2;
+  }
+
+  .blog__lista {
+    order: 3;
+    gap: 34px;
+  }
+
+  .pagination {
+    order: 4;
+  }
+
+  .blog__contador {
+    order: 5;
+  }
+
+  .lateral__banner {
+    order: 6;
+  }
+
+  .lateral__bloco--categorias {
+    order: 7;
+  }
+
+  .lateral__bloco--lidos {
+    order: 8;
+  }
+
+  .lateral__bloco--tags {
+    order: 9;
+  }
+
+  .lateral__bloco--redes {
+    order: 10;
+  }
+
+  /* o compartilhar desce para a linha das categorias */
+  .post-card__corpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .post-card__acoes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    grid-area: auto;
+    margin-top: 14px;
+  }
+
+  .post-card__titulo {
+    grid-area: auto;
+    font-size: 17px;
+  }
+
+  .post-card__resumo,
+  .post-card__meta,
+  .post-card__cats {
+    grid-area: auto;
+  }
+
+  .pagination .nav-links {
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 26px;
+  }
+
+  .pagination .page-numbers {
+    min-width: 28px;
+    height: 28px;
+    padding-inline: 6px;
+    font-size: 12px;
   }
 
   /* 404: tudo numa coluna, com a arte entre o texto e os botões */

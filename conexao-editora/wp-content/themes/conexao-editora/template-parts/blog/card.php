@@ -18,17 +18,10 @@ $categorias = get_the_category();
         </a>
     <?php endif; ?>
 
+    <?php /* a grade do corpo é que coloca o compartilhar ao lado do título no
+             desktop e junto das categorias no celular */ ?>
     <div class="post-card__corpo">
-        <div class="post-card__topo">
-            <h2 class="post-card__titulo"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
-
-            <button class="compartilhar" type="button" data-compartilhar
-                    data-url="<?php the_permalink(); ?>"
-                    data-titulo="<?php echo esc_attr(get_the_title()); ?>"
-                    aria-label="Compartilhar este conteúdo">
-                <?php conexao_the_icon('compartilhar', 18); ?>
-            </button>
-        </div>
+        <h2 class="post-card__titulo"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
 
         <p class="post-card__resumo"><?php echo esc_html(get_the_excerpt()); ?></p>
 
@@ -43,7 +36,9 @@ $categorias = get_the_category();
 
             <span aria-hidden="true">·</span>
             <span><?php echo esc_html(conexao_tempo_leitura($id)); ?> min</span>
+        </footer>
 
+        <div class="post-card__acoes">
             <?php if ($categorias) : ?>
                 <span class="post-card__cats">
                     <?php foreach (array_slice($categorias, 0, 2) as $categoria) : ?>
@@ -51,6 +46,13 @@ $categorias = get_the_category();
                     <?php endforeach; ?>
                 </span>
             <?php endif; ?>
-        </footer>
+
+            <button class="compartilhar" type="button" data-compartilhar
+                    data-url="<?php the_permalink(); ?>"
+                    data-titulo="<?php echo esc_attr(get_the_title()); ?>"
+                    aria-label="Compartilhar este conteúdo">
+                <?php conexao_the_icon('compartilhar', 18); ?>
+            </button>
+        </div>
     </div>
 </article>
