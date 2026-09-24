@@ -30,7 +30,16 @@ $autores = conexao_autores($product);
         <p class="card-catalogo__autores">Autores: <?php echo esc_html($autores); ?></p>
     <?php endif; ?>
 
-    <p class="card-catalogo__preco"><?php echo wp_kses_post($product->get_price_html()); ?></p>
+    <p class="card-catalogo__preco">
+        <?php
+        if ($product->is_type('variable')) {
+            // no cartão cabe um preço só: mostramos o menor dos formatos
+            printf('A partir de %s', wp_kses_post(wc_price((float) $product->get_variation_price('min', true))));
+        } else {
+            echo wp_kses_post($product->get_price_html());
+        }
+        ?>
+    </p>
 
     <a class="btn btn--contorno btn--bloco btn--pequeno" href="<?php the_permalink(); ?>">Ver mais</a>
 </article>

@@ -87,12 +87,27 @@ if (count($sugestoes) < 5) {
         </div>
 
         <div class="produto__compra">
-            <div class="compra">
-                <p class="compra__preco"><?php echo wp_kses_post($product->get_price_html()); ?></p>
+            <div class="compra" data-compra data-parcelas="<?php echo esc_attr($parcelas); ?>">
+                <p class="compra__preco" data-compra-preco>
+                    <?php
+                    if ($product->is_type('variable')) {
+                        $menor = (float) $product->get_variation_price('min', true);
+                        printf('A partir de %s', wp_kses_post(wc_price($menor)));
+                    } else {
+                        echo wp_kses_post($product->get_price_html());
+                    }
+                    ?>
+                </p>
 
-                <?php if ($preco > 0) : ?>
-                    <p class="compra__parcelas">ou <?php echo esc_html($parcelas); ?>x de <?php echo wp_kses_post(wc_price($preco / $parcelas)); ?> sem juros</p>
-                <?php endif; ?>
+                <p class="compra__parcelas" data-compra-parcelas>
+                    <?php
+                    $base = $product->is_type('variable') ? (float) $product->get_variation_price('min', true) : $preco;
+
+                    if ($base > 0) {
+                        printf('ou %dx de %s sem juros', $parcelas, wp_kses_post(wc_price($base / $parcelas)));
+                    }
+                    ?>
+                </p>
 
                 <?php
                 // o seletor de formato só aparece quando o livro tem variações

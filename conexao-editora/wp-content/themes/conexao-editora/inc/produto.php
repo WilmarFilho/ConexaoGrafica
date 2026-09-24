@@ -109,6 +109,78 @@ function conexao_ficha_produto(WC_Product $produto): array
     return apply_filters('conexao_ficha_produto', $ficha, $produto);
 }
 
+/**
+ * Na página do livro, o seletor de formato só oferece o que dá para comprar:
+ * variação existente, publicada e com preço.
+ */
+add_filter('woocommerce_dropdown_variation_attribute_options_args', function (array $args): array {
+    if (($args['attribute'] ?? '') !== 'pa_formato' || empty($args['product'])) {
+        return $args;
+    }
+
+    $disponiveis = [];
+
+    foreach ($args['product']->get_available_variations() as $variacao) {
+        $valor = $variacao['attributes']['attribute_pa_formato'] ?? '';
+
+        if ($valor !== '') {
+            $disponiveis[] = $valor;
+        }
+    }
+
+    if ($disponiveis) {
+        $args['options'] = array_values(array_intersect((array) $args['options'], $disponiveis));
+    }
+
+    // a ordem do layout não é a alfabética
+    $ordem = apply_filters('conexao_ordem_formatos', ['impresso', 'e-book', 'impresso-e-book']);
+
+    usort($args['options'], static function ($a, $b) use ($ordem) {
+        $pa = array_search($a, $ordem, true);
+        $pb = array_search($b, $ordem, true);
+
+        return ($pa === false ? 99 : $pa) <=> ($pb === false ? 99 : $pb);
+    });
+
+    return $args;
+});
+
+/**
+ * Endereço antigo do e-book (agora rascunho) leva para o produto unificado,
+ * com 301, para não perder link nem posição de busca.
+ */
+add_action('template_redirect', function (): void {
+    if (! is_404()) {
+        return;
+    }
+
+    $caminho = trim((string) wp_parse_url(add_query_arg([]), PHP_URL_PATH), '/');
+    $slug = $caminho ? basename($caminho) : '';
+
+    if (! $slug) {
+        return;
+    }
+
+    $antigo = get_posts([
+        'name' => $slug,
+        'post_type' => 'product',
+        'post_status' => ['draft', 'pending', 'private', 'publish'],
+        'numberposts' => 1,
+        'meta_key' => '_conexao_unificado_em',
+    ]);
+
+    if (! $antigo) {
+        return;
+    }
+
+    $destino = (int) get_post_meta($antigo[0]->ID, '_conexao_unificado_em', true);
+
+    if ($destino && get_post_status($destino) === 'publish') {
+        wp_safe_redirect(get_permalink($destino), 301);
+        exit;
+    }
+});
+
 /** Estrelas da avaliação, com as estrelas do layout. */
 function conexao_estrelas_produto(WC_Product $produto): void
 {

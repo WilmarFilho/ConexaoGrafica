@@ -552,6 +552,111 @@
         }
     });
 
+    /* Formato do livro: o WooCommerce entrega um <select>; aqui ele vira a
+       lista de opções do layout, continuando a valer como select por baixo */
+    document.querySelectorAll('.variations_form .variations select').forEach(function (select) {
+        var grupo = document.createElement('div');
+        grupo.className = 'formatos';
+
+        var titulo = document.createElement('p');
+        titulo.className = 'formatos__titulo';
+        titulo.textContent = 'Formato';
+        grupo.appendChild(titulo);
+
+        var nome = 'formato-' + select.id;
+
+        // a ordem do layout é impresso, e-book e o combo; o WooCommerce
+        // devolve as opções em ordem alfabética
+        var preferida = ['impresso', 'e-book', 'impresso-e-book'];
+
+        var opcoes = Array.prototype.slice.call(select.options).sort(function (a, b) {
+            var pa = preferida.indexOf(a.value);
+            var pb = preferida.indexOf(b.value);
+
+            return (pa === -1 ? 99 : pa) - (pb === -1 ? 99 : pb);
+        });
+
+        opcoes.forEach(function (opcao) {
+            if (!opcao.value) {
+                return;
+            }
+
+            var linha = document.createElement('label');
+            linha.className = 'formatos__opcao';
+
+            var entrada = document.createElement('input');
+            entrada.type = 'radio';
+            entrada.name = nome;
+            entrada.value = opcao.value;
+            entrada.checked = select.value === opcao.value;
+
+            var texto = document.createElement('span');
+            texto.textContent = opcao.textContent;
+
+            entrada.addEventListener('change', function () {
+                select.value = entrada.value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+
+            linha.appendChild(entrada);
+            linha.appendChild(texto);
+            grupo.appendChild(linha);
+        });
+
+        // o WooCommerce também muda o select sozinho (ex.: ao limpar a escolha)
+        select.addEventListener('change', function () {
+            grupo.querySelectorAll('input[type="radio"]').forEach(function (entrada) {
+                entrada.checked = entrada.value === select.value;
+            });
+        });
+
+        var tabela = select.closest('.variations');
+        tabela.parentNode.insertBefore(grupo, tabela);
+        tabela.hidden = true;
+
+        if (!select.value) {
+            var primeira = grupo.querySelector('input[type="radio"]');
+
+            if (primeira) {
+                primeira.checked = true;
+                select.value = primeira.value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+    });
+
+    /* ao escolher o formato, o preço e as parcelas do topo acompanham */
+    var caixaCompra = document.querySelector('[data-compra]');
+
+    if (caixaCompra && window.jQuery) {
+        var alvoPreco = caixaCompra.querySelector('[data-compra-preco]');
+        var alvoParcelas = caixaCompra.querySelector('[data-compra-parcelas]');
+        var precoInicial = alvoPreco ? alvoPreco.innerHTML : '';
+        var parcelasInicial = alvoParcelas ? alvoParcelas.innerHTML : '';
+        var vezes = Number(caixaCompra.dataset.parcelas || 6);
+
+        window.jQuery(document).on('found_variation', function (evento, variacao) {
+            if (alvoPreco && variacao.price_html) {
+                alvoPreco.innerHTML = variacao.price_html;
+            }
+
+            if (alvoParcelas && variacao.display_price) {
+                var parcela = (variacao.display_price / vezes).toFixed(2).replace('.', ',');
+                alvoParcelas.textContent = 'ou ' + vezes + 'x de R$' + parcela + ' sem juros';
+            }
+        });
+
+        window.jQuery(document).on('reset_data', function () {
+            if (alvoPreco) {
+                alvoPreco.innerHTML = precoInicial;
+            }
+
+            if (alvoParcelas) {
+                alvoParcelas.innerHTML = parcelasInicial;
+            }
+        });
+    }
+
     /* abas da página do livro */
     var abas = document.querySelector('[data-abas]');
 
