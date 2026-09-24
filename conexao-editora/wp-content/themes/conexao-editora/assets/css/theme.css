@@ -16,6 +16,7 @@
   --azul-escuro-2: #0A3A6E;
 
   --papel: #FAFAFA;
+  --cinza-filtros: #F0F0F0;
   --banda: #EAF0F3;
   --branco: #FFFFFF;
   --cinza-topo: #EEEEEE;
@@ -1116,9 +1117,9 @@ button {
 }
 
 .filtros {
-  padding: 22px 20px 24px;
+  padding: 26px 22px 28px;
   border-radius: 4px;
-  background: var(--papel);
+  background: var(--cinza-filtros);
 }
 
 .filtros__grupo + .filtros__grupo {
@@ -1128,34 +1129,37 @@ button {
 }
 
 .filtros h2 {
-  font-size: 16px;
+  font-size: 17px;
   color: var(--tinta-forte);
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .filtros__lista {
   display: grid;
-  gap: 10px;
+  gap: 14px;
 }
 
 .filtros__conta {
   color: var(--tinta-fraca);
 }
 
-.caixa--quadrada {
+.caixa.caixa--quadrada {
   align-items: center;
-  gap: 10px;
-  font-size: 13px;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--tinta-forte);
 }
 
-.caixa--quadrada input {
-  width: 15px;
-  height: 15px;
+.caixa.caixa--quadrada input {
+  width: 20px;
+  height: 20px;
   margin: 0;
-  border-radius: 3px;
+  border-radius: 4px;
+  background: #fff;
 }
 
-.caixa--quadrada input:checked {
+.caixa.caixa--quadrada input:checked {
+  border-color: var(--azul);
   box-shadow: none;
   background: var(--azul) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E") center/11px no-repeat;
 }
@@ -4724,7 +4728,7 @@ button {
   .filtros-caixa {
     border: 1px solid var(--linha);
     border-radius: 6px;
-    background: var(--papel);
+    background: var(--cinza-filtros);
   }
 
   .filtros-caixa__resumo {
