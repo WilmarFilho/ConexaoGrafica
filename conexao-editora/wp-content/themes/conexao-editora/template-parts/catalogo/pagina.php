@@ -32,7 +32,13 @@ $arte_banner = get_template_directory().'/assets/img/catalogo-banner.png';
 
     <div class="catalogo-topo">
         <div class="catalogo-topo__texto">
-            <h1>Catálogo</h1>
+            <div class="catalogo-topo__linha">
+                <h1>Catálogo</h1>
+
+                <button class="catalogo-funil" type="button" data-abrir-filtros aria-label="Filtros">
+                    <?php conexao_the_icon('funil', 26); ?>
+                </button>
+            </div>
             <p>Explore nosso catálogo completo e encontre livros por tema, autor, coleção ou palavra-chave.<br>
                 Use os filtros para refinar sua busca e descobrir conteúdos que conectam conhecimento e pessoas.</p>
         </div>
@@ -95,6 +101,10 @@ $arte_banner = get_template_directory().'/assets/img/catalogo-banner.png';
                         <?php endforeach; ?>
                     <?php endforeach; ?>
                 </form>
+
+                <button class="catalogo-funil catalogo-funil--barra" type="button" data-abrir-filtros aria-label="Filtros">
+                    <?php conexao_the_icon('funil', 24); ?>
+                </button>
 
                 <div class="catalogo__visao" role="group" aria-label="Modo de exibição">
                     <a class="catalogo__visao-botao<?php echo $visao === 'grade' ? ' catalogo__visao-botao--ativa' : ''; ?>"

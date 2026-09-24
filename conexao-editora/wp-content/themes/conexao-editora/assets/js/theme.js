@@ -478,12 +478,24 @@
         });
     }
 
-    /* no celular a coluna de filtros começa fechada, para os livros aparecerem
-       logo; sem JavaScript ela fica aberta, que também funciona */
+    /* no celular a coluna de filtros começa fechada e abre pelos botões de
+       funil; sem JavaScript ela fica aberta, que também funciona */
     var caixaFiltros = document.querySelector('.filtros-caixa');
 
-    if (caixaFiltros && window.matchMedia('(max-width: 760px)').matches) {
-        caixaFiltros.open = false;
+    if (caixaFiltros) {
+        if (window.matchMedia('(max-width: 760px)').matches) {
+            caixaFiltros.open = false;
+        }
+
+        document.querySelectorAll('[data-abrir-filtros]').forEach(function (botao) {
+            botao.addEventListener('click', function () {
+                caixaFiltros.open = !caixaFiltros.open;
+
+                if (caixaFiltros.open) {
+                    caixaFiltros.scrollIntoView({ behavior: semMovimento.matches ? 'auto' : 'smooth', block: 'start' });
+                }
+            });
+        });
     }
 
     /* filtros do catálogo: "ver todas" e a busca dentro do grupo */

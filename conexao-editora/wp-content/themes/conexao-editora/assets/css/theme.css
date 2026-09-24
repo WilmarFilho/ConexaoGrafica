@@ -1057,6 +1057,23 @@ button {
   height: auto;
 }
 
+/* os funis são atalhos de celular */
+.catalogo-funil {
+  display: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--azul);
+  cursor: pointer;
+}
+
+.catalogo-topo__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 /* categorias em destaque */
 .catalogo-destaques {
   margin-bottom: 30px;
@@ -4764,47 +4781,90 @@ button {
     gap: 14px;
   }
 
-  /* a coluna de filtros vira sanfona: o resumo é o botão de funil */
-  .filtros-caixa {
-    display: grid;
-  }
-
+  /* a coluna de filtros abre pelos funis; o resumo do details não aparece */
   .filtros-caixa__resumo {
-    display: grid;
-    place-items: center;
-    justify-self: end;
-    width: 46px;
-    height: 46px;
-    border: 1px solid var(--linha);
-    border-radius: 6px;
-    background: #fff;
-    color: var(--azul);
-    cursor: pointer;
-    list-style: none;
-  }
-
-  .filtros-caixa__resumo::-webkit-details-marker {
     display: none;
   }
 
-  .filtros-caixa[open] .filtros-caixa__resumo {
-    background: var(--azul);
-    border-color: var(--azul);
-    color: #fff;
+  .filtros-caixa:not([open]) {
+    display: none;
   }
 
-  .filtros {
-    margin-top: 12px;
+  .catalogo-funil {
+    display: grid;
+    place-items: center;
   }
 
-  /* busca em cima; ordenação e modos de exibição embaixo */
-  .catalogo__barra {
-    grid-template-columns: minmax(0, 1fr) auto;
+  .catalogo-topo h1 {
+    font-size: 30px;
+    margin-bottom: 0;
+  }
+
+  .catalogo-topo__linha {
+    margin-bottom: 16px;
+  }
+
+  /* o rótulo das categorias vira título de seção, com a régua ao lado */
+  .catalogo-destaques h2 {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--azul);
+  }
+
+  .catalogo-destaques h2::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--azul-claro, var(--linha));
+  }
+
+  .catalogo-destaques li {
+    flex: 0 0 100px;
+  }
+
+  .catalogo-destaque {
+    min-height: 106px;
     gap: 12px;
   }
 
+  .catalogo-destaque .icone {
+    height: 44px;
+  }
+
+  /* busca e funil em cima; ordenação e modos de exibição embaixo. Quatro
+     colunas porque as duas linhas se dividem em proporções diferentes */
+  .catalogo__barra {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px 12px;
+  }
+
   .busca--catalogo {
-    grid-column: 1 / -1;
+    grid-area: 1 / 1 / auto / 4;
+  }
+
+  .catalogo-funil--barra {
+    grid-area: 1 / 4;
+    width: 44px;
+    justify-self: end;
+  }
+
+  .catalogo__ordem {
+    grid-area: 2 / 1 / auto / 3;
+  }
+
+  .catalogo__visao {
+    grid-area: 2 / 3 / auto / -1;
+    justify-content: flex-end;
+  }
+
+  /* os botões de exibição ficam redondos, como no layout */
+  .catalogo__visao-botao {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
   }
 
   /* no celular são três livros por linha, rolando para baixo */
@@ -5673,6 +5733,21 @@ button {
   .vitrine__trilho {
     grid-auto-columns: minmax(150px, 1fr);
     gap: 18px;
+  }
+}
+
+/* telas bem estreitas: dois livros por linha */
+@media (max-width: 474px) {
+  .catalogo__grade--grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card-catalogo__titulo {
+    font-size: 12.5px;
+  }
+
+  .card-catalogo .btn {
+    font-size: 10px;
   }
 }
 
