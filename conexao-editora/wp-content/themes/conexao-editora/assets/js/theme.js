@@ -478,6 +478,45 @@
         });
     }
 
+    /* no celular a coluna de filtros começa fechada, para os livros aparecerem
+       logo; sem JavaScript ela fica aberta, que também funciona */
+    var caixaFiltros = document.querySelector('.filtros-caixa');
+
+    if (caixaFiltros && window.matchMedia('(max-width: 760px)').matches) {
+        caixaFiltros.open = false;
+    }
+
+    /* filtros do catálogo: "ver todas" e a busca dentro do grupo */
+    document.querySelectorAll('[data-filtro]').forEach(function (grupo) {
+        var mais = grupo.querySelector('[data-filtro-mais]');
+        var busca = grupo.querySelector('[data-filtro-busca]');
+
+        if (mais) {
+            mais.addEventListener('click', function () {
+                var escondidos = grupo.querySelectorAll('[data-extra]');
+                var abrindo = escondidos[0] && escondidos[0].hidden;
+
+                escondidos.forEach(function (item) {
+                    item.hidden = !abrindo;
+                });
+
+                mais.textContent = abrindo ? 'Ver menos' : 'Ver todas';
+            });
+        }
+
+        if (busca) {
+            busca.addEventListener('input', function () {
+                var procurado = busca.value.trim().toLowerCase();
+
+                grupo.querySelectorAll('.filtros__lista li').forEach(function (item) {
+                    var texto = item.textContent.trim().toLowerCase();
+                    // com busca em curso o "ver todas" não esconde mais nada
+                    item.hidden = procurado ? texto.indexOf(procurado) === -1 : item.hasAttribute('data-extra');
+                });
+            });
+        }
+    });
+
     /* voltar ao topo */
     var topo = document.querySelector('.flutuante--topo');
 

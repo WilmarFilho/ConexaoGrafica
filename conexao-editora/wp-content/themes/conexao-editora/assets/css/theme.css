@@ -1020,6 +1020,393 @@ button {
   color: var(--azul);
 }
 
+/* ---------- catálogo ---------- */
+.catalogo-topo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 620px);
+  align-items: start;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.catalogo-topo h1 {
+  font-size: clamp(22px, 2.6vw, 28px);
+  color: var(--azul);
+  margin-bottom: 14px;
+}
+
+.catalogo-topo p {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--tinta-media);
+  margin: 0;
+}
+
+/* faixa de chamada para publicar */
+.catalogo-banner {
+  display: grid;
+  grid-template-columns: auto 1px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 20px;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.catalogo-banner .marca img {
+  width: 120px;
+  height: auto;
+}
+
+.catalogo-banner::after {
+  content: "";
+  grid-column: 2;
+  grid-row: 1;
+  align-self: stretch;
+  width: 1px;
+  background: var(--linha);
+}
+
+.catalogo-banner__texto {
+  grid-column: 3;
+}
+
+.catalogo-banner__titulo {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--azul-escuro);
+  margin-bottom: 4px;
+}
+
+.catalogo-banner__texto p {
+  font-size: 12.5px;
+  color: var(--tinta-media);
+  margin-bottom: 10px;
+}
+
+.catalogo-banner__arte {
+  grid-column: 4;
+  width: 96px;
+  height: auto;
+}
+
+/* categorias em destaque */
+.catalogo-destaques {
+  margin-bottom: 30px;
+}
+
+.catalogo-destaques h2 {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--tinta-media);
+  margin-bottom: 14px;
+}
+
+.catalogo-destaques ul {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.catalogo-destaque {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+  min-height: 120px;
+  padding: 16px 10px;
+  border: 1px solid var(--azul);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--azul);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.catalogo-destaque:hover,
+.catalogo-destaque--ativa {
+  background: var(--banda);
+  text-decoration: none;
+}
+
+.catalogo-destaque .icone {
+  height: 40px;
+  width: auto;
+}
+
+/* grade da página: filtros e conteúdo */
+.catalogo {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+/* ---- filtros ---- */
+/* no desktop a sanfona não aparece: o resumo some e o conteúdo fica aberto */
+.filtros-caixa__resumo {
+  display: none;
+}
+
+.filtros {
+  padding: 22px 20px 24px;
+  border-radius: 4px;
+  background: var(--papel);
+}
+
+.filtros__grupo + .filtros__grupo {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--linha);
+}
+
+.filtros h2 {
+  font-size: 16px;
+  color: var(--tinta-forte);
+  margin-bottom: 14px;
+}
+
+.filtros__lista {
+  display: grid;
+  gap: 10px;
+}
+
+.filtros__conta {
+  color: var(--tinta-fraca);
+}
+
+.caixa--quadrada {
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.caixa--quadrada input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  border-radius: 3px;
+}
+
+.caixa--quadrada input:checked {
+  box-shadow: none;
+  background: var(--azul) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E") center/11px no-repeat;
+}
+
+.filtros__busca {
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.filtros__busca input {
+  width: 100%;
+  border: 1px solid var(--linha-forte);
+  border-radius: 999px;
+  padding: 9px 36px 9px 14px;
+  font-family: var(--fonte);
+  font-size: 12.5px;
+  background: #fff;
+}
+
+.filtros__busca .icone {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--tinta-fraca);
+}
+
+.filtros__mais {
+  margin-top: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--azul);
+  font-family: var(--fonte);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.filtros__preco {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--tinta-media);
+  margin-bottom: 6px;
+}
+
+.filtros__faixa {
+  width: 100%;
+  accent-color: var(--azul);
+}
+
+.filtros__acoes {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.btn--contorno-cinza {
+  background: #fff;
+  border: 1px solid var(--linha-forte);
+  color: var(--tinta-media);
+}
+
+.btn--contorno-cinza:hover {
+  border-color: var(--azul);
+  color: var(--azul);
+}
+
+/* ---- barra de busca e ordenação ---- */
+.catalogo__barra {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px auto;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.busca--catalogo input[type="search"] {
+  font-weight: 400;
+  padding-block: 11px;
+}
+
+.catalogo__ordem {
+  margin: 0;
+}
+
+.catalogo__ordem select {
+  width: 100%;
+  padding-block: 12px;
+  font-weight: 400;
+  border-radius: 999px;
+}
+
+.catalogo__visao {
+  display: flex;
+  gap: 8px;
+}
+
+.catalogo__visao-botao {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--tinta-fraca);
+}
+
+.catalogo__visao-botao--ativa {
+  background: var(--azul);
+  border-color: var(--azul);
+  color: #fff;
+}
+
+/* ---- grade de livros ---- */
+.catalogo__grade {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.card-catalogo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.card-catalogo:hover {
+  border-color: var(--azul);
+}
+
+.card-catalogo__capa img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: var(--sombra-capa);
+}
+
+.card-catalogo__titulo {
+  font-size: 12.5px;
+  line-height: 1.35;
+  margin: 4px 0 0;
+}
+
+.card-catalogo__titulo a {
+  color: var(--tinta-forte);
+}
+
+.card-catalogo:hover .card-catalogo__titulo a {
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.card-catalogo__autores {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--tinta-fraca);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-catalogo__preco {
+  margin: auto 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+}
+
+.card-catalogo .btn {
+  padding-block: 10px;
+  font-size: 10.5px;
+}
+
+/* modo lista: capa à esquerda, texto à direita */
+.catalogo__grade--lista {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.catalogo__grade--lista .card-catalogo {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 180px;
+  align-items: center;
+  gap: 20px;
+}
+
+.catalogo__grade--lista .card-catalogo__titulo {
+  font-size: 15px;
+}
+
+.catalogo__grade--lista .card-catalogo__autores {
+  -webkit-line-clamp: 2;
+}
+
+.catalogo__grade--lista .card-catalogo__preco {
+  margin: 0;
+  text-align: right;
+}
+
+.catalogo__contador {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--tinta-fraca);
+}
+
 /* ---------- publique conosco ---------- */
 .publique {
   position: relative;
@@ -4341,6 +4728,99 @@ button {
 
   .form-manuscrito__campos #manuscrito-obra {
     grid-column: auto;
+  }
+
+  /* catálogo no celular */
+  .catalogo-topo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .catalogo-banner {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .catalogo-banner::after,
+  .catalogo-banner__arte {
+    display: none;
+  }
+
+  .catalogo-banner .marca img {
+    width: 90px;
+  }
+
+  /* as categorias rolam na horizontal */
+  .catalogo-destaques ul {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .catalogo-destaques ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  .catalogo-destaques li {
+    flex: 0 0 116px;
+  }
+
+  .catalogo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* a coluna de filtros vira sanfona */
+  .filtros-caixa {
+    border: 1px solid var(--linha);
+    border-radius: 6px;
+    background: var(--papel);
+  }
+
+  .filtros-caixa__resumo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tinta-forte);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .filtros-caixa__resumo::-webkit-details-marker {
+    display: none;
+  }
+
+  .filtros {
+    padding-top: 0;
+  }
+
+  .catalogo__barra {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+
+  .busca--catalogo {
+    grid-column: 1 / -1;
+  }
+
+  .catalogo__grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* em lista, capa menor e sem a coluna de preço à direita */
+  .catalogo__grade--lista .card-catalogo {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
+  .catalogo__grade--lista .card-catalogo__preco {
+    text-align: left;
+  }
+
+  .catalogo__grade--lista .card-catalogo .btn {
+    grid-column: 1 / -1;
   }
 
   /* 404: tudo numa coluna, com a arte entre o texto e os botões */

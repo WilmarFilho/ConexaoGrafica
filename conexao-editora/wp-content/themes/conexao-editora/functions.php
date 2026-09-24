@@ -17,6 +17,7 @@ require_once get_template_directory().'/inc/menu.php';
 require_once get_template_directory().'/inc/faq.php';
 require_once get_template_directory().'/inc/ajuda.php';
 require_once get_template_directory().'/inc/manuscrito.php';
+require_once get_template_directory().'/inc/catalogo.php';
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
