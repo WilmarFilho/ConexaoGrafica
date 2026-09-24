@@ -2966,6 +2966,44 @@ button {
     font-size: 21px;
   }
 
+  /* publique conosco: texto, botão vazado e a arte embaixo */
+  .publique__grade {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+    padding-block: 34px;
+  }
+
+  .publique__texto {
+    max-width: none;
+  }
+
+  .publique__texto h2 {
+    font-size: 20px;
+  }
+
+  .publique__texto p {
+    font-size: 15px;
+    margin-bottom: 26px;
+  }
+
+  .publique__texto .btn {
+    width: 100%;
+    padding-block: 16px;
+    background: transparent;
+    border: 1px solid var(--azul-escuro);
+    color: var(--azul-escuro);
+  }
+
+  .publique__texto .btn:hover {
+    background: var(--azul-escuro);
+    color: #fff;
+  }
+
+  .publique__arte img {
+    max-height: none;
+    width: 100%;
+  }
+
   /* categorias rolam na horizontal, com a próxima aparecendo pela metade */
   .categorias__lista {
     display: flex;
