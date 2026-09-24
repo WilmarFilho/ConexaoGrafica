@@ -2225,6 +2225,12 @@ button {
 }
 
 .conta__divisor span {
+  /* a coluna tem 1px: centralizar pela grade jogaria a bolinha para a direita,
+     porque o navegador encosta no início o item que transborda */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: grid;
   place-items: center;
   width: 42px;
