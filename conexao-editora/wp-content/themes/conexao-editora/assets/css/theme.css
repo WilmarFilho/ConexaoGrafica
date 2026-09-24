@@ -1442,6 +1442,31 @@ button {
   text-align: right;
 }
 
+/* nada encontrado */
+.catalogo-vazio {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 40px 20px 60px;
+  text-align: center;
+}
+
+.catalogo-vazio img {
+  width: min(300px, 70%);
+  height: auto;
+}
+
+.catalogo-vazio p {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--tinta-media);
+  margin: 0;
+}
+
+.catalogo-vazio__acao {
+  margin-top: 18px;
+}
+
 .catalogo__contador {
   margin-top: 14px;
   text-align: center;

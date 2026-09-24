@@ -23,6 +23,7 @@ $categorias_destaque = get_terms([
 $ordem_atual = isset($_GET['orderby']) ? sanitize_key(wp_unslash($_GET['orderby'])) : 'date'; // phpcs:ignore WordPress.Security.NonceVerification
 $busca = isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 $visao = (isset($_GET['visao']) && $_GET['visao'] === 'lista') ? 'lista' : 'grade'; // phpcs:ignore WordPress.Security.NonceVerification
+$img = get_template_directory_uri().'/assets/img/';
 $faixa = conexao_faixa_precos();
 $publique = get_page_by_path('publique-conosco');
 
@@ -206,8 +207,17 @@ $arte_banner = get_template_directory().'/assets/img/catalogo-banner.png';
 
                 <p class="catalogo__contador"><?php echo esc_html(conexao_resumo_resultados()); ?></p>
             <?php else : ?>
-                <p class="vazio">Nenhum livro encontrado com esses filtros.
-                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">Limpar filtros</a>.</p>
+                <div class="catalogo-vazio">
+                    <img src="<?php echo esc_url($img.'sem-resultados.png'); ?>" alt="" aria-hidden="true"
+                         width="390" height="328" decoding="async">
+
+                    <p>Ops! Não encontramos o que você procura.<br>
+                        Tente buscar por outro título, autor, ISBN ou palavra-chave.</p>
+
+                    <p class="catalogo-vazio__acao">
+                        <a class="btn btn--contorno btn--pequeno" href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">Limpar filtros</a>
+                    </p>
+                </div>
             <?php endif; ?>
         </div>
     </div>

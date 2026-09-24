@@ -190,6 +190,9 @@ function conexao_svg_categoria(string $slug): string
 
     $svg = (string) file_get_contents($caminho);
 
+    // a cor sai do arquivo: assim o ícone fica branco no cartão selecionado
+    $svg = str_ireplace(['#00448B', '#0197D4', '#0095D3'], 'currentColor', $svg);
+
     return str_replace('<svg ', '<svg class="icone icone--categoria" aria-hidden="true" focusable="false" ', $svg);
 }
 
