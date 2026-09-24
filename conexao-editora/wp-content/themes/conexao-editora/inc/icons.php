@@ -114,6 +114,37 @@ function conexao_the_icon(string $nome, int $tamanho = 20): void
  * Ícone da categoria enviado pela editora (assets/img/categorias/<slug>.svg).
  * A cor vem do CSS, então o ícone acompanha o cartão quando ele fica azul.
  */
+/**
+ * SVGs da central de ajuda, como vieram do layout. A cor sai do arquivo e passa
+ * a vir do CSS, para o mesmo desenho servir ao atalho ativo (branco) e ao
+ * quadrinho do cartão (azul escuro).
+ */
+function conexao_svg_ajuda(string $nome, int $altura = 30): string
+{
+    $caminho = get_template_directory().'/assets/img/ajuda/'.sanitize_file_name($nome).'.svg';
+
+    if (! file_exists($caminho)) {
+        return '';
+    }
+
+    $svg = (string) file_get_contents($caminho);
+    $svg = str_ireplace(['#00448B', '#0197D4', '#0095D3'], 'currentColor', $svg);
+
+    // sem width/height próprios a largura acompanha o viewBox
+    $svg = preg_replace('/\s(?:width|height)="[^"]*"/i', '', $svg, 2);
+
+    return str_replace(
+        '<svg ',
+        sprintf('<svg class="icone icone--ajuda" height="%d" aria-hidden="true" focusable="false" ', $altura),
+        $svg
+    );
+}
+
+function conexao_a_svg_ajuda(string $nome, int $altura = 30): void
+{
+    echo conexao_svg_ajuda($nome, $altura); // phpcs:ignore WordPress.Security.EscapeOutput
+}
+
 function conexao_svg_categoria(string $slug): string
 {
     $caminho = get_template_directory().'/assets/img/categorias/'.sanitize_file_name($slug).'.svg';

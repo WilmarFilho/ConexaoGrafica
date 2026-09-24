@@ -296,73 +296,97 @@
         }
     });
 
-    /* F.A.Q: uma pergunta aberta por vez, abrindo e fechando com altura animada
-       (o <details> sozinho troca de estado sem transição nenhuma) */
-    var faq = document.querySelector('.faq');
+    /* sanfonas (F.A.Q e central de ajuda): um item aberto por vez, com a altura
+       animada — o <details> sozinho troca de estado sem transição nenhuma */
+    var semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var duracaoSanfona = 240;
 
-    if (faq) {
-        var perguntas = [].slice.call(faq.querySelectorAll('.faq__item'));
-        var semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var animarPainel = function (painel, de, para, aoTerminar) {
+        var encerrado = false;
 
-        var duracao = 240;
-
-        var animar = function (painel, de, para, aoTerminar) {
-            var encerrado = false;
-
-            var encerrar = function () {
-                if (encerrado) {
-                    return;
-                }
-
-                encerrado = true;
-                var corrente = painel.animacao;
-                painel.animacao = null;
-
-                // pelo relógio a animação ainda pode estar rodando; sem largar
-                // dela o painel ficaria preso na altura do meio do caminho
-                if (corrente && corrente.playState === 'running') {
-                    corrente.cancel();
-                }
-
-                aoTerminar();
-            };
-
-            if (painel.animacao) {
-                painel.animacao.cancel();
-            }
-
-            if (semMovimento.matches) {
-                encerrar();
+        var encerrar = function () {
+            if (encerrado) {
                 return;
             }
 
-            painel.animacao = painel.animate(
-                { height: [de + 'px', para + 'px'], opacity: [de ? 1 : 0, para ? 1 : 0] },
-                { duration: duracao, easing: 'ease' }
-            );
+            encerrado = true;
+            var corrente = painel.animacao;
+            painel.animacao = null;
 
-            painel.animacao.onfinish = encerrar;
+            // pelo relógio a animação ainda pode estar rodando; sem largar dela
+            // o painel ficaria preso na altura do meio do caminho
+            if (corrente && corrente.playState === 'running') {
+                corrente.cancel();
+            }
 
-            // se outro clique cancelar esta animação, o estado é de quem cancelou
-            painel.animacao.oncancel = function () {
-                encerrado = true;
-            };
-
-            // em aba de segundo plano os quadros não rodam e o onfinish nunca
-            // chega; o relógio continua andando e fecha o item mesmo assim
-            setTimeout(encerrar, duracao + 30);
+            aoTerminar();
         };
 
-        var fechar = function (item) {
-            var painel = item.querySelector('.faq__resposta');
+        if (painel.animacao) {
+            painel.animacao.cancel();
+        }
 
-            animar(painel, painel.offsetHeight, 0, function () {
+        if (semMovimento.matches) {
+            encerrar();
+            return;
+        }
+
+        painel.animacao = painel.animate(
+            { height: [de + 'px', para + 'px'], opacity: [de ? 1 : 0, para ? 1 : 0] },
+            { duration: duracaoSanfona, easing: 'ease' }
+        );
+
+        painel.animacao.onfinish = encerrar;
+
+        // se outro clique cancelar esta animação, o estado é de quem cancelou
+        painel.animacao.oncancel = function () {
+            encerrado = true;
+        };
+
+        // em aba de segundo plano os quadros não rodam e o onfinish nunca chega;
+        // o relógio continua andando e fecha o item mesmo assim
+        setTimeout(encerrar, duracaoSanfona + 30);
+    };
+
+    var montarSanfona = function (lista, seletorGatilho, seletorPainel, aoAbrir) {
+        if (!lista) {
+            return null;
+        }
+
+        var itens = [].slice.call(lista.children).filter(function (filho) {
+            return filho.tagName === 'DETAILS';
+        });
+
+        var fechar = function (item) {
+            var painel = item.querySelector(seletorPainel);
+
+            animarPainel(painel, painel.offsetHeight, 0, function () {
                 item.open = false;
             });
         };
 
-        perguntas.forEach(function (item) {
-            item.querySelector('.faq__pergunta').addEventListener('click', function (evento) {
+        var abrir = function (item) {
+            itens.forEach(function (outro) {
+                if (outro !== item && outro.open) {
+                    fechar(outro);
+                }
+            });
+
+            if (item.open) {
+                return;
+            }
+
+            item.open = true;
+            var painel = item.querySelector(seletorPainel);
+            animarPainel(painel, 0, painel.offsetHeight, function () {});
+
+            if (aoAbrir) {
+                aoAbrir(item);
+            }
+        };
+
+        itens.forEach(function (item) {
+            item.querySelector(seletorGatilho).addEventListener('click', function (evento) {
                 // o clique abriria o details na hora, sem passar pela animação
                 evento.preventDefault();
 
@@ -371,15 +395,39 @@
                     return;
                 }
 
-                perguntas.forEach(function (outro) {
-                    if (outro !== item && outro.open) {
-                        fechar(outro);
-                    }
-                });
+                abrir(item);
+            });
+        });
 
-                item.open = true;
-                var painel = item.querySelector('.faq__resposta');
-                animar(painel, 0, painel.offsetHeight, function () {});
+        return { abrir: abrir };
+    };
+
+    montarSanfona(document.querySelector('.faq'), '.faq__pergunta', '.faq__resposta');
+
+    /* central de ajuda: os atalhos do topo abrem o cartão do tema */
+    var atalhos = [].slice.call(document.querySelectorAll('.ajuda-atalho'));
+
+    var marcarAtalho = function (cartao) {
+        atalhos.forEach(function (atalho) {
+            atalho.classList.toggle('ajuda-atalho--ativo', atalho.getAttribute('href') === '#' + cartao.id);
+        });
+    };
+
+    var ajuda = montarSanfona(document.querySelector('.ajuda-lista'), '.ajuda-card__resumo', '.ajuda-card__painel', marcarAtalho);
+
+    if (ajuda) {
+        atalhos.forEach(function (atalho) {
+            atalho.addEventListener('click', function (evento) {
+                var cartao = document.querySelector(atalho.getAttribute('href'));
+
+                if (!cartao) {
+                    return;
+                }
+
+                evento.preventDefault();
+                ajuda.abrir(cartao);
+                marcarAtalho(cartao);
+                cartao.scrollIntoView({ behavior: semMovimento.matches ? 'auto' : 'smooth', block: 'center' });
             });
         });
     }

@@ -1647,6 +1647,208 @@ button {
   line-height: 1.6;
 }
 
+/* ---------- central de ajuda ---------- */
+.ajuda-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  min-height: 290px;
+  margin-bottom: 26px;
+  padding: 30px 40px;
+  border-radius: 12px;
+  background: var(--azul-escuro) url("../img/ajuda-banner.png") center/cover no-repeat;
+  color: #fff;
+}
+
+.ajuda-hero h1 {
+  font-size: clamp(26px, 3vw, 34px);
+  margin-bottom: 12px;
+}
+
+.ajuda-hero p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, .9);
+  max-width: 44ch;
+  margin-bottom: 24px;
+}
+
+.ajuda-hero__busca {
+  max-width: 340px;
+}
+
+.ajuda-hero__busca input[type="search"] {
+  border-color: transparent;
+}
+
+.ajuda-hero__busca button {
+  color: var(--azul);
+}
+
+.ajuda-hero__arte {
+  width: min(300px, 30vw);
+  height: auto;
+}
+
+/* atalhos por tema */
+.ajuda-atalhos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.ajuda-atalho {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border: 1px solid var(--azul);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--azul);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ajuda-atalho:hover {
+  background: var(--banda);
+  text-decoration: none;
+}
+
+.ajuda-atalho--ativo,
+.ajuda-atalho--ativo:hover {
+  background: var(--azul-escuro);
+  border-color: var(--azul-escuro);
+  color: #fff;
+}
+
+/* cartões dos tópicos */
+.ajuda-lista {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 60px;
+}
+
+.ajuda-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 14px 64px 14px 14px;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.ajuda-card[open] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, .95fr);
+}
+
+.ajuda-card__resumo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.ajuda-card__resumo::-webkit-details-marker {
+  display: none;
+}
+
+.ajuda-card__icone {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 8px;
+  background: var(--banda);
+  color: var(--azul-escuro);
+}
+
+.ajuda-card__texto {
+  display: grid;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--tinta-media);
+}
+
+.ajuda-card__texto strong {
+  color: var(--azul);
+  font-size: 14px;
+}
+
+/* o +/- fica na borda do cartão nos dois estados */
+.ajuda-card__botao {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--linha);
+  color: var(--tinta-media);
+}
+
+.ajuda-card__botao::before,
+.ajuda-card__botao::after {
+  content: "";
+  position: absolute;
+  inset: 50% 7px auto;
+  height: 1.5px;
+  background: currentColor;
+}
+
+.ajuda-card__botao::after {
+  transform: rotate(90deg);
+  transition: transform .2s ease;
+}
+
+.ajuda-card[open] .ajuda-card__botao::after {
+  transform: rotate(0deg);
+}
+
+.ajuda-card__painel {
+  overflow: hidden;
+  padding: 14px 52px 14px 22px;
+  border-radius: 8px;
+  background: var(--banda);
+}
+
+.ajuda-card__painel ul {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 16px;
+  list-style: disc;
+  font-size: 12.5px;
+  color: var(--azul-escuro);
+}
+
+/* cartão final, de contato */
+.ajuda-fale {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--banda);
+}
+
+.ajuda-fale .ajuda-card__icone {
+  background: #fff;
+}
+
+.ajuda-fale .ajuda-card__texto strong {
+  color: var(--azul-escuro);
+}
+
 /* ---------- 404 ---------- */
 .erro404__grade {
   display: grid;
@@ -2883,6 +3085,86 @@ button {
     padding: 14px 20px 20px;
   }
 
+  /* ajuda: banner em pé, com a arte entre o texto e a busca */
+  .ajuda-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    min-height: 0;
+    padding: 26px 20px 28px;
+    background-image: url("../img/ajuda-banner-celular.png");
+  }
+
+  .ajuda-hero__texto {
+    display: contents;
+  }
+
+  .ajuda-hero h1 {
+    order: 1;
+  }
+
+  .ajuda-hero p {
+    order: 2;
+    max-width: none;
+    margin-bottom: 0;
+  }
+
+  .ajuda-hero__arte {
+    order: 3;
+    justify-self: center;
+    width: min(240px, 72%);
+  }
+
+  .ajuda-hero__busca {
+    order: 4;
+    max-width: none;
+  }
+
+  /* atalhos em duas colunas */
+  .ajuda-atalhos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .ajuda-atalho {
+    justify-content: center;
+    padding: 10px 10px;
+    font-size: 11.5px;
+    text-align: center;
+  }
+
+  /* cartões: o painel desce para baixo do texto */
+  .ajuda-card,
+  .ajuda-card[open] {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px 56px 14px 14px;
+  }
+
+  .ajuda-card__icone {
+    width: 46px;
+    height: 46px;
+  }
+
+  .ajuda-card__botao {
+    top: 32px;
+    transform: none;
+  }
+
+  .ajuda-card__painel {
+    padding: 14px 16px;
+  }
+
+  .ajuda-fale {
+    grid-template-columns: auto minmax(0, 1fr);
+    row-gap: 14px;
+  }
+
+  .ajuda-fale .btn {
+    grid-column: 1 / -1;
+    width: 100%;
+    padding-block: 15px;
+  }
+
   /* 404: tudo numa coluna, com a arte entre o texto e os botões */
   .erro404__grade {
     grid-template-columns: minmax(0, 1fr);
@@ -3118,7 +3400,8 @@ button {
     padding-block: 18px;
   }
 
-  .busca {
+  /* só a busca do cabeçalho: solta, pegava também a do banner da ajuda */
+  .cabecalho__grade .busca {
     grid-column: 1 / -1;
     order: 3;
   }
