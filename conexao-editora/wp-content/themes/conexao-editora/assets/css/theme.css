@@ -3311,6 +3311,89 @@ button {
     padding-block: 10px 20px;
   }
 
+  /* vendas corporativas: ícone e título lado a lado, régua, lista e botão vazado */
+  .corporativo__grade {
+    gap: 26px;
+    padding-block: 36px;
+  }
+
+  .corporativo__marca {
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .corporativo__icone {
+    height: 92px;
+  }
+
+  .corporativo__marca h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .corporativo__marca p {
+    font-size: 14px;
+    max-width: none;
+  }
+
+  .corporativo__vantagens {
+    gap: 20px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255, 255, 255, .45);
+    font-size: 16px;
+  }
+
+  .corporativo__grade .btn {
+    width: 100%;
+    justify-self: stretch;
+    padding-block: 18px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, .9);
+    color: #fff;
+    box-shadow: none;
+  }
+
+  .corporativo__grade .btn:hover {
+    background: #fff;
+    color: var(--hero-escuro);
+  }
+
+  /* newsletter: ícone e título na mesma linha, texto e campo ocupando a largura */
+  .newsletter__grade {
+    gap: 14px 16px;
+    padding-block: 34px;
+  }
+
+  /* solta o h2 e o parágrafo na grade, para o texto começar na margem */
+  .newsletter__texto {
+    display: contents;
+  }
+
+  .newsletter__icone {
+    height: 56px;
+  }
+
+  .newsletter h2 {
+    font-size: 22px;
+    line-height: 1.25;
+    margin-bottom: 0;
+  }
+
+  .newsletter p {
+    grid-column: 1 / -1;
+  }
+
+  .newsletter__form {
+    grid-column: 1 / -1;
+    min-width: 0;
+    padding-left: 22px;
+  }
+
+  .newsletter__form .btn {
+    padding: 14px 24px;
+    font-size: 12px;
+  }
+
 }
 
 @media (max-width: 640px) {
