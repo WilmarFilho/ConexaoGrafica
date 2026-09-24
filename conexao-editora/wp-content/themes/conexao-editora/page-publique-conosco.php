@@ -57,7 +57,7 @@ $avisos = [
 
         <?php if (file_exists($arte)) : ?>
             <img class="publique-hero__arte" src="<?php echo esc_url($img.'publique-hero.png'); ?>" alt=""
-                 aria-hidden="true" decoding="async">
+                 aria-hidden="true" width="561" height="374" decoding="async">
         <?php endif; ?>
     </section>
 
