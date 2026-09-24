@@ -1231,7 +1231,8 @@ button {
 /* ---- barra de busca e ordenação ---- */
 .catalogo__barra {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px auto;
+  /* a busca tem um mínimo próprio: quem encolhe primeiro é a ordenação */
+  grid-template-columns: minmax(260px, 1fr) minmax(180px, 320px) auto;
   align-items: center;
   gap: 14px;
   margin-bottom: 20px;
@@ -1343,6 +1344,18 @@ button {
 .card-catalogo .btn {
   padding-block: 10px;
   font-size: 10.5px;
+}
+
+/* abaixo de 900px a busca não cabe ao lado da ordenação */
+@media (max-width: 899px) {
+  .catalogo__barra {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+
+  .busca--catalogo {
+    grid-column: 1 / -1;
+  }
 }
 
 /* abaixo de 1000px o banner desce para baixo do texto */
