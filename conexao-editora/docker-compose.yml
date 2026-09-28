@@ -32,6 +32,8 @@ services:
       # e-mails do ambiente caem no Mailpit, não saem para fora
       CONEXAO_SMTP_HOST: mailpit
       CONEXAO_SMTP_PORT: 1025
+      # livros digitais ficam fora da pasta pública
+      CONEXAO_BIBLIOTECA_DIR: /var/biblioteca
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_DEBUG_LOG', true);
         define('WP_DEBUG_DISPLAY', false);
@@ -40,6 +42,8 @@ services:
       - wp_core:/var/www/html
       - ./wp-content/themes/conexao-editora:/var/www/html/wp-content/themes/conexao-editora
       - ./wp-content/uploads:/var/www/html/wp-content/uploads
+      - ./wp-content/plugins/conexao-biblioteca:/var/www/html/wp-content/plugins/conexao-biblioteca
+      - ./biblioteca:/var/biblioteca
 
   mailpit:
     image: axllent/mailpit:latest
@@ -60,10 +64,13 @@ services:
       WORDPRESS_DB_PASSWORD: conexao
       CONEXAO_SMTP_HOST: mailpit
       CONEXAO_SMTP_PORT: 1025
+      CONEXAO_BIBLIOTECA_DIR: /var/biblioteca
     volumes:
       - wp_core:/var/www/html
       - ./wp-content/themes/conexao-editora:/var/www/html/wp-content/themes/conexao-editora
       - ./wp-content/uploads:/var/www/html/wp-content/uploads
+      - ./wp-content/plugins/conexao-biblioteca:/var/www/html/wp-content/plugins/conexao-biblioteca
+      - ./biblioteca:/var/biblioteca
       - ./scripts:/scripts
     entrypoint: ["tail", "-f", "/dev/null"]
 

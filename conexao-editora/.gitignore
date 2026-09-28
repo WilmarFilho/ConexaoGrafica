@@ -2,3 +2,9 @@ wp-content/uploads/
 *.sql
 *.sql.gz
 .env
+
+# livros digitais (arquivos dos clientes, nunca no git)
+/biblioteca/
+
+# pacote da migração (dados de clientes, nunca no git)
+/migracao/

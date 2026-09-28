@@ -19,6 +19,7 @@ require_once get_template_directory().'/inc/ajuda.php';
 require_once get_template_directory().'/inc/manuscrito.php';
 require_once get_template_directory().'/inc/catalogo.php';
 require_once get_template_directory().'/inc/produto.php';
+require_once get_template_directory().'/inc/migracao.php';
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');

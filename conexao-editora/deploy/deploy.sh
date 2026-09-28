@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Publica o tema no site de produção. Roda como o usuário do cPanel:
+# Publica o tema e o plugin da biblioteca no site de produção. Roda como o usuário do cPanel:
 #   bash ~/hub/conexao-editora/deploy/deploy.sh
 set -euo pipefail
 
@@ -15,6 +15,16 @@ echo "== tema"
 rsync -a --delete \
   "$REPO/conexao-editora/wp-content/themes/conexao-editora/" \
   "$RAIZ/wp-content/themes/conexao-editora/"
+
+echo "== plugin da biblioteca"
+rsync -a --delete   "$REPO/conexao-editora/wp-content/plugins/conexao-biblioteca/"   "$RAIZ/wp-content/plugins/conexao-biblioteca/"
+
+# os livros ficam fora da pasta pública; a pasta só é criada, nunca apagada
+BIBLIOTECA="${BIBLIOTECA:-$HOME/biblioteca}"
+mkdir -p "$BIBLIOTECA"
+chmod 750 "$BIBLIOTECA"
+$WP config has CONEXAO_BIBLIOTECA_DIR >/dev/null 2>&1 || $WP config set CONEXAO_BIBLIOTECA_DIR "$BIBLIOTECA" --type=constant
+$WP plugin is-active conexao-biblioteca || $WP plugin activate conexao-biblioteca
 
 echo "== banco e caches"
 $WP core update-db
