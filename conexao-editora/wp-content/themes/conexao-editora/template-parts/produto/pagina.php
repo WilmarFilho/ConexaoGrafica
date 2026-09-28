@@ -47,8 +47,25 @@ if (count($sugestoes) < 5) {
     ?>
 
     <div class="produto">
-        <figure class="produto__capa">
+        <?php $amostras = conexao_amostras_produto($product); ?>
+        <figure class="produto__capa"<?php echo $amostras ? ' data-amostras' : ''; ?>>
             <?php echo $product->get_image('woocommerce_single'); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+
+            <?php if ($amostras) : ?>
+                <figcaption class="produto__amostras">
+                    <span class="produto__amostras-titulo">Leia uma amostra</span>
+                    <div class="produto__amostras-trilho">
+                        <?php foreach ($amostras as $i => $amostra) : ?>
+                            <button type="button" class="produto__amostra<?php echo $i === 0 ? ' e-atual' : ''; ?>"
+                                data-grande="<?php echo esc_url($amostra['grande']); ?>"
+                                aria-label="<?php echo esc_attr($amostra['rotulo']); ?>"
+                                aria-pressed="<?php echo $i === 0 ? 'true' : 'false'; ?>">
+                                <img src="<?php echo esc_url($amostra['mini']); ?>" alt="" loading="lazy" width="56" height="78">
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+                </figcaption>
+            <?php endif; ?>
         </figure>
 
         <div class="produto__texto">

@@ -734,6 +734,31 @@
         });
     }
 
+    /* página do livro: miniaturas de capa e amostra trocam a imagem grande */
+    var capa = document.querySelector('[data-amostras]');
+
+    if (capa) {
+        var grande = capa.querySelector(':scope > img');
+        var miniaturas = capa.querySelectorAll('.produto__amostra');
+
+        miniaturas.forEach(function (miniatura) {
+            miniatura.addEventListener('click', function () {
+                if (!grande) {
+                    return;
+                }
+
+                grande.removeAttribute('srcset');
+                grande.removeAttribute('sizes');
+                grande.src = miniatura.getAttribute('data-grande');
+
+                miniaturas.forEach(function (outra) {
+                    outra.classList.toggle('e-atual', outra === miniatura);
+                    outra.setAttribute('aria-pressed', outra === miniatura ? 'true' : 'false');
+                });
+            });
+        });
+    }
+
     /* voltar ao topo */
     var topo = document.querySelector('.flutuante--topo');
 

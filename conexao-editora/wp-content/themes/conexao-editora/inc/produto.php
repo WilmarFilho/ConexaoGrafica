@@ -17,6 +17,8 @@ function conexao_campos_livro(): array
         '_conexao_idioma' => ['rotulo' => 'Idioma', 'icone' => 'idioma', 'dica' => 'Ex.: Português-BR'],
         '_conexao_isbn10' => ['rotulo' => 'ISBN-10', 'icone' => 'isbn10', 'dica' => ''],
         '_conexao_isbn13' => ['rotulo' => 'ISBN-13', 'icone' => 'isbn13', 'dica' => ''],
+        '_conexao_editora' => ['rotulo' => 'Editora', 'icone' => 'editora', 'dica' => 'Em branco: Conexão Editora'],
+        '_conexao_publicacao' => ['rotulo' => 'Data de publicação', 'icone' => 'publicacao', 'dica' => 'Ano ou data. Em branco: data de cadastro do produto'],
     ];
 }
 
@@ -85,13 +87,17 @@ function conexao_ficha_produto(WC_Product $produto): array
         ];
     }
 
-    $ficha[] = [
-        'icone' => 'editora',
-        'rotulo' => 'Editora',
-        'valor' => (string) apply_filters('conexao_nome_editora', 'Conexão Editora'),
-    ];
+    $presentes = array_column($ficha, 'icone');
 
-    $publicacao = $produto->get_date_created();
+    if (! in_array('editora', $presentes, true)) {
+        $ficha[] = [
+            'icone' => 'editora',
+            'rotulo' => 'Editora',
+            'valor' => (string) apply_filters('conexao_nome_editora', 'Conexão Editora'),
+        ];
+    }
+
+    $publicacao = in_array('publicacao', $presentes, true) ? null : $produto->get_date_created();
 
     if ($publicacao) {
         $ficha[] = [
@@ -266,4 +272,37 @@ function conexao_calcula_frete(): void
     }
 
     wp_send_json_success(['opcoes' => $opcoes]);
+}
+
+/**
+ * Capa e páginas de amostra (a galeria do produto), para a faixa de miniaturas.
+ *
+ * @return array<int, array{id: int, grande: string, mini: string, rotulo: string}>
+ */
+function conexao_amostras_produto(WC_Product $produto): array
+{
+    $galeria = array_filter(array_map('intval', $produto->get_gallery_image_ids()));
+
+    if (! $galeria || ! $produto->get_image_id()) {
+        return [];
+    }
+
+    $itens = [];
+
+    foreach (array_merge([(int) $produto->get_image_id()], $galeria) as $i => $id) {
+        $grande = wp_get_attachment_image_url($id, 'woocommerce_single');
+
+        if (! $grande) {
+            continue;
+        }
+
+        $itens[] = [
+            'id' => $id,
+            'grande' => $grande,
+            'mini' => (string) wp_get_attachment_image_url($id, 'thumbnail'),
+            'rotulo' => $i === 0 ? 'Capa' : 'Amostra: página '.$i,
+        ];
+    }
+
+    return count($itens) > 1 ? $itens : [];
 }
