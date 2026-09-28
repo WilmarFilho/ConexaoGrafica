@@ -261,6 +261,7 @@ WP_CLI::log(sprintf('clientes: %d no pacote, %d novos, %d já existiam', count($
 $estados_validos = array_map(static fn ($e) => substr($e, 3), array_keys(wc_get_order_statuses()));
 $novos = 0;
 $repetidos = 0;
+$atualizados = 0;
 $itens_sem_produto = 0;
 $por_estado = [];
 
@@ -269,6 +270,28 @@ foreach ($pacote['pedidos'] as $p) {
 
     if ($ja) {
         $repetidos++;
+
+        // o pedido já veio, mas pode ter andado na loja antiga (pago, concluído…)
+        $existente = wc_get_order((int) $ja[0]);
+        $estado_origem = in_array($p['estado'], $estados_validos, true) ? $p['estado'] : 'on-hold';
+
+        if ($existente && $existente->get_status() !== $estado_origem) {
+            $atualizados++;
+
+            if ($aplicar) {
+                if ($p['pago']) {
+                    $existente->set_date_paid($p['pago']);
+                }
+
+                if ($p['concluido']) {
+                    $existente->set_date_completed($p['concluido']);
+                }
+
+                $existente->set_status($estado_origem, 'Estado atualizado a partir da loja Pubcon.', true);
+                $existente->save();
+            }
+        }
+
         continue;
     }
 
@@ -376,10 +399,11 @@ foreach ($pacote['pedidos'] as $p) {
 }
 
 WP_CLI::log(sprintf(
-    'pedidos: %d no pacote, %d novos, %d já importados | itens sem produto no site novo: %d',
+    'pedidos: %d no pacote, %d novos, %d já importados (%d com estado atualizado) | itens sem produto no site novo: %d',
     count($pacote['pedidos']),
     $novos,
     $repetidos,
+    $atualizados,
     $itens_sem_produto
 ));
 
