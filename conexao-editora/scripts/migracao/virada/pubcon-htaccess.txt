@@ -1,0 +1,21 @@
+# BEGIN Conexao Editora (virada)
+# A loja mudou para conexaoeditora.com.br. Continuam aqui só o painel (/adm,
+# /wp-admin), a API usada pelo Hub, os arquivos e os avisos de pagamento.
+# Para desfazer: apagar este bloco.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/(wp-admin|adm|wp-json|wp-content|wp-includes|wc-api|\.well-known)(/|$) [NC,OR]
+RewriteCond %{REQUEST_URI} ^/(wp-login\.php|wp-cron\.php|xmlrpc\.php|index\.php|favicon\.ico|robots\.txt) [NC,OR]
+RewriteCond %{QUERY_STRING} (^|&)(rest_route|wc-api|wc-ajax|aiowps|action)= [NC]
+RewriteRule ^ - [S=%%REGRAS%%]
+%%MAPA%%
+RewriteRule ^produto/ https://conexaoeditora.com.br/loja/ [R=302,L,NC]
+RewriteRule ^categorias/([^/]+)/?$ https://conexaoeditora.com.br/product-category/$1/ [R=302,L,NC]
+RewriteRule ^(shop|loja)(/.*)?$ https://conexaoeditora.com.br/loja/ [R=302,L,NC]
+RewriteRule ^minhaconta(/.*)?$ https://conexaoeditora.com.br/minha-conta/ [R=302,L,NC]
+RewriteRule ^cart(/.*)?$ https://conexaoeditora.com.br/carrinho/ [R=302,L,NC]
+RewriteRule ^checkout(/.*)?$ https://conexaoeditora.com.br/finalizar-compra/ [R=302,L,NC]
+RewriteRule ^ https://conexaoeditora.com.br/ [R=302,L]
+</IfModule>
+# END Conexao Editora (virada)
+

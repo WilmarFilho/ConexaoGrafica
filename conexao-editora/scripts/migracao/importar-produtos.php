@@ -10,6 +10,7 @@
  *   CONEXAO_APLICAR=1 wp eval-file importar-produtos.php   para valer
  *
  * CONEXAO_PACOTE  pacote gerado pelo exportar-produtos.php
+ * CONEXAO_PARTE   ex.: 0/4, 1/4… para rodar em processos paralelos
  * CONEXAO_MIDIA   pasta com as imagens (mesma estrutura de uploads da Pubcon);
  *                 sem ela, cada imagem é baixada pelo endereço original
  */
@@ -28,6 +29,16 @@ $pacote = file_exists($arquivo) ? json_decode((string) file_get_contents($arquiv
 if (! is_array($pacote) || empty($pacote['produtos'])) {
     WP_CLI::error('pacote de produtos não encontrado ou inválido');
 }
+
+// CONEXAO_PARTE=0/4 divide o trabalho entre processos paralelos (pelo produto de destino)
+[$parte, $partes] = array_map('intval', explode('/', (getenv('CONEXAO_PARTE') ?: '0/1'))) + [0, 1];
+$partes = max(1, $partes);
+
+// página de amostra só precisa dos tamanhos que o site mostra
+add_filter('intermediate_image_sizes_advanced', static fn (array $tamanhos): array => array_intersect_key(
+    $tamanhos,
+    array_flip(['thumbnail', 'large', 'woocommerce_thumbnail', 'woocommerce_single', 'woocommerce_gallery_thumbnail'])
+));
 
 WP_CLI::log($aplicar ? '== APLICANDO' : '== SIMULAÇÃO (nada será gravado)');
 
@@ -98,6 +109,10 @@ foreach ($pacote['produtos'] as $p) {
     }
 
     $alvo = (int) get_post_meta($local, '_conexao_unificado_em', true) ?: $local;
+    if ($alvo % $partes !== $parte) {
+        continue;
+    }
+
     $produto = wc_get_product($alvo);
 
     if (! $produto) {
