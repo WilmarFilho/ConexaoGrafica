@@ -86,7 +86,8 @@ class OrderMapper
             'currency' => $o['currency'] ?? 'BRL',
             'ship_name' => trim(($addr['first_name'] ?? '') . ' ' . ($addr['last_name'] ?? '')) ?: null,
             'ship_street' => $addr['address_1'] ?? null,
-            'ship_number' => $meta["{$prefix}_number"] ?? null,
+            // há cliente que digita o complemento no campo do número: corta no tamanho da coluna
+            'ship_number' => isset($meta["{$prefix}_number"]) ? mb_substr((string) $meta["{$prefix}_number"], 0, 20) : null,
             'ship_complement' => $addr['address_2'] ?? null,
             'ship_district' => $meta["{$prefix}_neighborhood"] ?? null,
             'ship_city' => $addr['city'] ?? null,
