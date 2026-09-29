@@ -143,6 +143,15 @@ class ImportProductsTest extends TestCase
         ImportProducts::make()->all();
         $this->assertSame(1, Product::count());
         $this->assertSame(4, ProductChannelRef::count());
+
+        // livro que saiu da vitrine (rascunho na loja): o vínculo antigo não tem
+        // formato, mas o produto só tem um, e o item herda esse
+        $rascunho = Product::create(['name' => 'Tratado', 'sku' => 'WOO-99', 'formats' => ['ebook'], 'active' => true]);
+        ProductChannelRef::create(['channel_id' => $woo->id, 'product_id' => $rascunho->id, 'external_id' => '99']);
+        $antigo = $order->items()->create(['name' => 'Ebook Tratado', 'external_sku' => '99', 'product_id' => $rascunho->id, 'quantity' => 1, 'unit_cents' => 100, 'total_cents' => 100]);
+
+        ImportProducts::make()->all();
+        $this->assertSame('ebook', $antigo->fresh()->format);
     }
 
     public function test_formats_decide_if_the_product_is_shipped(): void
@@ -153,6 +162,12 @@ class ImportProductsTest extends TestCase
         $p->update(['formats' => ['fisico_ebook', 'ebook', 'ebook']]);
         $this->assertTrue($p->fresh()->physical);
         $this->assertSame(['ebook', 'fisico_ebook'], $p->fresh()->formats);
+
+        $this->assertSame('Tratado de Doenças Raras', Product::cleanTitle('Ebook Tratado de Doenças Raras'));
+        $this->assertSame('1º Manual de Condutas', Product::cleanTitle('E-Book 1º Manual de Condutas'));
+        $this->assertSame('A História do Cremego', Product::cleanTitle('A História do Cremego - Impresso'));
+        $this->assertSame('Neuro-oftalmologia', Product::cleanTitle('Neuro-oftalmologia — Impresso + E-book'));
+        $this->assertSame('Ebookeria', Product::cleanTitle('Ebookeria'));
 
         $this->assertSame('fisico_ebook', Product::formatFromLabel('Impresso + E-book'));
         $this->assertSame('fisico', Product::formatFromLabel('Físico'));

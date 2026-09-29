@@ -64,6 +64,19 @@ class Product extends Model
         };
     }
 
+    /**
+     * Título do livro sem o formato: "E-book X", "X - Impresso" e
+     * "X — Físico + E-book" viram "X". O formato aparece à parte.
+     */
+    public static function cleanTitle(string $name): string
+    {
+        $clean = preg_replace('/^\s*e-?\s?books?\b\s*[:\-–—]?\s*/iu', '', $name);
+        $clean = preg_replace('/\s*[-–—]\s*(impresso|f[íi]sico|e-?\s?book)(\s*\+\s*(impresso|f[íi]sico|e-?\s?book))?\s*$/iu', '', (string) $clean);
+        $clean = trim((string) $clean);
+
+        return $clean !== '' ? $clean : trim($name);
+    }
+
     public function channelRefs(): HasMany
     {
         return $this->hasMany(ProductChannelRef::class);

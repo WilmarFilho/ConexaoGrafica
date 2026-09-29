@@ -99,7 +99,7 @@ class ImportProducts
             $product = $this->findOrMerge(array_keys($formatsById), $p);
 
             $data = [
-                'name' => $p['name'],
+                'name' => Product::cleanTitle((string) $p['name']),
                 'formats' => $onSale,
                 'active' => ($p['status'] ?? 'publish') === 'publish',
             ];
@@ -192,12 +192,18 @@ class ImportProducts
         $refs = ProductChannelRef::query()->where('channel_id', $this->channel->id)->get();
         $bySku = $refs->whereNotNull('external_sku')->keyBy('external_sku');
         $byId = $refs->keyBy('external_id');
+
+        // vínculo antigo, sem formato, de produto que só tem um: vale esse
+        $single = Product::query()->whereIn('id', $refs->pluck('product_id')->unique())->get(['id', 'formats'])
+            ->filter(fn (Product $p) => count($p->formats ?? []) === 1)
+            ->mapWithKeys(fn (Product $p) => [$p->id => $p->formats[0]]);
+
         $n = 0;
 
         OrderItem::query()
             ->where(fn ($q) => $q->whereNull('product_id')->orWhereNull('format'))
             ->whereHas('order', fn ($q) => $q->where('channel_id', $this->channel->id))
-            ->chunkById(200, function ($items) use ($bySku, $byId, &$n) {
+            ->chunkById(200, function ($items) use ($bySku, $byId, $single, &$n) {
                 foreach ($items as $item) {
                     $ref = $byId[$item->external_sku] ?? $bySku[$item->external_sku] ?? null;
 
@@ -212,8 +218,10 @@ class ImportProducts
                         $n++;
                     }
 
-                    if (! $item->format && $ref->format) {
-                        $changes['format'] = $ref->format;
+                    $format = $ref->format ?? $single[$ref->product_id] ?? null;
+
+                    if (! $item->format && $format) {
+                        $changes['format'] = $format;
                     }
 
                     if ($changes) {
