@@ -53,6 +53,8 @@ html {
 
 body {
   margin: 0;
+  /* trava geral: nada do conteúdo abre rolagem lateral na página */
+  overflow-x: clip;
   /* sem o realce azul que o celular pinta ao tocar */
   -webkit-tap-highlight-color: transparent;
   background: var(--papel);
@@ -117,6 +119,10 @@ button {
 
 .tela-leitor {
   position: absolute;
+  /* sem posição definida o texto oculto fica onde estaria no fluxo: dentro de
+     um trilho rolável ele escapava para a direita e esticava a página */
+  top: 0;
+  left: 0;
   width: 1px;
   height: 1px;
   margin: -1px;
@@ -131,6 +137,8 @@ button {
 .screen-reader-text,
 .sr-only {
   position: absolute !important;
+  top: 0;
+  left: 0;
   width: 1px;
   height: 1px;
   margin: -1px;
@@ -3322,7 +3330,8 @@ button {
   gap: 20px;
   margin-bottom: 60px;
   padding: 54px clamp(20px, 5vw, 70px) 46px;
-  background: #fff;
+  /* vazado: só o contorno, o fundo da página aparece por dentro */
+  background: transparent;
   border: 1px solid var(--linha);
   border-radius: var(--raio-grande);
 }
