@@ -152,8 +152,10 @@ add_filter('woocommerce_dropdown_variation_attribute_options_args', function (ar
 });
 
 /**
- * Endereço antigo do e-book (agora rascunho) leva para o produto unificado,
- * com 301, para não perder link nem posição de busca.
+ * Endereço antigo do e-book leva para o produto unificado, com 301, para não
+ * perder link nem posição de busca. Os e-books antigos foram removidos; o mapa
+ * endereço → livro ficou na opção conexao_enderecos_antigos. Enquanto algum
+ * ainda existir como rascunho, ele também vale.
  */
 add_action('template_redirect', function (): void {
     if (! is_404()) {
@@ -165,6 +167,14 @@ add_action('template_redirect', function (): void {
 
     if (! $slug) {
         return;
+    }
+
+    $mapa = (array) get_option('conexao_enderecos_antigos', []);
+    $destino = (int) ($mapa[$slug] ?? 0);
+
+    if ($destino && get_post_status($destino) === 'publish') {
+        wp_safe_redirect(get_permalink($destino), 301);
+        exit;
     }
 
     $antigo = get_posts([
