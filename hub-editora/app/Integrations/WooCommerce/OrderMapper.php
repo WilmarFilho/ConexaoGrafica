@@ -42,7 +42,7 @@ class OrderMapper
             return true;
         }
 
-        // Sem shipping_lines: pedido só de e-books (virtual) no padrão da Pubcon.
+        // Sem shipping_lines: pedido só de e-books (virtual).
         return (float) ($order['shipping_total'] ?? 0) > 0;
     }
 

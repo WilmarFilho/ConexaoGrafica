@@ -25,7 +25,7 @@
 <main>
     <div class="brand">
         <svg width="30" height="30" viewBox="0 0 34 34" aria-hidden="true"><rect x="1" y="1" width="32" height="32" rx="9" fill="#2E6BD6"/><rect x="8" y="10" width="13" height="2.6" rx="1.3" fill="#fff"/><rect x="8" y="15.7" width="16" height="2.6" rx="1.3" fill="#fff"/><rect x="8" y="21.4" width="10" height="2.6" rx="1.3" fill="#fff"/><circle cx="24.5" cy="22.7" r="3.2" fill="#fff"/><circle cx="24.5" cy="22.7" r="1.4" fill="#2E6BD6"/></svg>
-        <div><strong>Hub Editora</strong><span>Conexão Editora · Pubcon</span></div>
+        <div><strong>Hub Editora</strong><span>Conexão Editora</span></div>
     </div>
 
     <h1>Política de Privacidade e Tratamento de Dados</h1>

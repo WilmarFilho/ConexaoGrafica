@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Importa/atualiza pedidos do WooCommerce no hub.
  *
- * Regras que vieram da operação real da Pubcon:
+ * Regras que vieram da operação real da loja:
  * - O plugin multi-vendor (MVX) cria pedidos-filho por vendedor. Só o pedido
  *   pai (parent_id = 0) entra; senão a fila conta em dobro.
  * - Idempotente por (canal, external_id): webhook repetido ou varredura
@@ -106,13 +106,13 @@ class ImportOrders
             $order->items()->delete();
 
             foreach (OrderMapper::items($payload) as $item) {
-                $productId = ProductChannelRef::query()
+                $ref = ProductChannelRef::query()
                     ->where('channel_id', $this->channel->id)
                     ->where('external_id', $item['external_product_id'])
-                    ->value('product_id');
+                    ->first(['product_id', 'format']);
 
                 unset($item['external_product_id']);
-                $order->items()->create([...$item, 'product_id' => $productId]);
+                $order->items()->create([...$item, 'product_id' => $ref?->product_id, 'format' => $ref?->format]);
             }
 
             // Atualização sem mudança de etapa não vira ruído no histórico.

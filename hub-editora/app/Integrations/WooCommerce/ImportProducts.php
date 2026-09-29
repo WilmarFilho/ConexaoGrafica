@@ -12,13 +12,15 @@ use Illuminate\Support\Facades\DB;
 /**
  * Traz o catálogo do WooCommerce para a tabela de produtos do hub.
  *
- * - Um produto do hub por produto do Woo, ligado por ProductChannelRef.
+ * - Um produto do hub por livro, ligado por ProductChannelRef.
+ * - Livro com formatos (produto variável na loja): o livro e cada variação
+ *   apontam para o mesmo produto do hub; o vínculo guarda qual formato é
+ *   aquele id, e o produto lista os formatos à venda.
  * - Peso e medidas: o que a loja tem preenchido vence; o que está vazio na
  *   loja não apaga o que alguém digitou no hub.
- * - E-book = produto virtual/baixável no Woo (não entra na expedição).
- * - Livro com formatos (produto variável): cada formato vira um produto do
- *   hub, ligado pelo id da variação.
- * - No fim, religa os itens de pedido que ainda não apontavam para produto.
+ * - E-book = virtual/baixável no Woo (não entra na expedição).
+ * - No fim, religa os itens de pedido que ainda não apontavam para produto e
+ *   anota em cada item o formato vendido.
  */
 class ImportProducts
 {
@@ -41,21 +43,11 @@ class ImportProducts
 
         try {
             foreach ($this->client->products() as $payload) {
-                if (($payload['type'] ?? 'simple') === 'variable') {
-                    foreach ($this->client->variations((int) $payload['id']) as $variation) {
-                        // formato ainda sem preço não está à venda: não vira produto
-                        if ((string) ($variation['price'] ?? '') === '') {
-                            continue;
-                        }
+                $variations = ($payload['type'] ?? 'simple') === 'variable'
+                    ? $this->client->variations((int) $payload['id'])
+                    : [];
 
-                        $this->upsert(self::variationAsProduct($payload, $variation), $weightUnit, $dimUnit);
-                        $count++;
-                    }
-
-                    continue;
-                }
-
-                $this->upsert($payload, $weightUnit, $dimUnit);
+                $this->upsert($payload, $weightUnit, $dimUnit, $variations);
                 $count++;
             }
 
@@ -71,89 +63,130 @@ class ImportProducts
     }
 
     /**
-     * Cada formato de um livro (variação) entra no hub como um produto próprio:
-     * o impresso vai para a expedição, o e-book não. O que a variação não
-     * informa (peso, medidas, ISBN) vem do livro.
+     * @param  array  $variations  variações do produto na loja (vazio = produto simples)
      */
-    public static function variationAsProduct(array $parent, array $variation): array
+    public function upsert(array $p, string $weightUnit = 'kg', string $dimUnit = 'cm', array $variations = []): Product
     {
-        $format = collect($variation['attributes'] ?? [])->pluck('option')->filter()->implode(' / ');
-        $dimensions = [];
+        return DB::transaction(function () use ($p, $weightUnit, $dimUnit, $variations) {
+            $parentId = (string) $p['id'];
 
-        foreach (['length', 'width', 'height'] as $side) {
-            $dimensions[$side] = ($variation['dimensions'][$side] ?? '') !== ''
-                ? $variation['dimensions'][$side]
-                : ($parent['dimensions'][$side] ?? '');
-        }
+            // id da loja => formato daquele id (null = o livro em si, com variações)
+            $formatsById = [];
 
-        return [
-            'id' => $variation['id'],
-            'name' => trim($parent['name'].($format !== '' ? " — {$format}" : '')),
-            'sku' => $variation['sku'] ?? '',
-            'status' => $variation['status'] ?? 'publish',
-            'virtual' => (bool) ($variation['virtual'] ?? false),
-            'downloadable' => (bool) ($variation['downloadable'] ?? false),
-            'weight' => ($variation['weight'] ?? '') !== '' ? $variation['weight'] : ($parent['weight'] ?? ''),
-            'dimensions' => $dimensions,
-            'manage_stock' => ($variation['manage_stock'] ?? false) === true,
-            'stock_quantity' => $variation['stock_quantity'] ?? null,
-            'attributes' => $parent['attributes'] ?? [],
-            'meta_data' => array_merge($parent['meta_data'] ?? [], $variation['meta_data'] ?? []),
-        ];
-    }
+            if ($variations) {
+                $formatsById[$parentId] = null;
 
-    public function upsert(array $p, string $weightUnit = 'kg', string $dimUnit = 'cm'): Product
-    {
-        return DB::transaction(function () use ($p, $weightUnit, $dimUnit) {
-            $externalId = (string) $p['id'];
-            $ref = ProductChannelRef::query()
-                ->where('channel_id', $this->channel->id)
-                ->where('external_id', $externalId)
-                ->first();
+                foreach ($variations as $v) {
+                    $label = collect($v['attributes'] ?? [])->pluck('option')->filter()->implode(' ');
+                    $formatsById[(string) $v['id']] = Product::formatFromLabel($label, (bool) ($v['virtual'] ?? false));
+                }
 
-            $product = $ref?->product ?? $this->matchBySku($p) ?? new Product;
+                // formato sem preço não está à venda
+                $onSale = collect($variations)
+                    ->filter(fn ($v) => (string) ($v['price'] ?? '') !== '')
+                    ->map(fn ($v) => $formatsById[(string) $v['id']])
+                    ->all();
 
-            $physical = ! ($p['virtual'] ?? false) && ! ($p['downloadable'] ?? false);
+                $shipped = collect($variations)
+                    ->first(fn ($v) => in_array($formatsById[(string) $v['id']], Product::SHIPPED_FORMATS, true));
+            } else {
+                $single = Product::formatFromLabel(null, (bool) ($p['virtual'] ?? false) || (bool) ($p['downloadable'] ?? false));
+                $formatsById[$parentId] = $single;
+                $onSale = [$single];
+                $shipped = null;
+            }
+
+            $product = $this->findOrMerge(array_keys($formatsById), $p);
+
             $data = [
                 'name' => $p['name'],
-                'physical' => $physical,
+                'formats' => $onSale,
                 'active' => ($p['status'] ?? 'publish') === 'publish',
             ];
 
             if (! $product->exists) {
-                $data['sku'] = $this->uniqueSku($p['sku'] ?: 'WOO-'.$externalId);
+                $data['sku'] = $this->uniqueSku($p['sku'] ?: 'WOO-'.$parentId);
             }
 
             if ($isbn = $this->isbnFrom($p)) {
                 $data['isbn'] = $isbn;
             }
 
-            // Medidas: só sobrescreve quando a loja tem valor.
-            if ($grams = $this->grams($p['weight'] ?? null, $weightUnit)) {
+            // Medidas: as do impresso, se a variação tiver; senão as do livro.
+            // Só sobrescreve quando a loja tem valor.
+            $weight = ($shipped['weight'] ?? '') !== '' ? $shipped['weight'] : ($p['weight'] ?? null);
+
+            if ($grams = $this->grams($weight, $weightUnit)) {
                 $data['weight_grams'] = $grams;
             }
+
             foreach (['width' => 'width_cm', 'height' => 'height_cm', 'length' => 'depth_cm'] as $from => $to) {
-                if ($cm = $this->cm($p['dimensions'][$from] ?? null, $dimUnit)) {
+                $value = ($shipped['dimensions'][$from] ?? '') !== '' ? $shipped['dimensions'][$from] : ($p['dimensions'][$from] ?? null);
+
+                if ($cm = $this->cm($value, $dimUnit)) {
                     $data[$to] = $cm;
                 }
             }
 
-            if (($p['manage_stock'] ?? false) && isset($p['stock_quantity'])) {
-                $data['stock_physical'] = (int) $p['stock_quantity'];
+            $stock = ($shipped && ($shipped['manage_stock'] ?? false) === true) ? $shipped : $p;
+
+            if (($stock['manage_stock'] ?? false) === true && isset($stock['stock_quantity'])) {
+                $data['stock_physical'] = (int) $stock['stock_quantity'];
             }
 
             $product->fill($data)->save();
 
-            ProductChannelRef::updateOrCreate(
-                ['channel_id' => $this->channel->id, 'external_id' => $externalId],
-                ['product_id' => $product->id, 'external_sku' => $p['sku'] ?: null],
-            );
+            $skus = collect($variations)->pluck('sku', 'id')->put($parentId, $p['sku'] ?? '');
+
+            foreach ($formatsById as $externalId => $format) {
+                ProductChannelRef::updateOrCreate(
+                    ['channel_id' => $this->channel->id, 'external_id' => (string) $externalId],
+                    ['product_id' => $product->id, 'external_sku' => ($skus[$externalId] ?? '') ?: null, 'format' => $format],
+                );
+            }
 
             return $product;
         });
     }
 
-    /** Itens de pedido sem produto: casa pelo SKU ou pelo id do produto no canal. */
+    /**
+     * O produto do hub para este livro. Quando cada formato já tinha virado um
+     * produto separado, junta tudo no primeiro físico (ou no mais antigo):
+     * itens de pedido e vínculos passam para ele e os outros deixam de existir.
+     */
+    private function findOrMerge(array $externalIds, array $p): Product
+    {
+        $candidates = Product::query()
+            ->whereIn('id', ProductChannelRef::query()
+                ->where('channel_id', $this->channel->id)
+                ->whereIn('external_id', array_map('strval', $externalIds))
+                ->select('product_id'))
+            ->orderByDesc('physical')
+            ->orderBy('id')
+            ->get();
+
+        $keeper = $candidates->first() ?? $this->matchBySku($p) ?? new Product;
+
+        foreach ($candidates->skip(1) as $other) {
+            OrderItem::query()->where('product_id', $other->id)->update(['product_id' => $keeper->id]);
+            ProductChannelRef::query()->where('product_id', $other->id)->update(['product_id' => $keeper->id]);
+
+            foreach (['weight_grams', 'width_cm', 'height_cm', 'depth_cm', 'isbn'] as $field) {
+                if (blank($keeper->{$field}) && filled($other->{$field})) {
+                    $keeper->{$field} = $other->{$field};
+                }
+            }
+
+            $other->delete();
+        }
+
+        return $keeper;
+    }
+
+    /**
+     * Itens de pedido sem produto ou sem formato: casa pelo SKU ou pelo id do
+     * produto no canal. Conta só os que ganharam produto.
+     */
     public function relinkOrderItems(): int
     {
         $refs = ProductChannelRef::query()->where('channel_id', $this->channel->id)->get();
@@ -162,14 +195,29 @@ class ImportProducts
         $n = 0;
 
         OrderItem::query()
-            ->whereNull('product_id')
+            ->where(fn ($q) => $q->whereNull('product_id')->orWhereNull('format'))
             ->whereHas('order', fn ($q) => $q->where('channel_id', $this->channel->id))
             ->chunkById(200, function ($items) use ($bySku, $byId, &$n) {
                 foreach ($items as $item) {
-                    $ref = $bySku[$item->external_sku] ?? $byId[$item->external_sku] ?? null;
-                    if ($ref) {
-                        $item->update(['product_id' => $ref->product_id]);
+                    $ref = $byId[$item->external_sku] ?? $bySku[$item->external_sku] ?? null;
+
+                    if (! $ref) {
+                        continue;
+                    }
+
+                    $changes = [];
+
+                    if (! $item->product_id) {
+                        $changes['product_id'] = $ref->product_id;
                         $n++;
+                    }
+
+                    if (! $item->format && $ref->format) {
+                        $changes['format'] = $ref->format;
+                    }
+
+                    if ($changes) {
+                        $item->update($changes);
                     }
                 }
             });
@@ -216,7 +264,7 @@ class ImportProducts
         return null;
     }
 
-    private function grams(?string $value, string $unit): ?int
+    private function grams(mixed $value, string $unit): ?int
     {
         $v = (float) str_replace(',', '.', (string) $value);
         if ($v <= 0) {
@@ -231,7 +279,7 @@ class ImportProducts
         });
     }
 
-    private function cm(?string $value, string $unit): ?int
+    private function cm(mixed $value, string $unit): ?int
     {
         $v = (float) str_replace(',', '.', (string) $value);
         if ($v <= 0) {

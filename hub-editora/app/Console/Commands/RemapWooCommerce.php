@@ -11,13 +11,13 @@ use Illuminate\Support\Facades\DB;
  * php artisan hub:remap-woocommerce mapa.json           (simulação)
  * php artisan hub:remap-woocommerce mapa.json --apply   (para valer)
  *
- * A loja mudou de endereço (Pubcon → Conexão Editora) e, com ela, os ids de
+ * A loja mudou de endereço (loja antiga → Conexão Editora) e, com ela, os ids de
  * pedidos e produtos. Este comando troca os ids antigos pelos novos nos
  * registros do canal WooCommerce, para o hub continuar enxergando os mesmos
  * pedidos e produtos em vez de importar tudo de novo em duplicidade.
  *
  * O mapa é um JSON: {"orders": {"idAntigo": "idNovo"}, "products": {...}}.
- * O que não tiver par fica marcado como "pubcon-<id>", para nunca ser
+ * O que não tiver par fica marcado como "antigo-<id>", para nunca ser
  * confundido com um id da loja nova.
  */
 class RemapWooCommerce extends Command
@@ -26,7 +26,7 @@ class RemapWooCommerce extends Command
 
     protected $description = 'Troca os ids de pedidos e produtos do WooCommerce após a mudança de loja';
 
-    private const LEGACY = 'pubcon-';
+    private const LEGACY = 'antigo-';
 
     private const ACTION = 'store.remapped';
 

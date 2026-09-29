@@ -8,6 +8,7 @@ use App\Models\Channel;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductChannelRef;
 use Database\Seeders\ChannelSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -79,7 +80,7 @@ class ImportProductsTest extends TestCase
         $this->assertSame(420, $livro->fresh()->weight_grams);
     }
 
-    public function test_book_formats_become_separate_products_linked_by_variation(): void
+    public function test_a_book_with_formats_is_one_product_and_merges_old_per_format_products(): void
     {
         Http::fake([
             'loja.test/wp-json/wc/v3/settings/products/*' => Http::response(['value' => 'kg']),
@@ -95,36 +96,68 @@ class ImportProductsTest extends TestCase
             ]),
             'loja.test/wp-json/wc/v3/products?*' => Http::response([
                 ['id' => 20, 'type' => 'variable', 'name' => 'Neuro-oftalmologia', 'sku' => '', 'status' => 'publish',
-                    'weight' => '0.9', 'dimensions' => ['length' => '3', 'width' => '23', 'height' => '32'],
+                    'weight' => '0.9', 'dimensions' => ['length' => '', 'width' => '23', 'height' => '32'],
                     'meta_data' => [['key' => '_conexao_isbn13', 'value' => '978-65-975654-7-4']]],
             ], 200, ['X-WP-TotalPages' => '1']),
         ]);
 
         $woo = Channel::bySlug(Channel::WOOCOMMERCE);
+
+        // como estava antes: um produto do hub por formato
+        $impresso = Product::create(['name' => 'Neuro-oftalmologia — Impresso', 'sku' => 'WOO-21', 'physical' => true, 'active' => true, 'depth_cm' => 3]);
+        $ebook = Product::create(['name' => 'Neuro-oftalmologia — E-book', 'sku' => 'WOO-22', 'physical' => false, 'active' => true]);
+        ProductChannelRef::create(['channel_id' => $woo->id, 'product_id' => $impresso->id, 'external_id' => '21']);
+        ProductChannelRef::create(['channel_id' => $woo->id, 'product_id' => $ebook->id, 'external_id' => '22']);
+
         $customer = Customer::create(['name' => 'Cliente']);
         $order = Order::create([
             'channel_id' => $woo->id, 'external_id' => '900', 'customer_id' => $customer->id,
             'status' => 'paid', 'payment_status' => 'paid', 'requires_shipping' => true, 'placed_at' => now(),
         ]);
-        $item = $order->items()->create(['name' => 'Neuro-oftalmologia', 'external_sku' => '21', 'quantity' => 1, 'unit_cents' => 12000, 'total_cents' => 12000]);
+        $semProduto = $order->items()->create(['name' => 'Neuro-oftalmologia - Impresso', 'external_sku' => '21', 'quantity' => 1, 'unit_cents' => 12000, 'total_cents' => 12000]);
+        $doEbook = $order->items()->create(['name' => 'Neuro-oftalmologia - E-book', 'external_sku' => '22', 'product_id' => $ebook->id, 'quantity' => 1, 'unit_cents' => 6000, 'total_cents' => 6000]);
 
         $r = ImportProducts::make()->all();
 
-        $this->assertSame(['products' => 2, 'relinked' => 1], $r);
+        $this->assertSame(['products' => 1, 'relinked' => 1], $r);
+        $this->assertSame(1, Product::count());
 
-        $impresso = Product::where('sku', 'WOO-21')->firstOrFail();
-        $this->assertSame('Neuro-oftalmologia — Impresso', $impresso->name);
-        $this->assertTrue($impresso->physical);
-        $this->assertSame(900, $impresso->weight_grams);
-        $this->assertSame([23, 32, 3], [$impresso->width_cm, $impresso->height_cm, $impresso->depth_cm]);
-        $this->assertSame('9786597565474', $impresso->isbn);
+        $livro = $impresso->fresh();
+        $this->assertSame('Neuro-oftalmologia', $livro->name);
+        $this->assertSame('WOO-21', $livro->sku);
+        $this->assertSame(['fisico', 'ebook'], $livro->formats); // o combo sem preço não está à venda
+        $this->assertTrue($livro->physical);
+        $this->assertSame(900, $livro->weight_grams);
+        $this->assertSame([23, 32, 3], [$livro->width_cm, $livro->height_cm, $livro->depth_cm]);
+        $this->assertSame('9786597565474', $livro->isbn);
 
-        $ebook = Product::where('sku', 'WOO-22')->firstOrFail();
-        $this->assertFalse($ebook->physical);
+        $this->assertSame(
+            ['20' => null, '21' => 'fisico', '22' => 'ebook', '23' => 'fisico_ebook'],
+            ProductChannelRef::where('product_id', $livro->id)->orderBy('external_id')->pluck('format', 'external_id')->all(),
+        );
 
-        $this->assertSame(0, Product::where('sku', 'WOO-20')->count());
-        $this->assertSame(0, Product::where('sku', 'WOO-23')->count());
-        $this->assertSame($impresso->id, $item->fresh()->product_id);
+        $this->assertSame([$livro->id, 'fisico'], [$semProduto->fresh()->product_id, $semProduto->fresh()->format]);
+        $this->assertSame([$livro->id, 'ebook'], [$doEbook->fresh()->product_id, $doEbook->fresh()->format]);
+
+        // segunda rodada: nada se multiplica
+        ImportProducts::make()->all();
+        $this->assertSame(1, Product::count());
+        $this->assertSame(4, ProductChannelRef::count());
+    }
+
+    public function test_formats_decide_if_the_product_is_shipped(): void
+    {
+        $p = Product::create(['name' => 'Livro', 'sku' => 'L-1', 'formats' => ['ebook'], 'active' => true]);
+        $this->assertFalse($p->physical);
+
+        $p->update(['formats' => ['fisico_ebook', 'ebook', 'ebook']]);
+        $this->assertTrue($p->fresh()->physical);
+        $this->assertSame(['ebook', 'fisico_ebook'], $p->fresh()->formats);
+
+        $this->assertSame('fisico_ebook', Product::formatFromLabel('Impresso + E-book'));
+        $this->assertSame('fisico', Product::formatFromLabel('Físico'));
+        $this->assertSame('ebook', Product::formatFromLabel('E-book'));
+        $this->assertSame('ebook', Product::formatFromLabel(null, true));
     }
 
     public function test_order_items_point_to_the_variation_when_there_is_one(): void

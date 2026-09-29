@@ -34,7 +34,7 @@ class ChannelsHealth extends Widget
         $me = $channels[Channel::MELHOR_ENVIO] ?? null;
 
         return array_values(array_filter([
-            $this->row('WooCommerce (Pubcon)', [$woo],
+            $this->row('Loja Conexão Editora', [$woo],
                 filled(config('hub.woocommerce.url')) && filled(config('hub.woocommerce.key')), orders: [$woo]),
 
             $this->row('Pagar.me (landing pages)', [$pm],

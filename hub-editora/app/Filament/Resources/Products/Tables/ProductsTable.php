@@ -13,17 +13,22 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ProductsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->withCount('channelRefs'))
+            // um livro tem um vínculo por formato no mesmo canal: conta canais, não vínculos
+            ->modifyQueryUsing(fn (Builder $query) => $query->withCount([
+                'channelRefs as channel_refs_count' => fn (Builder $q) => $q->select(DB::raw('count(distinct channel_id)')),
+            ]))
             ->defaultSort('name')
             ->paginated([25, 50, 100])
             ->columns([
@@ -41,11 +46,13 @@ class ProductsTable
                     ->sortable()
                     ->wrap(),
 
-                IconColumn::make('physical')
-                    ->label('Tipo')
-                    ->icon(fn (bool $state) => $state ? Heroicon::OutlinedCube : Heroicon::OutlinedDevicePhoneMobile)
-                    ->color(fn (bool $state) => $state ? 'primary' : 'gray')
-                    ->tooltip(fn (bool $state) => $state ? 'Físico' : 'E-book'),
+                TextColumn::make('formats')
+                    ->label('Formatos')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state) => Product::FORMATS[$state] ?? $state)
+                    ->icon(fn (string $state) => $state === 'ebook' ? Heroicon::OutlinedDevicePhoneMobile : Heroicon::OutlinedCube)
+                    ->color(fn (string $state) => $state === 'ebook' ? 'gray' : 'primary')
+                    ->placeholder('—'),
 
                 TextColumn::make('weight_grams')
                     ->label('Peso')
@@ -87,10 +94,12 @@ class ProductsTable
                     ->label('Ativo'),
             ])
             ->filters([
-                TernaryFilter::make('physical')
-                    ->label('Tipo')
-                    ->trueLabel('Físicos')
-                    ->falseLabel('E-books'),
+                SelectFilter::make('formato')
+                    ->label('Formato')
+                    ->options(Product::FORMATS)
+                    ->query(fn (Builder $query, array $data) => filled($data['value'] ?? null)
+                        ? $query->whereJsonContains('formats', $data['value'])
+                        : $query),
 
                 Filter::make('sem_medidas')
                     ->label('Sem peso ou medidas')

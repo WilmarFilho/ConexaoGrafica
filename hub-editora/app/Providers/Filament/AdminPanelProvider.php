@@ -40,7 +40,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('2.1rem')
             ->favicon(asset('favicon.svg'))
             // Paleta da identidade: azul suave como cor de acao, cinzas quentes
-            // no resto (papel). O ciano da Pubcon nao entra: o hub e da editora.
+            // no resto (papel). O hub tem identidade propria.
             ->colors([
                 'primary' => Color::hex('#2E6BD6'),
                 'gray' => Color::Stone,

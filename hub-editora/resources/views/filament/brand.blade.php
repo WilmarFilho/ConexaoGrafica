@@ -1,4 +1,4 @@
-{{-- Marca do Hub Editora (identidade propria; a Pubcon e uma das editoras do hub). --}}
+{{-- Marca do Hub Editora (identidade propria). --}}
 <span style="display: inline-flex; align-items: center; gap: 10px;">
     <svg width="30" height="30" viewBox="0 0 34 34" aria-hidden="true">
         <rect x="1" y="1" width="32" height="32" rx="9" fill="#2E6BD6"></rect>

@@ -52,7 +52,7 @@ class RemapWooCommerceTest extends TestCase
 
         $this->assertSame('812', $migrado->fresh()->external_id);
         $this->assertSame('8300', $migrado->fresh()->external_number);
-        $this->assertSame('pubcon-8301', $semPar->fresh()->external_id);
+        $this->assertSame('antigo-8301', $semPar->fresh()->external_id);
         $this->assertSame('305', $item->fresh()->external_sku);
         $this->assertSame('301', ProductChannelRef::where('product_id', $a->id)->value('external_id'));
         $this->assertSame('305', ProductChannelRef::where('product_id', $b->id)->value('external_id'));

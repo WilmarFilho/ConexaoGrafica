@@ -64,7 +64,7 @@ class ImportOrders
     }
 
     /**
-     * A loja Pubcon cobra pelo módulo do Pagar.me, então cada pedido do
+     * A loja cobra pelo módulo do Pagar.me, então cada pedido do
      * WooCommerce também existe no Pagar.me. O dono desse pedido é o
      * WooCommerce; aqui só entram os checkouts diretos (landing pages).
      */

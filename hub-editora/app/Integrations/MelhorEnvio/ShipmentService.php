@@ -345,12 +345,28 @@ class ShipmentService
         return $shipment;
     }
 
-    /** Volumes por item, usando dimensões do produto ou o pacote padrão. */
+    /**
+     * Volumes por item, usando dimensões do produto ou o pacote padrão.
+     * E-book não tem volume: fica de fora (a não ser que o pedido só tenha
+     * itens sem formato conhecido, e aí vai tudo, como antes).
+     */
     private function productsForQuote(Order $order): array
     {
         $def = config('hub.melhor_envio.default_package');
 
-        return $order->items->map(function (OrderItem $item) use ($def) {
+        $items = $order->items->reject(function (OrderItem $item) {
+            if ($item->format) {
+                return ! in_array($item->format, Product::SHIPPED_FORMATS, true);
+            }
+
+            return $item->product_id && Product::find($item->product_id)?->physical === false;
+        });
+
+        if ($items->isEmpty()) {
+            $items = $order->items;
+        }
+
+        return $items->map(function (OrderItem $item) use ($def) {
             $p = $item->product_id ? Product::find($item->product_id) : null;
             $ok = $p?->hasShippingDimensions();
 

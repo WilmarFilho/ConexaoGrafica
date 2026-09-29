@@ -1,7 +1,7 @@
 # Hub Editora
 
 Painel operacional único de pedidos e expedição da editora. Os canais de venda
-(WooCommerce da Pubcon, checkouts Pagar.me das landing pages e Amazon Seller)
+(loja WooCommerce da Conexão Editora, checkouts Pagar.me das landing pages e Amazon Seller)
 entram como origem de pedidos; a expedição sai por um só lugar, com etiqueta
 do Melhor Envio e baixa automática do status no canal de origem.
 

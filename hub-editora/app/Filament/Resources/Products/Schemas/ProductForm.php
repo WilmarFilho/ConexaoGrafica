@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Models\Product;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
@@ -47,7 +48,13 @@ class ProductForm
                     ->schema([
                         Section::make('Situação')
                             ->schema([
-                                Toggle::make('physical')->label('Produto físico')->helperText('Desligado = e-book, não entra na expedição.')->default(true),
+                                CheckboxList::make('formats')
+                                    ->label('Formatos')
+                                    ->options(Product::FORMATS)
+                                    ->default(['fisico'])
+                                    ->required()
+                                    ->validationMessages(['required' => 'Marque pelo menos um formato.'])
+                                    ->helperText('Os formatos em que o livro é vendido. Físico entra na expedição; e-book não. A loja atualiza a cada sincronização.'),
                                 Toggle::make('active')->label('Ativo')->default(true),
                                 TextInput::make('stock_physical')->label('Estoque físico')->numeric()->default(0)
                                     ->helperText('Atualizado pela loja quando ela controla estoque.'),
@@ -57,8 +64,10 @@ class ProductForm
                             ->schema([
                                 TextEntry::make('channel_refs_label')
                                     ->hiddenLabel()
-                                    ->state(fn (?Product $record) => $record?->channelRefs()->with('channel')->get()
-                                        ->map(fn ($r) => ($r->channel?->name ?? '?').': '.$r->external_id.($r->external_sku ? " (SKU {$r->external_sku})" : ''))
+                                    ->state(fn (?Product $record) => $record?->channelRefs()->with('channel')->orderBy('channel_id')->orderBy('id')->get()
+                                        ->map(fn ($r) => ($r->channel?->name ?? '?').': '.$r->external_id
+                                            .($r->format ? ' · '.(Product::FORMATS[$r->format] ?? $r->format) : '')
+                                            .($r->external_sku ? " (SKU {$r->external_sku})" : ''))
                                         ->implode("\n") ?: null)
                                     ->placeholder('Ainda não vinculado a nenhum canal.')
                                     ->extraAttributes(['class' => 'hub-mono', 'style' => 'white-space: pre-line']),

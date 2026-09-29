@@ -67,7 +67,7 @@ class Integracoes extends Page implements HasSchemas
             ->statePath('data')
             ->components([
                 Grid::make(2)->schema([
-                    $this->section('WooCommerce (loja Pubcon)', Channel::WOOCOMMERCE, 'woo', [
+                    $this->section('Loja Conexão Editora (WooCommerce)', Channel::WOOCOMMERCE, 'woo', [
                         $this->text('woocommerce.url'),
                         $this->secret('woocommerce.key'),
                         $this->secret('woocommerce.secret'),
