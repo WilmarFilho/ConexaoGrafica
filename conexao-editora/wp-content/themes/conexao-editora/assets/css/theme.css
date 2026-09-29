@@ -1536,7 +1536,8 @@ button {
   padding: 16px 10px;
   border: 1px solid var(--azul);
   border-radius: 6px;
-  background: #fff;
+  /* vazado, como os cards de categoria da home */
+  background: transparent;
   color: var(--azul);
   font-size: 12.5px;
   text-align: center;
@@ -1701,6 +1702,8 @@ button {
 .busca--catalogo input[type="search"] {
   font-weight: 400;
   padding-block: 11px;
+  /* vazado, como a busca do cabeçalho */
+  background-color: transparent;
 }
 
 .catalogo__ordem {
@@ -1712,6 +1715,13 @@ button {
   padding-block: 12px;
   font-weight: 400;
   border-radius: 999px;
+  /* vazado; a seta continua desenhada por cima */
+  background-color: transparent;
+}
+
+/* a lista aberta do select não fica transparente sobre a página */
+.catalogo__ordem select option {
+  background-color: #fff;
 }
 
 .catalogo__visao {
