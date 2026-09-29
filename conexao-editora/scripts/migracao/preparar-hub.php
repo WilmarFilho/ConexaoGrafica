@@ -10,6 +10,10 @@
  *
  *   CONEXAO_HUB_URL=https://hub…  CONEXAO_HUB_SEGREDO=…  CONEXAO_SAIDA=~/hub-virada \
  *     wp eval-file preparar-hub.php
+ *
+ * No Hub, depois: trocar WOO_URL/chaves pelo chave.env, WOO_SYNC_PRODUCTS=true,
+ * e `php artisan hub:remap-woocommerce mapa.json --apply --again --keep-products`
+ * (o Hub já tem vínculos de produto das duas lojas; só pedidos e itens mudam).
  */
 
 global $wpdb;
@@ -86,6 +90,16 @@ foreach ($wpdb->get_results("SELECT post_id, meta_value FROM {$wpdb->postmeta} W
     }
 
     $mapa['products'][(string) $linha->meta_value] = (string) $novo;
+}
+
+// e-books antigos que já saíram da loja: o código da Pubcon ficou no registro
+foreach ((array) get_option('conexao_rascunhos_removidos', []) as $r) {
+    $livro = ! empty($r['pubcon']) && ! empty($r['destino']) ? wc_get_product((int) $r['destino']) : null;
+    $ebook = $livro && $livro->is_type('variable') ? $formato($livro, 'e-book') : 0;
+
+    if ($ebook) {
+        $mapa['products'][(string) $r['pubcon']] = (string) $ebook;
+    }
 }
 
 file_put_contents($saida.'/mapa.json', wp_json_encode($mapa));

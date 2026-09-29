@@ -94,7 +94,23 @@ $variacao_de = static function (int $pai, string $formato): int {
 $mapa = [];       // id Pubcon => ['produto' => base, 'variacao' => id, 'formato' => slug]
 $sem_par = [];
 
+// e-books antigos que viraram formato de outro livro e já saíram da loja
+// (ver scripts/limpar-rascunhos.php): o código da Pubcon ficou no registro
+$removidos = [];
+
+foreach ((array) get_option('conexao_rascunhos_removidos', []) as $r) {
+    if (! empty($r['pubcon']) && ! empty($r['destino']) && get_post_status((int) $r['destino'])) {
+        $removidos[(int) $r['pubcon']] = (int) $r['destino'];
+    }
+}
+
 foreach ($pacote['produtos'] as $p) {
+    if (isset($removidos[$p['id']])) {
+        $destino = $removidos[$p['id']];
+        $mapa[$p['id']] = ['produto' => $destino, 'variacao' => $variacao_de($destino, 'e-book'), 'formato' => 'e-book', 'registro' => 0];
+        continue;
+    }
+
     $tipo = $e_ebook($p['nome']) ? 'ebook' : 'livro';
     $local = $por_origem[$p['id']] ?? $por_slug[$p['slug']] ?? $por_nome[$tipo][$chave($p['nome'])] ?? 0;
 
@@ -137,7 +153,7 @@ foreach ($pacote['produtos'] as $p) {
         continue;
     }
 
-    if ($aplicar) {
+    if ($aplicar && $mapa[$p['id']]['registro']) {
         update_post_meta($mapa[$p['id']]['registro'], '_pubcon_id', $p['id']);
     }
 
