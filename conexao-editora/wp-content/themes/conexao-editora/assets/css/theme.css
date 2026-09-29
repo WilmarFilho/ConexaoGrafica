@@ -2266,7 +2266,12 @@ button {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) repeat(5, minmax(0, 1fr));
   gap: 30px;
-  padding-bottom: 44px;
+  padding-bottom: 64px;
+}
+
+/* a marca e a descrição ficam mais afastadas das colunas de links */
+.rodape__marca {
+  padding-right: 36px;
 }
 
 .rodape__marca .marca--rodape {
@@ -2295,12 +2300,12 @@ button {
 }
 
 .rodape__titulo-secundario {
-  margin-top: 34px;
+  margin-top: 44px;
 }
 
 .rodape__links {
   display: grid;
-  gap: 12px;
+  gap: 8px;
   font-size: 14px;
   color: var(--tinta-media);
   overflow-wrap: anywhere;
@@ -2376,6 +2381,32 @@ button {
   text-align: center;
   font-size: 13px;
   color: var(--tinta-media);
+}
+
+/* ---------- aviso de cookies (plugin Cookie Notice) nas cores da marca ---------- */
+#cookie-notice {
+  background-color: var(--azul-escuro) !important;
+  font-family: var(--fonte);
+}
+
+#cookie-notice .cn-button {
+  border: 1px solid #fff;
+  border-radius: 999px;
+  background: transparent !important;
+  color: #fff !important;
+  font-family: var(--fonte);
+  font-weight: 700;
+}
+
+#cookie-notice #cn-accept-cookie {
+  background: #fff !important;
+  color: var(--azul-escuro) !important;
+}
+
+#cookie-notice .cn-button:hover {
+  background: var(--azul) !important;
+  border-color: var(--azul);
+  color: #fff !important;
 }
 
 /* ---------- botões flutuantes ---------- */
