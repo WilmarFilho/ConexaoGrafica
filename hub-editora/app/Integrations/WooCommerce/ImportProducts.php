@@ -81,9 +81,9 @@ class ImportProducts
                     $formatsById[(string) $v['id']] = Product::formatFromLabel($label, (bool) ($v['virtual'] ?? false));
                 }
 
-                // formato sem preço não está à venda
+                // formato sem preço ou desativado na loja não está à venda
                 $onSale = collect($variations)
-                    ->filter(fn ($v) => (string) ($v['price'] ?? '') !== '')
+                    ->filter(fn ($v) => (string) ($v['price'] ?? '') !== '' && ($v['status'] ?? 'publish') === 'publish')
                     ->map(fn ($v) => $formatsById[(string) $v['id']])
                     ->all();
 

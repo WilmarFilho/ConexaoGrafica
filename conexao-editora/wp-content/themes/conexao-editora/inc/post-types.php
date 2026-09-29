@@ -49,3 +49,23 @@ add_action('init', function () {
         'rewrite' => ['slug' => 'colecoes'],
     ]);
 });
+
+// Lista de produtos no painel: o WooCommerce fixa a largura das colunas dele e
+// as de autor e coleção ficavam com largura zero (nome quebrando letra a letra,
+// uma linha ocupando a tela inteira).
+add_action('admin_head-edit.php', function (): void {
+    if (($GLOBALS['typenow'] ?? '') !== 'product') {
+        return;
+    }
+
+    echo '<style>.wp-list-table .column-taxonomy-autor{width:15%}.wp-list-table .column-taxonomy-colecao{width:9%}</style>';
+});
+
+// Marcas não são usadas pela editora: a coluna só aparece se alguma for criada.
+add_filter('manage_edit-product_columns', function (array $colunas): array {
+    if (isset($colunas['taxonomy-product_brand']) && ! (int) wp_count_terms(['taxonomy' => 'product_brand', 'hide_empty' => false])) {
+        unset($colunas['taxonomy-product_brand']);
+    }
+
+    return $colunas;
+}, 20);

@@ -94,7 +94,15 @@ class ImportProductsTest extends TestCase
                 ['id' => 23, 'sku' => '', 'status' => 'publish', 'price' => '', 'virtual' => false,
                     'attributes' => [['name' => 'Formato', 'option' => 'Impresso + E-book']]],
             ]),
+            'loja.test/wp-json/wc/v3/products/40/variations*' => Http::response([
+                ['id' => 41, 'sku' => '', 'status' => 'private', 'price' => '120', 'virtual' => false,
+                    'attributes' => [['name' => 'Formato', 'option' => 'Impresso']]],
+                ['id' => 42, 'sku' => '', 'status' => 'publish', 'price' => '190', 'virtual' => true,
+                    'attributes' => [['name' => 'Formato', 'option' => 'E-book']]],
+            ]),
             'loja.test/wp-json/wc/v3/products?*' => Http::response([
+                ['id' => 40, 'type' => 'variable', 'name' => 'Tratado', 'sku' => '', 'status' => 'publish',
+                    'weight' => '', 'dimensions' => ['length' => '', 'width' => '', 'height' => '']],
                 ['id' => 20, 'type' => 'variable', 'name' => 'Neuro-oftalmologia', 'sku' => '', 'status' => 'publish',
                     'weight' => '0.9', 'dimensions' => ['length' => '', 'width' => '23', 'height' => '32'],
                     'meta_data' => [['key' => '_conexao_isbn13', 'value' => '978-65-975654-7-4']]],
@@ -119,8 +127,13 @@ class ImportProductsTest extends TestCase
 
         $r = ImportProducts::make()->all();
 
-        $this->assertSame(['products' => 1, 'relinked' => 1], $r);
-        $this->assertSame(1, Product::count());
+        $this->assertSame(['products' => 2, 'relinked' => 1], $r);
+        $this->assertSame(2, Product::count());
+
+        // impresso desativado na loja (mesmo com preço) não conta como à venda
+        $tratado = Product::where('name', 'Tratado')->firstOrFail();
+        $this->assertSame(['ebook'], $tratado->formats);
+        $this->assertFalse($tratado->physical);
 
         $livro = $impresso->fresh();
         $this->assertSame('Neuro-oftalmologia', $livro->name);
@@ -141,8 +154,8 @@ class ImportProductsTest extends TestCase
 
         // segunda rodada: nada se multiplica
         ImportProducts::make()->all();
-        $this->assertSame(1, Product::count());
-        $this->assertSame(4, ProductChannelRef::count());
+        $this->assertSame(2, Product::count());
+        $this->assertSame(7, ProductChannelRef::count());
 
         // livro que saiu da vitrine (rascunho na loja): o vínculo antigo não tem
         // formato, mas o produto só tem um, e o item herda esse
