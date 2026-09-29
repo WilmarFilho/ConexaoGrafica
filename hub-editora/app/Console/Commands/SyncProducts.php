@@ -33,6 +33,12 @@ class SyncProducts extends Command
             return self::SUCCESS;
         }
 
+        if (! config('hub.woocommerce.sync_products')) {
+            $this->warn('woocommerce: catálogo congelado (WOO_SYNC_PRODUCTS=false); nada a fazer.');
+
+            return self::SUCCESS;
+        }
+
         $r = WooProducts::make()->all();
         $this->info("woocommerce: {$r['products']} produto(s) sincronizado(s), {$r['relinked']} item(ns) de pedido religado(s).");
 

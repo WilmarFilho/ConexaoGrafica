@@ -13,6 +13,10 @@ return [
         'webhook_secret' => env('WOO_WEBHOOK_SECRET'), // assinatura dos webhooks
         // Quantos dias para trás a varredura periódica olha (rede de segurança do webhook).
         'lookback_days' => (int) env('WOO_LOOKBACK_DAYS', 3),
+        // false congela o catálogo: pedidos continuam chegando, mas títulos,
+        // formatos e medidas não são atualizados pela loja (usado enquanto a
+        // loja ativa não é a do catálogo que está no hub).
+        'sync_products' => filter_var(env('WOO_SYNC_PRODUCTS', true), FILTER_VALIDATE_BOOLEAN),
     ],
 
     'pagarme' => [

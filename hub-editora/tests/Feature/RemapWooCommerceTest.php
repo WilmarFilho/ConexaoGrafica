@@ -64,5 +64,24 @@ class RemapWooCommerceTest extends TestCase
         $this->assertSame('305', $item->fresh()->external_sku);
         $this->assertSame('301', ProductChannelRef::where('product_id', $a->id)->value('external_id'));
         $this->assertSame('305', ProductChannelRef::where('product_id', $b->id)->value('external_id'));
+
+        // volta à loja anterior: pedidos e itens retomam os ids antigos, os
+        // vínculos de produto ficam como estão
+        file_put_contents($mapa, json_encode(['orders' => ['812' => '8300'], 'products' => ['305' => '301']]));
+        $this->artisan('hub:remap-woocommerce', ['file' => $mapa, '--apply' => true, '--again' => true, '--keep-products' => true])->assertSuccessful();
+
+        $this->assertSame('8300', $migrado->fresh()->external_id);
+        $this->assertSame('301', $item->fresh()->external_sku);
+        $this->assertSame('301', ProductChannelRef::where('product_id', $a->id)->value('external_id'));
+        $this->assertSame('305', ProductChannelRef::where('product_id', $b->id)->value('external_id'));
+    }
+
+    public function test_frozen_catalog_skips_the_product_sync(): void
+    {
+        config(['hub.woocommerce.url' => 'https://loja.test', 'hub.woocommerce.key' => 'ck', 'hub.woocommerce.sync_products' => false]);
+
+        $this->artisan('hub:sync-products', ['channel' => 'woocommerce'])
+            ->expectsOutputToContain('catálogo congelado')
+            ->assertSuccessful();
     }
 }

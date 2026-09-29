@@ -22,7 +22,9 @@ use Illuminate\Support\Facades\DB;
  */
 class RemapWooCommerce extends Command
 {
-    protected $signature = 'hub:remap-woocommerce {file : JSON com o mapa de ids} {--apply : Grava as mudanças}';
+    protected $signature = 'hub:remap-woocommerce {file : JSON com o mapa de ids} {--apply : Grava as mudanças}
+        {--again : Permite uma nova troca (ex.: voltar à loja anterior)}
+        {--keep-products : Não mexe nos vínculos de produto; só pedidos e itens}';
 
     protected $description = 'Troca os ids de pedidos e produtos do WooCommerce após a mudança de loja';
 
@@ -45,15 +47,17 @@ class RemapWooCommerce extends Command
 
         // A troca só pode acontecer uma vez: depois dela, um id novo pode ser
         // igual a um id antigo do mapa e seria trocado de novo por engano.
-        if (SyncLog::query()->where('channel_id', $channel->id)->where('action', self::ACTION)->exists()) {
-            $this->info('A troca de ids já foi aplicada neste hub; nada a fazer.');
+        if (! $this->option('again') && SyncLog::query()->where('channel_id', $channel->id)->where('action', self::ACTION)->exists()) {
+            $this->info('A troca de ids já foi aplicada neste hub; nada a fazer (use --again para uma nova troca).');
 
             return self::SUCCESS;
         }
 
         $run = function () use ($map, $channel): array {
             $orders = $this->remap('orders', $channel->id, $map['orders']);
-            $products = $this->remap('product_channel_refs', $channel->id, $map['products']);
+            $products = $this->option('keep-products')
+                ? ['mapped' => 0, 'legacy' => 0, 'kept' => 0, 'ids' => []]
+                : $this->remap('product_channel_refs', $channel->id, $map['products']);
 
             return [
                 'pedidos' => $orders,

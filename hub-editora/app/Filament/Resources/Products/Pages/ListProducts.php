@@ -24,6 +24,8 @@ class ListProducts extends ListRecords
                 ->label('Atualizar da loja')
                 ->icon(Heroicon::OutlinedArrowPath)
                 ->color('gray')
+                ->disabled(fn () => ! config('hub.woocommerce.sync_products'))
+                ->tooltip(fn () => config('hub.woocommerce.sync_products') ? null : 'Catálogo congelado enquanto a loja nova não entra no ar.')
                 ->requiresConfirmation()
                 ->modalHeading('Atualizar catálogo a partir do WooCommerce')
                 ->modalDescription('Traz títulos novos e atualiza peso, medidas e estoque que a loja tiver preenchido. O que só existe aqui no hub é mantido.')
