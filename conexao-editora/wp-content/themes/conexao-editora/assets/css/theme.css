@@ -225,7 +225,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  min-height: 80px;
+  min-height: 56px;
 }
 
 .barra-topo p,
@@ -278,7 +278,6 @@ button {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 28px;
-  /* metade mais alto que a barra do topo: 80px + 40px */
   min-height: 120px;
   padding-block: 12px;
 }
@@ -622,6 +621,9 @@ button {
 }
 
 .hero__grade {
+  /* o texto fica alinhado ao container; as capas vão até a borda direita do banner */
+  max-width: none;
+  padding-inline: max(20px, calc((100% - var(--container)) / 2 + 20px)) 0;
   height: 560px;
   display: grid;
   grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
@@ -661,9 +663,6 @@ button {
   scrollbar-width: none;
   /* espaço para a sombra das capas não ser cortada pela rolagem */
   padding: 22px 0 30px;
-  /* a última capa some aos poucos, indicando que o trilho continua */
-  -webkit-mask-image: linear-gradient(to right, #000 78%, transparent 100%);
-  mask-image: linear-gradient(to right, #000 78%, transparent 100%);
 }
 
 .hero__trilho::-webkit-scrollbar {
@@ -671,9 +670,11 @@ button {
 }
 
 .hero__capa {
-  flex: 0 0 auto;
+  /* quatro capas enchem o trilho até a borda; em tela muito larga elas param
+     de crescer e aparece mais uma */
+  flex: 0 0 clamp(150px, calc((100% - 66px) / 4), 250px);
   scroll-snap-align: start;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: var(--sombra-capa);
   transition: transform .2s ease;
@@ -683,12 +684,12 @@ button {
   transform: translateY(-4px);
 }
 
-/* as capas mantêm a proporção do arquivo e ficam todas com a mesma altura */
+/* todas as capas com a mesma proporção de livro */
 .hero__capa img {
-  height: 340px;
-  width: auto;
-  max-width: none;
-  object-fit: contain;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
 }
 
 .hero__pontos {
@@ -696,6 +697,8 @@ button {
   justify-content: center;
   gap: 7px;
   margin-top: 18px;
+  /* centrados sob a parte das capas que fica dentro do container */
+  padding-right: calc(max(0px, (100vw - var(--container)) / 2) + 20px);
 }
 
 .hero__pontos button {
@@ -773,7 +776,7 @@ button {
 
 .card-livro__imagem {
   display: block;
-  border-radius: 6px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: var(--sombra-capa);
 }
@@ -5746,6 +5749,11 @@ button {
   .hero__grade {
     grid-template-columns: minmax(0, 1fr);
     padding-block: 36px;
+  }
+
+  /* em uma coluna, só as capas vão até a borda; o texto mantém a margem */
+  .hero__texto {
+    padding-right: 20px;
   }
 
   .destaque__vazio {
