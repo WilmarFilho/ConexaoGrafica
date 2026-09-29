@@ -1911,7 +1911,8 @@ button {
 .publique {
   position: relative;
   display: grid;
-  align-items: center;
+  /* a grade ocupa a altura toda: a ilustração assenta no fim da seção */
+  align-items: stretch;
   min-height: 500px;
   background: var(--banda-publique);
   overflow: hidden;
@@ -1923,7 +1924,8 @@ button {
   top: 50%;
   translate: 0 -50%;
   z-index: 0;
-  width: 120px;
+  /* cresce com a sobra lateral da tela, sem encostar no conteúdo */
+  width: clamp(120px, calc((100vw - var(--container)) / 2 - 30px), 190px);
   height: auto;
   pointer-events: none;
 }
@@ -1936,8 +1938,8 @@ button {
   right: 2%;
 }
 
-/* abaixo de 1430px não há espaço livre nas laterais: os selos saem */
-@media (max-width: 1429px) {
+/* abaixo de 1500px não há espaço livre nas laterais: os selos saem */
+@media (max-width: 1499px) {
   .publique__selo {
     display: none;
   }
@@ -1951,7 +1953,13 @@ button {
   grid-template-columns: minmax(280px, 30%) minmax(0, 1fr);
   align-items: center;
   gap: clamp(24px, 4vw, 60px);
-  padding-block: 40px;
+  padding-block: 40px 0;
+}
+
+.publique__texto {
+  align-self: center;
+  /* sem o respiro de baixo da grade, o texto fica centrado no mesmo lugar */
+  padding-bottom: 40px;
 }
 
 .publique__texto h2 {
@@ -1968,6 +1976,7 @@ button {
 
 .publique__arte {
   min-width: 0;
+  align-self: end;
 }
 
 .publique__arte img {
@@ -5959,11 +5968,12 @@ button {
   .publique__grade {
     grid-template-columns: minmax(0, 1fr);
     gap: 26px;
-    padding-block: 34px;
+    padding-block: 34px 0;
   }
 
   .publique__texto {
     max-width: none;
+    padding-bottom: 0;
   }
 
   .publique__texto h2 {
