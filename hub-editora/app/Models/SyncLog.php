@@ -60,6 +60,7 @@ class SyncLog extends Model
             'auth.failed' => 'Login falhou',
             'pii.purged' => 'Dados pessoais apagados',
             'security.digest' => 'Resumo de segurança enviado',
+            'store.remapped' => 'Loja mudou de endereço',
             default => $this->action,
         };
     }

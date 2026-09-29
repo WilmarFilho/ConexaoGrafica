@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
  * - Peso e medidas: o que a loja tem preenchido vence; o que está vazio na
  *   loja não apaga o que alguém digitou no hub.
  * - E-book = produto virtual/baixável no Woo (não entra na expedição).
+ * - Livro com formatos (produto variável): cada formato vira um produto do
+ *   hub, ligado pelo id da variação.
  * - No fim, religa os itens de pedido que ainda não apontavam para produto.
  */
 class ImportProducts
@@ -39,6 +41,20 @@ class ImportProducts
 
         try {
             foreach ($this->client->products() as $payload) {
+                if (($payload['type'] ?? 'simple') === 'variable') {
+                    foreach ($this->client->variations((int) $payload['id']) as $variation) {
+                        // formato ainda sem preço não está à venda: não vira produto
+                        if ((string) ($variation['price'] ?? '') === '') {
+                            continue;
+                        }
+
+                        $this->upsert(self::variationAsProduct($payload, $variation), $weightUnit, $dimUnit);
+                        $count++;
+                    }
+
+                    continue;
+                }
+
                 $this->upsert($payload, $weightUnit, $dimUnit);
                 $count++;
             }
@@ -52,6 +68,38 @@ class ImportProducts
             SyncLog::record($this->channel, 'in', 'products.sync', null, $e->getMessage(), [], 'error');
             throw $e;
         }
+    }
+
+    /**
+     * Cada formato de um livro (variação) entra no hub como um produto próprio:
+     * o impresso vai para a expedição, o e-book não. O que a variação não
+     * informa (peso, medidas, ISBN) vem do livro.
+     */
+    public static function variationAsProduct(array $parent, array $variation): array
+    {
+        $format = collect($variation['attributes'] ?? [])->pluck('option')->filter()->implode(' / ');
+        $dimensions = [];
+
+        foreach (['length', 'width', 'height'] as $side) {
+            $dimensions[$side] = ($variation['dimensions'][$side] ?? '') !== ''
+                ? $variation['dimensions'][$side]
+                : ($parent['dimensions'][$side] ?? '');
+        }
+
+        return [
+            'id' => $variation['id'],
+            'name' => trim($parent['name'].($format !== '' ? " — {$format}" : '')),
+            'sku' => $variation['sku'] ?? '',
+            'status' => $variation['status'] ?? 'publish',
+            'virtual' => (bool) ($variation['virtual'] ?? false),
+            'downloadable' => (bool) ($variation['downloadable'] ?? false),
+            'weight' => ($variation['weight'] ?? '') !== '' ? $variation['weight'] : ($parent['weight'] ?? ''),
+            'dimensions' => $dimensions,
+            'manage_stock' => ($variation['manage_stock'] ?? false) === true,
+            'stock_quantity' => $variation['stock_quantity'] ?? null,
+            'attributes' => $parent['attributes'] ?? [],
+            'meta_data' => array_merge($parent['meta_data'] ?? [], $variation['meta_data'] ?? []),
+        ];
     }
 
     public function upsert(array $p, string $weightUnit = 'kg', string $dimUnit = 'cm'): Product

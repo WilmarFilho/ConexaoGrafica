@@ -105,10 +105,14 @@ class OrderMapper
     {
         $cents = fn ($v) => (int) round(((float) $v) * 100);
 
+        // Livro com formatos (impresso / e-book) é um produto só na loja; quem
+        // diz o que foi vendido é a variação. Sem variação, vale o produto.
+        $externalId = fn (array $li) => (string) (((int) ($li['variation_id'] ?? 0)) ?: ($li['product_id'] ?? ''));
+
         return collect($o['line_items'] ?? [])->map(fn ($li) => [
             'name' => $li['name'],
-            'external_sku' => $li['sku'] ?: (string) ($li['product_id'] ?? ''),
-            'external_product_id' => (string) ($li['product_id'] ?? ''),
+            'external_sku' => $li['sku'] ?: $externalId($li),
+            'external_product_id' => $externalId($li),
             'quantity' => (int) $li['quantity'],
             'unit_cents' => $li['quantity'] ? intdiv($cents($li['total']), (int) $li['quantity']) : $cents($li['total']),
             'total_cents' => $cents($li['total']),

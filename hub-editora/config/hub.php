@@ -7,7 +7,7 @@
 return [
 
     'woocommerce' => [
-        'url' => env('WOO_URL'),                       // https://novo.pubcon.com.br
+        'url' => env('WOO_URL'),                       // https://conexaoeditora.com.br
         'key' => env('WOO_CONSUMER_KEY'),
         'secret' => env('WOO_CONSUMER_SECRET'),
         'webhook_secret' => env('WOO_WEBHOOK_SECRET'), // assinatura dos webhooks

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Integrations\WooCommerce\ImportProducts;
+use App\Integrations\WooCommerce\OrderMapper;
 use App\Models\Channel;
 use App\Models\Customer;
 use App\Models\Order;
@@ -76,5 +77,64 @@ class ImportProductsTest extends TestCase
         $this->assertSame(1, Product::where('sku', 'LIV-001')->count());
         $this->assertSame(4, $livro->fresh()->depth_cm);
         $this->assertSame(420, $livro->fresh()->weight_grams);
+    }
+
+    public function test_book_formats_become_separate_products_linked_by_variation(): void
+    {
+        Http::fake([
+            'loja.test/wp-json/wc/v3/settings/products/*' => Http::response(['value' => 'kg']),
+            'loja.test/wp-json/wc/v3/products/20/variations*' => Http::response([
+                ['id' => 21, 'sku' => '', 'status' => 'publish', 'price' => '120', 'virtual' => false, 'downloadable' => false,
+                    'weight' => '', 'dimensions' => ['length' => '', 'width' => '', 'height' => ''],
+                    'manage_stock' => 'parent', 'attributes' => [['name' => 'Formato', 'option' => 'Impresso']]],
+                ['id' => 22, 'sku' => '', 'status' => 'publish', 'price' => '60', 'virtual' => true, 'downloadable' => false,
+                    'weight' => '', 'dimensions' => ['length' => '', 'width' => '', 'height' => ''],
+                    'attributes' => [['name' => 'Formato', 'option' => 'E-book']]],
+                ['id' => 23, 'sku' => '', 'status' => 'publish', 'price' => '', 'virtual' => false,
+                    'attributes' => [['name' => 'Formato', 'option' => 'Impresso + E-book']]],
+            ]),
+            'loja.test/wp-json/wc/v3/products?*' => Http::response([
+                ['id' => 20, 'type' => 'variable', 'name' => 'Neuro-oftalmologia', 'sku' => '', 'status' => 'publish',
+                    'weight' => '0.9', 'dimensions' => ['length' => '3', 'width' => '23', 'height' => '32'],
+                    'meta_data' => [['key' => '_conexao_isbn13', 'value' => '978-65-975654-7-4']]],
+            ], 200, ['X-WP-TotalPages' => '1']),
+        ]);
+
+        $woo = Channel::bySlug(Channel::WOOCOMMERCE);
+        $customer = Customer::create(['name' => 'Cliente']);
+        $order = Order::create([
+            'channel_id' => $woo->id, 'external_id' => '900', 'customer_id' => $customer->id,
+            'status' => 'paid', 'payment_status' => 'paid', 'requires_shipping' => true, 'placed_at' => now(),
+        ]);
+        $item = $order->items()->create(['name' => 'Neuro-oftalmologia', 'external_sku' => '21', 'quantity' => 1, 'unit_cents' => 12000, 'total_cents' => 12000]);
+
+        $r = ImportProducts::make()->all();
+
+        $this->assertSame(['products' => 2, 'relinked' => 1], $r);
+
+        $impresso = Product::where('sku', 'WOO-21')->firstOrFail();
+        $this->assertSame('Neuro-oftalmologia — Impresso', $impresso->name);
+        $this->assertTrue($impresso->physical);
+        $this->assertSame(900, $impresso->weight_grams);
+        $this->assertSame([23, 32, 3], [$impresso->width_cm, $impresso->height_cm, $impresso->depth_cm]);
+        $this->assertSame('9786597565474', $impresso->isbn);
+
+        $ebook = Product::where('sku', 'WOO-22')->firstOrFail();
+        $this->assertFalse($ebook->physical);
+
+        $this->assertSame(0, Product::where('sku', 'WOO-20')->count());
+        $this->assertSame(0, Product::where('sku', 'WOO-23')->count());
+        $this->assertSame($impresso->id, $item->fresh()->product_id);
+    }
+
+    public function test_order_items_point_to_the_variation_when_there_is_one(): void
+    {
+        $items = OrderMapper::items(['line_items' => [
+            ['name' => 'Livro — Impresso', 'sku' => '', 'product_id' => 20, 'variation_id' => 21, 'quantity' => 2, 'total' => '240.00'],
+            ['name' => 'Livro simples', 'sku' => 'LIV-9', 'product_id' => 30, 'variation_id' => 0, 'quantity' => 1, 'total' => '50.00'],
+        ]]);
+
+        $this->assertSame(['21', '21'], [$items[0]['external_product_id'], $items[0]['external_sku']]);
+        $this->assertSame(['30', 'LIV-9'], [$items[1]['external_product_id'], $items[1]['external_sku']]);
     }
 }

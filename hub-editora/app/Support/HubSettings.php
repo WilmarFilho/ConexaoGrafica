@@ -25,7 +25,7 @@ class HubSettings
     public static function definitions(): array
     {
         return [
-            'woocommerce.url' => ['label' => 'URL da loja', 'secret' => false, 'config' => 'hub.woocommerce.url', 'help' => 'Ex.: https://novo.pubcon.com.br'],
+            'woocommerce.url' => ['label' => 'URL da loja', 'secret' => false, 'config' => 'hub.woocommerce.url', 'help' => 'Ex.: https://conexaoeditora.com.br'],
             'woocommerce.key' => ['label' => 'Consumer key', 'secret' => true, 'config' => 'hub.woocommerce.key'],
             'woocommerce.secret' => ['label' => 'Consumer secret', 'secret' => true, 'config' => 'hub.woocommerce.secret'],
             'woocommerce.webhook_secret' => ['label' => 'Segredo dos webhooks', 'secret' => true, 'config' => 'hub.woocommerce.webhook_secret'],

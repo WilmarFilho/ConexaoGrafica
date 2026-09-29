@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Http;
  * Cliente mínimo da REST API v3 do WooCommerce.
  *
  * Autentica por consumer key/secret em Basic Auth sobre HTTPS — o modo
- * recomendado quando a loja está em HTTPS, como a Pubcon.
+ * recomendado quando a loja está em HTTPS, como a da Conexão Editora.
  */
 class WooCommerceClient
 {
@@ -101,6 +101,19 @@ class WooCommerceClient
             $totalPages = (int) $response->header('X-WP-TotalPages');
             $page++;
         } while ($page <= $totalPages);
+    }
+
+    /**
+     * Variações de um produto variável (os formatos do livro: impresso, e-book).
+     *
+     * @return array<int, array>
+     */
+    public function variations(int $productId): array
+    {
+        return (array) $this->http()
+            ->get("/products/{$productId}/variations", ['per_page' => 100])
+            ->throw()
+            ->json();
     }
 
     /** Valor de uma opção da loja (ex.: unidade de peso: kg | g). */
