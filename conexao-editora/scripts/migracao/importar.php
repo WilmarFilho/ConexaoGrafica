@@ -434,7 +434,14 @@ $avaliacoes = 0;
 $avaliacoes_fora = 0;
 $tocados = [];
 
+// avaliações já trazidas e depois apagadas na moderação não voltam
+$descartadas = array_map('strval', (array) get_option('conexao_avaliacoes_descartadas', []));
+
 foreach ($pacote['avaliacoes'] as $a) {
+    if (in_array((string) $a['id'], $descartadas, true)) {
+        continue;
+    }
+
     if (! isset($mapa[$a['produto']])) {
         $avaliacoes_fora++;
         continue;
