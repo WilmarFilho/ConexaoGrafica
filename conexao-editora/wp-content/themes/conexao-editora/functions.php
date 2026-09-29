@@ -36,6 +36,10 @@ add_action('after_setup_theme', function () {
     add_theme_support('wc-product-gallery-lightbox');
     add_theme_support('wc-product-gallery-slider');
 
+    // capa de livro não é quadrada: a miniatura mantém a proporção do arquivo
+    // (o padrão da loja cortava 400×400 e sumia com o alto e o pé da capa)
+    add_filter('woocommerce_get_image_size_thumbnail', static fn (): array => ['width' => 400, 'height' => '', 'crop' => 0]);
+
     register_nav_menus([
         'principal' => 'Menu principal',
         'topo' => 'Barra do topo',

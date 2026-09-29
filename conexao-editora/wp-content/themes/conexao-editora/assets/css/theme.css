@@ -325,6 +325,11 @@ button {
   background: #fff;
 }
 
+/* no cabeçalho a busca é só o contorno: o fundo da faixa aparece por dentro */
+.cabecalho .busca input[type="search"] {
+  background: transparent;
+}
+
 .busca input[type="search"]::placeholder {
   color: var(--cinza-busca);
   opacity: 1;
@@ -663,6 +668,9 @@ button {
   scrollbar-width: none;
   /* espaço para a sombra das capas não ser cortada pela rolagem */
   padding: 22px 0 30px;
+  /* a última capa some aos poucos na borda, indicando que o trilho continua */
+  -webkit-mask-image: linear-gradient(to right, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 82%, transparent 100%);
 }
 
 .hero__trilho::-webkit-scrollbar {
@@ -848,7 +856,8 @@ button {
   gap: 12px;
   min-height: 118px;
   padding: 16px 10px;
-  background: #fff;
+  /* vazado: só o contorno, o fundo da faixa aparece por dentro */
+  background: transparent;
   border: 1px solid var(--azul-claro);
   border-radius: 12px;
   color: var(--azul);
@@ -877,7 +886,9 @@ button {
 }
 
 /* ---------- carrossel de destaque ---------- */
+/* a faixa clara das categorias continua até embaixo dos cards do destaque */
 .destaque {
+  background: var(--banda);
   padding-block: 10px 48px;
 }
 
