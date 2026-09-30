@@ -2177,10 +2177,16 @@ button {
 
 .corporativo__grade {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) auto auto;
+  /* a marca tem largura própria: o divisor e as vantagens ficam mais à esquerda,
+     perto do texto, e só o botão vai para a ponta direita */
+  grid-template-columns: minmax(0, 540px) auto minmax(0, 1fr);
   align-items: center;
   gap: 40px;
   padding-block: 30px;
+}
+
+.corporativo__grade > .btn {
+  justify-self: end;
 }
 
 .corporativo__marca {
@@ -3462,6 +3468,13 @@ button {
   color: var(--tinta);
   /* vazado: só o contorno, o fundo da página aparece por dentro */
   background-color: transparent;
+}
+
+/* campo de várias linhas: raio de caixa, não de pílula */
+textarea.campo__entrada {
+  border-radius: 14px;
+  resize: vertical;
+  line-height: 1.5;
 }
 
 /* a lista aberta do select não herda a transparência */
