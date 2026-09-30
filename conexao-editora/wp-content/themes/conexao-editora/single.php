@@ -52,7 +52,7 @@ while (have_posts()) :
                 <div class="post-unico__cabecalho">
                     <span class="post-card__meta">
                         <span class="post-card__autor">
-                            <?php echo get_avatar(get_the_author_meta('ID'), 26, '', $autor, ['class' => 'post-card__avatar']); ?>
+                            <?php echo conexao_avatar_autor(26); ?>
                             <?php echo esc_html($autor); ?>
                         </span>
 

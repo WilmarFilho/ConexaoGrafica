@@ -213,13 +213,16 @@ function conexao_card_post(WP_Post $post_item, bool $grande = false): void
             ?>
         </a>
 
-        <p class="card-post__data"><?php conexao_the_icon('calendario', 16); ?> <?php echo esc_html(get_the_date('j \d\e F, Y', $post_item)); ?></p>
+        <?php /* a data e a legenda formam um bloco só: a data fica sempre rente à legenda, de qualquer altura */ ?>
+        <div class="card-post__base">
+            <p class="card-post__data"><?php conexao_the_icon('calendario', 16); ?> <?php echo esc_html(get_the_date('j \d\e F, Y', $post_item)); ?></p>
 
-        <div class="card-post__legenda">
-            <?php if ($categoria) : ?>
-                <span class="card-post__categoria"><?php echo esc_html($categoria); ?></span>
-            <?php endif; ?>
-            <h3><a href="<?php echo esc_url(get_permalink($post_item)); ?>"><?php echo esc_html(get_the_title($post_item)); ?></a></h3>
+            <div class="card-post__legenda">
+                <?php if ($categoria) : ?>
+                    <span class="card-post__categoria"><?php echo esc_html($categoria); ?></span>
+                <?php endif; ?>
+                <h3><a href="<?php echo esc_url(get_permalink($post_item)); ?>"><?php echo esc_html(get_the_title($post_item)); ?></a></h3>
+            </div>
         </div>
 
         <a class="card-post__mais" href="<?php echo esc_url(get_permalink($post_item)); ?>" aria-label="<?php echo esc_attr('Ler: '.get_the_title($post_item)); ?>">
@@ -294,5 +297,29 @@ function conexao_estrelas(WC_Product $produto): void
     printf(
         '<span class="avaliacoes">%s</span>',
         esc_html(sprintf(_n('%s Avaliação', '%s Avaliações', $quantidade, 'conexao'), number_format_i18n($quantidade)))
+    );
+}
+
+/**
+ * Avatar do autor do post: a logo da Conexão Editora (a mesma do favicon),
+ * já que os posts saem em nome da editora. Um autor com foto própria no perfil
+ * (plugin de avatar, por exemplo) continua com a dele.
+ */
+function conexao_avatar_autor(int $tamanho = 26): string
+{
+    $autor_id = (int) get_the_author_meta('ID');
+    $nome = (string) get_the_author_meta('display_name');
+    $proprio = (int) get_user_meta($autor_id, 'conexao_avatar', true);
+
+    if ($proprio && wp_attachment_is_image($proprio)) {
+        return wp_get_attachment_image($proprio, [$tamanho * 2, $tamanho * 2], false, ['class' => 'post-card__avatar', 'alt' => $nome]);
+    }
+
+    return sprintf(
+        '<img class="post-card__avatar post-card__avatar--marca" src="%s" alt="%s" width="%d" height="%d" loading="lazy" decoding="async">',
+        esc_url(get_template_directory_uri().'/assets/img/favicon.png'),
+        esc_attr($nome),
+        $tamanho,
+        $tamanho
     );
 }

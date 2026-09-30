@@ -2076,39 +2076,48 @@ button {
   object-fit: cover;
 }
 
-/* etiqueta da data, logo acima da legenda */
-.card-post__data {
+/* data e legenda num bloco só, assentado embaixo à esquerda */
+.card-post__base {
   position: absolute;
   left: 0;
-  bottom: 118px;
+  bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: min(78%, 330px);
+}
+
+.card-post--grande .card-post__base {
+  width: min(66%, 360px);
+}
+
+/* etiqueta da data, rente ao topo da legenda; o ícone alinha com o texto dela */
+.card-post__data {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin: 0;
-  padding: 7px 16px 7px 20px;
+  padding: 7px 16px 7px 22px;
   background: var(--azul);
   color: #fff;
   font-size: 12.5px;
   font-weight: 600;
+  line-height: 1.2;
   border-radius: 0 8px 8px 0;
 }
 
 .card-post--grande .card-post__data {
-  bottom: 136px;
+  padding-left: 26px;
 }
 
 .card-post__legenda {
-  position: absolute;
-  left: 0;
-  bottom: 22px;
-  width: min(78%, 330px);
+  width: 100%;
   padding: 14px 22px 16px;
   background: #fff;
   border-radius: 0 10px 10px 0;
 }
 
 .card-post--grande .card-post__legenda {
-  width: min(66%, 360px);
   padding: 18px 26px 20px;
 }
 
@@ -2671,7 +2680,8 @@ button {
   padding: 20px 18px;
   border: 1px solid var(--linha);
   border-radius: 8px;
-  background: #fff;
+  /* vazado, como os demais cards da página */
+  background: transparent;
 }
 
 .publique-motivo__icone {
@@ -3431,7 +3441,14 @@ button {
   font-size: 14px;
   font-weight: 600;
   color: var(--tinta);
-  background: #fff;
+  /* vazado: só o contorno, o fundo da página aparece por dentro */
+  background-color: transparent;
+}
+
+/* a lista aberta do select não herda a transparência */
+.campo__entrada option {
+  background-color: #fff;
+  color: var(--tinta);
 }
 
 /* ícone dentro do campo, como no layout da conta */
@@ -3491,14 +3508,14 @@ button {
   appearance: none;
   border: 1px solid var(--linha-forte);
   border-radius: 50%;
-  background: #fff;
+  background: transparent;
   cursor: pointer;
 }
 
 .caixa input:checked {
   border-color: var(--azul);
   background: var(--azul);
-  box-shadow: inset 0 0 0 3px #fff;
+  box-shadow: inset 0 0 0 3px var(--papel);
 }
 
 .caixa--termos {
@@ -4136,6 +4153,14 @@ button {
 
 .post-card__avatar {
   border-radius: 50%;
+}
+
+/* a logo da editora dentro do círculo, sem cortar */
+.post-card__avatar--marca {
+  padding: 3px;
+  background: #fff;
+  border: 1px solid var(--linha);
+  object-fit: contain;
 }
 
 .post-card__cats {
@@ -5954,10 +5979,15 @@ button {
     object-fit: cover;
   }
 
+  .card-post__base,
+  .card-post--grande .card-post__base {
+    position: static;
+    width: 100%;
+  }
+
   /* a data vira uma faixa azul, na largura toda */
   .card-post__data,
   .card-post--grande .card-post__data {
-    position: static;
     display: flex;
     width: 100%;
     padding: 12px 18px;
@@ -5967,7 +5997,6 @@ button {
 
   .card-post__legenda,
   .card-post--grande .card-post__legenda {
-    position: static;
     width: 100%;
     padding: 16px 76px 20px 18px;
     border-radius: 0;
