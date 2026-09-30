@@ -6362,3 +6362,326 @@ button {
     transition: none !important;
   }
 }
+/* =========================================================
+   Autores
+   ========================================================= */
+.autores-hero {
+  margin-bottom: 36px;
+  padding: 42px 56px 44px;
+  border-radius: 12px;
+  background: var(--azul-escuro) url("../img/ajuda-banner.png") center/cover no-repeat;
+  color: #fff;
+}
+
+.autores-hero h1 {
+  font-size: clamp(26px, 2.6vw, 32px);
+  font-weight: 300;
+  margin-bottom: 34px;
+}
+
+.autores-hero p {
+  max-width: 34ch;
+  font-size: 17px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, .92);
+  margin-bottom: 44px;
+}
+
+.autores-letras {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.autores-letras__trilho {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.autores-letras__trilho::-webkit-scrollbar {
+  display: none;
+}
+
+.autores-letras a,
+.autores-letras span {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  min-width: 30px;
+  height: 42px;
+  padding-inline: 6px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 300;
+  text-decoration: none;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+
+.autores-letras__todos {
+  margin-right: 18px;
+  padding-inline: 24px !important;
+  border-color: #fff !important;
+}
+
+.autores-letras a:hover,
+.autores-letras a.e-atual {
+  border-color: #fff;
+  text-decoration: none;
+}
+
+.autores-letras__todos.e-atual,
+.autores-letras__todos:hover {
+  background: rgba(255, 255, 255, .12);
+}
+
+.autores-letras__letra--vazia {
+  opacity: .4;
+}
+
+/* seta das letras: só no celular, quando o trilho não cabe */
+.autores-letras__seta {
+  display: none;
+}
+
+/* cards */
+.autores-grade {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 30px 48px;
+  margin-bottom: 44px;
+}
+
+.autor-card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 26px 24px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+}
+
+.autor-card__foto {
+  display: block;
+  width: 74px;
+  height: 74px;
+  margin-bottom: 22px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.autor-card__imagem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.autor-card__iniciais {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: var(--azul-lavado);
+  color: var(--azul);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.autor-card__nome {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.autor-card__nome a {
+  color: var(--tinta-forte);
+}
+
+.autor-card__nome a:hover {
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.autor-card__bio {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 34ch;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--linha);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--tinta-media);
+}
+
+.autor-card__titulo {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+  margin-bottom: 16px;
+}
+
+.autor-card__livros {
+  display: grid;
+  gap: 14px;
+}
+
+.autor-livro {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+}
+
+.autor-livro__capa {
+  display: block;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(15, 45, 70, .16);
+}
+
+.autor-livro__capa img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.autor-livro__texto {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.autor-livro__nome {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--tinta-forte);
+}
+
+.autor-livro__nome:hover {
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.autor-livro__autores {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--tinta-fraca);
+}
+
+.autor-card__todos {
+  margin-top: 16px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.autores-vazio {
+  margin: 40px 0 70px;
+  text-align: center;
+  color: var(--tinta-media);
+}
+
+@media (max-width: 1099px) {
+  .autores-grade {
+    gap: 26px;
+  }
+}
+
+@media (max-width: 900px) {
+  .autores-grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .autores-hero {
+    padding: 34px 32px 36px;
+  }
+}
+
+/* celular: banner de ponta a ponta e letras roláveis com seta */
+@media (max-width: 600px) {
+  .autores-hero {
+    margin-inline: -20px;
+    padding: 30px 20px 34px;
+    border-radius: 0;
+    background-image: url("../img/ajuda-banner-celular.png");
+  }
+
+  .autores-hero h1 {
+    font-size: 24px;
+    margin-bottom: 26px;
+  }
+
+  .autores-hero p {
+    font-size: 22px;
+    line-height: 1.35;
+    margin-bottom: 30px;
+  }
+
+  .autores-letras__trilho {
+    /* a última letra some aos poucos antes da seta */
+    -webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+  }
+
+  .autores-letras a,
+  .autores-letras span {
+    font-size: 20px;
+  }
+
+  .autores-letras__todos {
+    margin-right: 10px;
+    font-size: 19px !important;
+    height: 46px !important;
+  }
+
+  .autores-letras__seta {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 42px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+  }
+
+  .autores-grade {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .autor-card {
+    padding: 22px 26px 26px;
+  }
+
+  .autor-card__nome {
+    font-size: 17px;
+  }
+
+  .autor-card__bio {
+    max-width: none;
+    font-size: 14px;
+  }
+
+  .autor-card__titulo {
+    font-size: 16px;
+  }
+
+  .autor-livro__texto {
+    font-size: 13.5px;
+  }
+}

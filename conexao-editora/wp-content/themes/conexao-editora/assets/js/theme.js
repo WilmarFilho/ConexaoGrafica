@@ -759,6 +759,35 @@
         });
     }
 
+    /* autores: a seta das letras anda o trilho; some quando chega ao fim */
+    document.querySelectorAll('[data-letras-seta]').forEach(function (seta) {
+        var trilho = seta.parentElement.querySelector('[data-letras]');
+
+        if (!trilho) {
+            return;
+        }
+
+        var atualiza = function () {
+            var fim = trilho.scrollLeft + trilho.clientWidth >= trilho.scrollWidth - 4;
+            seta.style.visibility = fim ? 'hidden' : '';
+        };
+
+        seta.addEventListener('click', function () {
+            trilho.scrollBy({ left: trilho.clientWidth * 0.7, behavior: 'smooth' });
+        });
+
+        trilho.addEventListener('scroll', atualiza, { passive: true });
+        window.addEventListener('resize', atualiza);
+        atualiza();
+
+        // a letra escolhida aparece no trilho, mesmo que esteja lá no fim
+        var atual = trilho.querySelector('.e-atual');
+
+        if (atual && atual.offsetLeft > trilho.clientWidth) {
+            trilho.scrollLeft = atual.offsetLeft - trilho.clientWidth / 2;
+        }
+    });
+
     /* voltar ao topo */
     var topo = document.querySelector('.flutuante--topo');
 
