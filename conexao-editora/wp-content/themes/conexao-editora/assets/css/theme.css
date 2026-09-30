@@ -2289,16 +2289,24 @@ button {
   padding-top: 54px;
 }
 
+.rodape__grade,
+.rodape__base {
+  /* rodapé em largura total: sem o limite do container, só a margem lateral */
+  max-width: none;
+  padding-inline: clamp(24px, 5vw, 96px);
+}
+
 .rodape__grade {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) repeat(5, minmax(0, 1fr));
-  gap: 30px;
+  /* marca e contato, que têm textos mais longos, ganham as colunas mais largas */
+  grid-template-columns: minmax(0, 1.85fr) repeat(3, minmax(0, 1fr)) minmax(0, 1.1fr) minmax(0, 1.45fr);
+  gap: 30px clamp(20px, 2.4vw, 44px);
   padding-bottom: 64px;
 }
 
 /* a marca e a descrição ficam mais afastadas das colunas de links */
 .rodape__marca {
-  padding-right: 36px;
+  padding-right: clamp(0px, 1.5vw, 24px);
 }
 
 .rodape__marca .marca--rodape {
@@ -2314,8 +2322,14 @@ button {
 .rodape__marca p {
   font-size: 14px;
   color: var(--tinta-media);
-  max-width: 28ch;
+  max-width: 40ch;
   margin-top: 22px;
+}
+
+/* o e-mail nunca quebra no meio; se faltar espaço, a coluna é que cede */
+.rodape__links--contato a[href^="mailto:"] {
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 
 .rodape h3 {
@@ -2463,9 +2477,14 @@ button {
 }
 
 .flutuante--topo {
-  background: #fff;
-  color: var(--tinta-media);
+  background: var(--azul);
+  color: #fff;
   border-radius: 6px;
+  transition: background-color .15s ease;
+}
+
+.flutuante--topo:hover {
+  background: var(--azul-escuro);
 }
 
 /* ---------- páginas internas ---------- */
@@ -4826,7 +4845,25 @@ button {
 }
 
 /* ---------- telas menores ---------- */
-/* abaixo de 1160px as seis colunas do rodapé não cabem sem espremer o contato */
+/* entre 1160 e 1439px as seis colunas espremem links e e-mail: a marca sobe
+   para uma linha só e as cinco colunas de links dividem a largura embaixo */
+@media (max-width: 1439px) {
+  .rodape__grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.1fr) minmax(0, 1.45fr);
+    row-gap: 40px;
+  }
+
+  .rodape__marca {
+    grid-column: 1 / -1;
+    padding-right: 0;
+  }
+
+  .rodape__marca p {
+    max-width: 64ch;
+  }
+}
+
+/* abaixo de 1160px nem as cinco colunas cabem sem espremer o contato */
 @media (max-width: 1159px) {
   .rodape__grade {
     grid-template-columns: repeat(3, minmax(0, 1fr));
