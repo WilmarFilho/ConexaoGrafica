@@ -1760,7 +1760,8 @@ button {
   padding: 14px;
   border: 1px solid var(--linha);
   border-radius: 6px;
-  background: #fff;
+  /* vazado: só o contorno, o fundo da página aparece por dentro */
+  background: transparent;
 }
 
 .card-catalogo:hover {
@@ -1774,7 +1775,8 @@ button {
      para uma altura diferente */
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  border-radius: 4px;
+  /* mesmo arredondamento das capas da home */
+  border-radius: 12px;
   box-shadow: var(--sombra-capa);
 }
 
@@ -2948,7 +2950,7 @@ button {
   padding: 22px 20px;
   border: 1px solid var(--linha);
   border-radius: 10px;
-  background: #fff;
+  background: transparent;
 }
 
 .editora-pilar__icone {
@@ -3056,7 +3058,7 @@ button {
 .editora-livro__capa img {
   width: 100%;
   height: auto;
-  border-radius: 6px;
+  border-radius: 12px;
   box-shadow: var(--sombra-card);
 }
 
