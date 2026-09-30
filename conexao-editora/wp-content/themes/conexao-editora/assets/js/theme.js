@@ -576,6 +576,39 @@
             return (pa === -1 ? 99 : pa) - (pb === -1 ? 99 : pb);
         });
 
+        // o livro mostra sempre os três formatos; o que ele não tem fica apagado
+        var rotulos = { 'impresso': 'Impresso', 'e-book': 'E-book', 'impresso-e-book': 'Impresso + E-book' };
+        var existentes = {};
+
+        opcoes.forEach(function (opcao) {
+            if (opcao.value) {
+                existentes[opcao.value] = true;
+            }
+        });
+
+        Object.keys(rotulos).forEach(function (valor) {
+            if (existentes[valor]) {
+                return;
+            }
+
+            var apagada = document.createElement('label');
+            apagada.className = 'formatos__opcao formatos__opcao--indisponivel';
+            apagada.title = 'Este livro não tem este formato';
+
+            var entradaApagada = document.createElement('input');
+            entradaApagada.type = 'radio';
+            entradaApagada.name = nome;
+            entradaApagada.disabled = true;
+
+            var textoApagado = document.createElement('span');
+            textoApagado.textContent = rotulos[valor];
+
+            apagada.appendChild(entradaApagada);
+            apagada.appendChild(textoApagado);
+            apagada.setAttribute('data-chave', valor);
+            grupo.appendChild(apagada);
+        });
+
         opcoes.forEach(function (opcao) {
             if (!opcao.value) {
                 return;
@@ -603,6 +636,23 @@
             grupo.appendChild(linha);
         });
 
+        // as opções apagadas entram na ordem do layout, entre as disponíveis
+        var ordenadas = Array.prototype.slice.call(grupo.querySelectorAll('.formatos__opcao'));
+
+        ordenadas.forEach(function (linha) {
+            var entrada = linha.querySelector('input');
+            // as disponíveis têm o valor no próprio campo; as apagadas, o data-chave
+            var chave = linha.getAttribute('data-chave') || entrada.value;
+
+            linha.setAttribute('data-ordem', preferida.indexOf(chave));
+        });
+
+        ordenadas.sort(function (a, b) {
+            return Number(a.getAttribute('data-ordem')) - Number(b.getAttribute('data-ordem'));
+        }).forEach(function (linha) {
+            grupo.appendChild(linha);
+        });
+
         // o WooCommerce também muda o select sozinho (ex.: ao limpar a escolha)
         select.addEventListener('change', function () {
             grupo.querySelectorAll('input[type="radio"]').forEach(function (entrada) {
@@ -615,7 +665,7 @@
         tabela.hidden = true;
 
         if (!select.value) {
-            var primeira = grupo.querySelector('input[type="radio"]');
+            var primeira = grupo.querySelector('input[type="radio"]:not(:disabled)');
 
             if (primeira) {
                 primeira.checked = true;
@@ -653,6 +703,25 @@
 
             if (alvoParcelas) {
                 alvoParcelas.innerHTML = parcelasInicial;
+            }
+        });
+    }
+
+    /* "Comprar agora" dos livros com formatos: só vale com um formato escolhido */
+    if (window.jQuery) {
+        window.jQuery(document).on('show_variation', '.variations_form', function () {
+            var botao = this.querySelector('button.compra__principal');
+
+            if (botao) {
+                botao.disabled = false;
+            }
+        });
+
+        window.jQuery(document).on('hide_variation', '.variations_form', function () {
+            var botao = this.querySelector('button.compra__principal');
+
+            if (botao) {
+                botao.disabled = true;
             }
         });
     }

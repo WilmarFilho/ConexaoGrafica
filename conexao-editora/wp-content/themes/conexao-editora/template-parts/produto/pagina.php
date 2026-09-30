@@ -142,11 +142,15 @@ if (count($sugestoes) < 5) {
                                 <button class="passo__botao" type="button" data-passo="1" aria-label="Aumentar quantidade">+</button>
                             </div>
 
-                            <button class="btn btn--azul btn--bloco" type="submit" name="add-to-cart" value="<?php echo esc_attr($id); ?>">Adicionar ao carrinho</button>
+                            <?php conexao_botao_compra_principal($product); ?>
 
-                            <button class="btn btn--contorno btn--bloco" type="submit" name="conexao_comprar" value="1">Comprar agora</button>
+                            <button class="btn btn--contorno btn--bloco" type="submit" name="add-to-cart" value="<?php echo esc_attr($id); ?>">Adicionar ao carrinho</button>
                         <?php else : ?>
-                            <p class="compra__indisponivel">Este título está indisponível no momento.</p>
+                            <?php if (conexao_venda_externa($product)) : ?>
+                                <?php conexao_botao_compra_principal($product); ?>
+                            <?php else : ?>
+                                <p class="compra__indisponivel">Este título está indisponível no momento.</p>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </form>
                 <?php } ?>

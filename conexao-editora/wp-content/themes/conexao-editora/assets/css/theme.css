@@ -1284,6 +1284,17 @@ button {
   font-weight: 600;
 }
 
+/* formato que o livro não tem: aparece, mas apagado e sem clique */
+.formatos__opcao--indisponivel {
+  cursor: not-allowed;
+  color: var(--linha-forte);
+}
+
+.formatos__opcao--indisponivel input {
+  cursor: not-allowed;
+  border-color: var(--linha);
+}
+
 /* a caixa de compra usa o preço de cima, não o do formulário */
 .compra .woocommerce-variation-price,
 .compra .woocommerce-variation-availability {
@@ -1298,6 +1309,61 @@ button {
 
 .compra .variations_form .button {
   width: 100%;
+}
+
+/* botões da compra: "Comprar agora" (ou o link externo) em cima, cheio; o
+   carrinho embaixo, só contorno. Nos livros com formatos o WooCommerce entrega
+   o carrinho primeiro, então a ordem é acertada aqui. */
+.compra .variations_button {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.compra .variations_button > * {
+  margin: 0;
+}
+
+.compra .variations_button .quantity {
+  order: 0;
+}
+
+.compra .variations_button .compra__principal {
+  order: 1;
+}
+
+/* a especificidade acompanha a do tema padrão do WooCommerce (botão "alt" roxo) */
+.compra .variations_form .variations_button button.single_add_to_cart_button.button.alt {
+  order: 2;
+  padding: 13px 30px;
+  border: 1px solid var(--azul);
+  border-radius: 0;
+  background: transparent;
+  color: var(--azul);
+  font-family: var(--fonte);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.compra .variations_form .variations_button button.single_add_to_cart_button.button.alt:hover:not(.disabled) {
+  background: var(--azul);
+  color: #fff;
+}
+
+/* os botões da compra têm os cantos retos do layout */
+.compra .btn--bloco {
+  border-radius: 0;
+}
+
+/* sem formato escolhido (ou formato fora de venda) os dois botões ficam apagados */
+.compra .variations_form .variations_button button.single_add_to_cart_button.button.alt.disabled,
+.compra .variations_form .variations_button button.single_add_to_cart_button.button.alt:disabled,
+.compra__principal:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  filter: none;
 }
 
 /* frete e prazo */

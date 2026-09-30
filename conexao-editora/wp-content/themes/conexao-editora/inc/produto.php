@@ -220,6 +220,99 @@ function conexao_estrelas_produto(WC_Product $produto): void
     );
 }
 
+/**
+ * Venda externa: o livro é vendido em outro site (Amazon, o site do autor…).
+ * Com o link preenchido no produto, o botão principal deixa de ir para o
+ * carrinho e abre o endereço em outra aba.
+ */
+add_action('woocommerce_product_options_general_product_data', function (): void {
+    echo '<div class="options_group">';
+
+    woocommerce_wp_text_input([
+        'id' => '_conexao_link_externo',
+        'label' => 'Link de venda externa',
+        'type' => 'url',
+        'placeholder' => 'https://',
+        'desc_tip' => true,
+        'description' => 'Em branco, o livro é vendido pela loja. Preenchido, o botão principal abre este endereço em outra aba.',
+    ]);
+
+    woocommerce_wp_text_input([
+        'id' => '_conexao_texto_externo',
+        'label' => 'Texto do botão externo',
+        'placeholder' => 'Comprar no site oficial',
+        'desc_tip' => true,
+        'description' => 'Só vale com o link acima. Em branco: "Comprar no site oficial".',
+    ]);
+
+    echo '</div>';
+});
+
+add_action('woocommerce_process_product_meta', function (int $id): void {
+    $link = isset($_POST['_conexao_link_externo']) ? esc_url_raw(trim(wp_unslash($_POST['_conexao_link_externo'])), ['http', 'https']) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+    $texto = isset($_POST['_conexao_texto_externo']) ? sanitize_text_field(wp_unslash($_POST['_conexao_texto_externo'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+
+    foreach (['_conexao_link_externo' => $link, '_conexao_texto_externo' => $link ? $texto : ''] as $chave => $valor) {
+        if ($valor === '') {
+            delete_post_meta($id, $chave);
+        } else {
+            update_post_meta($id, $chave, $valor);
+        }
+    }
+});
+
+/** @return array{url: string, texto: string}|null */
+function conexao_venda_externa(WC_Product $produto): ?array
+{
+    $id = $produto->get_parent_id() ?: $produto->get_id();
+    $url = (string) get_post_meta($id, '_conexao_link_externo', true);
+
+    if ($url === '') {
+        return null;
+    }
+
+    $texto = (string) get_post_meta($id, '_conexao_texto_externo', true);
+
+    return ['url' => $url, 'texto' => $texto !== '' ? $texto : 'Comprar no site oficial'];
+}
+
+/**
+ * O botão principal da compra: "Comprar agora" (vai direto ao pagamento) ou,
+ * na venda externa, o link para o site oficial numa aba nova.
+ */
+function conexao_botao_compra_principal(WC_Product $produto, bool $habilitado = true): void
+{
+    $externa = conexao_venda_externa($produto);
+
+    if ($externa) {
+        printf(
+            '<a class="btn btn--azul btn--bloco compra__principal compra__principal--externo" href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            esc_url($externa['url']),
+            esc_html($externa['texto'])
+        );
+
+        return;
+    }
+
+    printf(
+        '<button class="btn btn--azul btn--bloco compra__principal" type="submit" name="conexao_comprar" value="1"%s>Comprar agora</button>',
+        $habilitado ? '' : ' disabled'
+    );
+}
+
+/**
+ * Livro com formatos usa o formulário do WooCommerce: o botão principal entra
+ * depois do "Adicionar ao carrinho" e a ordem visual é acertada pelo CSS. Nasce
+ * desabilitado, até um formato à venda ser escolhido.
+ */
+add_action('woocommerce_after_add_to_cart_button', function (): void {
+    global $product;
+
+    if ($product instanceof WC_Product && $product->is_type('variable')) {
+        conexao_botao_compra_principal($product, false);
+    }
+});
+
 /** "Comprar agora": põe no carrinho e segue direto para o pagamento. */
 add_filter('woocommerce_add_to_cart_redirect', function (string $url): string {
     return isset($_REQUEST['conexao_comprar']) ? wc_get_checkout_url() : $url; // phpcs:ignore WordPress.Security.NonceVerification
