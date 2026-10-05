@@ -908,6 +908,8 @@ button {
   /* começa alinhado com o conteúdo da página e segue até a borda da tela */
   padding: 18px 0 30px;
   padding-left: max(20px, calc((100% - var(--container)) / 2));
+  /* o encaixe respeita o recuo: sem isto o primeiro card cola na borda ao carregar */
+  scroll-padding-left: max(20px, calc((100% - var(--container)) / 2));
   scrollbar-width: none;
   /* o fade na direita mostra que dá para rolar */
   -webkit-mask-image: linear-gradient(to right, #000 82%, transparent 100%);
@@ -6423,6 +6425,7 @@ textarea.campo__entrada {
 
   .destaque__trilho {
     padding-left: 20px;
+    scroll-padding-left: 20px;
     padding-block: 10px 20px;
   }
 
@@ -6518,8 +6521,9 @@ textarea.campo__entrada {
     display: none;
   }
 
+  /* duas capas e meia: a terceira aparece pela metade e mostra que dá para deslizar */
   .vitrine__trilho {
-    grid-auto-columns: minmax(150px, 1fr);
+    grid-auto-columns: 40%;
     gap: 18px;
   }
 }
@@ -7371,5 +7375,105 @@ textarea.campo__entrada {
 
   .pedido-status__rastreio .btn {
     margin-left: 0;
+  }
+}
+
+/* ---------- vitrines que andam para o lado (setas, bordas e arrastar) ---------- */
+.carrossel {
+  position: relative;
+}
+
+/* a borda esmaece onde ainda há livros escondidos; some quando chega na ponta */
+.carrossel [data-arrastavel] {
+  --fade-ini: #000;
+  --fade-fim: #000;
+  -webkit-mask-image: linear-gradient(to right, var(--fade-ini) 0, #000 6%, #000 90%, var(--fade-fim) 100%);
+  mask-image: linear-gradient(to right, var(--fade-ini) 0, #000 6%, #000 90%, var(--fade-fim) 100%);
+}
+
+.carrossel .destaque__trilho {
+  -webkit-mask-image: linear-gradient(to right, var(--fade-ini) 0, #000 6%, #000 82%, var(--fade-fim) 100%);
+  mask-image: linear-gradient(to right, var(--fade-ini) 0, #000 6%, #000 82%, var(--fade-fim) 100%);
+}
+
+.carrossel--rola:not(.carrossel--inicio) [data-arrastavel] {
+  --fade-ini: transparent;
+}
+
+.carrossel--rola:not(.carrossel--fim) [data-arrastavel] {
+  --fade-fim: transparent;
+}
+
+.carrossel__seta {
+  display: none;
+}
+
+/* setas e mãozinha só onde há mouse; no celular o dedo rola o trilho */
+@media (hover: hover) and (pointer: fine) and (min-width: 901px) {
+  .carrossel--rola .carrossel__seta {
+    position: absolute;
+    top: var(--seta-topo, 50%);
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border: 1px solid var(--linha);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--azul);
+    box-shadow: 0 6px 18px rgba(15, 45, 70, .16);
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: opacity .2s ease, background-color .15s ease, color .15s ease;
+  }
+
+  .carrossel__seta:hover,
+  .carrossel__seta:focus-visible {
+    border-color: var(--azul);
+    background: var(--azul);
+    color: #fff;
+  }
+
+  .carrossel__seta:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .carrossel__seta--ant {
+    left: -16px;
+  }
+
+  .carrossel__seta--prox {
+    right: -16px;
+  }
+
+  .carrossel--rola [data-arrastavel] {
+    cursor: grab;
+  }
+
+  .carrossel--arrastando [data-arrastavel] {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    user-select: none;
+  }
+
+  /* na vitrine a seta fica na altura das capas, não do card inteiro */
+  .vitrine .carrossel {
+    --seta-topo: 36%;
+  }
+
+  /* no destaque o trilho vai de ponta a ponta: as setas acompanham o conteúdo */
+  .destaque .carrossel {
+    --seta-topo: calc(50% - 6px);
+  }
+
+  .destaque .carrossel__seta--ant {
+    left: max(12px, calc((100% - var(--container)) / 2 - 22px));
+  }
+
+  .destaque .carrossel__seta--prox {
+    right: 28px;
   }
 }

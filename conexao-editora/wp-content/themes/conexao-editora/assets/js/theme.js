@@ -110,20 +110,84 @@
         }, { passive: true });
     });
 
-    /* arrastar as vitrines com o mouse */
+    /* vitrines que andam para o lado: setas nas pontas (no computador), bordas
+       esmaecidas onde ainda há livros e arrastar com o mouse. No celular o dedo
+       já rola o trilho; as setas ficam escondidas pelo CSS. */
     document.querySelectorAll('[data-arrastavel]').forEach(function (trilho) {
+        var caixa = document.createElement('div');
+        caixa.className = 'carrossel';
+        trilho.parentNode.insertBefore(caixa, trilho);
+        caixa.appendChild(trilho);
+
+        var seta = function (sentido, rotulo) {
+            var botao = document.createElement('button');
+            botao.type = 'button';
+            botao.className = 'carrossel__seta carrossel__seta--' + (sentido < 0 ? 'ant' : 'prox');
+            botao.setAttribute('aria-label', rotulo);
+            botao.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' +
+                (sentido < 0 ? 'M14.5 5.5L8 12l6.5 6.5' : 'M9.5 5.5L16 12l-6.5 6.5') + '"/></svg>';
+            botao.addEventListener('click', function () {
+                // anda quase uma tela: o último livro visível vira o primeiro
+                trilho.scrollBy({ left: sentido * Math.max(trilho.clientWidth * 0.8, 200), behavior: 'smooth' });
+            });
+            caixa.appendChild(botao);
+
+            return botao;
+        };
+
+        var anterior = seta(-1, 'Ver livros anteriores');
+        var proxima = seta(1, 'Ver mais livros');
+
+        var atualiza = function () {
+            var max = trilho.scrollWidth - trilho.clientWidth;
+            var inicio = trilho.scrollLeft <= 4;
+            var fim = trilho.scrollLeft >= max - 4;
+
+            caixa.classList.toggle('carrossel--rola', max > 4);
+            caixa.classList.toggle('carrossel--inicio', inicio);
+            caixa.classList.toggle('carrossel--fim', fim);
+            anterior.disabled = inicio;
+            proxima.disabled = fim;
+        };
+
+        trilho.addEventListener('scroll', atualiza, { passive: true });
+        window.addEventListener('resize', atualiza);
+
+        // o filtro de categorias esconde e mostra cartões: o tamanho do trilho muda
+        if ('MutationObserver' in window) {
+            new MutationObserver(function () {
+                window.requestAnimationFrame(atualiza);
+            }).observe(trilho, { attributes: true, attributeFilter: ['hidden'], subtree: true });
+        }
+
+        window.addEventListener('load', atualiza);
+        atualiza();
+
+        /* arrastar com o mouse */
         var arrastando = false;
+        var arrastou = false;
         var inicioX = 0;
         var inicioScroll = 0;
+        var ultimoX = 0;
+        var ultimoT = 0;
+        var velocidade = 0;
+
+        // sem isto o navegador "pega" a capa ou o link e o trilho não anda
+        trilho.addEventListener('dragstart', function (evento) {
+            evento.preventDefault();
+        });
 
         trilho.addEventListener('pointerdown', function (evento) {
-            if (evento.pointerType !== 'mouse') {
+            if (evento.pointerType !== 'mouse' || evento.button !== 0) {
                 return;
             }
 
             arrastando = true;
-            inicioX = evento.clientX;
+            arrastou = false;
+            inicioX = ultimoX = evento.clientX;
+            ultimoT = evento.timeStamp;
             inicioScroll = trilho.scrollLeft;
+            velocidade = 0;
         });
 
         trilho.addEventListener('pointermove', function (evento) {
@@ -133,18 +197,47 @@
 
             var distancia = evento.clientX - inicioX;
 
-            if (Math.abs(distancia) > 4) {
+            if (!arrastou && Math.abs(distancia) > 5) {
+                arrastou = true;
+                caixa.classList.add('carrossel--arrastando');
+                trilho.setPointerCapture(evento.pointerId);
+            }
+
+            if (arrastou) {
+                var dt = Math.max(1, evento.timeStamp - ultimoT);
+                velocidade = (evento.clientX - ultimoX) / dt;
+                ultimoX = evento.clientX;
+                ultimoT = evento.timeStamp;
                 trilho.scrollLeft = inicioScroll - distancia;
-                trilho.style.cursor = 'grabbing';
             }
         });
 
-        ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (evento) {
-            trilho.addEventListener(evento, function () {
-                arrastando = false;
-                trilho.style.cursor = '';
-            });
+        var solta = function () {
+            if (!arrastando) {
+                return;
+            }
+
+            arrastando = false;
+            caixa.classList.remove('carrossel--arrastando');
+
+            // ao soltar, o trilho segue um pouco no embalo do gesto
+            if (arrastou && Math.abs(velocidade) > 0.2) {
+                trilho.scrollBy({ left: -velocidade * 220, behavior: 'smooth' });
+            }
+        };
+
+        ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (nome) {
+            trilho.addEventListener(nome, solta);
         });
+
+        // quem arrastou não queria abrir o livro em que soltou o mouse
+        trilho.addEventListener('click', function (evento) {
+            if (arrastou) {
+                evento.preventDefault();
+                evento.stopPropagation();
+                arrastou = false;
+            }
+        }, true);
     });
 
     /* o painel do menu cobre a faixa de abertura inteira */
