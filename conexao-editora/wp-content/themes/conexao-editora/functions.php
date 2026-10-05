@@ -23,6 +23,7 @@ require_once get_template_directory().'/inc/migracao.php';
 require_once get_template_directory().'/inc/autores.php';
 require_once get_template_directory().'/inc/eventos.php';
 require_once get_template_directory().'/inc/acompanhar.php';
+require_once get_template_directory().'/inc/opcoes.php';
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
@@ -78,6 +79,11 @@ add_action('wp_enqueue_scripts', function () {
 
     // endereço do admin-ajax para o cálculo de frete da página do livro
     wp_localize_script('conexao', 'conexaoTema', ['ajax' => admin_url('admin-ajax.php')]);
+
+    // mapa azul do contato: só na página de contato e só com a chave do Google Maps salva
+    if (is_page('contato') && get_theme_mod('conexao_maps_chave', '') !== '') {
+        wp_enqueue_script('conexao-mapa', get_template_directory_uri().'/assets/js/mapa.js', [], conexao_versao_arquivo('/assets/js/mapa.js'), true);
+    }
 }, 20);
 
 /** O carrinho do cabeçalho atualiza sem recarregar a página. */

@@ -4812,6 +4812,18 @@ textarea.campo__entrada {
   border-radius: 10px;
 }
 
+/* a caixa do mapa: guarda o iframe comum ou recebe o mapa azul do Google Maps */
+.mapa-caixa {
+  display: grid;
+  min-height: 520px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mapa-caixa--estilizado {
+  background: #EAF4FB;
+}
+
 /* ---------- páginas de texto ---------- */
 .texto-legal {
   max-width: 860px;
@@ -4863,6 +4875,10 @@ textarea.campo__entrada {
   .mapa {
     height: 320px;
     min-height: 0;
+  }
+
+  .mapa-caixa {
+    min-height: 320px;
   }
 }
 

@@ -101,8 +101,20 @@ $estado = isset($_GET['contato']) ? sanitize_key(wp_unslash($_GET['contato'])) :
         </div>
 
         <div class="contato__coluna contato__coluna--mapa">
-            <iframe class="mapa" src="<?php echo esc_url($mapa); ?>" title="Localização da Conexão Editora"
-                    loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+            <?php
+            // com a chave do Google Maps, o mapa azul entra no lugar do iframe (que fica de reserva)
+            $chave_mapa = (string) get_theme_mod('conexao_maps_chave', '');
+            $dados_mapa = $chave_mapa !== '' ? sprintf(
+                ' data-chave="%s" data-endereco="%s" data-coordenadas="%s" data-titulo="Conexão Editora"',
+                esc_attr($chave_mapa),
+                esc_attr($endereco),
+                esc_attr((string) get_theme_mod('conexao_mapa_coordenadas', ''))
+            ) : '';
+            ?>
+            <div class="mapa-caixa"<?php echo $dados_mapa; // phpcs:ignore WordPress.Security.EscapeOutput -- montado com esc_attr acima ?>>
+                <iframe class="mapa" src="<?php echo esc_url($mapa); ?>" title="Localização da Conexão Editora"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+            </div>
         </div>
     </div>
 </div>
