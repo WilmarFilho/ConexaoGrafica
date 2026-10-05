@@ -21,6 +21,7 @@ require_once get_template_directory().'/inc/catalogo.php';
 require_once get_template_directory().'/inc/produto.php';
 require_once get_template_directory().'/inc/migracao.php';
 require_once get_template_directory().'/inc/autores.php';
+require_once get_template_directory().'/inc/eventos.php';
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');

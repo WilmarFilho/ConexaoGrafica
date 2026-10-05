@@ -81,8 +81,9 @@ $estado = isset($_GET['contato']) ? sanitize_key(wp_unslash($_GET['contato'])) :
                     <label class="tela-leitor" for="contato-assunto">Tipo de serviço</label>
                     <select class="campo__entrada campo__entrada--select" id="contato-assunto" name="assunto">
                         <option value="">Tipo de serviço</option>
+                        <?php $escolhido = conexao_assunto_escolhido(); ?>
                         <?php foreach (conexao_assuntos_contato() as $assunto) : ?>
-                            <option value="<?php echo esc_attr($assunto); ?>"><?php echo esc_html($assunto); ?></option>
+                            <option value="<?php echo esc_attr($assunto); ?>"<?php selected($assunto, $escolhido); ?>><?php echo esc_html($assunto); ?></option>
                         <?php endforeach; ?>
                     </select>
 

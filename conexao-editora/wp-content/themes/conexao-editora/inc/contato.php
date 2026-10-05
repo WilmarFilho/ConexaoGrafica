@@ -12,11 +12,39 @@ function conexao_assuntos_contato(): array
 {
     return apply_filters('conexao_assuntos_contato', [
         'Quero publicar meu livro',
+        'Organizar meu evento ou Masterclass',
         'Compra corporativa',
         'Dúvida sobre um pedido',
         'Imprensa',
         'Outro assunto',
     ]);
+}
+
+/**
+ * Assunto que já vem escolhido quando o link traz ?assunto= (o botão da página
+ * de eventos manda "evento"). Aceita o apelido curto ou o nome da opção.
+ */
+function conexao_assunto_escolhido(): string
+{
+    $pedido = sanitize_title(wp_unslash($_GET['assunto'] ?? ''));
+
+    if ($pedido === '') {
+        return '';
+    }
+
+    $apelidos = ['evento' => 'Organizar meu evento ou Masterclass', 'publicar' => 'Quero publicar meu livro', 'corporativa' => 'Compra corporativa'];
+
+    if (isset($apelidos[$pedido])) {
+        return $apelidos[$pedido];
+    }
+
+    foreach (conexao_assuntos_contato() as $assunto) {
+        if (sanitize_title($assunto) === $pedido) {
+            return $assunto;
+        }
+    }
+
+    return '';
 }
 
 add_action('admin_post_nopriv_conexao_contato', 'conexao_recebe_contato');
