@@ -7010,3 +7010,350 @@ textarea.campo__entrada {
     padding-inline: 18px;
   }
 }
+
+/* ---------- acompanhe seu pedido ---------- */
+.acompanhar {
+  scroll-margin-top: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+  margin-bottom: 70px;
+}
+
+.acompanhar__conta {
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--tinta-media);
+}
+
+.acompanhar__conta a {
+  font-weight: 700;
+}
+
+.acompanhar__ajuda,
+.pedido-status {
+  padding: 30px 32px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+}
+
+.acompanhar__ajuda h2 {
+  font-size: 17px;
+  color: var(--tinta-forte);
+  margin-bottom: 16px;
+}
+
+.acompanhar__ajuda h2 + .acompanhar__canais {
+  margin-top: 0;
+}
+
+.acompanhar__passos {
+  display: grid;
+  gap: 14px;
+  margin: 0 0 30px;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
+}
+
+.acompanhar__passos li {
+  position: relative;
+  padding-left: 40px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--tinta-media);
+  counter-increment: passo;
+}
+
+.acompanhar__passos li::before {
+  content: counter(passo);
+  position: absolute;
+  left: 0;
+  top: -2px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--azul-lavado);
+  color: var(--azul);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.acompanhar__passos strong {
+  color: var(--tinta-forte);
+}
+
+.acompanhar__canais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+}
+
+.acompanhar__canais a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--tinta-forte);
+  overflow-wrap: anywhere;
+}
+
+.acompanhar__canais a:hover {
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.acompanhar__canais svg {
+  flex: none;
+  color: var(--azul);
+}
+
+/* pedido encontrado */
+.pedido-status__topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 26px;
+  border-bottom: 1px solid var(--linha);
+}
+
+.pedido-status__topo h2 {
+  font-size: 19px;
+  color: var(--tinta-forte);
+  margin-bottom: 4px;
+}
+
+.pedido-status__topo p {
+  font-size: 13px;
+  color: var(--tinta-fraca);
+}
+
+.pedido-status__selo {
+  flex: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--azul-lavado);
+  color: var(--azul);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pedido-status__selo--completed {
+  background: #E4F1EA;
+  color: #17724A;
+}
+
+.pedido-status__selo--pending,
+.pedido-status__selo--on-hold {
+  background: #FDF3E1;
+  color: #9A5B00;
+}
+
+.pedido-status__selo--cancelled,
+.pedido-status__selo--refunded,
+.pedido-status__selo--failed {
+  background: #FBEAE8;
+  color: #B3261E;
+}
+
+/* etapas: bolinhas ligadas por um traço, na horizontal */
+.etapas {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  margin: 0 0 28px;
+  padding: 0;
+  list-style: none;
+}
+
+.etapas__item {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.etapas__item::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--linha);
+}
+
+.etapas__item:first-child::before {
+  display: none;
+}
+
+.etapas__item--feito::before,
+.etapas__item--atual::before {
+  background: var(--azul);
+}
+
+.etapas__marca {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--linha);
+  border-radius: 50%;
+  background: #fff;
+  color: #fff;
+}
+
+.etapas__item--feito .etapas__marca {
+  border-color: var(--azul);
+  background: var(--azul);
+}
+
+.etapas__item--atual .etapas__marca {
+  border-color: var(--azul);
+  box-shadow: inset 0 0 0 5px #fff, inset 0 0 0 14px var(--azul);
+}
+
+.etapas__texto {
+  display: grid;
+  gap: 2px;
+  padding-inline: 4px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--tinta-fraca);
+}
+
+.etapas__item--feito strong,
+.etapas__item--atual strong {
+  color: var(--tinta-forte);
+}
+
+.etapas__texto small {
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+}
+
+.pedido-status__rastreio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-bottom: 26px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--azul-lavado);
+  font-size: 13.5px;
+  color: var(--tinta-media);
+}
+
+.pedido-status__rastreio svg {
+  flex: none;
+  color: var(--azul);
+}
+
+.pedido-status__rastreio span {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.pedido-status__rastreio .btn {
+  margin-left: auto;
+}
+
+.pedido-status__subtitulo {
+  font-size: 14px;
+  color: var(--tinta-forte);
+  margin-bottom: 10px;
+}
+
+.pedido-status__itens {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pedido-status__itens li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--linha);
+  font-size: 13.5px;
+  color: var(--tinta-media);
+}
+
+.pedido-status__itens li > span:last-child {
+  flex: none;
+  color: var(--tinta-forte);
+}
+
+.pedido-status__itens small {
+  color: var(--tinta-fraca);
+}
+
+.pedido-status__total {
+  border-bottom: 0 !important;
+  font-weight: 700;
+  color: var(--tinta-forte) !important;
+}
+
+@media (max-width: 900px) {
+  .acompanhar {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 34px;
+  }
+
+  .acompanhar .form-contato {
+    max-width: none;
+  }
+
+  /* depois da busca, a situação do pedido vem antes do formulário */
+  .acompanhar--resultado .acompanhar__painel {
+    order: -1;
+  }
+}
+
+/* celular: etapas na vertical, uma embaixo da outra */
+@media (max-width: 600px) {
+  .acompanhar__ajuda,
+  .pedido-status {
+    padding: 24px 20px;
+  }
+
+  .etapas {
+    grid-auto-flow: row;
+    gap: 18px;
+  }
+
+  .etapas__item {
+    grid-template-columns: 28px minmax(0, 1fr);
+    justify-items: start;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+  }
+
+  .etapas__item::before {
+    top: auto;
+    bottom: 50%;
+    right: auto;
+    left: 13px;
+    width: 2px;
+    height: calc(100% + 18px);
+  }
+
+  .etapas__texto {
+    padding-inline: 0;
+  }
+
+  .pedido-status__rastreio .btn {
+    margin-left: 0;
+  }
+}
