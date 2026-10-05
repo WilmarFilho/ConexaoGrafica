@@ -12,6 +12,7 @@ $faixa = conexao_faixa_precos();
 $min_atual = isset($_GET['min_price']) ? (float) $_GET['min_price'] : $faixa['min']; // phpcs:ignore WordPress.Security.NonceVerification
 $max_atual = isset($_GET['max_price']) ? (float) $_GET['max_price'] : $faixa['max']; // phpcs:ignore WordPress.Security.NonceVerification
 $estoque_atual = conexao_filtro_selecionado('estoque');
+$destaques_atuais = conexao_destaques_selecionados();
 $mostrar = 8;
 ?>
 <?php /* no celular a coluna vira uma sanfona; no desktop o resumo fica escondido */ ?>
@@ -84,6 +85,23 @@ $mostrar = 8;
                max="<?php echo esc_attr((string) (int) $faixa['max']); ?>"
                step="10" value="<?php echo esc_attr((string) (int) $max_atual); ?>">
         <input type="hidden" name="min_price" value="<?php echo esc_attr((string) (int) $min_atual); ?>">
+    </section>
+
+    <section class="filtros__grupo">
+        <h2>Destaques</h2>
+
+        <ul class="filtros__lista">
+            <?php foreach (conexao_destaques_catalogo() as $valor => $rotulo) : ?>
+                <li>
+                    <label class="caixa caixa--quadrada">
+                        <input type="checkbox" name="destaque[]" value="<?php echo esc_attr($valor); ?>"
+                               <?php checked(in_array($valor, $destaques_atuais, true)); ?>>
+                        <span><?php echo esc_html($rotulo); ?></span>
+                        <span class="filtros__conta">(<?php echo esc_html((string) count(conexao_ids_destaque($valor))); ?>)</span>
+                    </label>
+                </li>
+            <?php endforeach; ?>
+        </ul>
     </section>
 
     <section class="filtros__grupo">

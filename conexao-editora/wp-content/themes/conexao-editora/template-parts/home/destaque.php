@@ -51,8 +51,6 @@ if (! $produtos) {
                             </a>
                         <?php endif; ?>
 
-                        <button class="botao-favorito" type="button" aria-label="Salvar nos favoritos"><?php conexao_a_icone_arte('coracao', 20); ?></button>
-
                         <a class="destaque__detalhes" href="<?php echo esc_url($produto->get_permalink()); ?>">Ver detalhes</a>
                     </div>
                 </div>

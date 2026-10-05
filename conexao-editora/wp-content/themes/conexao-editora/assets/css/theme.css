@@ -1020,23 +1020,6 @@ button {
   flex-wrap: wrap;
 }
 
-.botao-favorito {
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--linha);
-  border-radius: 50%;
-  background: #fff;
-  color: #C3C9D2;
-}
-
-.botao-favorito:hover,
-.botao-favorito[aria-pressed="true"] {
-  color: #E4576B;
-  border-color: #F3C3CA;
-}
-
 .destaque__detalhes {
   font-size: 15px;
   font-weight: 600;
@@ -4043,7 +4026,7 @@ textarea.campo__entrada {
 }
 
 .carrinho-vazio {
-  margin: 20px 0 60px;
+  margin: 20px 0 50px;
   padding: 50px 30px;
   text-align: center;
   background: var(--azul-lavado);
@@ -4052,6 +4035,56 @@ textarea.campo__entrada {
 
 .carrinho-vazio p {
   margin-inline: auto;
+}
+
+/* o carinha triste na cor da marca */
+.carrinho-vazio__icone {
+  display: block;
+  margin: 0 auto 22px;
+  color: var(--azul);
+}
+
+.carrinho-vazio h2 {
+  font-size: 26px;
+  color: var(--tinta-forte);
+}
+
+.carrinho-vazio__pontos {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin: 18px auto 20px;
+}
+
+.carrinho-vazio__pontos span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--azul);
+}
+
+.carrinho-novidades {
+  margin-bottom: 60px;
+}
+
+.carrinho-novidades h2 {
+  margin-bottom: 24px;
+  font-size: 22px;
+  text-align: center;
+  color: var(--tinta-forte);
+}
+
+.carrinho-novidades__grade {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .carrinho-novidades__grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -6323,7 +6356,7 @@ textarea.campo__entrada {
 
   .destaque__acoes {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
     gap: 8px;
   }
@@ -6339,16 +6372,6 @@ textarea.campo__entrada {
   .destaque__acoes .btn .icone {
     width: 13px;
     height: 13px;
-  }
-
-  .botao-favorito {
-    width: 28px;
-    height: 28px;
-  }
-
-  .botao-favorito .icone {
-    width: 14px;
-    height: 14px;
   }
 
   .destaque__detalhes {

@@ -19,6 +19,99 @@ function conexao_filtros_taxonomia(): array
     ]);
 }
 
+/**
+ * Vitrines do menu "Livros" (Pré-vendas, Lançamentos, Mais vendidos) como filtro
+ * do catálogo. A chave é também o endereço da página do menu.
+ */
+function conexao_destaques_catalogo(): array
+{
+    return [
+        'pre-vendas' => 'Pré-vendas',
+        'lancamentos' => 'Lançamentos',
+        'mais-vendidos' => 'Mais vendidos',
+    ];
+}
+
+/** Quantos livros a vitrine "Lançamentos" mostra enquanto nenhum estiver marcado. */
+const CONEXAO_LANCAMENTOS_PADRAO = 15;
+
+/**
+ * Livros de uma vitrine:
+ *  - pré-vendas: os marcados como "Livro em pré-venda" no produto;
+ *  - lançamentos: os marcados como "Lançamento"; sem nenhum marcado, os mais recentes;
+ *  - mais vendidos: os que já têm venda, do que mais vendeu para o que menos.
+ *
+ * @return int[]
+ */
+function conexao_ids_destaque(string $chave): array
+{
+    static $cache = [];
+
+    if (isset($cache[$chave])) {
+        return $cache[$chave];
+    }
+
+    $base = ['post_type' => 'product', 'post_status' => 'publish', 'fields' => 'ids', 'numberposts' => -1, 'no_found_rows' => true];
+
+    if ($chave === 'pre-vendas') {
+        $ids = get_posts($base + ['meta_key' => '_conexao_pre_venda', 'meta_value' => 'yes']);
+    } elseif ($chave === 'lancamentos') {
+        $ids = get_posts($base + ['meta_key' => '_conexao_lancamento', 'meta_value' => 'yes', 'orderby' => 'date', 'order' => 'DESC']);
+
+        if (! $ids) {
+            $ids = get_posts(array_merge($base, ['numberposts' => CONEXAO_LANCAMENTOS_PADRAO, 'orderby' => 'date', 'order' => 'DESC']));
+        }
+    } elseif ($chave === 'mais-vendidos') {
+        $ids = get_posts($base + [
+            'meta_key' => 'total_sales',
+            'meta_value' => 0,
+            'meta_compare' => '>',
+            'meta_type' => 'NUMERIC',
+            'orderby' => 'meta_value_num',
+            'order' => 'DESC',
+        ]);
+    } else {
+        $ids = [];
+    }
+
+    return $cache[$chave] = array_map('intval', $ids);
+}
+
+/** Vitrines escolhidas no filtro, só as que existem. */
+function conexao_destaques_selecionados(): array
+{
+    return array_values(array_intersect(conexao_filtro_selecionado('destaque'), array_keys(conexao_destaques_catalogo())));
+}
+
+/** Ordenação em uso: a escolhida ou, na vitrine de mais vendidos, a por vendas. */
+function conexao_ordem_atual(): string
+{
+    $escolhida = isset($_GET['orderby']) ? sanitize_key(wp_unslash($_GET['orderby'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+
+    if ($escolhida !== '') {
+        return $escolhida;
+    }
+
+    return conexao_destaques_selecionados() === ['mais-vendidos'] ? 'popularity' : 'date';
+}
+
+add_filter('woocommerce_default_catalog_orderby', function ($ordem) {
+    return conexao_destaques_selecionados() === ['mais-vendidos'] ? 'popularity' : $ordem;
+});
+
+/**
+ * As páginas do menu (Livros → Pré-vendas, Lançamentos, Mais vendidos, e as
+ * mesmas no rodapé) levam ao catálogo já filtrado.
+ */
+add_action('template_redirect', function (): void {
+    foreach (array_keys(conexao_destaques_catalogo()) as $chave) {
+        if (is_page($chave) && function_exists('wc_get_page_permalink')) {
+            wp_safe_redirect(add_query_arg('destaque[]', $chave, wc_get_page_permalink('shop')), 302);
+            exit;
+        }
+    }
+});
+
 /** Valores escolhidos num filtro, já limpos. */
 function conexao_filtro_selecionado(string $chave): array
 {
@@ -91,6 +184,26 @@ add_action('pre_get_posts', function (WP_Query $query): void {
 
     if ($tax_query) {
         $query->set('tax_query', $tax_query);
+    }
+
+    $vitrines = conexao_destaques_selecionados();
+
+    if ($vitrines) {
+        $ids = [];
+
+        foreach ($vitrines as $chave) {
+            $ids = array_merge($ids, conexao_ids_destaque($chave));
+        }
+
+        $ids = array_values(array_unique($ids));
+        $ja = array_filter(array_map('intval', (array) $query->get('post__in')));
+
+        if ($ja) {
+            $ids = array_values(array_intersect($ids, $ja));
+        }
+
+        // vitrine vazia: nenhum resultado, em vez de o catálogo inteiro
+        $query->set('post__in', $ids ?: [0]);
     }
 
     $estoque = conexao_filtro_selecionado('estoque');

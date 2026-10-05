@@ -228,6 +228,18 @@ function conexao_estrelas_produto(WC_Product $produto): void
 add_action('woocommerce_product_options_general_product_data', function (): void {
     echo '<div class="options_group">';
 
+    woocommerce_wp_checkbox([
+        'id' => '_conexao_pre_venda',
+        'label' => 'Livro em pré-venda',
+        'description' => 'Aparece em Livros → Pré-vendas e no filtro "Destaques" do catálogo.',
+    ]);
+
+    woocommerce_wp_checkbox([
+        'id' => '_conexao_lancamento',
+        'label' => 'Lançamento',
+        'description' => 'Aparece em Livros → Lançamentos. Enquanto nenhum livro estiver marcado, valem os 15 mais recentes.',
+    ]);
+
     woocommerce_wp_text_input([
         'id' => '_conexao_link_externo',
         'label' => 'Link de venda externa',
@@ -246,6 +258,16 @@ add_action('woocommerce_product_options_general_product_data', function (): void
     ]);
 
     echo '</div>';
+});
+
+add_action('woocommerce_process_product_meta', function (int $id): void {
+    foreach (['_conexao_pre_venda', '_conexao_lancamento'] as $chave) {
+        if (isset($_POST[$chave])) { // phpcs:ignore WordPress.Security.NonceVerification
+            update_post_meta($id, $chave, 'yes');
+        } else {
+            delete_post_meta($id, $chave);
+        }
+    }
 });
 
 add_action('woocommerce_process_product_meta', function (int $id): void {
@@ -312,6 +334,9 @@ add_action('woocommerce_after_add_to_cart_button', function (): void {
         conexao_botao_compra_principal($product, false);
     }
 });
+
+// o carrinho vazio do tema já diz que está vazio: sem o aviso repetido do WooCommerce
+remove_action('woocommerce_cart_is_empty', 'wc_empty_cart_message', 10);
 
 /** "Comprar agora": põe no carrinho e segue direto para o pagamento. */
 add_filter('woocommerce_add_to_cart_redirect', function (string $url): string {

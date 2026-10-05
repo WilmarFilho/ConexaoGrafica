@@ -20,7 +20,7 @@ $categorias_destaque = get_terms([
     'orderby' => 'name',
 ]);
 
-$ordem_atual = isset($_GET['orderby']) ? sanitize_key(wp_unslash($_GET['orderby'])) : 'date'; // phpcs:ignore WordPress.Security.NonceVerification
+$ordem_atual = conexao_ordem_atual();
 $busca = isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 $visao = (isset($_GET['visao']) && $_GET['visao'] === 'lista') ? 'lista' : 'grade'; // phpcs:ignore WordPress.Security.NonceVerification
 $img = get_template_directory_uri().'/assets/img/';
@@ -43,6 +43,11 @@ foreach (conexao_filtros_taxonomia() as $chave => $grupo) {
         $rotulo_filtro = $termo->name;
         break;
     }
+}
+
+// vitrine do menu (Pré-vendas, Lançamentos, Mais vendidos) também dá nome à página
+if (! $rotulo_filtro && ($vitrines_escolhidas = conexao_destaques_selecionados())) {
+    $rotulo_filtro = conexao_destaques_catalogo()[$vitrines_escolhidas[0]];
 }
 
 $procurado = $busca ?: $rotulo_filtro;
