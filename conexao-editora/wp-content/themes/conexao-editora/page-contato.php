@@ -14,7 +14,10 @@ $telefones = get_theme_mod('conexao_telefones', '62 99822-8022 / 62 3229.6147');
 $email_contato = get_theme_mod('conexao_email', 'contato@conexaoeditora.com.br');
 $horario = get_theme_mod('conexao_horario', 'Seg. a sex: 8h às 18h');
 $endereco = get_theme_mod('conexao_endereco', 'Rua 227 A, 20 — Setor Leste Universitário, Goiânia - GO');
-$mapa = get_theme_mod('conexao_mapa', 'https://www.google.com/maps?q='.rawurlencode($endereco).'&output=embed');
+// com as coordenadas salvas, o mapa comum aponta para o mesmo ponto do mapa azul
+// (o endereço sozinho cai em outro trecho da Rua 227-A)
+$coordenadas = (string) get_theme_mod('conexao_mapa_coordenadas', '');
+$mapa = get_theme_mod('conexao_mapa', 'https://www.google.com/maps?q='.rawurlencode($coordenadas !== '' ? $coordenadas : $endereco).'&z=16&output=embed');
 $estado = isset($_GET['contato']) ? sanitize_key(wp_unslash($_GET['contato'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 ?>
 <div class="container pagina pagina--contato">
@@ -108,7 +111,7 @@ $estado = isset($_GET['contato']) ? sanitize_key(wp_unslash($_GET['contato'])) :
                 ' data-chave="%s" data-endereco="%s" data-coordenadas="%s" data-titulo="Conexão Editora"',
                 esc_attr($chave_mapa),
                 esc_attr($endereco),
-                esc_attr((string) get_theme_mod('conexao_mapa_coordenadas', ''))
+                esc_attr($coordenadas)
             ) : '';
             ?>
             <div class="mapa-caixa"<?php echo $dados_mapa; // phpcs:ignore WordPress.Security.EscapeOutput -- montado com esc_attr acima ?>>
