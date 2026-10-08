@@ -686,7 +686,7 @@
 
             var apagada = document.createElement('label');
             apagada.className = 'formatos__opcao formatos__opcao--indisponivel';
-            apagada.title = 'Este livro não tem este formato';
+            apagada.title = 'Formato indisponível para este livro';
 
             var entradaApagada = document.createElement('input');
             entradaApagada.type = 'radio';

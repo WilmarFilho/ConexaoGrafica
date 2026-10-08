@@ -115,9 +115,53 @@ function conexao_ficha_produto(WC_Product $produto): array
     return apply_filters('conexao_ficha_produto', $ficha, $produto);
 }
 
+/** Formato de uma variação (impresso, e-book ou impresso-e-book). */
+function conexao_formato_variacao(WC_Product $variacao): string
+{
+    return (string) ($variacao->get_attributes()['pa_formato'] ?? '');
+}
+
+/**
+ * O impresso deste livro está à venda? Zerar o estoque do impresso (ou marcar
+ * "Fora de estoque") tira dele também o combo, que depende do livro físico.
+ */
+function conexao_impresso_a_venda(int $produto_id): bool
+{
+    static $memoria = [];
+
+    if (isset($memoria[$produto_id])) {
+        return $memoria[$produto_id];
+    }
+
+    $produto = wc_get_product($produto_id);
+    $a_venda = false;
+
+    foreach ($produto ? $produto->get_children() : [] as $filho) {
+        $variacao = wc_get_product($filho);
+
+        if ($variacao && conexao_formato_variacao($variacao) === 'impresso') {
+            $a_venda = $variacao->get_status() === 'publish'
+                && $variacao->get_price() !== ''
+                && $variacao->is_in_stock();
+            break;
+        }
+    }
+
+    return $memoria[$produto_id] = $a_venda;
+}
+
+add_filter('woocommerce_variation_is_purchasable', function (bool $pode, $variacao): bool {
+    if ($pode && $variacao instanceof WC_Product_Variation && conexao_formato_variacao($variacao) === 'impresso-e-book') {
+        return conexao_impresso_a_venda($variacao->get_parent_id());
+    }
+
+    return $pode;
+}, 10, 2);
+
 /**
  * Na página do livro, o seletor de formato só oferece o que dá para comprar:
- * variação existente, publicada e com preço.
+ * variação existente, publicada, com preço e em estoque. O que sobra aparece
+ * apagado (theme.js).
  */
 add_filter('woocommerce_dropdown_variation_attribute_options_args', function (array $args): array {
     if (($args['attribute'] ?? '') !== 'pa_formato' || empty($args['product'])) {
@@ -129,14 +173,12 @@ add_filter('woocommerce_dropdown_variation_attribute_options_args', function (ar
     foreach ($args['product']->get_available_variations() as $variacao) {
         $valor = $variacao['attributes']['attribute_pa_formato'] ?? '';
 
-        if ($valor !== '') {
+        if ($valor !== '' && ! empty($variacao['is_in_stock']) && ! empty($variacao['is_purchasable'])) {
             $disponiveis[] = $valor;
         }
     }
 
-    if ($disponiveis) {
-        $args['options'] = array_values(array_intersect((array) $args['options'], $disponiveis));
-    }
+    $args['options'] = array_values(array_intersect((array) $args['options'], $disponiveis));
 
     // a ordem do layout não é a alfabética
     $ordem = apply_filters('conexao_ordem_formatos', ['impresso', 'e-book', 'impresso-e-book']);
