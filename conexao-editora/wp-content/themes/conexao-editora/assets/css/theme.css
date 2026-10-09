@@ -7503,7 +7503,7 @@ textarea.campo__entrada {
 }
 
 @media (min-width: 921px) {
-  .menu-principal .sub-menu--categorias > li > a {
+  .menu-principal .sub-menu--categorias > li:not(.botao) > a {
     display: block;
     width: min(440px, 40vw);
     margin-left: -16px;
@@ -7513,7 +7513,7 @@ textarea.campo__entrada {
   }
 
   .menu-principal .sub-menu--categorias > li.ativa > a,
-  .menu-principal .sub-menu--categorias > li > a:focus-visible {
+  .menu-principal .sub-menu--categorias > li:not(.botao) > a:focus-visible {
     background: rgba(0, 0, 0, .2);
     text-decoration: none;
   }
