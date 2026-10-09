@@ -7518,6 +7518,24 @@ textarea.campo__entrada {
     text-decoration: none;
   }
 
+  /* seta na ponta da categoria ativa, apontando para as subcategorias */
+  .menu-principal .sub-menu--categorias > li:not(.botao) > a {
+    position: relative;
+  }
+
+  .menu-principal .sub-menu--categorias > li.ativa > a::after {
+    content: "";
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+
   /* a coluna da direita: alinhada ao topo do painel, ao lado da lista */
   .menu-principal .sub-menu--categorias .subcategorias {
     position: absolute;
