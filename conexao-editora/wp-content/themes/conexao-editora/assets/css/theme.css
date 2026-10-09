@@ -1655,6 +1655,17 @@ button {
   color: var(--tinta-fraca);
 }
 
+/* subcategorias recuadas embaixo da categoria principal */
+.filtros__sub {
+  margin-top: -4px;
+  padding-left: 26px;
+}
+
+.filtros__sub .caixa.caixa--quadrada {
+  font-size: 13px;
+  color: var(--tinta-media);
+}
+
 .caixa.caixa--quadrada {
   align-items: center;
   gap: 12px;

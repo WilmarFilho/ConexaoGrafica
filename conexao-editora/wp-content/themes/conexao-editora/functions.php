@@ -18,6 +18,7 @@ require_once get_template_directory().'/inc/faq.php';
 require_once get_template_directory().'/inc/ajuda.php';
 require_once get_template_directory().'/inc/manuscrito.php';
 require_once get_template_directory().'/inc/catalogo.php';
+require_once get_template_directory().'/inc/categorias.php';
 require_once get_template_directory().'/inc/produto.php';
 require_once get_template_directory().'/inc/migracao.php';
 require_once get_template_directory().'/inc/autores.php';

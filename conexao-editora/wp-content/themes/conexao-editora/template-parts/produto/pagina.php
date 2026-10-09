@@ -21,8 +21,8 @@ $id = $product->get_id();
 $autores = conexao_autores($product);
 $ficha = conexao_ficha_produto($product);
 $avaliacoes = (int) $product->get_review_count();
-$categorias = get_the_terms($id, 'product_cat');
-$categoria = (! is_wp_error($categorias) && $categorias) ? $categorias[0] : null;
+// a subcategoria (Oftalmologia) e a principal acima dela (Medicina)
+[$categoria, $categoria_principal] = conexao_categoria_do_livro($id);
 
 $parcelas = 6;
 $preco = (float) $product->get_price();
@@ -40,10 +40,14 @@ if (count($sugestoes) < 5) {
 ?>
 <div class="container pagina pagina--produto">
     <?php
-    conexao_trilha(get_the_title(), $categoria ? [[
-        'url' => get_term_link($categoria),
-        'texto' => $categoria->name,
-    ]] : []);
+    // Home › Medicina › Oftalmologia › livro
+    $niveis = [];
+
+    foreach (array_unique(array_filter([$categoria_principal, $categoria]), SORT_REGULAR) as $nivel) {
+        $niveis[] = ['url' => get_term_link($nivel), 'texto' => $nivel->name];
+    }
+
+    conexao_trilha(get_the_title(), $niveis);
     ?>
 
     <div class="produto">

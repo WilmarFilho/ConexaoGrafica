@@ -187,6 +187,8 @@ function conexao_a_svg_conta(string $nome, int $altura = 20): void
 
 function conexao_svg_categoria(string $slug): string
 {
+    // categorias novas que usam o desenho de outra
+    $slug = ['educacao' => 'educacao-familiar', 'fe' => 'religiao', 'politica' => 'direito'][$slug] ?? $slug;
     $caminho = get_template_directory().'/assets/img/categorias/'.sanitize_file_name($slug).'.svg';
 
     if (! file_exists($caminho)) {
@@ -212,6 +214,11 @@ function conexao_icone_categoria(string $slug): string
         'cronicas' => 'cronica',
         'direito' => 'direito',
         'educacao-familiar' => 'familia',
+        'educacao' => 'familia',
+        'fe' => 'religiao',
+        'politica' => 'direito',
+        'historia-da-medicina-e-das-instituicoes' => 'historia',
+        'historia-de-goias' => 'historia',
         'historia' => 'historia',
         'medicina' => 'medicina',
         'saude' => 'medicina',

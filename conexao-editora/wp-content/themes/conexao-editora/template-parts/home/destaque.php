@@ -20,7 +20,7 @@ if (! $produtos) {
             <?php
             $termos = get_the_terms($produto->get_id(), 'product_cat');
             $termos = (! is_wp_error($termos) && $termos) ? $termos : [];
-            $categoria = $termos[0] ?? null;
+            [$categoria] = conexao_categoria_do_livro($produto->get_id());
             $slugs = implode(' ', wp_list_pluck($termos, 'slug'));
             ?>
             <article class="destaque__card" data-categorias="<?php echo esc_attr($slugs); ?>">

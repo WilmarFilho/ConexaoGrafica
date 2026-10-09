@@ -26,18 +26,28 @@ $mostrar = 8;
             continue;
         }
 
-        $termos = get_terms([
-            'taxonomy' => $grupo['taxonomia'],
-            'hide_empty' => true,
-            'orderby' => 'count',
-            'order' => 'DESC',
-        ]);
+        // categorias em árvore (principal e, recuadas, as subcategorias); o resto pela quantidade
+        if ($grupo['taxonomia'] === 'product_cat') {
+            $arvore = conexao_categorias_em_arvore();
+            $termos = array_column($arvore, 0);
+            $niveis = array_column($arvore, 1);
+        } else {
+            $termos = get_terms([
+                'taxonomy' => $grupo['taxonomia'],
+                'hide_empty' => true,
+                'orderby' => 'count',
+                'order' => 'DESC',
+            ]);
+            $niveis = [];
+        }
 
         if (is_wp_error($termos) || ! $termos) {
             continue;
         }
 
         $selecionados = conexao_filtro_selecionado($chave);
+        // na árvore, "ver todas" esconde depois da oitava categoria principal, não no meio de um grupo
+        $limite = $niveis ? (array_keys(array_filter($niveis, static fn ($n) => $n === 0))[$mostrar] ?? PHP_INT_MAX) : $mostrar;
         ?>
         <section class="filtros__grupo" data-filtro>
             <h2><?php echo esc_html($grupo['titulo']); ?></h2>
@@ -53,7 +63,7 @@ $mostrar = 8;
 
             <ul class="filtros__lista">
                 <?php foreach ($termos as $i => $termo) : ?>
-                    <li<?php echo $i >= $mostrar ? ' hidden data-extra' : ''; ?>>
+                    <li<?php echo ! empty($niveis[$i]) ? ' class="filtros__sub"' : ''; ?><?php echo $i >= $limite ? ' hidden data-extra' : ''; ?>>
                         <label class="caixa caixa--quadrada">
                             <input type="checkbox" name="<?php echo esc_attr($chave); ?>[]"
                                    value="<?php echo esc_attr($termo->slug); ?>"
@@ -65,7 +75,7 @@ $mostrar = 8;
                 <?php endforeach; ?>
             </ul>
 
-            <?php if (count($termos) > $mostrar) : ?>
+            <?php if (count($termos) > $limite) : ?>
                 <button class="filtros__mais" type="button" data-filtro-mais>Ver todas</button>
             <?php endif; ?>
         </section>
