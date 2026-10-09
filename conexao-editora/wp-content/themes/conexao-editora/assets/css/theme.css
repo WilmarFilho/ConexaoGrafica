@@ -7494,3 +7494,80 @@ textarea.campo__entrada {
   font-weight: 700;
   color: var(--azul);
 }
+
+/* ---------- menu Categorias: subcategorias ao lado da principal ---------- */
+.menu-principal .subcategorias {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 921px) {
+  .menu-principal .sub-menu--categorias > li > a {
+    display: block;
+    width: min(440px, 40vw);
+    margin-left: -16px;
+    padding: 9px 16px;
+    border-radius: 6px;
+    transition: background-color .15s ease;
+  }
+
+  .menu-principal .sub-menu--categorias > li.ativa > a,
+  .menu-principal .sub-menu--categorias > li > a:focus-visible {
+    background: rgba(0, 0, 0, .2);
+    text-decoration: none;
+  }
+
+  /* a coluna da direita: alinhada ao topo do painel, ao lado da lista */
+  .menu-principal .sub-menu--categorias .subcategorias {
+    position: absolute;
+    top: 46px;
+    left: calc(max(20px, calc((100% - var(--container)) / 2 + 20px)) + min(440px, 40vw) + 60px);
+    display: none;
+    min-width: 280px;
+    min-height: 260px;
+    padding-left: 44px;
+    border-left: 1px solid rgba(255, 255, 255, .3);
+  }
+
+  /* o JavaScript marca a principal ativa (mouse ou teclado); sem ele, vale o hover */
+  .menu-principal .sub-menu--categorias > li.ativa > .subcategorias,
+  .menu-principal .sub-menu--categorias:not(.com-js) > li:hover > .subcategorias,
+  .menu-principal .sub-menu--categorias:not(.com-js) > li:focus-within > .subcategorias {
+    display: block;
+  }
+
+  .menu-principal .subcategorias a {
+    display: block;
+    padding: 9px 0;
+    font-weight: 500;
+  }
+}
+
+/* celular: as subcategorias aparecem recuadas embaixo da principal */
+@media (max-width: 920px) {
+  .menu-principal .subcategorias {
+    padding: 0 0 6px 14px;
+  }
+
+  .menu-principal .subcategorias a {
+    font-size: 13.5px;
+    font-weight: 500;
+    opacity: .85;
+  }
+
+  .menu-principal li.aberto > .sub-menu--categorias {
+    max-height: 1400px;
+  }
+}
+
+/* filtros: enquanto a página recarrega com o filtro marcado */
+.filtros--aplicando {
+  opacity: .6;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+
+#resultados {
+  scroll-margin-top: 16px;
+}

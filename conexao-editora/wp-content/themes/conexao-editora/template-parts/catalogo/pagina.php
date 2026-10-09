@@ -123,7 +123,7 @@ $arte_banner = get_template_directory().'/assets/img/catalogo-banner.png';
         </section>
     <?php endif; ?>
 
-    <div class="catalogo">
+    <div class="catalogo" id="resultados">
         <?php get_template_part('template-parts/catalogo/filtros'); ?>
 
         <div class="catalogo__conteudo">

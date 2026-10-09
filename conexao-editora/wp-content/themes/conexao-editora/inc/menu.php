@@ -12,14 +12,64 @@ if (! defined('ABSPATH')) {
 
 class Conexao_Menu_Walker extends Walker_Nav_Menu
 {
+    /** O próximo submenu é o painel de categorias (com as subcategorias ao lado). */
+    private bool $painel_categorias = false;
+
+    public function start_lvl(&$output, $depth = 0, $args = null): void
+    {
+        if ($depth === 0 && $this->painel_categorias) {
+            $output .= '<ul class="sub-menu sub-menu--categorias" data-painel-categorias>';
+
+            return;
+        }
+
+        parent::start_lvl($output, $depth, $args);
+    }
+
     public function start_el(&$output, $item, $depth = 0, $args = null, $id = 0): void
     {
+        if ($depth === 0) {
+            $this->painel_categorias = in_array('painel-categorias', (array) $item->classes, true)
+                || trim(wp_strip_all_tags($item->title)) === 'Categorias';
+        }
+
         parent::start_el($output, $item, $depth, $args, $id);
 
         if ($depth === 0 && in_array('painel-autores', (array) $item->classes, true)) {
             $output .= conexao_painel_autores();
         }
+
+        // categoria principal no painel: as subcategorias vão junto, para abrir ao lado
+        if ($depth === 1 && $item->object === 'product_cat') {
+            $output .= conexao_subcategorias_menu((int) $item->object_id);
+        }
     }
+}
+
+/** Subcategorias de uma categoria principal, cada uma levando ao catálogo já filtrado. */
+function conexao_subcategorias_menu(int $categoria): string
+{
+    $filhas = get_terms(['taxonomy' => 'product_cat', 'parent' => $categoria, 'hide_empty' => true]);
+
+    if (is_wp_error($filhas) || ! $filhas) {
+        return '';
+    }
+
+    $ordem = static fn (WP_Term $t): int => (int) get_term_meta($t->term_id, 'order', true);
+    usort($filhas, static fn (WP_Term $a, WP_Term $b): int => [$ordem($a), $a->name] <=> [$ordem($b), $b->name]);
+
+    $loja = class_exists('WooCommerce') ? wc_get_page_permalink('shop') : home_url('/loja/');
+    $itens = '';
+
+    foreach ($filhas as $filha) {
+        $itens .= sprintf(
+            '<li><a href="%s">%s</a></li>',
+            esc_url(add_query_arg(['cat' => [$filha->slug]], $loja)),
+            esc_html($filha->name)
+        );
+    }
+
+    return '<ul class="subcategorias">'.$itens.'</ul>';
 }
 
 /** Autores em destaque: os que têm foto, na ordem definida no painel. */

@@ -19,7 +19,8 @@ $mostrar = 8;
 <details class="filtros-caixa" open>
     <summary class="filtros-caixa__resumo" aria-label="Filtros"><?php conexao_the_icon('funil', 20); ?></summary>
 
-<form class="filtros" method="get" action="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">
+<?php /* a âncora leva direto aos resultados depois de filtrar */ ?>
+<form class="filtros" method="get" action="<?php echo esc_url(wc_get_page_permalink('shop').'#resultados'); ?>">
     <?php foreach (conexao_filtros_taxonomia() as $chave => $grupo) : ?>
         <?php
         if (! taxonomy_exists($grupo['taxonomia'])) {

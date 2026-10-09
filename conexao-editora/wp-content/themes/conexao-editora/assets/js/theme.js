@@ -264,6 +264,74 @@
         window.addEventListener('resize', alinhar);
     });
 
+    /* menu Categorias: a principal sob o mouse (ou com o foco) mostra as
+       subcategorias na coluna da direita; a primeira já vem aberta */
+    document.querySelectorAll('[data-painel-categorias]').forEach(function (painel) {
+        var principais = Array.prototype.filter.call(painel.children, function (li) {
+            return li.querySelector(':scope > .subcategorias');
+        });
+
+        if (!principais.length) {
+            return;
+        }
+
+        painel.classList.add('com-js');
+
+        var ativa = principais[0];
+        var espera = null;
+
+        ativa.classList.add('ativa');
+
+        var ativar = function (li) {
+            if (li === ativa) {
+                return;
+            }
+
+            ativa.classList.remove('ativa');
+            ativa = li;
+            ativa.classList.add('ativa');
+        };
+
+        principais.forEach(function (li) {
+            // um instante de espera: quem atravessa outra linha a caminho da
+            // coluna da direita não troca a coluna sem querer
+            li.addEventListener('mouseenter', function () {
+                window.clearTimeout(espera);
+                espera = window.setTimeout(function () {
+                    ativar(li);
+                }, 110);
+            });
+
+            li.addEventListener('focusin', function () {
+                window.clearTimeout(espera);
+                ativar(li);
+            });
+        });
+    });
+
+    /* filtros do catálogo: no computador, marcar uma opção já aplica, sem rolar
+       até o botão. No celular o painel cobre a tela e a pessoa marca várias
+       antes de tocar em "Aplicar filtros". */
+    var formFiltros = document.querySelector('form.filtros');
+
+    if (formFiltros) {
+        formFiltros.addEventListener('change', function (evento) {
+            var campo = evento.target;
+
+            if ((campo.type !== 'checkbox' && campo.type !== 'range') || window.matchMedia('(max-width: 760px)').matches) {
+                return;
+            }
+
+            formFiltros.classList.add('filtros--aplicando');
+
+            if (typeof formFiltros.requestSubmit === 'function') {
+                formFiltros.requestSubmit();
+            } else {
+                formFiltros.submit();
+            }
+        });
+    }
+
     /* setas dos carrosséis do celular: data-rolar diz o sentido e data-trilho
        de quem é a régua que anda */
     document.querySelectorAll('[data-rolar]').forEach(function (seta) {
