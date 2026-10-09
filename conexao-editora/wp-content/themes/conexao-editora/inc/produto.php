@@ -326,6 +326,47 @@ add_action('woocommerce_process_product_meta', function (int $id): void {
 });
 
 /** @return array{url: string, texto: string}|null */
+/**
+ * Preço do livro para cards e página: "Grátis" quando o preço está vazio ou é
+ * zero; nos livros com formatos, "A partir de" o menor preço, ou "Grátis ou a
+ * partir de" quando um formato é grátis e outro é pago.
+ */
+function conexao_preco_livro(WC_Product $produto): string
+{
+    $gratis = '<span class="preco-gratis">Grátis</span>';
+
+    if (! $produto->is_type('variable')) {
+        return $produto->get_price_html();
+    }
+
+    $precos = array_map('floatval', $produto->get_variation_prices(true)['price'] ?? []);
+    $pagos = array_filter($precos, static fn (float $p): bool => $p > 0);
+
+    if (! $pagos) {
+        return $gratis;
+    }
+
+    $menor = wp_kses_post(wc_price(min($pagos)));
+
+    return count($pagos) < count($precos) ? $gratis.' ou a partir de '.$menor : 'A partir de '.$menor;
+}
+
+/*
+ * Preço vazio ou zero vira "Grátis" em toda a loja (vitrines, carrinho, variação
+ * escolhida). Livro vendido fora (link externo) continua sem preço.
+ */
+add_filter('woocommerce_get_price_html', function (string $html, WC_Product $produto): string {
+    if ($produto->is_type('external') || conexao_venda_externa($produto)) {
+        return $html;
+    }
+
+    if ($produto->is_type('variable')) {
+        return conexao_preco_livro($produto);
+    }
+
+    return (float) $produto->get_price() > 0 ? $html : '<span class="preco-gratis">Grátis</span>';
+}, 100, 2);
+
 function conexao_venda_externa(WC_Product $produto): ?array
 {
     $id = $produto->get_parent_id() ?: $produto->get_id();

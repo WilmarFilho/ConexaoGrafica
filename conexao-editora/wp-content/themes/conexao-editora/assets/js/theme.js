@@ -786,6 +786,9 @@
             if (alvoParcelas && variacao.display_price) {
                 var parcela = (variacao.display_price / vezes).toFixed(2).replace('.', ',');
                 alvoParcelas.textContent = 'ou ' + vezes + 'x de R$' + parcela + ' sem juros';
+            } else if (alvoParcelas) {
+                // formato grátis: não há parcela
+                alvoParcelas.textContent = '';
             }
         });
 

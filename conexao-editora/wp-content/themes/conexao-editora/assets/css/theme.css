@@ -7488,3 +7488,9 @@ textarea.campo__entrada {
     right: 28px;
   }
 }
+
+/* livro sem preço ou com preço zero */
+.preco-gratis {
+  font-weight: 700;
+  color: var(--azul);
+}

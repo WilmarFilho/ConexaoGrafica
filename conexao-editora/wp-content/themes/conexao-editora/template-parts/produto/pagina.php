@@ -111,12 +111,7 @@ if (count($sugestoes) < 5) {
             <div class="compra" data-compra data-parcelas="<?php echo esc_attr($parcelas); ?>">
                 <p class="compra__preco" data-compra-preco>
                     <?php
-                    if ($product->is_type('variable')) {
-                        $menor = (float) $product->get_variation_price('min', true);
-                        printf('A partir de %s', wp_kses_post(wc_price($menor)));
-                    } else {
-                        echo wp_kses_post($product->get_price_html());
-                    }
+                    echo wp_kses_post(conexao_preco_livro($product));
                     ?>
                 </p>
 

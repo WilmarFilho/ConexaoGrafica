@@ -32,12 +32,8 @@ $autores = conexao_autores($product);
 
     <p class="card-catalogo__preco">
         <?php
-        if ($product->is_type('variable')) {
-            // no cartão cabe um preço só: mostramos o menor dos formatos
-            printf('A partir de %s', wp_kses_post(wc_price((float) $product->get_variation_price('min', true))));
-        } else {
-            echo wp_kses_post($product->get_price_html());
-        }
+        // no cartão cabe um preço só: o menor dos formatos, ou "Grátis"
+        echo wp_kses_post(conexao_preco_livro($product));
         ?>
     </p>
 
