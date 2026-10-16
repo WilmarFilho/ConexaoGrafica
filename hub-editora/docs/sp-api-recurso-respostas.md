@@ -20,10 +20,10 @@ Testes automatizados cobrindo tudo isso: `AmazonImportTest`, `AccessControlTest`
 
 1. ~~**Teste de invasão anual**~~ — **feito em 16/10/2026**, relatório em `docs/pentest-2026.md`. Sobram dois ajustes de servidor recomendados no relatório, a fazer pelo administrador do VPS: bloquear a porta 3306 no firewall e desativar o FTP (21) se não for usado.
 2. ~~**Cópia de backup fora do servidor**~~ — **ativada em 16/10/2026**: Supabase Storage (projeto `hub-backups`, organização Conexão, região eu-central-1/Frankfurt, bucket privado `hub-backups`). Primeiro backup enviado e conferido (212 KB cifrados, 19 tabelas). Chave de cifra e chaves S3 no cofre de senhas. Atenção: no plano gratuito, o Supabase pausa projetos sem atividade; se o projeto for pausado, o backup falha e o Hub alerta os administradores.
-3. **Servidor (achados de 16/10/2026)** — as respostas 2.6 e 2.7 só ficam verdadeiras depois disto, feito pelo Wilmar:
-   - ativar o firewall da Hostinger (painel do VPS) só com as portas necessárias, liberando a 3306 apenas para os dois IPs do CREF14;
-   - mudar a varredura do ImunifyAV de mensal para **diária** (WHM → Plugins → ImunifyAV → Settings);
-   - limpar o flipbook `~/biblioteca/flipbooks/1897` da conta hubpubcon: as páginas têm redirecionamento de spam injetado. A pasta não é publicada pelo Hub, mas a origem dela, o acervo da Pubcon, pode ter o mesmo problema.
+3. **Servidor (achados de 16/10/2026)** — decisões e ações:
+   - firewall da Hostinger: **decidido não ativar** (16/10/2026). As respostas não citam firewall de rede;
+   - ImunifyAV fica **mensal**, e as respostas 2.6 e 2.7 já dizem mensal;
+   - flipbook `~/biblioteca/flipbooks/1897` **limpo em 16/10/2026**: as 360 páginas `basic-html` tinham sido trocadas por um redirecionamento de spam (`rxcheapplace.shop`). Foram para a quarentena `/root/quarentena/flipbook-1897-infectado-20261016.tgz` e removidas; os JS do leitor estavam íntegros. A pasta não era publicada pelo Hub. Falta conferir o original no acervo da Pubcon.
 4. **Criptografia em repouso do banco (MariaDB):** a política lista como controle; está pendente desde setembro (precisa reiniciar o banco). Não é um dos seis pontos recusados, mas a Amazon cobra na Data Protection Policy (2.4) e pode aparecer na próxima avaliação.
 5. **Bling ↔ Amazon fora do Hub:** se a integração de marketplace Bling↔Amazon continuar ligada no Bling para nota fiscal, ela é do ERP da editora e não alimenta o Hub. Se não for mais necessária, desligar no Bling e revogar o app "Hub" lá (Bling → Configurações → Aplicativos).
 6. **Assinar** a política (`docs/politica-tratamento-dados.md`, versão 1.1) e o plano de incidentes.
@@ -48,7 +48,7 @@ Testes automatizados cobrindo tudo isso: `AmazonImportTest`, `AccessControlTest`
 >
 > **Os registros não contêm Informações de Identificação Pessoal de compradores.** As entradas referenciam apenas o número do pedido Amazon e identificadores internos; nome, endereço, telefone e e-mail de compradores nunca são escritos nos registros, e a cópia do pedido guardada para auditoria também exclui endereço e dados do comprador. Os únicos dados pessoais nos registros são o e-mail e o IP dos operadores do próprio sistema, necessários para identificar quem fez cada ação. Os registros são **retidos por no mínimo 12 meses**, só podem ser incluídos pela aplicação (não há edição nem exclusão pela interface) e só os administradores os consultam.
 >
-> **Monitoramento**: alertas automáticos por e-mail aos administradores quando há 5 tentativas de login falhas em 15 minutos para o mesmo usuário ou IP, quando uma conta é **bloqueada após 10 falhas**, quando qualquer integração falha repetidamente e quando a varredura mensal encontra vulnerabilidade. A cada 15 dias o sistema envia aos administradores um **resumo de segurança** (logins, falhas, bloqueios, usuários alterados, integrações alteradas, erros, apagamentos de dados pessoais, varreduras), revisado pelo responsável técnico. O servidor tem firewall de rede liberando só as portas necessárias, WAF (ModSecurity), bloqueio de força bruta (cPHulk) e antimalware (ImunifyAV) com varredura diária.
+> **Monitoramento**: alertas automáticos por e-mail aos administradores quando há 5 tentativas de login falhas em 15 minutos para o mesmo usuário ou IP, quando uma conta é **bloqueada após 10 falhas**, quando qualquer integração falha repetidamente e quando a varredura mensal encontra vulnerabilidade. A cada 15 dias o sistema envia aos administradores um **resumo de segurança** (logins, falhas, bloqueios, usuários alterados, integrações alteradas, erros, apagamentos de dados pessoais, varreduras), revisado pelo responsável técnico. O servidor tem WAF (ModSecurity), bloqueio automático de força bruta (cPHulk) e antimalware (ImunifyAV) com varredura mensal de todos os arquivos.
 >
 > **Investigação de incidentes**: temos Plano de Resposta a Incidentes com Incident Management Point of Contact (IMPOC) designado (responsável técnico, comercial@conexaopro.com.br), com etapas e prazos: contenção em até 4 horas (revogação de tokens e chaves, bloqueio de usuários), **notificação à Amazon (security@amazon.com) em até 24 horas** da detecção, investigação em até 72 horas reconstituindo a linha do tempo pela trilha de auditoria e pelos logs do servidor, correção em até 7 dias e relatório em até 15 dias. O plano é revisado a cada 6 meses e exercitado anualmente.
 
@@ -67,7 +67,7 @@ Testes automatizados cobrindo tudo isso: `AmazonImportTest`, `AccessControlTest`
 
 > **Antes de cada publicação**, uma verificação obrigatória e automatizada roda em ambiente de teste, sem dados reais: varredura de vulnerabilidades conhecidas em todas as dependências (composer audit, base de CVEs e GitHub Security Advisories), verificação de sintaxe de todo o código e a suíte completa de testes automatizados. Qualquer falha bloqueia a publicação. Todo o código é versionado em git, e a publicação em produção é restrita ao responsável técnico.
 >
-> **Frequências**: varredura de vulnerabilidades das dependências **a cada 30 dias**, de forma automática e agendada, com o resultado registrado na trilha de auditoria e alerta aos administradores quando há achado; a mesma varredura roda após qualquer mudança relevante, pois toda publicação passa por ela. Varredura de malware no servidor **diária** (ImunifyAV) e atualizações de sistema operacional, PHP e painel aplicadas automaticamente pelo WHM/cPanel. **Teste de invasão a cada 365 dias** da aplicação e da infraestrutura exposta, com metodologia OWASP, relatório com recomendações e reteste após as correções.
+> **Frequências**: varredura de vulnerabilidades das dependências **a cada 30 dias**, de forma automática e agendada, com o resultado registrado na trilha de auditoria e alerta aos administradores quando há achado; a mesma varredura roda após qualquer mudança relevante, pois toda publicação passa por ela. Varredura de malware no servidor **mensal** (ImunifyAV, todos os arquivos) e atualizações de sistema operacional, PHP e painel aplicadas automaticamente pelo WHM/cPanel. **Teste de invasão a cada 365 dias** da aplicação e da infraestrutura exposta, com metodologia OWASP, relatório com recomendações e reteste após as correções.
 >
 > **Prazos de correção**: vulnerabilidades **críticas em até 7 dias** e **altas em até 30 dias** a partir da descoberta; médias e baixas no ciclo de publicação seguinte. Vulnerabilidades em dependências são corrigidas por atualização da biblioteca, seguida de nova verificação completa antes da publicação.
 >
@@ -82,7 +82,7 @@ Testes automatizados cobrindo tudo isso: `AmazonImportTest`, `AccessControlTest`
 - [x] Hub publicado com as mudanças de 16/10/2026.
 - [x] Pendência 1 (teste de invasão) resolvida.
 - [x] Pendência 2 (ativar o backup externo) resolvida.
-- [ ] Pendência 3 (firewall, ImunifyAV diário, flipbook 1897) resolvida.
+- [x] Pendência 3 (flipbook 1897 limpo) resolvida.
 - [ ] Perfil do Provedor de Soluções atualizado com os textos da seção 3.
 - [ ] Caso novo aberto no Solution Provider Portal, citando o 22092972891 e informando que as respostas foram corrigidas.
 - [ ] Após a aprovação: criar o app no portal, gerar Client ID, Client Secret e Refresh token, colar em Integrações → Amazon, testar e acompanhar a primeira varredura de pedidos.
