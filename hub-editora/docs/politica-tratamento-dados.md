@@ -25,7 +25,7 @@ Versão pública (para compradores e parceiros): https://hub.pubcon.com.br/priva
 - Auditoria de todas as ações sobre pedidos, integrações, usuários e logins, com alerta automático para tentativas de login repetidas, bloqueio de conta, quedas de integração e criação de usuários. Os registros não contêm dados pessoais de compradores (só o número do pedido); os únicos dados pessoais neles são e-mail e IP dos operadores do sistema.
 - Varredura de vulnerabilidades das dependências a cada 30 dias (automática, registrada na auditoria) e antes de cada publicação; teste de invasão anual da aplicação e da infraestrutura exposta, com reteste após as correções. Prazos de correção: crítica em até 7 dias, alta em até 30 dias.
 - Apagamento automático de dados pessoais de compradores da Amazon 30 dias após o envio.
-- Backups diários; cópia cifrada externa; restauração testada semestralmente (RPO 24 h, RTO 4 h).
+- Backup diário do banco cifrado com AES-256-GCM antes de sair do servidor, enviado a armazenamento externo em outro provedor e região, retenção de 30 dias; chave de cifra guardada fora do servidor. Conferência automática semanal (decifra e valida o mais recente, com alerta se falhar) e restauração completa exercitada semestralmente (RPO 24 h, RTO 4 h).
 
 ## 4. Registros de processamento
 A trilha de auditoria do hub (menu Auditoria) é o registro de operações: importação de pedidos, geração de etiqueta, envio de rastreio, alterações manuais com autor e motivo, alterações de integrações, logins e apagamentos de dados. Exportável sob demanda para auditoria.

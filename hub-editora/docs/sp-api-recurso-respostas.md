@@ -12,14 +12,18 @@ Avaliação recusada em 14/10/2026 por seis pontos. Respostas revisadas em 16/10
 | **1.2 / 1.3 — acesso e menor privilégio** | Perfis **Administrador** e **Expedição**; Usuários, Integrações e Auditoria só para administradores. **Revisão trimestral automática** (lista aos administradores + confirmação registrada no painel); contas de Expedição sem uso há 90 dias são desativadas; desativação imediata pelo painel. |
 | **2.6 — logs e PII** | Já não havia PII de comprador nos registros; agora também o "raw" dos pedidos da SP-API é guardado **sem** endereço e comprador. Bloqueio de conta e varreduras entram na auditoria e no resumo quinzenal. |
 | **1.4 — senhas** | Senha sem partes do nome/e-mail, **histórico das 10 últimas**, **idade mínima de 1 dia**, **bloqueio após 10 falhas** (30 min, aviso aos administradores, desbloqueio pelo painel). Já existiam: 12+ caracteres com maiúsculas, minúsculas, número e símbolo, checagem de vazamentos, MFA obrigatório e expiração em 365 dias. |
-| **2.7 — vulnerabilidades** | **Varredura mensal automática** das dependências (dia 5, registrada na auditoria, alerta se houver achado), além da verificação obrigatória antes de cada publicação (`deploy/check.sh`). Prazos de correção na política: crítica 7 dias, alta 30 dias. |
+| **2.7 — vulnerabilidades** | **Varredura mensal automática** das dependências (dia 5, registrada na auditoria, alerta se houver achado), além da verificação obrigatória antes de cada publicação (`deploy/check.sh`). Prazos de correção na política: crítica 7 dias, alta 30 dias. **Primeiro teste de invasão feito em 16/10/2026** (OWASP ZAP + verificações manuais, 0 falhas, avisos corrigidos e retestados; `docs/pentest-2026.md`). **Backup diário cifrado (AES-256-GCM) para armazenamento S3 externo** (`hub:backup`), com conferência automática semanal (`hub:backup-restore --conferir`). |
 
-Testes automatizados cobrindo tudo isso: `AmazonImportTest`, `AccessControlTest` (51 testes no total).
+Testes automatizados cobrindo tudo isso: `AmazonImportTest`, `AccessControlTest`, `BackupTest` (56 testes no total).
 
 ## 2. Antes de reenviar — pendências fora do código
 
-1. **Teste de invasão anual:** a resposta 2.7 declara teste anual. Fazer o primeiro antes de reenviar (ex.: OWASP ZAP contra hub.pubcon.com.br, ou contratar) e guardar o relatório em `docs/pentest-2026.md`, com a data.
-2. **Cópia de backup fora do servidor:** a política e a resposta citam cópia cifrada em local separado. Configurar o destino remoto no WHM (Backup Configuration → Additional Destinations: S3, Backblaze ou Google Drive) com criptografia.
+1. ~~**Teste de invasão anual**~~ — **feito em 16/10/2026**, relatório em `docs/pentest-2026.md`. Sobram dois ajustes de servidor recomendados no relatório, a fazer pelo administrador do VPS: bloquear a porta 3306 no firewall e desativar o FTP (21) se não for usado.
+2. **Cópia de backup fora do servidor** — o código está publicado (`hub:backup` diário às 02:40, conferência às segundas 06:15); **falta só ativar**:
+   1. Criar um bucket privado em um provedor S3 compatível, em região diferente da do VPS (ex.: Backblaze B2 `us-west` ou AWS S3 `sa-east-1`), e uma chave de aplicação com acesso **só a esse bucket**.
+   2. No servidor, gerar a chave de cifra: `php artisan hub:backup --gerar-chave`. Guardar a chave no cofre de senhas: sem ela, nenhum backup pode ser restaurado.
+   3. Preencher no `.env` de produção: `BACKUP_ENCRYPTION_KEY`, `BACKUP_S3_KEY`, `BACKUP_S3_SECRET`, `BACKUP_S3_REGION`, `BACKUP_S3_BUCKET` e `BACKUP_S3_ENDPOINT` (no B2: `https://s3.<região>.backblazeb2.com`).
+   4. Rodar `php artisan config:cache`, `php artisan hub:backup` e `php artisan hub:backup-restore --conferir`. Os dois devem aparecer em Registros como "Backup externo enviado" e "Backup externo conferido".
 3. **Criptografia em repouso do banco (MariaDB):** a política lista como controle; está pendente desde setembro (precisa reiniciar o banco). Não é um dos seis pontos recusados, mas a Amazon cobra na Data Protection Policy (2.4) e pode aparecer na próxima avaliação.
 4. **Bling ↔ Amazon fora do Hub:** se a integração de marketplace Bling↔Amazon continuar ligada no Bling para nota fiscal, ela é do ERP da editora e não alimenta o Hub. Se não for mais necessária, desligar no Bling e revogar o app "Hub" lá (Bling → Configurações → Aplicativos).
 5. **Assinar** a política (`docs/politica-tratamento-dados.md`, versão 1.1) e o plano de incidentes.
@@ -67,14 +71,17 @@ Testes automatizados cobrindo tudo isso: `AmazonImportTest`, `AccessControlTest`
 >
 > **Prazos de correção**: vulnerabilidades **críticas em até 7 dias** e **altas em até 30 dias** a partir da descoberta; médias e baixas no ciclo de publicação seguinte. Vulnerabilidades em dependências são corrigidas por atualização da biblioteca, seguida de nova verificação completa antes da publicação.
 >
-> **Recuperação**: backups diários completos da aplicação e do banco, com cópia cifrada em provedor externo em local geograficamente separado e teste de restauração semestral; RPO de 24 horas e RTO de 4 horas.
+> **Teste de invasão**: o primeiro foi realizado em **16/10/2026**: varredura completa com OWASP ZAP (rastreamento e ataque ativo: injeção de SQL, XSS, injeção de comando e de template, path traversal, entre outros) e verificações manuais de exposição de arquivos, TLS, autenticação dos webhooks, controle de acesso e portas do servidor. **Nenhuma vulnerabilidade explorável foi encontrada.** Os achados de configuração (cabeçalhos de segurança HTTP como HSTS e Content-Security-Policy, além de um serviço interno exposto no servidor) foram corrigidos no mesmo dia e confirmados em reteste. O relatório fica arquivado e o próximo teste está previsto para outubro de 2027.
+>
+> **Recuperação**: backup diário do banco de dados, **cifrado com AES-256-GCM antes de sair do servidor** e enviado a armazenamento de objetos externo, em outro provedor e região geográfica, com retenção de 30 dias; a chave de cifra fica fora do servidor e do armazenamento. Toda semana o sistema decifra automaticamente o backup mais recente e confere o conteúdo (teste de restauração), registrando o resultado na trilha de auditoria e alertando os administradores em caso de falha; uma restauração completa é exercitada a cada 6 meses. O código da aplicação é recuperável a partir do repositório git. RPO de 24 horas e RTO de 4 horas.
 
-*(A última frase só vale depois de configurado o destino remoto de backup — pendência 2.)*
+*(O parágrafo de recuperação só vale depois de ativado o backup externo — pendência 2.)*
 
 ## 4. Checklist do novo caso
 
-- [ ] Hub publicado com as mudanças de 16/10/2026.
-- [ ] Pendências 1 e 2 da seção 2 resolvidas (ou o texto da resposta 2.7 ajustado ao que existir).
+- [x] Hub publicado com as mudanças de 16/10/2026.
+- [x] Pendência 1 (teste de invasão) resolvida.
+- [ ] Pendência 2 (ativar o backup externo) resolvida.
 - [ ] Perfil do Provedor de Soluções atualizado com os textos da seção 3.
 - [ ] Caso novo aberto no Solution Provider Portal, citando o 22092972891 e informando que as respostas foram corrigidas.
 - [ ] Após a aprovação: criar o app no portal, gerar Client ID, Client Secret e Refresh token, colar em Integrações → Amazon, testar e acompanhar a primeira varredura de pedidos.

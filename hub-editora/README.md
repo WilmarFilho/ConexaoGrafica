@@ -41,6 +41,22 @@ Painel em <http://localhost:8095/admin>.
 5. `.env` de produção fora do docroot; credenciais das integrações **nunca**
    no repositório.
 
+### Backup externo
+
+`hub:backup` (diário, 02:40): `mysqldump` → gzip → AES-256-GCM → bucket S3
+compatível em outro provedor e região, guardando `BACKUP_RETENTION_DAYS` dias.
+`hub:backup-restore --conferir` (segundas, 06:15) decifra o mais recente e
+alerta os administradores se algo falhar. Sem `BACKUP_*` no `.env`, os dois só
+avisam e não fazem nada.
+
+- Chave nova: `php artisan hub:backup --gerar-chave`. Guarde a chave no cofre de
+  senhas, porque sem ela nenhum backup pode ser restaurado.
+- Restaurar: `php artisan hub:backup-restore --listar`, depois
+  `php artisan hub:backup-restore [arquivo] --saida=/caminho/hub.sql` e, por fim,
+  `mysql banco < /caminho/hub.sql`. A restauração é manual, de propósito.
+
+Teste de invasão anual: relatório em `docs/pentest-2026.md`.
+
 ## Estrutura de integrações
 
 ```
