@@ -71,6 +71,10 @@ return [
             'bucket' => env('BACKUP_S3_BUCKET'),
             'endpoint' => env('BACKUP_S3_ENDPOINT'),
             'use_path_style_endpoint' => env('BACKUP_S3_PATH_STYLE', false),
+            // Provedores S3 compatíveis (Supabase, B2...) nem sempre aceitam os checksums
+            // que o SDK da AWS manda por padrão desde 2025; só quando a operação exige.
+            'request_checksum_calculation' => 'when_required',
+            'response_checksum_validation' => 'when_required',
             'root' => env('BACKUP_S3_PREFIX', 'hub-editora'),
             'throw' => true,
             'report' => false,
