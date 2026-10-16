@@ -20,7 +20,7 @@ class SecurityHeaders
         ."script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
         ."style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net; "
         ."font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net; "
-        ."img-src 'self' data: blob: https:; "
+        ."img-src 'self' data: blob: https://ui-avatars.com; "
         ."connect-src 'self'; "
         ."frame-ancestors 'self'; "
         ."form-action 'self'; "

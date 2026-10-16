@@ -99,6 +99,7 @@ class BackupTest extends TestCase
             ->assertHeader('X-Content-Type-Options', 'nosniff')
             ->assertHeader('Cross-Origin-Resource-Policy', 'same-origin');
         $this->assertStringContainsString("frame-ancestors 'self'", $r->headers->get('Content-Security-Policy'));
+        $this->assertDoesNotMatchRegularExpression('/(^|[\s;])(https?:|\*)(;|\s|$)/', $r->headers->get('Content-Security-Policy'), 'sem origem curinga');
         $this->assertNotNull($r->headers->get('Permissions-Policy'));
     }
 }
