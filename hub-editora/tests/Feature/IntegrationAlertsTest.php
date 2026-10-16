@@ -2,17 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Integrations\Bling\BlingClient;
-use App\Integrations\Bling\ImportOrders;
 use App\Models\Channel;
-use App\Models\Setting;
 use App\Models\SyncLog;
 use App\Models\User;
 use App\Notifications\IntegrationDown;
 use App\Support\IntegrationAlerts;
 use Database\Seeders\ChannelSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -51,29 +47,16 @@ class IntegrationAlertsTest extends TestCase
         Notification::assertCount(2);
 
         // Token revogado é imediato: não volta sozinho.
-        IntegrationAlerts::down(Channel::BLING, 'invalid_grant', immediate: true);
+        IntegrationAlerts::down(Channel::AMAZON, 'invalid_grant', immediate: true);
         Notification::assertCount(4);
     }
 
-    public function test_bling_refresh_refusal_disconnects_and_alerts(): void
+    public function test_amazon_without_sp_api_credentials_shows_as_pending(): void
     {
-        User::factory()->create();
-        config(['hub.bling.client_id' => 'cid', 'hub.bling.client_secret' => 'csec', 'hub.bling.base_url' => 'https://api.bling.test/Api/v3']);
-        Setting::create(['key' => 'bling.access_token', 'value' => 'velho']);
-        Setting::create(['key' => 'bling.refresh_token', 'value' => 'ref']);
-        Setting::create(['key' => 'bling.expires_at', 'value' => (string) now()->subMinute()->timestamp]);
-        cache()->forget('hub.settings.v1');
+        config(['hub.amazon.client_id' => null, 'hub.amazon.client_secret' => null, 'hub.amazon.refresh_token' => null]);
+        $this->assertContains('Amazon', array_column(IntegrationAlerts::openIssues(), 'channel'));
 
-        Http::fake([BlingClient::TOKEN_URL => Http::response(['error' => 'invalid_grant', 'error_description' => 'revogado'], 400)]);
-
-        try {
-            ImportOrders::make()->one(1);
-            $this->fail('deveria lançar');
-        } catch (\RuntimeException) {
-        }
-
-        $this->assertFalse(BlingClient::isConnected());
-        Notification::assertSentTimes(IntegrationDown::class, 1);
-        $this->assertContains('Bling / Amazon', array_column(IntegrationAlerts::openIssues(), 'channel'));
+        config(['hub.amazon.client_id' => 'cid', 'hub.amazon.client_secret' => 'sec', 'hub.amazon.refresh_token' => 'ref']);
+        $this->assertNotContains('Amazon', array_column(IntegrationAlerts::openIssues(), 'channel'));
     }
 }

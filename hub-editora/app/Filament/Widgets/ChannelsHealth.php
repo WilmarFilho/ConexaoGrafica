@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Integrations\Bling\BlingClient;
+use App\Integrations\Amazon\AmazonClient;
 use App\Integrations\MelhorEnvio\MelhorEnvioClient;
 use App\Models\Channel;
 use App\Models\Order;
@@ -11,8 +11,7 @@ use Filament\Widgets\Widget;
 
 /**
  * Situação de cada integração: configurada, última sincronização, erros
- * desde o último sucesso. Bling e Amazon aparecem como uma linha só, porque
- * hoje a Amazon chega exclusivamente pelo Bling.
+ * desde o último sucesso. A Amazon vem direto pela SP-API.
  */
 class ChannelsHealth extends Widget
 {
@@ -30,7 +29,6 @@ class ChannelsHealth extends Widget
         $woo = $channels[Channel::WOOCOMMERCE] ?? null;
         $pm = $channels[Channel::PAGARME] ?? null;
         $amz = $channels[Channel::AMAZON] ?? null;
-        $bling = $channels[Channel::BLING] ?? null;
         $me = $channels[Channel::MELHOR_ENVIO] ?? null;
 
         return array_values(array_filter([
@@ -40,9 +38,8 @@ class ChannelsHealth extends Widget
             $this->row('Pagar.me (landing pages)', [$pm],
                 filled(config('hub.pagarme.secret_key')), orders: [$pm]),
 
-            $this->row('Bling / Amazon', [$bling, $amz],
-                BlingClient::isConfigured() && BlingClient::isConnected(), orders: [$amz],
-                offLabel: BlingClient::isConfigured() ? 'Falta autorizar' : 'Sem credenciais'),
+            $this->row('Amazon (SP-API)', [$amz], AmazonClient::isConfigured(), orders: [$amz],
+                offLabel: 'Aguardando credenciais da SP-API'),
 
             $this->row('Melhor Envio', [$me], MelhorEnvioClient::isConfigured()),
         ]));

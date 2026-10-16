@@ -76,7 +76,6 @@ class AmazonConfirmShipmentTest extends TestCase
 
     public function test_notify_job_confirms_on_amazon_using_the_amazon_order_number(): void
     {
-        config(['hub.bling.client_id' => null]); // sem Bling: só a Amazon
         $customer = Customer::create(['name' => 'Guilherme']);
         $order = Order::create(['channel_id' => Channel::bySlug(Channel::AMAZON)->id, 'external_id' => '26884098698', 'external_number' => '702-8230738-5649812',
             'customer_id' => $customer->id, 'status' => 'label_generated', 'payment_status' => 'paid', 'requires_shipping' => true, 'placed_at' => now()]);

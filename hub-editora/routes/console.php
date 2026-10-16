@@ -17,7 +17,7 @@ Schedule::command('hub:sync pagarme')
     ->withoutOverlapping()
     ->onOneServer();
 
-// Amazon chega pelo Bling, que não tem webhook para nós: varredura a cada 15 min.
+// Amazon pela SP-API (sem webhook para nós): varredura a cada 15 min.
 Schedule::command('hub:sync amazon')
     ->everyFifteenMinutes()
     ->withoutOverlapping()
@@ -37,6 +37,17 @@ Schedule::command('hub:purge-pii')
 // Revisão quinzenal de segurança por e-mail (dias 1 e 16).
 Schedule::command('hub:security-digest')
     ->twiceMonthly(1, 16, '08:00')
+    ->onOneServer();
+
+// Revisão trimestral de acessos (dia 1 de jan/abr/jul/out): lista aos administradores
+// e desativa contas de expedição sem uso há 90 dias.
+Schedule::command('hub:access-review')
+    ->quarterlyOn(1, '08:30')
+    ->onOneServer();
+
+// Varredura mensal de vulnerabilidades nas dependências (além da que roda antes de cada deploy).
+Schedule::command('hub:security-scan')
+    ->monthlyOn(5, '07:00')
     ->onOneServer();
 
 // Rastreio: o Melhor Envio não empurra eventos; a cada hora perguntamos.

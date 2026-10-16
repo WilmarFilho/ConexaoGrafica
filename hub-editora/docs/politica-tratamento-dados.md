@@ -1,6 +1,6 @@
 # Política Interna de Tratamento, Classificação e Privacidade de Dados — Hub Editora
 
-Versão 1.0 · 16/09/2026 · Revisão anual
+Versão 1.1 · 16/10/2026 · Revisão anual
 Versão pública (para compradores e parceiros): https://hub.pubcon.com.br/privacidade
 
 ## 1. Classificação
@@ -14,13 +14,16 @@ Versão pública (para compradores e parceiros): https://hub.pubcon.com.br/priva
 ## 2. Princípios
 - **Mínimo necessário**: coletar só o que a entrega exige. Nada de dados de pagamento.
 - **Finalidade**: expedição, rastreio e atendimento do pedido. Nenhum uso comercial secundário.
-- **Necessidade de saber**: acesso apenas para a equipe de expedição, com usuário individual.
+- **Necessidade de saber e menor privilégio**: usuário individual para cada pessoa, com dois perfis — **Expedição** (pedidos, expedição e catálogo) e **Administrador** (também usuários, integrações e auditoria).
+- **Fonte única**: Informações da Amazon vêm exclusivamente da Selling Partner API. Nenhum ERP, planilha ou intermediário é usado como fonte de dados da Amazon.
 
 ## 3. Controles técnicos em vigor
-- Painel só por HTTPS; login individual; senha com 12+ caracteres, letras maiúsculas e minúsculas, número e símbolo, verificada contra vazamentos; autenticação em dois fatores obrigatória; troca de senha a cada 365 dias.
+- Painel só por HTTPS; login individual; senha com 12+ caracteres, letras maiúsculas e minúsculas, número e símbolo, sem partes do nome ou do e-mail, verificada contra vazamentos; as 10 últimas senhas não podem ser repetidas; idade mínima de 1 dia; troca obrigatória a cada 365 dias; autenticação em dois fatores obrigatória.
+- Bloqueio da conta por 30 minutos após 10 tentativas de login falhas seguidas, com aviso aos administradores; desbloqueio antecipado só por administrador ou redefinição pelo link de e-mail.
 - Credenciais de integração cifradas (AES-256) no banco; banco com criptografia em repouso; chave fora do diretório do banco, acessível só ao root.
 - Servidor com firewall, proteção contra malware e acesso administrativo apenas por chave SSH.
-- Auditoria de todas as ações sobre pedidos, integrações, usuários e logins, com alerta automático para tentativas de login repetidas, quedas de integração e criação de usuários.
+- Auditoria de todas as ações sobre pedidos, integrações, usuários e logins, com alerta automático para tentativas de login repetidas, bloqueio de conta, quedas de integração e criação de usuários. Os registros não contêm dados pessoais de compradores (só o número do pedido); os únicos dados pessoais neles são e-mail e IP dos operadores do sistema.
+- Varredura de vulnerabilidades das dependências a cada 30 dias (automática, registrada na auditoria) e antes de cada publicação; teste de invasão anual da aplicação e da infraestrutura exposta, com reteste após as correções. Prazos de correção: crítica em até 7 dias, alta em até 30 dias.
 - Apagamento automático de dados pessoais de compradores da Amazon 30 dias após o envio.
 - Backups diários; cópia cifrada externa; restauração testada semestralmente (RPO 24 h, RTO 4 h).
 
@@ -31,8 +34,9 @@ A trilha de auditoria do hub (menu Auditoria) é o registro de operações: impo
 Todo código é versionado em git com histórico. Antes de publicar: auditoria automática de vulnerabilidades nas dependências, verificação de sintaxe e suíte de testes, em ambiente de teste sem dados reais. Publicação em produção restrita ao responsável técnico. Ambientes de teste usam dados fictícios.
 
 ## 6. Pessoas
-- Entrada: usuário criado por administrador; a pessoa define a própria senha por link e configura o segundo fator no primeiro acesso.
-- Saída: usuário removido no desligamento; credenciais compartilhadas que a pessoa conhecia são rotacionadas.
+- Entrada: usuário criado por administrador, com o perfil mínimo necessário; a pessoa define a própria senha por link e configura o segundo fator no primeiro acesso.
+- Revisão trimestral: a cada três meses o sistema envia aos administradores a lista de usuários, perfis, segundo fator e último acesso; o administrador confirma a revisão no painel (registrada na auditoria). Contas de Expedição sem acesso há 90 dias são desativadas automaticamente.
+- Saída ou mudança de função: acesso desativado ou perfil ajustado em até 24 horas; credenciais compartilhadas que a pessoa conhecia são rotacionadas.
 - Uso aceitável: não copiar dados de compradores para fora do sistema; não compartilhar login; não usar dispositivos sem bloqueio de tela.
 
 ## 7. Direitos dos titulares e contato

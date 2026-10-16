@@ -48,12 +48,14 @@ app/Integrations/
   WooCommerce/   REST v3 + webhooks (order.created / order.updated)
   PagarMe/       Core v5 (orders) + webhooks (order.paid, charge.*)
   MelhorEnvio/   cotação → carrinho → compra → etiqueta → rastreio
-  Amazon/        SP-API (fase 2; requer RDT para dados do comprador)
-  Bling/         Amazon via Bling (fase 1) e NF-e sob demanda
+  Amazon/        SP-API: pedidos (RDT para endereço/comprador) e confirmação de envio; única fonte de dados da Amazon
 ```
 
 Cada integração é isolada: mudar uma API não derruba as outras. Todo canal
 tem webhook **e** varredura periódica — o webhook nunca é 100%.
+
+A Amazon não tem webhook para o hub: varredura a cada 15 min pela SP-API.
+Nenhum ERP ou intermediário é fonte de dados da Amazon (exigência da AUP).
 
 ### Cadastro dos webhooks
 

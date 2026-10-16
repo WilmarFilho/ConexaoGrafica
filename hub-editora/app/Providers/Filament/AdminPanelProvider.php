@@ -28,8 +28,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->passwordReset() // "esqueci a senha" por e-mail: ninguem precisa repassar senha
-            ->profile()
+            // "esqueci a senha" por e-mail: ninguem precisa repassar senha. Perfil e
+            // redefinicao aplicam a politica completa (nome/e-mail, historico, idade minima).
+            ->passwordReset(resetAction: \App\Filament\Pages\Auth\ResetPassword::class)
+            ->profile(\App\Filament\Pages\Auth\EditProfile::class)
             // Dois fatores por aplicativo autenticador, obrigatorio para todos
             // (exigencia da Amazon para dados de compradores).
             ->multiFactorAuthentication([

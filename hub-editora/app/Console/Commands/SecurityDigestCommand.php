@@ -26,6 +26,8 @@ class SecurityDigestCommand extends Command
             'Logins' => $count('auth.login'),
             'Tentativas de login falhas' => $count('auth.failed'),
             'Usuários criados/alterados' => User::where('updated_at', '>=', $since)->count(),
+            'Contas bloqueadas por tentativas' => $count('auth.locked'),
+            'Varreduras de vulnerabilidades' => $count('security.scan'),
             'Integrações alteradas ou testadas' => $count('settings.changed') + $count('settings.tested'),
             'Etapas alteradas manualmente' => $count('status.changed'),
             'Erros de integração' => (clone $logs)->where('level', 'error')->count(),
@@ -47,7 +49,7 @@ class SecurityDigestCommand extends Command
             }
         }
 
-        $users = User::query()->whereNotNull('email')->get();
+        $users = User::query()->admins()->whereNotNull('email')->get();
         foreach ($users as $user) {
             $user->notify(new SecurityDigest($period, $stats, $highlights));
         }

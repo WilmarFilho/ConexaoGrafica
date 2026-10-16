@@ -53,7 +53,6 @@
         <tr><th>Destinatário</th><th>O que recebe</th><th>Para quê</th></tr>
         <tr><td>Melhor Envio (plataforma de postagem)</td><td>Nome, endereço, documento e telefone do destinatário</td><td>Emissão da etiqueta e contratação do frete</td></tr>
         <tr><td>Transportadora (Correios ou outra escolhida no frete)</td><td>Dados impressos na etiqueta</td><td>Entrega do pacote</td></tr>
-        <tr><td>Bling (ERP)</td><td>Pedido e código de rastreio</td><td>Conciliação e emissão de nota fiscal quando exigida</td></tr>
     </table>
     <p>Nenhum outro compartilhamento. Não vendemos nem cedemos dados a terceiros.</p>
 

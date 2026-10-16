@@ -73,6 +73,11 @@ return [
         'amazon_pii_days' => min(30, max(1, (int) env('AMAZON_PII_RETENTION_DAYS', 30))),
     ],
 
+    // Varredura mensal de vulnerabilidades (hub:security-scan).
+    'security' => [
+        'composer_bin' => env('COMPOSER_BIN', rtrim((string) getenv('HOME'), '/').'/bin/composer'),
+    ],
+
     // Amazon Seller Central (SP-API, autorização própria via Login with Amazon).
     'amazon' => [
         'client_id' => env('AMAZON_LWA_CLIENT_ID'),
@@ -81,12 +86,6 @@ return [
         'marketplace_id' => env('AMAZON_MARKETPLACE_ID', 'A2Q3Y263D00KWC'), // Brasil
         'endpoint' => env('AMAZON_SP_ENDPOINT', 'https://sellingpartnerapi-na.amazon.com'),
         'token_url' => 'https://api.amazon.com/auth/o2/token',
-    ],
-
-    'bling' => [
-        'client_id' => env('BLING_CLIENT_ID'),
-        'client_secret' => env('BLING_CLIENT_SECRET'),
-        'base_url' => env('BLING_BASE_URL', 'https://api.bling.com.br/Api/v3'),
     ],
 
 ];

@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use App\Integrations\Amazon\AmazonClient;
-use App\Integrations\Bling\BlingClient;
 use App\Integrations\MelhorEnvio\MelhorEnvioClient;
 use App\Integrations\PagarMe\PagarMeClient;
 use App\Integrations\WooCommerce\WooCommerceClient;
@@ -33,6 +32,12 @@ use Throwable;
  */
 class Integracoes extends Page implements HasSchemas
 {
+    /** Só administradores (menor privilégio: a expedição não vê isto). */
+    public static function canAccess(): bool
+    {
+        return (bool) auth()->user()?->isAdmin();
+    }
+
     use InteractsWithSchemas;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPuzzlePiece;
@@ -103,20 +108,7 @@ class Integracoes extends Page implements HasSchemas
                         $this->secret('amazon.client_secret'),
                         $this->secret('amazon.refresh_token'),
                         $this->text('amazon.marketplace_id'),
-                    ], 'App privado em Seller Central → Apps e serviços → Desenvolver aplicativos. O hub usa para o "Confirmar envio" com rastreio assim que a etiqueta sai; os pedidos continuam chegando pelo Bling.'),
-
-                    $this->section('Amazon via Bling', Channel::BLING, 'bling', [
-                        $this->text('bling.client_id'),
-                        $this->secret('bling.client_secret'),
-                        Actions::make([
-                            Action::make('conectar_bling')
-                                ->label(BlingClient::isConnected() ? 'Reconectar ao Bling' : 'Conectar ao Bling')
-                                ->icon(Heroicon::OutlinedLink)
-                                ->color(BlingClient::isConnected() ? 'gray' : 'primary')
-                                ->url(route('bling.connect'))
-                                ->disabled(! BlingClient::isConfigured()),
-                        ]),
-                    ], 'Aplicativo privado em developer.bling.com.br com redirecionamento '.url('/bling/callback').'. Salve as chaves e clique em Conectar: o Bling pede autorização uma vez e o hub renova o acesso sozinho. Só entram pedidos com número da Amazon.'),
+                    ], 'App privado em Seller Central → Apps e serviços → Desenvolver aplicativos. É a única ponte com a Amazon: os pedidos entram por aqui (com endereço de entrega) e o "Confirmar envio" com rastreio volta assim que a etiqueta sai.'),
                 ]),
             ]);
     }
@@ -172,7 +164,6 @@ class Integracoes extends Page implements HasSchemas
             Channel::WOOCOMMERCE => filled(config('hub.woocommerce.url')) && filled(config('hub.woocommerce.key')) && filled(config('hub.woocommerce.secret')),
             Channel::PAGARME => filled(config('hub.pagarme.secret_key')),
             Channel::MELHOR_ENVIO => MelhorEnvioClient::isConfigured(),
-            Channel::BLING => BlingClient::isConfigured(),
             Channel::AMAZON => AmazonClient::isConfigured(),
             default => false,
         };
@@ -180,13 +171,6 @@ class Integracoes extends Page implements HasSchemas
         $dot = $configured ? '#15803D' : '#B45309';
         $label = $configured ? 'Configurado' : 'Sem credenciais';
 
-        if ($slug === Channel::BLING && $configured) {
-            $connected = BlingClient::isConnected();
-            $dot = $connected ? '#15803D' : '#B45309';
-            $label = $connected
-                ? 'Conectado'.(BlingClient::connectedAt() ? ' em '.BlingClient::connectedAt()->format('d/m/Y H:i') : '')
-                : 'Chaves salvas · falta autorizar (Conectar ao Bling)';
-        }
         $sync = $channel?->last_sync_at
             ? ' · última sincronização '.$channel->last_sync_at->diffForHumans().($channel->last_sync_status === 'error' ? ' <span style="color:#B91C1C">com erro</span>' : '')
             : '';
@@ -228,14 +212,6 @@ class Integracoes extends Page implements HasSchemas
 
                     return 'Amazon respondeu; '.count($orders).' pedido(s) nos últimos 30 dias'.(isset($orders[0]['AmazonOrderId']) ? ' (ex.: '.$orders[0]['AmazonOrderId'].')' : '').'.';
                 })(),
-                Channel::BLING => (function () {
-                    if (! BlingClient::isConnected()) {
-                        throw new \RuntimeException('Chaves salvas, mas a conta ainda não foi autorizada. Clique em "Conectar ao Bling".');
-                    }
-                    $r = BlingClient::fromConfig()->get('/pedidos/vendas', ['limite' => 1]);
-
-                    return 'Bling respondeu; leitura de pedidos de venda OK'.(isset($r['data'][0]['numero']) ? ' (último nº '.$r['data'][0]['numero'].')' : '').'.';
-                })(),
                 default => throw new \RuntimeException('Teste ainda não disponível para este canal.'),
             };
 
@@ -253,7 +229,7 @@ class Integracoes extends Page implements HasSchemas
         $changed = [];
 
         foreach (HubSettings::definitions() as $key => $def) {
-            // As chaves têm ponto (ex.: bling.client_id) e o formulário devolve o estado aninhado.
+            // As chaves têm ponto (ex.: amazon.client_id) e o formulário devolve o estado aninhado.
             $value = data_get($state, $key);
 
             if ($key === 'melhor_envio.sandbox') {

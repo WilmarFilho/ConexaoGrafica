@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Integrations\Amazon\AmazonClient;
-use App\Integrations\Bling\BlingClient;
 use App\Models\Order;
 use App\Integrations\WooCommerce\WooCommerceClient;
 use App\Models\Channel;
@@ -15,8 +14,8 @@ use Throwable;
 
 /**
  * Devolve o rastreio ao canal de origem do pedido (WooCommerce: nota ao
- * cliente + status "concluído"). Pagar.me (landing) não tem para onde
- * escrever; Amazon entra na fase da SP-API.
+ * cliente + status "concluído"; Amazon: "Confirmar envio" pela SP-API).
+ * Pagar.me (landing) não tem para onde escrever.
  */
 class NotifyChannelShipped implements ShouldQueue
 {
@@ -37,9 +36,9 @@ class NotifyChannelShipped implements ShouldQueue
         $order = $shipment->order;
         $channel = $order->channel;
 
-        // Amazon: direto pela SP-API quando configurada; senão pelo Bling; sem nenhum, adia.
-        if ($channel?->slug === Channel::AMAZON && ! AmazonClient::isConfigured() && ! (BlingClient::isConfigured() && BlingClient::isConnected())) {
-            SyncLog::record($channel, 'out', 'tracking.failed', $order, 'Amazon/Bling não configurados: confirmação de envio adiada', [], 'warning');
+        // Amazon só pela SP-API; sem credencial, adia (o próximo envio tenta de novo).
+        if ($channel?->slug === Channel::AMAZON && ! AmazonClient::isConfigured()) {
+            SyncLog::record($channel, 'out', 'tracking.failed', $order, 'SP-API da Amazon não configurada: confirmação de envio adiada', [], 'warning');
 
             return;
         }
@@ -62,40 +61,18 @@ class NotifyChannelShipped implements ShouldQueue
         }
     }
 
-    /**
-     * Amazon: "Confirmar envio" direto na SP-API (com rastreio) e, quando o Bling
-     * está conectado, também grava o rastreio lá e marca o pedido como atendido,
-     * para o Bling não ficar defasado. O número da Amazon está em external_number;
-     * external_id é o id do pedido no Bling.
-     */
+    /** Amazon: "Confirmar envio" com rastreio na SP-API, pelo número do pedido na Amazon. */
     private function amazon(Order $order, Shipment $shipment): bool
     {
-        $confirmed = false;
+        AmazonClient::fromConfig()->confirmShipment(
+            $order->external_number,
+            $shipment->tracking_code,
+            $shipment->carrier ?: 'Correios',
+            $shipment->service,
+            $shipment->label_generated_at ?? now(),
+        );
 
-        if (AmazonClient::isConfigured()) {
-            AmazonClient::fromConfig()->confirmShipment(
-                $order->external_number,
-                $shipment->tracking_code,
-                $shipment->carrier ?: 'Correios',
-                $shipment->service,
-                $shipment->label_generated_at ?? now(),
-            );
-            $confirmed = true;
-        }
-
-        if (BlingClient::isConfigured() && BlingClient::isConnected()) {
-            try {
-                BlingClient::fromConfig()->markShipped((int) $order->external_id, $shipment->tracking_code, $shipment->service ?: 'PAC');
-                $confirmed = true;
-            } catch (Throwable $e) {
-                if (! $confirmed) {
-                    throw $e;
-                }
-                SyncLog::record($order->channel, 'out', 'tracking.failed', $order, 'Amazon confirmada, mas o Bling não aceitou o rastreio: '.$e->getMessage(), [], 'warning');
-            }
-        }
-
-        return $confirmed;
+        return true;
     }
 
     private function woo(string $externalId, Shipment $shipment): bool

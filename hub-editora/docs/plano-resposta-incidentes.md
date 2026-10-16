@@ -15,7 +15,7 @@ Qualquer evento que comprometa, ou possa comprometer, a confidencialidade, integ
 | Etapa | Prazo | O que fazer |
 |---|---|---|
 | Detecção e registro | imediato | Anotar data/hora, como foi percebido, sistemas envolvidos. Preservar logs e auditoria. |
-| Contenção | até 4 h | Revogar tokens e chaves afetados (Integrações → trocar chaves; revogar no Bling, Amazon, Melhor Envio, Pagar.me, WooCommerce); desativar usuários suspeitos; se necessário, tirar o painel do ar. |
+| Contenção | até 4 h | Revogar tokens e chaves afetados (Integrações → trocar chaves; revogar na Amazon, Melhor Envio, Pagar.me, WooCommerce); desativar usuários suspeitos; se necessário, tirar o painel do ar. |
 | Notificação à Amazon | até 24 h da detecção | E-mail para security@amazon.com com: o que aconteceu, quando, quais dados, quantos pedidos, medidas tomadas, contato. Não esperar a investigação terminar. |
 | Investigação | até 72 h | Reconstituir a linha do tempo pela Auditoria do hub e pelos logs do servidor (Apache, Exim, SSH). Identificar causa raiz e extensão. |
 | Erradicação e recuperação | até 7 dias | Corrigir a causa (atualização, patch, troca de senhas), restaurar de backup íntegro se houver perda, revalidar integrações. |
@@ -24,7 +24,7 @@ Qualquer evento que comprometa, ou possa comprometer, a confidencialidade, integ
 ## 4. Comunicação
 - Amazon: security@amazon.com (obrigatório em 24 h quando envolver dados de compradores da Amazon).
 - Titulares afetados e ANPD: conforme LGPD, quando houver risco relevante, coordenado pelo administrador da conta.
-- Demais parceiros (Melhor Envio, Bling, Pagar.me): quando credenciais deles estiverem envolvidas.
+- Demais parceiros (Melhor Envio, Pagar.me, WooCommerce): quando credenciais deles estiverem envolvidas.
 
 ## 5. Contatos e acessos de emergência
 - Servidor: acesso root por chave SSH (responsável técnico). Provedor: Hostinger (suporte via hPanel).

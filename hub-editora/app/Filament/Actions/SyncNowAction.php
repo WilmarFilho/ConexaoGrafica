@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions;
 
-use App\Integrations\Bling\BlingClient;
-use App\Integrations\Bling\ImportOrders as BlingImport;
+use App\Integrations\Amazon\AmazonClient;
+use App\Integrations\Amazon\ImportOrders as AmazonImport;
 use App\Integrations\MelhorEnvio\MelhorEnvioClient;
 use App\Integrations\PagarMe\ImportOrders as PagarMeImport;
 use App\Integrations\WooCommerce\ImportOrders as WooImport;
@@ -36,7 +36,7 @@ class SyncNowAction
                 $channels = [
                     'WooCommerce' => fn () => filled(config('hub.woocommerce.key')) ? WooImport::make()->sinceLookback() : null,
                     'Pagar.me' => fn () => filled(config('hub.pagarme.secret_key')) ? PagarMeImport::make()->sinceLookback() : null,
-                    'Amazon (Bling)' => fn () => BlingClient::isConfigured() && BlingClient::isConnected() ? BlingImport::make()->sinceLookback() : null,
+                    'Amazon' => fn () => AmazonClient::isConfigured() ? AmazonImport::make()->sinceLookback() : null,
                 ];
 
                 foreach ($channels as $label => $run) {

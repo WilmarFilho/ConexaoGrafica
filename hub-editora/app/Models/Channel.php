@@ -10,7 +10,6 @@ class Channel extends Model
     public const WOOCOMMERCE = 'woocommerce';
     public const PAGARME = 'pagarme';
     public const AMAZON = 'amazon';
-    public const BLING = 'bling';
     public const MELHOR_ENVIO = 'melhor_envio';
 
     protected $guarded = [];

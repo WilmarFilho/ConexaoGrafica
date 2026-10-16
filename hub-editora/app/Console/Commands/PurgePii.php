@@ -58,7 +58,8 @@ class PurgePii extends Command
         foreach ($orders as $order) {
             DB::transaction(function () use ($order, &$n) {
                 $raw = $order->raw ?? [];
-                unset($raw['contato'], $raw['transporte']['etiqueta'], $raw['transporte']['contato']);
+                // pedidos antigos (ponte anterior) e SP-API (que já não guarda esses blocos no raw)
+                unset($raw['contato'], $raw['transporte']['etiqueta'], $raw['transporte']['contato'], $raw['ShippingAddress'], $raw['BuyerInfo']);
 
                 $order->forceFill([
                     'ship_name' => null, 'ship_street' => null, 'ship_number' => null, 'ship_complement' => null,

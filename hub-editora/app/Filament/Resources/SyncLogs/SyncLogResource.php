@@ -22,6 +22,12 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class SyncLogResource extends Resource
 {
+    /** Só administradores (menor privilégio: a expedição não vê isto). */
+    public static function canAccess(): bool
+    {
+        return (bool) auth()->user()?->isAdmin();
+    }
+
     protected static ?string $model = SyncLog::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;

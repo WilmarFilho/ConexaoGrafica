@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users;
 
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Models\SyncLog;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -11,12 +12,14 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Auth\Notifications\ResetPassword;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Password;
@@ -26,6 +29,9 @@ use Illuminate\Support\Str;
  * Usuários do painel. Ninguém digita senha de outra pessoa: a conta nasce
  * com senha aleatória e a pessoa define a sua pelo link de redefinição,
  * enviado por e-mail daqui mesmo.
+ *
+ * Só administradores entram aqui. Cada pessoa tem um perfil (menor privilégio):
+ * Administrador (usuários, integrações e auditoria) ou Expedição (pedidos e envio).
  */
 class UserResource extends Resource
 {
@@ -45,12 +51,25 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function canAccess(): bool
+    {
+        return (bool) auth()->user()?->isAdmin();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('name')->label('Nome')->required()->maxLength(120),
             TextInput::make('email')->label('E-mail')->email()->required()->maxLength(190)->unique(ignoreRecord: true)
                 ->helperText('Os avisos de integração e o link de senha vão para este endereço.'),
+            Select::make('role')->label('Perfil')
+                ->options(User::ROLES)
+                ->default(User::ROLE_EXPEDICAO)
+                ->required()
+                ->native(false)
+                // ninguém rebaixa o próprio acesso (e fica sem administrador)
+                ->disabled(fn (?User $record) => $record?->id === auth()->id())
+                ->helperText('Expedição: pedidos, expedição e catálogo. Administrador: também usuários, integrações e auditoria.'),
         ]);
     }
 
@@ -61,6 +80,19 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name')->label('Nome')->weight(FontWeight::Medium)->searchable(),
                 TextColumn::make('email')->label('E-mail')->searchable()->copyable(),
+                TextColumn::make('role')->label('Perfil')->badge()
+                    ->formatStateUsing(fn (string $state) => User::ROLES[$state] ?? $state)
+                    ->color(fn (string $state) => $state === User::ROLE_ADMIN ? 'primary' : 'gray'),
+                TextColumn::make('situacao')->label('Situação')->badge()
+                    ->state(fn (User $record) => match (true) {
+                        $record->disabled_at !== null => 'Desativado',
+                        $record->isLocked() => 'Bloqueado até '.$record->locked_until->format('H:i'),
+                        default => 'Ativo',
+                    })
+                    ->color(fn (string $state) => $state === 'Ativo' ? 'success' : 'danger'),
+                IconColumn::make('mfa')->label('2 fatores')->boolean()
+                    ->state(fn (User $record) => filled($record->app_authentication_secret)),
+                TextColumn::make('last_login_at')->label('Último acesso')->since()->placeholder('nunca'),
                 TextColumn::make('created_at')->label('Criado')->since(),
             ])
             ->recordActions([
@@ -76,7 +108,47 @@ class UserResource extends Resource
                             ? Notification::make()->title('Link enviado para '.$record->email)->success()->send()
                             : Notification::make()->title('Não foi possível enviar o e-mail')->danger()->send();
                     }),
-                EditAction::make()->label('Editar')->slideOver(),
+                Action::make('desbloquear')
+                    ->label('Desbloquear')
+                    ->icon(Heroicon::OutlinedLockOpen)
+                    ->color('warning')
+                    ->visible(fn (User $record) => $record->isLocked())
+                    ->requiresConfirmation()
+                    ->action(function (User $record) {
+                        $record->forceFill(['locked_until' => null, 'failed_logins' => 0])->saveQuietly();
+                        SyncLog::record(null, SyncLog::MANUAL, 'user.unlocked', $record, 'Conta '.$record->email.' desbloqueada');
+                        Notification::make()->title('Conta desbloqueada')->success()->send();
+                    }),
+                Action::make('desativar')
+                    ->label('Desativar')
+                    ->icon(Heroicon::OutlinedNoSymbol)
+                    ->color('danger')
+                    ->visible(fn (User $record) => $record->disabled_at === null && $record->id !== auth()->id())
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (User $record) => 'Desativar '.$record->email.'?')
+                    ->modalDescription('A pessoa perde o acesso na hora (inclusive sessões abertas). Use no desligamento ou mudança de função.')
+                    ->action(function (User $record) {
+                        $record->forceFill(['disabled_at' => now()])->saveQuietly();
+                        SyncLog::record(null, SyncLog::MANUAL, 'user.disabled', $record, 'Usuário '.$record->email.' desativado');
+                        Notification::make()->title('Usuário desativado')->success()->send();
+                    }),
+                Action::make('reativar')
+                    ->label('Reativar')
+                    ->icon(Heroicon::OutlinedArrowPath)
+                    ->color('gray')
+                    ->visible(fn (User $record) => $record->disabled_at !== null)
+                    ->requiresConfirmation()
+                    ->action(function (User $record) {
+                        $record->forceFill(['disabled_at' => null])->saveQuietly();
+                        SyncLog::record(null, SyncLog::MANUAL, 'user.enabled', $record, 'Usuário '.$record->email.' reativado');
+                        Notification::make()->title('Usuário reativado')->success()->send();
+                    }),
+                EditAction::make()->label('Editar')->slideOver()
+                    ->after(function (User $record) {
+                        if ($record->wasChanged('role')) {
+                            SyncLog::record(null, SyncLog::MANUAL, 'user.role_changed', $record, 'Perfil de '.$record->email.' alterado para '.$record->roleLabel());
+                        }
+                    }),
                 DeleteAction::make()
                     ->label('Remover')
                     ->hidden(fn (User $record) => $record->id === auth()->id()),

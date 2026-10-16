@@ -13,7 +13,6 @@ class ChannelSeeder extends Seeder
             [Channel::WOOCOMMERCE, 'Loja Conexão Editora (WooCommerce)'],
             [Channel::PAGARME, 'Pagar.me (landing pages)'],
             [Channel::AMAZON, 'Amazon Seller'],
-            [Channel::BLING, 'Bling (fiscal / ponte Amazon)'],
             [Channel::MELHOR_ENVIO, 'Melhor Envio'],
         ];
 

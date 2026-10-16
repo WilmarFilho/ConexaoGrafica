@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-use App\Integrations\Bling\BlingClient;
+use App\Integrations\Amazon\AmazonClient;
 use App\Integrations\MelhorEnvio\MelhorEnvioClient;
 use App\Models\Channel;
 use App\Models\SyncLog;
@@ -20,13 +20,13 @@ class IntegrationAlerts
     public const THROTTLE_HOURS = 6;
 
     /**
-     * Falhas consecutivas antes de avisar. As APIs (Bling em especial) devolvem
+     * Falhas consecutivas antes de avisar. As APIs devolvem
      * erros passageiros; com varredura a cada 15 min, 3 seguidas = ~45 min fora.
      */
     public const CONSECUTIVE_FAILURES = 3;
 
     /**
-     * Chamado por quem detectou a queda (refresh do Bling, varreduras).
+     * Chamado por quem detectou a queda (varreduras, renovação de token).
      * $immediate = true pula a contagem (ex.: token revogado, que não volta sozinho).
      */
     public static function down(string $slug, string $reason, bool $immediate = false): void
@@ -91,8 +91,8 @@ class IntegrationAlerts
         if (! MelhorEnvioClient::isConfigured()) {
             $add('Melhor Envio', 'sem token ou CEP de origem: não dá para cotar nem gerar etiquetas');
         }
-        if (BlingClient::isConfigured() && ! BlingClient::isConnected()) {
-            $add('Bling / Amazon', 'chaves salvas, mas a conta não está autorizada: pedidos da Amazon parados', 'Reconectar ao Bling');
+        if (! AmazonClient::isConfigured()) {
+            $add('Amazon', 'sem credenciais da SP-API: pedidos da Amazon não estão sendo importados');
         }
 
         foreach (Channel::query()->where('last_sync_status', 'error')->get() as $c) {

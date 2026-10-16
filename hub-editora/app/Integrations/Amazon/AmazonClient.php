@@ -12,8 +12,9 @@ use RuntimeException;
  * Selling Partner API da Amazon (Orders v0), com app privado autorizado na
  * própria conta. Desde 2023 basta o token do Login with Amazon: sem AWS/SigV4.
  *
- * Uso no hub: confirmar o envio com rastreio ("Confirmar envio" do Seller
- * Central) assim que a etiqueta sai. Os pedidos em si continuam vindo pelo Bling.
+ * É a única fonte de dados da Amazon no hub: os pedidos entram pela listagem
+ * (com endereço e comprador via token de dados restritos) e o "Confirmar envio"
+ * com rastreio volta por aqui assim que a etiqueta sai.
  */
 class AmazonClient
 {
@@ -69,14 +70,74 @@ class AmazonClient
     public function forgetToken(): void
     {
         Cache::forget('hub.amazon.access_token.'.md5($this->clientId.$this->refreshToken));
+        Cache::forget('hub.amazon.rdt.orders.'.md5($this->clientId.$this->refreshToken));
     }
 
-    private function http(): PendingRequest
+    private function http(?string $token = null): PendingRequest
     {
         return Http::baseUrl($this->endpoint)
-            ->withHeaders(['x-amz-access-token' => $this->accessToken()])
+            ->withHeaders(['x-amz-access-token' => $token ?? $this->accessToken()])
             ->acceptJson()
             ->timeout(40);
+    }
+
+    /**
+     * Token de dados restritos (Tokens API) para ler endereço de entrega e
+     * dados do comprador na listagem de pedidos. Vale uma hora.
+     */
+    private function restrictedOrdersToken(): string
+    {
+        $key = 'hub.amazon.rdt.orders.'.md5($this->clientId.$this->refreshToken);
+
+        return Cache::remember($key, now()->addMinutes(50), function () {
+            $res = $this->unwrap($this->http()->post('/tokens/2021-03-01/restrictedDataToken', [
+                'restrictedResources' => [[
+                    'method' => 'GET',
+                    'path' => '/orders/v0/orders',
+                    'dataElements' => ['buyerInfo', 'shippingAddress'],
+                ]],
+            ]));
+
+            if (empty($res['restrictedDataToken'])) {
+                throw new RuntimeException('Amazon Tokens API: resposta sem restrictedDataToken.');
+            }
+
+            return (string) $res['restrictedDataToken'];
+        });
+    }
+
+    /**
+     * Pedidos alterados desde $since (criados, pagos, enviados, cancelados),
+     * página a página, já com endereço de entrega e comprador.
+     *
+     * @return \Generator<int, array>
+     */
+    public function ordersUpdatedSince(\DateTimeInterface $since): \Generator
+    {
+        $token = $this->restrictedOrdersToken();
+
+        // A Amazon exige LastUpdatedAfter pelo menos 2 minutos no passado.
+        $after = min($since->getTimestamp(), now()->subMinutes(3)->getTimestamp());
+        $query = [
+            'MarketplaceIds' => $this->marketplaceId,
+            'LastUpdatedAfter' => gmdate('Y-m-d\TH:i:s\Z', $after),
+            'MaxResultsPerPage' => 100,
+        ];
+
+        do {
+            $payload = $this->unwrap($this->http($token)->get('/orders/v0/orders', $query))['payload'] ?? [];
+
+            foreach ($payload['Orders'] ?? [] as $order) {
+                yield $order;
+            }
+
+            $next = $payload['NextToken'] ?? null;
+            $query = ['MarketplaceIds' => $this->marketplaceId, 'NextToken' => $next];
+
+            if ($next) {
+                usleep(1_000_000); // getOrders: rajada curta permitida, sem pressa entre páginas
+            }
+        } while ($next);
     }
 
     // ---- Orders v0 -----------------------------------------------------------

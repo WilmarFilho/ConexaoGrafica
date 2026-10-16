@@ -27,23 +27,23 @@ class IntegracoesPageTest extends TestCase
     public function test_saves_dotted_keys_and_keeps_secrets_when_left_blank(): void
     {
         Livewire::test(Integracoes::class)
-            ->fillForm(['bling.client_id' => 'cid-123', 'bling.client_secret' => 'segredo-xyz'])
+            ->fillForm(['amazon.client_id' => 'cid-123', 'amazon.client_secret' => 'segredo-xyz'])
             ->call('save')
             ->assertNotified('Integrações salvas');
 
-        $this->assertSame('cid-123', HubSettings::stored()['bling.client_id']);
-        $this->assertSame('segredo-xyz', HubSettings::stored()['bling.client_secret']);
-        $this->assertSame('cid-123', config('hub.bling.client_id'));
+        $this->assertSame('cid-123', HubSettings::stored()['amazon.client_id']);
+        $this->assertSame('segredo-xyz', HubSettings::stored()['amazon.client_secret']);
+        $this->assertSame('cid-123', config('hub.amazon.client_id'));
 
         // Segredo em branco no formulário = manter; o texto só muda se mudar.
         Livewire::test(Integracoes::class)
-            ->fillForm(['bling.client_id' => 'cid-123', 'bling.client_secret' => ''])
+            ->fillForm(['amazon.client_id' => 'cid-123', 'amazon.client_secret' => ''])
             ->call('save')
             ->assertNotified('Nada mudou');
 
-        $this->assertSame('segredo-xyz', Setting::where('key', 'bling.client_secret')->first()->value);
+        $this->assertSame('segredo-xyz', Setting::where('key', 'amazon.client_secret')->first()->value);
 
         // Ao reabrir, o texto salvo aparece preenchido (caminho aninhado no estado).
-        Livewire::test(Integracoes::class)->assertFormSet(['bling.client_id' => 'cid-123']);
+        Livewire::test(Integracoes::class)->assertFormSet(['amazon.client_id' => 'cid-123']);
     }
 }
