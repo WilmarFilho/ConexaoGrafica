@@ -14,6 +14,9 @@ cd "$CI/.."
 git pull -q --ff-only
 cd "$CI"
 
+# Dependências iguais às do composer.lock (com as de desenvolvimento, para os testes).
+"$PHP" -d allow_url_fopen=1 "$COMPOSER" install --no-interaction --no-progress -q
+
 echo "== 1/3 vulnerabilidades nas dependências"
 "$PHP" -d allow_url_fopen=1 "$COMPOSER" audit --no-dev --locked --format=summary
 

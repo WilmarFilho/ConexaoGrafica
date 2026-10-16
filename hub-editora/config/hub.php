@@ -73,6 +73,13 @@ return [
         'amazon_pii_days' => min(30, max(1, (int) env('AMAZON_PII_RETENTION_DAYS', 30))),
     ],
 
+    // Backup diário cifrado fora do servidor (hub:backup). A chave fica só no
+    // .env e numa cópia guardada pelo responsável (sem ela não há restauração).
+    'backup' => [
+        'key' => env('BACKUP_ENCRYPTION_KEY'),           // base64:… (32 bytes), gerada com hub:backup --gerar-chave
+        'retention_days' => (int) env('BACKUP_RETENTION_DAYS', 30),
+    ],
+
     // Varredura mensal de vulnerabilidades (hub:security-scan).
     'security' => [
         'composer_bin' => env('COMPOSER_BIN', rtrim((string) getenv('HOME'), '/').'/bin/composer'),

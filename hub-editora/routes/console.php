@@ -39,6 +39,12 @@ Schedule::command('hub:security-digest')
     ->twiceMonthly(1, 16, '08:00')
     ->onOneServer();
 
+// Backup cifrado do banco para fora do servidor (armazenamento S3 em outra região).
+Schedule::command('hub:backup')
+    ->dailyAt('02:40')
+    ->withoutOverlapping()
+    ->onOneServer();
+
 // Revisão trimestral de acessos (dia 1 de jan/abr/jul/out): lista aos administradores
 // e desativa contas de expedição sem uso há 90 dias.
 Schedule::command('hub:access-review')
