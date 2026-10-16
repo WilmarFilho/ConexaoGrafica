@@ -36,6 +36,9 @@ echo "== composer install (sem dev)"
 echo "== migrações"
 "$PHP" artisan migrate --force
 
+echo "== criptografia em repouso (tabelas novas nascem sem cifra)"
+"$PHP" artisan hub:encrypt-tables
+
 echo "== caches"
 "$PHP" artisan optimize:clear >/dev/null
 "$PHP" artisan config:cache

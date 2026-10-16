@@ -121,6 +121,11 @@ class BackupTest extends TestCase
         Notification::assertSentTo($admin, SecurityAlert::class);
     }
 
+    public function test_encrypt_tables_is_a_no_op_outside_mariadb(): void
+    {
+        $this->artisan('hub:encrypt-tables')->expectsOutputToContain('nada a fazer')->assertSuccessful();
+    }
+
     public function test_security_headers_are_sent(): void
     {
         $r = $this->get('/privacidade');

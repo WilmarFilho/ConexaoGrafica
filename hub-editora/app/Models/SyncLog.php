@@ -69,6 +69,7 @@ class SyncLog extends Model
             'backup.sent' => 'Backup externo enviado',
             'backup.failed' => 'Backup externo falhou',
             'backup.checked' => 'Backup externo conferido',
+            'db.encrypted' => 'Tabelas cifradas',
             'pii.purged' => 'Dados pessoais apagados',
             'security.digest' => 'Resumo de segurança enviado',
             'store.remapped' => 'Loja mudou de endereço',
