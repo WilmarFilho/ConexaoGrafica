@@ -24,16 +24,17 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-# Cabeçalhos de segurança também nos arquivos estáticos (JS, CSS, fontes), que o
-# Apache serve sem passar pelo Laravel. As páginas recebem os mesmos (e a CSP)
-# pelo middleware App\Http\Middleware\SecurityHeaders.
+# Cabeçalhos de segurança também nos arquivos estáticos (JS, CSS, fontes, imagens),
+# que o Apache serve sem passar pelo Laravel. As páginas recebem os mesmos (e a CSP)
+# pelo middleware App\Http\Middleware\SecurityHeaders; repetir aqui duplicaria.
 <IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
-    Header set Cross-Origin-Resource-Policy "same-origin"
-    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains" "expr=%{HTTPS} == 'on'"
+    <FilesMatch "\.(js|mjs|css|map|woff2?|ttf|otf|eot|svg|png|jpe?g|gif|webp|avif|ico|txt|json)$">
+        Header set X-Content-Type-Options "nosniff"
+        Header set Referrer-Policy "strict-origin-when-cross-origin"
+        Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+        Header set Cross-Origin-Resource-Policy "same-origin"
+        Header set Strict-Transport-Security "max-age=31536000; includeSubDomains" "expr=%{HTTPS} == 'on'"
+    </FilesMatch>
 </IfModule>
 
 # php -- BEGIN cPanel-generated handler, do not edit
