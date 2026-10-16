@@ -94,6 +94,23 @@ class BackupTest extends TestCase
         $this->artisan('hub:backup-restore --conferir')->expectsOutputToContain('não configurado')->assertSuccessful();
     }
 
+    public function test_weekly_check_alerts_when_storage_is_unreachable(): void
+    {
+        $admin = User::factory()->create();
+        Storage::shouldReceive('disk')->with('backup')->andReturn(new class
+        {
+            public function files(): array
+            {
+                throw new \RuntimeException('InvalidAccessKeyId');
+            }
+        });
+
+        $this->artisan('hub:backup-restore --conferir')->assertFailed();
+
+        $this->assertStringContainsString('InvalidAccessKeyId', SyncLog::where('action', 'backup.failed')->first()->message);
+        Notification::assertSentTo($admin, SecurityAlert::class);
+    }
+
     public function test_weekly_check_alerts_when_there_is_no_backup(): void
     {
         $admin = User::factory()->create();

@@ -38,7 +38,13 @@ class BackupRestoreCommand extends Command
         }
 
         $disk = Storage::disk('backup');
-        $files = collect($disk->files('db'))->filter(fn ($f) => str_ends_with($f, '.sql.gz.enc'))->sort()->values();
+
+        try {
+            $files = collect($disk->files('db'))->filter(fn ($f) => str_ends_with($f, '.sql.gz.enc'))->sort()->values();
+        } catch (Throwable $e) {
+            // Credencial errada, bucket inexistente, provedor fora do ar...
+            return $this->falhou('armazenamento inacessível: '.mb_substr($e->getMessage(), 0, 300));
+        }
 
         if ($this->option('listar')) {
             foreach ($files as $f) {
