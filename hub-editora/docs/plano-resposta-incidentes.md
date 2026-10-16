@@ -27,7 +27,7 @@ Qualquer evento que comprometa, ou possa comprometer, a confidencialidade, integ
 - Demais parceiros (Melhor Envio, Pagar.me, WooCommerce): quando credenciais deles estiverem envolvidas.
 
 ## 5. Contatos e acessos de emergência
-- Servidor: acesso root por chave SSH (responsável técnico). Provedor: Hostinger (suporte via hPanel).
+- Servidor: acesso root por SSH (responsável técnico). Provedor: Hostinger (suporte via hPanel).
 - Painel do hub: hub.pubcon.com.br/admin · Auditoria em /admin/logs · Integrações em /admin/integracoes.
 
 ## 6. Exercício e revisão
