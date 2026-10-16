@@ -70,6 +70,8 @@ class BackupTest extends TestCase
         config(['hub.backup.key' => BackupCrypto::generateKey()]);
         Storage::disk('backup')->put($file, $blob);
         $this->artisan('hub:backup-restore --conferir')->assertFailed();
+
+        $this->assertSame(2, SyncLog::where('action', 'backup.failed')->count(), 'falha na conferência vai para a Auditoria');
     }
 
     public function test_failure_is_logged_and_alerts_admins(): void
@@ -89,6 +91,17 @@ class BackupTest extends TestCase
         config(['hub.backup.key' => null]);
         $this->artisan('hub:backup')->expectsOutputToContain('não configurado')->assertSuccessful();
         $this->artisan('hub:backup --gerar-chave')->expectsOutputToContain('base64:')->assertSuccessful();
+        $this->artisan('hub:backup-restore --conferir')->expectsOutputToContain('não configurado')->assertSuccessful();
+    }
+
+    public function test_weekly_check_alerts_when_there_is_no_backup(): void
+    {
+        $admin = User::factory()->create();
+
+        $this->artisan('hub:backup-restore --conferir')->assertFailed();
+
+        $this->assertSame(1, SyncLog::where('action', 'backup.failed')->count());
+        Notification::assertSentTo($admin, SecurityAlert::class);
     }
 
     public function test_security_headers_are_sent(): void

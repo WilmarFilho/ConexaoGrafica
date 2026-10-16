@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\SyncLog;
 use App\Support\BackupCrypto;
+use App\Support\SecurityAudit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -12,7 +13,8 @@ use Throwable;
  * Lista, confere e baixa backups do armazenamento externo.
  *
  *   php artisan hub:backup-restore --listar
- *   php artisan hub:backup-restore --conferir           confere o mais recente (decifra e valida, sem gravar)
+ *   php artisan hub:backup-restore --conferir           confere o mais recente (decifra e valida, sem gravar);
+ *                                                       roda toda semana pelo agendador e alerta se falhar
  *   php artisan hub:backup-restore --saida=/caminho.sql baixa e decifra o mais recente para um arquivo .sql
  *   php artisan hub:backup-restore db/hub-20261016-024000.sql.gz.enc --saida=...
  *
@@ -29,6 +31,12 @@ class BackupRestoreCommand extends Command
 
     public function handle(): int
     {
+        if ($this->option('conferir') && (blank(config('hub.backup.key')) || blank(config('filesystems.disks.backup.bucket')))) {
+            $this->warn('Backup externo não configurado (BACKUP_ENCRYPTION_KEY e BACKUP_S3_*); nada a conferir.');
+
+            return self::SUCCESS;
+        }
+
         $disk = Storage::disk('backup');
         $files = collect($disk->files('db'))->filter(fn ($f) => str_ends_with($f, '.sql.gz.enc'))->sort()->values();
 
@@ -44,9 +52,7 @@ class BackupRestoreCommand extends Command
         $name = $this->argument('arquivo') ?? $files->last();
 
         if (! $name || ! $disk->exists($name)) {
-            $this->error('Backup não encontrado.');
-
-            return self::FAILURE;
+            return $this->falhou('Backup não encontrado.');
         }
 
         try {
@@ -79,9 +85,21 @@ class BackupRestoreCommand extends Command
 
             return self::SUCCESS;
         } catch (Throwable $e) {
-            $this->error('Falha: '.$e->getMessage());
-
-            return self::FAILURE;
+            return $this->falhou('Falha: '.mb_substr($e->getMessage(), 0, 300));
         }
+    }
+
+    /** Na conferência (agendada), a falha vai para a Auditoria e alerta os administradores. */
+    private function falhou(string $msg): int
+    {
+        if ($this->option('conferir')) {
+            $msg = 'Conferência do backup externo falhou: '.$msg;
+            SyncLog::record(null, SyncLog::MANUAL, 'backup.failed', null, $msg, [], 'error');
+            SecurityAudit::alert($msg);
+        }
+
+        $this->error($msg);
+
+        return self::FAILURE;
     }
 }

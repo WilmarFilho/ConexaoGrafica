@@ -45,6 +45,12 @@ Schedule::command('hub:backup')
     ->withoutOverlapping()
     ->onOneServer();
 
+// Toda segunda: decifra o backup mais recente e confere o conteúdo (teste de restauração
+// automático; alerta os administradores se falhar ou se não houver backup).
+Schedule::command('hub:backup-restore --conferir')
+    ->weeklyOn(1, '06:15')
+    ->onOneServer();
+
 // Revisão trimestral de acessos (dia 1 de jan/abr/jul/out): lista aos administradores
 // e desativa contas de expedição sem uso há 90 dias.
 Schedule::command('hub:access-review')

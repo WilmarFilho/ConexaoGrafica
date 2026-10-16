@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # TRACE/TRACK não têm uso no hub e ajudam a mapear o servidor (teste de invasão 2026).
+    RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK)$
+    RewriteRule .* - [R=405,L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
