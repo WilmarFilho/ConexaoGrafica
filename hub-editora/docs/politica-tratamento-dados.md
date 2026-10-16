@@ -6,7 +6,7 @@ Versão pública (para compradores e parceiros): https://hub.pubcon.com.br/priva
 ## 1. Classificação
 | Classe | Exemplos | Regras |
 |---|---|---|
-| **Dado pessoal de comprador** | nome, endereço, telefone, CPF/CNPJ, e-mail | Só no hub e nos parceiros de entrega. Nunca em planilhas, mensagens ou arquivos locais. Amazon: apagado 30 dias após o envio. |
+| **Dado pessoal de comprador** | nome, endereço, telefone, CPF/CNPJ, e-mail | Só no hub e nos parceiros de entrega. Nunca em planilhas, mensagens ou arquivos locais. Amazon: apagado 15 dias após o envio (backups cifrados: 14 dias). |
 | **Dado do pedido** | número, itens, valores, cidade/UF, rastreio, datas | Mantido por prazo fiscal. Pode ser consultado pela equipe. |
 | **Credencial** | chaves de API, tokens, senhas | Só na tela Integrações ou no `.env` do servidor. Nunca em chat, e-mail, repositório ou documento. Rotação anual ou imediata em suspeita. |
 | **Registro de auditoria** | quem fez o quê e quando | Retido por no mínimo 12 meses; revisado a cada 15 dias. |
@@ -20,12 +20,12 @@ Versão pública (para compradores e parceiros): https://hub.pubcon.com.br/priva
 ## 3. Controles técnicos em vigor
 - Painel só por HTTPS; login individual; senha com 12+ caracteres, letras maiúsculas e minúsculas, número e símbolo, sem partes do nome ou do e-mail, verificada contra vazamentos; as 10 últimas senhas não podem ser repetidas; idade mínima de 1 dia; troca obrigatória a cada 365 dias; autenticação em dois fatores obrigatória.
 - Bloqueio da conta por 30 minutos após 10 tentativas de login falhas seguidas, com aviso aos administradores; desbloqueio antecipado só por administrador ou redefinição pelo link de e-mail.
-- Credenciais de integração cifradas (AES-256) no banco e backups cifrados (AES-256-GCM). Criptografia em repouso de todo o banco (MariaDB, chave fora do diretório do banco e acessível só ao root) em implantação: exige reiniciar o banco em janela de manutenção.
+- Credenciais de integração cifradas (AES-256) no banco e backups cifrados (AES-256-GCM). Banco do Hub cifrado em repouso (MariaDB, AES-256, inclusive o log de transações) desde 16/10/2026, com chave fora do diretório do banco, legível só pelo administrador do servidor, e rotação anual.
 - Servidor com firewall de rede (só as portas necessárias abertas), WAF (ModSecurity com OWASP Core Rule Set), bloqueio automático de força bruta (cPHulk), antimalware (ImunifyAV) com varredura mensal e acesso administrativo só por SSH, restrito ao responsável técnico.
 - Auditoria de todas as ações sobre pedidos, integrações, usuários e logins, com alerta automático para tentativas de login repetidas, bloqueio de conta, quedas de integração e criação de usuários. Os registros não contêm dados pessoais de compradores (só o número do pedido); os únicos dados pessoais neles são e-mail e IP dos operadores do sistema.
 - Varredura de vulnerabilidades das dependências a cada 30 dias (automática, registrada na auditoria) e antes de cada publicação; teste de invasão anual da aplicação e da infraestrutura exposta, com reteste após as correções. Prazos de correção: crítica em até 7 dias, alta em até 30 dias.
-- Apagamento automático de dados pessoais de compradores da Amazon 30 dias após o envio.
-- Backup diário do banco cifrado com AES-256-GCM antes de sair do servidor, enviado a armazenamento externo em outro provedor e região, retenção de 30 dias; chave de cifra guardada fora do servidor. Conferência automática semanal (decifra e valida o mais recente, com alerta se falhar) e restauração completa exercitada semestralmente (RPO 24 h, RTO 4 h).
+- Apagamento automático de dados pessoais de compradores da Amazon 15 dias após o envio. Com os backups guardados por 14 dias, nenhuma cópia passa de 30 dias.
+- Backup diário do banco cifrado com AES-256-GCM antes de sair do servidor, enviado a armazenamento externo em outro provedor e região, retenção de 14 dias; chave de cifra guardada fora do servidor. Conferência automática semanal (decifra e valida o mais recente, com alerta se falhar) e restauração completa exercitada semestralmente (RPO 24 h, RTO 4 h).
 
 ## 4. Registros de processamento
 A trilha de auditoria do hub (menu Auditoria) é o registro de operações: importação de pedidos, geração de etiqueta, envio de rastreio, alterações manuais com autor e motivo, alterações de integrações, logins e apagamentos de dados. Exportável sob demanda para auditoria.

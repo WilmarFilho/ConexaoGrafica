@@ -98,6 +98,6 @@ class SecurityPolicyTest extends TestCase
 
     public function test_privacy_policy_is_public(): void
     {
-        $this->get('/privacidade')->assertOk()->assertSee('Política de Privacidade')->assertSee('30 dias');
+        $this->get('/privacidade')->assertOk()->assertSee('Política de Privacidade')->assertSee('15 dias');
     }
 }

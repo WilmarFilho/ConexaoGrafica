@@ -57,7 +57,7 @@
     <p>Nenhum outro compartilhamento. Não vendemos nem cedemos dados a terceiros.</p>
 
     <h2>5. Por quanto tempo guardamos</h2>
-    <p>Os dados pessoais dos compradores da Amazon são apagados automaticamente <strong>30 dias após o envio do pedido</strong>. Depois disso permanecem apenas o número do pedido, os itens, os valores, a cidade e o estado de destino e o código de rastreio, para fins fiscais, contábeis e de garantia. Para os demais canais, os dados são mantidos pelo prazo necessário ao atendimento do pedido e às obrigações legais.</p>
+    <p>Os dados pessoais dos compradores da Amazon são apagados automaticamente <strong>15 dias após o envio do pedido</strong>, e as cópias de segurança (sempre cifradas) são guardadas por no máximo 14 dias, de modo que nenhuma cópia permanece mais de 30 dias após o envio. Depois disso permanecem apenas o número do pedido, os itens, os valores, a cidade e o estado de destino e o código de rastreio, para fins fiscais, contábeis e de garantia. Para os demais canais, os dados são mantidos pelo prazo necessário ao atendimento do pedido e às obrigações legais.</p>
 
     <h2>6. Segurança e incidentes</h2>
     <p>Mantemos plano de resposta a incidentes com contenção em até 4 horas e comunicação aos parceiros afetados, incluindo a Amazon, em até 24 horas da detecção. Os registros de auditoria são revisados a cada 15 dias e mantidos por no mínimo 12 meses. Vulnerabilidades são verificadas periodicamente e corrigidas conforme sua severidade.</p>

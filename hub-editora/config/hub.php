@@ -68,16 +68,17 @@ return [
 
     // Retenção de dados pessoais de compradores da Amazon. A Política de
     // Proteção de Dados da Amazon exige apagar em até 30 dias após o envio;
-    // por isso o valor efetivo nunca passa de 30 (o hub aplica min()).
+    // por isso o valor efetivo nunca passa de 30 (o hub aplica min()). Usamos 15
+    // porque os backups guardam 14 dias: nenhuma cópia passa de 30 dias.
     'retention' => [
-        'amazon_pii_days' => min(30, max(1, (int) env('AMAZON_PII_RETENTION_DAYS', 30))),
+        'amazon_pii_days' => min(30, max(1, (int) env('AMAZON_PII_RETENTION_DAYS', 15))),
     ],
 
     // Backup diário cifrado fora do servidor (hub:backup). A chave fica só no
     // .env e numa cópia guardada pelo responsável (sem ela não há restauração).
     'backup' => [
         'key' => env('BACKUP_ENCRYPTION_KEY'),           // base64:… (32 bytes), gerada com hub:backup --gerar-chave
-        'retention_days' => (int) env('BACKUP_RETENTION_DAYS', 30),
+        'retention_days' => (int) env('BACKUP_RETENTION_DAYS', 14),
     ],
 
     // Varredura mensal de vulnerabilidades (hub:security-scan).
