@@ -38,10 +38,12 @@ class EncryptTablesCommand extends Command
         }
 
         $db = DB::connection()->getDatabaseName();
+        // Pelas opções da tabela (ENCRYPTED=YES), que o usuário do hub enxerga;
+        // innodb_tablespaces_encryption exige o privilégio PROCESS.
         $pending = collect(DB::select(
-            "select t.table_name as name from information_schema.tables t
-             left join information_schema.innodb_tablespaces_encryption e on e.name = concat(t.table_schema, '/', t.table_name)
-             where t.table_schema = ? and t.engine = 'InnoDB' and coalesce(e.encryption_scheme, 0) = 0",
+            "select table_name as name from information_schema.tables
+             where table_schema = ? and engine = 'InnoDB' and table_type = 'BASE TABLE'
+               and coalesce(create_options, '') not like '%ENCRYPTED%YES%'",
             [$db]
         ))->pluck('name');
 
