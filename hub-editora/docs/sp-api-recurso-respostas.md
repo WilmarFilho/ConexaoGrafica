@@ -19,11 +19,7 @@ Testes automatizados cobrindo tudo isso: `AmazonImportTest`, `AccessControlTest`
 ## 2. Antes de reenviar — pendências fora do código
 
 1. ~~**Teste de invasão anual**~~ — **feito em 16/10/2026**, relatório em `docs/pentest-2026.md`. Sobram dois ajustes de servidor recomendados no relatório, a fazer pelo administrador do VPS: bloquear a porta 3306 no firewall e desativar o FTP (21) se não for usado.
-2. **Cópia de backup fora do servidor** — o código está publicado (`hub:backup` diário às 02:40, conferência às segundas 06:15); **falta só ativar**:
-   1. Criar um bucket privado em um provedor S3 compatível, em região diferente da do VPS (ex.: Backblaze B2 `us-west` ou AWS S3 `sa-east-1`), e uma chave de aplicação com acesso **só a esse bucket**.
-   2. No servidor, gerar a chave de cifra: `php artisan hub:backup --gerar-chave`. Guardar a chave no cofre de senhas: sem ela, nenhum backup pode ser restaurado.
-   3. Preencher no `.env` de produção: `BACKUP_ENCRYPTION_KEY`, `BACKUP_S3_KEY`, `BACKUP_S3_SECRET`, `BACKUP_S3_REGION`, `BACKUP_S3_BUCKET` e `BACKUP_S3_ENDPOINT` (no B2: `https://s3.<região>.backblazeb2.com`).
-   4. Rodar `php artisan config:cache`, `php artisan hub:backup` e `php artisan hub:backup-restore --conferir`. Os dois devem aparecer em Registros como "Backup externo enviado" e "Backup externo conferido".
+2. ~~**Cópia de backup fora do servidor**~~ — **ativada em 16/10/2026**: Supabase Storage (projeto `hub-backups`, organização Conexão, região eu-central-1/Frankfurt, bucket privado `hub-backups`). Primeiro backup enviado e conferido (212 KB cifrados, 19 tabelas). Chave de cifra e chaves S3 no cofre de senhas. Atenção: no plano gratuito, o Supabase pausa projetos sem atividade; se o projeto for pausado, o backup falha e o Hub alerta os administradores.
 3. **Criptografia em repouso do banco (MariaDB):** a política lista como controle; está pendente desde setembro (precisa reiniciar o banco). Não é um dos seis pontos recusados, mas a Amazon cobra na Data Protection Policy (2.4) e pode aparecer na próxima avaliação.
 4. **Bling ↔ Amazon fora do Hub:** se a integração de marketplace Bling↔Amazon continuar ligada no Bling para nota fiscal, ela é do ERP da editora e não alimenta o Hub. Se não for mais necessária, desligar no Bling e revogar o app "Hub" lá (Bling → Configurações → Aplicativos).
 5. **Assinar** a política (`docs/politica-tratamento-dados.md`, versão 1.1) e o plano de incidentes.
@@ -75,13 +71,13 @@ Testes automatizados cobrindo tudo isso: `AmazonImportTest`, `AccessControlTest`
 >
 > **Recuperação**: backup diário do banco de dados, **cifrado com AES-256-GCM antes de sair do servidor** e enviado a armazenamento de objetos externo, em outro provedor e região geográfica, com retenção de 30 dias; a chave de cifra fica fora do servidor e do armazenamento. Toda semana o sistema decifra automaticamente o backup mais recente e confere o conteúdo (teste de restauração), registrando o resultado na trilha de auditoria e alertando os administradores em caso de falha; uma restauração completa é exercitada a cada 6 meses. O código da aplicação é recuperável a partir do repositório git. RPO de 24 horas e RTO de 4 horas.
 
-*(O parágrafo de recuperação só vale depois de ativado o backup externo — pendência 2.)*
+*(Backup externo ativo desde 16/10/2026.)*
 
 ## 4. Checklist do novo caso
 
 - [x] Hub publicado com as mudanças de 16/10/2026.
 - [x] Pendência 1 (teste de invasão) resolvida.
-- [ ] Pendência 2 (ativar o backup externo) resolvida.
+- [x] Pendência 2 (ativar o backup externo) resolvida.
 - [ ] Perfil do Provedor de Soluções atualizado com os textos da seção 3.
 - [ ] Caso novo aberto no Solution Provider Portal, citando o 22092972891 e informando que as respostas foram corrigidas.
 - [ ] Após a aprovação: criar o app no portal, gerar Client ID, Client Secret e Refresh token, colar em Integrações → Amazon, testar e acompanhar a primeira varredura de pedidos.
