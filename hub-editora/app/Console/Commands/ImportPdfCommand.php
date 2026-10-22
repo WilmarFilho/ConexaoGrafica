@@ -28,7 +28,7 @@ class ImportPdfCommand extends Command
     public function handle(): int
     {
         if ((string) config('hub.ai.key') === '') {
-            $this->warn('Serviço de IA não configurado (OPENAI_API_KEY vazia no .env); nada a fazer.');
+            $this->warn('Serviço de IA não configurado (chave vazia no .env: OPENAI_API_KEY ou ANTHROPIC_API_KEY, conforme HUB_AI_PROVIDER); nada a fazer.');
 
             return self::SUCCESS;
         }

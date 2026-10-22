@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Editorial\Documents\StaleSheetsObserver;
 use App\Editorial\Import\Ai\AiGateway;
+use App\Editorial\Import\Ai\AnthropicGateway;
 use App\Editorial\Import\Ai\OpenAiGateway;
 use App\Models\Book;
 use App\Models\Chapter;
@@ -27,7 +28,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Importação de PDF com IA: o Analyzer fala com a API da OpenAI só por esta
         // interface (os testes trocam por um fake; sem chave nenhuma chamada sai).
-        $this->app->bind(AiGateway::class, OpenAiGateway::class);
+        $this->app->bind(AiGateway::class, fn () => config('hub.ai.provider') === 'anthropic'
+            ? new AnthropicGateway
+            : new OpenAiGateway);
     }
 
     /**

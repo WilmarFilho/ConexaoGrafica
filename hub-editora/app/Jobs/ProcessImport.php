@@ -98,7 +98,7 @@ class ProcessImport implements ShouldBeUnique, ShouldQueue
     {
         $model = (string) config('hub.ai.model');
         if ((string) config('hub.ai.key') === '') {
-            throw new \RuntimeException('OPENAI_API_KEY não configurada; a importação com IA está desligada.');
+            throw new \RuntimeException('Chave da IA não configurada (OPENAI_API_KEY ou ANTHROPIC_API_KEY, conforme HUB_AI_PROVIDER); a importação com IA está desligada.');
         }
 
         // 1. Extração ---------------------------------------------------------

@@ -112,10 +112,15 @@ return [
     // Importação de livros em PDF com IA (Conexão DOI, frente C). Chave só no .env;
     // sem ela o comando hub:importar-pdf avisa "não configurado" e não faz nada.
     'ai' => [
-        'key' => env('OPENAI_API_KEY'),
-        // Modelo da OpenAI (Responses API). gpt-6-astra é o mais capaz; gpt-6.1-sol
-        // custa 1/5 com desempenho próximo (ver docs/importacao-ia.md).
-        'model' => env('HUB_AI_MODEL', 'gpt-6-astra'),
+        // Provedor da IA: openai (Responses API) ou anthropic (Messages API). Trocar é só
+        // mudar HUB_AI_PROVIDER: a chave e o modelo de cada um ficam em variáveis próprias.
+        'provider' => env('HUB_AI_PROVIDER', 'openai'),
+        'key' => env('HUB_AI_PROVIDER', 'openai') === 'anthropic' ? env('ANTHROPIC_API_KEY') : env('OPENAI_API_KEY'),
+        // OpenAI: gpt-6-astra é o mais capaz; gpt-6.1-sol custa 1/5 com desempenho próximo.
+        // Anthropic: claude-opus-5-5 (padrão); claude-sonnet-5-5 custa metade.
+        'model' => env('HUB_AI_PROVIDER', 'openai') === 'anthropic'
+            ? env('HUB_AI_ANTHROPIC_MODEL', 'claude-opus-5-5')
+            : env('HUB_AI_MODEL', 'gpt-6-astra'),
         // Profundidade de raciocínio (low|medium|high|xhigh|max).
         'effort' => env('HUB_AI_EFFORT', 'medium'),
         // Quantas páginas iniciais (capa, ficha, autores, sumário) vão como PDF ao modelo.
@@ -135,6 +140,10 @@ return [
             'gpt-6.1-sol' => ['input' => 2.00, 'cached_input' => 0.10, 'output' => 10.00],
             'gpt-6-luna' => ['input' => 0.10, 'cached_input' => 0.01, 'output' => 0.50],
             'gpt-5.5' => ['input' => 5.00, 'cached_input' => 0.50, 'output' => 30.00],
+            // Anthropic (US$ por milhão; cached_input = leitura de cache)
+            'claude-opus-5-5' => ['input' => 4.00, 'cached_input' => 0.20, 'output' => 20.00],
+            'claude-sonnet-5-5' => ['input' => 2.00, 'cached_input' => 0.20, 'output' => 10.00],
+            'claude-haiku-5-5' => ['input' => 0.10, 'cached_input' => 0.01, 'output' => 0.50],
         ],
     ],
 

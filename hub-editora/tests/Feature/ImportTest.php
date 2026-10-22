@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Editorial\Import\Ai\AiException;
 use App\Editorial\Import\Ai\AiGateway;
+use App\Editorial\Import\Ai\AnthropicGateway;
 use App\Editorial\Import\Ai\OpenAiGateway;
 use App\Editorial\Import\Analyzer;
 use App\Editorial\Import\PdfText;
@@ -21,6 +22,10 @@ use OpenAI\Responses\Responses\CreateResponse;
 use OpenAI\Testing\ClientFake;
 use OpenAI\Testing\Enums\OverrideStrategy;
 use GuzzleHttp\Psr7\Response as PsrResponse;
+use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use Tests\Support\FakeAiGateway;
 use Tests\Support\PdfFixture;
 use Tests\TestCase;
@@ -495,6 +500,79 @@ class ImportTest extends TestCase
         // Reprocessar do zero apaga o ponto de retomada e lê a obra de novo.
         $import->reprocess();
         $this->assertNull($import->fresh()->checkpoint);
+    }
+
+    // ------------------------------------------- gateway da Anthropic (SDK com HTTP simulado)
+
+    private function anthropicMessage(string $text, string $stop = 'end_turn'): PsrResponse
+    {
+        return new PsrResponse(200, ['content-type' => 'application/json'], json_encode([
+            'id' => 'msg_1', 'type' => 'message', 'role' => 'assistant', 'model' => 'claude-opus-5-5',
+            'content' => [['type' => 'text', 'text' => $text]],
+            'stop_reason' => $stop, 'stop_sequence' => null, 'stop_details' => null, 'container' => null,
+            'usage' => ['input_tokens' => 900, 'output_tokens' => 120, 'cache_read_input_tokens' => 300, 'cache_creation_input_tokens' => 0],
+        ]));
+    }
+
+    public function test_anthropic_gateway_sends_pdf_and_schema_and_reads_usage(): void
+    {
+        config(['hub.ai.provider' => 'anthropic', 'hub.ai.key' => 'sk-ant-teste', 'hub.ai.model' => 'claude-opus-5-5', 'hub.ai.effort' => 'medium']);
+        $history = [];
+        $stack = HandlerStack::create(new MockHandler([
+            new PsrResponse(429, ['retry-after' => '0']),
+            $this->anthropicMessage('{"title": "Tratado de Doencas Raras", "pages": 991}'),
+            $this->anthropicMessage('', 'refusal'),
+            $this->anthropicMessage('{"title": "x"', 'max_tokens'),
+        ]));
+        $stack->push(Middleware::history($history));
+        $gateway = new AnthropicGateway(null, new Guzzle(['handler' => $stack]), ['initialRetryDelay' => 0.0, 'maxRetryDelay' => 0.0]);
+        $schema = ['type' => 'object', 'properties' => ['title' => ['type' => 'string'], 'pages' => ['type' => 'integer']], 'required' => ['title', 'pages'], 'additionalProperties' => false];
+        $pdf = 'data:application/pdf;base64,'.base64_encode('%PDF-1.4 fake');
+
+        $result = $gateway->structured('Instrucao fixa', [
+            ['type' => 'input_file', 'filename' => 'inicio.pdf', 'file_data' => $pdf],
+            ['type' => 'input_text', 'text' => 'Extraia.'],
+        ], 'front_matter', $schema, 4096);
+
+        $this->assertSame(['title' => 'Tratado de Doencas Raras', 'pages' => 991], $result->data);
+        $this->assertSame(['input_tokens' => 1200, 'output_tokens' => 120, 'cached_input_tokens' => 300, 'reasoning_tokens' => 0], $result->usage);
+        $this->assertCount(2, $history, 'o 429 foi repetido pelo SDK');
+
+        $body = json_decode((string) $history[1]['request']->getBody(), true);
+        $this->assertSame('claude-opus-5-5', $body['model']);
+        $this->assertSame(4096, $body['max_tokens']);
+        $this->assertSame('Instrucao fixa', $body['system'][0]['text']);
+        $this->assertSame(['type' => 'ephemeral'], $body['system'][0]['cache_control']);
+        $this->assertSame(['effort' => 'medium', 'format' => ['type' => 'json_schema', 'schema' => $schema]], $body['output_config']);
+        $this->assertSame(['type' => 'base64', 'media_type' => 'application/pdf', 'data' => base64_encode('%PDF-1.4 fake')], $body['messages'][0]['content'][0]['source']);
+        $this->assertSame('document', $body['messages'][0]['content'][0]['type']);
+        $this->assertSame(['type' => 'text', 'text' => 'Extraia.'], $body['messages'][0]['content'][1]);
+        $this->assertSame('Bearer sk-ant-teste', $history[1]['request']->getHeaderLine('authorization'), 'o SDK v1 envia a chave como Bearer');
+
+        try {
+            $gateway->structured('x', [['type' => 'input_text', 'text' => 'y']], 'chapter', $schema, 1024);
+            $this->fail('recusa deveria virar AiException');
+        } catch (AiException $e) {
+            $this->assertSame(AiException::REFUSAL, $e->reason);
+        }
+        try {
+            $gateway->structured('x', [['type' => 'input_text', 'text' => 'y']], 'chapter', $schema, 1024);
+            $this->fail('resposta cortada deveria virar AiException');
+        } catch (AiException $e) {
+            $this->assertSame(AiException::TRUNCATED, $e->reason);
+        }
+    }
+
+    public function test_provider_switch_picks_the_gateway_and_the_right_key(): void
+    {
+        config(['hub.ai.provider' => 'anthropic']);
+        $this->app->forgetInstance(AiGateway::class);
+        $this->app->offsetUnset(AiGateway::class);
+        (new \App\Providers\AppServiceProvider($this->app))->register();
+        $this->assertInstanceOf(AnthropicGateway::class, $this->app->make(AiGateway::class));
+
+        config(['hub.ai.provider' => 'openai']);
+        $this->assertInstanceOf(OpenAiGateway::class, $this->app->make(AiGateway::class));
     }
 
     public function test_sdk_gateway_is_not_contacted_without_a_key(): void
