@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Crossref\BookDeposits;
 use App\Crossref\DepositService;
 use App\Models\Deposit;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,7 +36,12 @@ class SendDeposit implements ShouldQueue
         }
 
         // Falha de rede lança ConnectionException: o depósito já está `failed` e a fila tenta de novo.
-        $deposit = DepositService::make()->send($deposit);
+        try {
+            $deposit = DepositService::make()->send($deposit);
+        } finally {
+            // Espelha o estado (sent ou failed) no doi_status do livro e dos capítulos (frente E1).
+            BookDeposits::make()->sync($deposit->refresh());
+        }
 
         if ($deposit->status === Deposit::SENT) {
             RefreshDeposit::dispatch($deposit->id)->delay(now()->addMinutes(5));

@@ -106,6 +106,8 @@ class SyncLog extends Model
             'deposit.pending' => 'Depósito Crossref em processamento',
             'deposit.done' => 'Depósito Crossref concluído',
             'deposit.failed' => 'Depósito Crossref falhou',
+            'deposit.requested' => 'Registro de DOI na Crossref solicitado',
+            'deposit.synced' => 'Estados de DOI do livro atualizados',
             default => $this->action,
         };
     }

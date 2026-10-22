@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Crossref\BookDeposits;
 use App\Crossref\DepositService;
 use App\Models\Deposit;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -32,6 +33,9 @@ class RefreshDeposit implements ShouldQueue
         }
 
         $deposit = DepositService::make()->refresh($deposit);
+
+        // Espelha o resultado (processing, registered ou failed) no livro e nos capítulos (frente E1).
+        BookDeposits::make()->sync($deposit);
 
         if ($deposit->awaitingResult() && $this->attempt < 6) {
             self::dispatch($deposit->id, $this->attempt + 1)->delay(now()->addMinutes(self::RETRY_MINUTES));

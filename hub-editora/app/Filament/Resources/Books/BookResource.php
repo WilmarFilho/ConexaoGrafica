@@ -6,6 +6,7 @@ use App\Filament\Resources\Books\Pages\CreateBook;
 use App\Filament\Resources\Books\Pages\EditBook;
 use App\Filament\Resources\Books\Pages\ListBooks;
 use App\Filament\Resources\Books\Pages\ViewBook;
+use App\Filament\Resources\Books\RelationManagers\DepositsRelationManager;
 use App\Filament\Resources\Books\Schemas\BookInfolist;
 use App\Filament\Resources\Books\Tables\BooksTable;
 use App\Models\Book;
@@ -105,14 +106,23 @@ class BookResource extends Resource
     }
 
     /**
-     * Gancho para a frente D (Crossref): ações de depósito mostradas na tela
-     * do livro para os perfis Depósito e Administrador. Até lá, nenhuma.
+     * Ações de depósito na Crossref (frente E1), mostradas na tela do livro para
+     * os perfis Depósito e Administrador: registrar DOI, consultar resultado,
+     * baixar o XML do último depósito.
      *
      * @return array<Action>
      */
     public static function depositActions(): array
     {
-        return [];
+        return DepositActions::all();
+    }
+
+    /** Histórico de depósitos (só na tela de resumo, para quem deposita). */
+    public static function getRelations(): array
+    {
+        return [
+            DepositsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

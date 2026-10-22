@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Crossref\BookDeposits;
 use App\Crossref\CrossrefException;
 use App\Crossref\DepositService;
 use App\Models\Deposit;
@@ -32,6 +33,7 @@ class CrossrefSendCommand extends Command
         try {
             $deposit = DepositService::make()->send($deposit);
         } catch (ConnectionException $e) {
+            BookDeposits::make()->sync($deposit->refresh());
             $this->error('Sem resposta da Crossref: '.$e->getMessage());
 
             return self::FAILURE;
@@ -40,6 +42,9 @@ class CrossrefSendCommand extends Command
 
             return self::FAILURE;
         }
+
+        // Espelha o estado (sent ou failed) no doi_status do livro e dos capítulos (frente E1).
+        BookDeposits::make()->sync($deposit);
 
         if ($deposit->status !== Deposit::SENT) {
             $this->error("Depósito {$deposit->batch_id} recusado (HTTP {$deposit->http_status}): ".mb_substr((string) $deposit->response, 0, 300));

@@ -48,6 +48,27 @@ class Deposit extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function book(): BelongsTo
+    {
+        return $this->belongsTo(Book::class);
+    }
+
+    public function getEnvironmentLabelAttribute(): string
+    {
+        return $this->environment === self::PRODUCTION ? 'Produção' : 'Homologação';
+    }
+
+    public static function statusColor(?string $status): string
+    {
+        return match ($status) {
+            self::QUEUED => 'gray',
+            self::SENT, self::PROCESSING => 'warning',
+            self::DONE => 'success',
+            self::FAILED => 'danger',
+            default => 'gray',
+        };
+    }
+
     /** Nome do arquivo como enviado à Crossref (fname) e usado na consulta do resultado. */
     public function filename(): string
     {
