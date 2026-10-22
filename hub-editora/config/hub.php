@@ -93,12 +93,6 @@ return [
         'secret' => env('CONEXAO_DOI_WP_SECRET'),  // 64 caracteres, o mesmo CONEXAO_DOI_SECRET do wp-config.php
     ],
 
-    // Crossref. A frente D completa com login, senha e ambiente; o prefixo de
-    // demonstração vale até a editora informar o oficial.
-    'crossref' => [
-        'prefix' => env('CROSSREF_PREFIX', '10.00000'),
-    ],
-
     // Amazon Seller Central (SP-API, autorização própria via Login with Amazon).
     'amazon' => [
         'client_id' => env('AMAZON_LWA_CLIENT_ID'),
@@ -136,6 +130,19 @@ return [
             'gpt-6-luna' => ['input' => 0.10, 'cached_input' => 0.01, 'output' => 0.50],
             'gpt-5.5' => ['input' => 5.00, 'cached_input' => 0.50, 'output' => 30.00],
         ],
+    // Conexão DOI: depósito de metadados na Crossref (App\Crossref). Em `test`
+    // o envio vai para test.crossref.org (homologação); `production` registra de verdade.
+    'crossref' => [
+        'env' => env('CROSSREF_ENV', 'test'),                   // test | production
+        'login' => env('CROSSREF_LOGIN'),                        // formato e-mail/role (ex.: usuario@editora/bcfg)
+        'password' => env('CROSSREF_PASSWORD'),
+        'prefix' => env('CROSSREF_PREFIX', '10.00000'),          // 10.00000 é só exemplo; o prefixo real da editora vai no .env (10.68564)
+        'depositor_name' => env('CROSSREF_DEPOSITOR_NAME', 'Conexão Editora'),
+        'depositor_email' => env('CROSSREF_DEPOSITOR_EMAIL'),  // recebe o e-mail de resultado da Crossref
+        'registrant' => env('CROSSREF_REGISTRANT', 'Conexão Editora'),
+        // Base das páginas públicas, usada só quando o payload não traz `landing_url`
+        // (o WordPress devolve as URLs definitivas ao publicar; são elas que valem).
+        'landing_base' => env('CROSSREF_LANDING_BASE', 'https://conexaoeditora.com.br'),
     ],
 
 ];

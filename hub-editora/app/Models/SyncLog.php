@@ -99,6 +99,13 @@ class SyncLog extends Model
             'publish.sent' => 'Livro publicado no site',
             'publish.unpublished' => 'Livro marcado fora de catálogo no site',
             'publish.failed' => 'Publicação no site falhou',
+
+            // Conexão DOI: depósitos na Crossref (App\Crossref)
+            'deposit.created' => 'Depósito Crossref gerado',
+            'deposit.sent' => 'Depósito enviado à Crossref',
+            'deposit.pending' => 'Depósito Crossref em processamento',
+            'deposit.done' => 'Depósito Crossref concluído',
+            'deposit.failed' => 'Depósito Crossref falhou',
             default => $this->action,
         };
     }
