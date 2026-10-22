@@ -358,7 +358,7 @@ class BookWizard
                         Text::make(fn (Book $record) => new HtmlString(self::checklistHtml($record->fresh() ?? $record))),
                     ]),
                 Actions::make(BookActions::transitions(saveFirst: true)),
-                Text::make('Depósito na Crossref: as ações de depósito chegam com a frente D e aparecem aqui e na tela de resumo para os perfis Depósito e Administrador.')
+                Text::make('Registro do DOI: depois de aprovar e publicar no site, use "Registrar DOI" na tela de resumo do livro (botão Visualizar), disponível para os perfis Depósito e Administrador.')
                     ->color('gray')
                     ->visible(fn () => (bool) auth()->user()?->canDeposit()),
                 Section::make('Prévia do payload enviado ao site')
