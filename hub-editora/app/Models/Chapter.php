@@ -8,6 +8,7 @@ use App\Editorial\Slug;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -83,6 +84,18 @@ class Chapter extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /** Fichas PDF (frente E). */
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    /** A ficha científica do capítulo, quando já gerada. */
+    public function sheet(): MorphOne
+    {
+        return $this->morphOne(Document::class, 'documentable')->where('type', Document::CHAPTER_SHEET);
     }
 
     /** `{prefixo do livro}/{sufixo do capítulo}`. */

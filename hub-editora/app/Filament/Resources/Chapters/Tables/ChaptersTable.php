@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Chapters\Tables;
 
+use App\Filament\Resources\Books\DocumentActions;
 use App\Models\Book;
 use App\Models\Chapter;
 use Filament\Support\Enums\FontWeight;
@@ -16,7 +17,7 @@ class ChaptersTable
     public static function configure(Table $table, bool $withBook): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['contributions.person', 'book']))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['contributions.person', 'book', 'sheet']))
             ->defaultSort('sequence')
             ->paginated([25, 50, 100])
             ->columns(array_values(array_filter([
@@ -63,6 +64,8 @@ class ChaptersTable
                     ->formatStateUsing(fn (string $state) => Book::DOI_STATUSES[$state] ?? $state)
                     ->color(fn (string $state) => Book::doiStatusColor($state))
                     ->sortable(),
+
+                DocumentActions::column(),
             ])))
             ->filters(array_values(array_filter([
                 $withBook ? SelectFilter::make('book_id')->label('Livro')->relationship('book', 'title')->searchable()->preload() : null,

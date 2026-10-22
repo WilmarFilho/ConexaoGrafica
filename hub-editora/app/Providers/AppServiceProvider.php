@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Editorial\Documents\StaleSheetsObserver;
 use App\Editorial\Import\Ai\AiGateway;
 use App\Editorial\Import\Ai\OpenAiGateway;
 use App\Models\Book;
@@ -47,6 +48,10 @@ class AppServiceProvider extends ServiceProvider
             'book' => Book::class,
             'chapter' => Chapter::class,
         ]);
+
+        // Fichas PDF (frente E): mudou campo público do livro/capítulo, a ficha no site fica desatualizada.
+        Book::observe(StaleSheetsObserver::class);
+        Chapter::observe(StaleSheetsObserver::class);
 
         // Chaves gravadas pela tela Integrações vencem o .env.
         if (! $this->app->runningUnitTests()) {

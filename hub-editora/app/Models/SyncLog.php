@@ -99,6 +99,11 @@ class SyncLog extends Model
             'publish.sent' => 'Livro publicado no site',
             'publish.unpublished' => 'Livro marcado fora de catálogo no site',
             'publish.failed' => 'Publicação no site falhou',
+            // Conexão DOI: fichas PDF (frente E)
+            'document.generated' => 'Ficha PDF gerada',
+            'document.published' => 'Fichas PDF enviadas ao site',
+            'document.requested' => 'Regeneração das fichas solicitada',
+            'document.failed' => 'Fichas PDF falharam',
 
             // Conexão DOI: depósitos na Crossref (App\Crossref)
             'deposit.created' => 'Depósito Crossref gerado',

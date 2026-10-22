@@ -93,6 +93,12 @@ return [
         'secret' => env('CONEXAO_DOI_WP_SECRET'),  // 64 caracteres, o mesmo CONEXAO_DOI_SECRET do wp-config.php
     ],
 
+    // Conexão DOI: fichas científicas em PDF (frente E). Com auto_publish, o
+    // PublishBook encadeia a geração e o envio das fichas depois do PUT.
+    'documents' => [
+        'auto_publish' => filter_var(env('HUB_FICHAS_AUTOMATICAS', true), FILTER_VALIDATE_BOOLEAN),
+    ],
+
     // Amazon Seller Central (SP-API, autorização própria via Login with Amazon).
     'amazon' => [
         'client_id' => env('AMAZON_LWA_CLIENT_ID'),

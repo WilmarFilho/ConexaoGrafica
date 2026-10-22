@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Collection;
 
 /**
@@ -141,6 +142,18 @@ class Book extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /** Fichas PDF (frente E). */
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    /** A ficha científica do livro, quando já gerada. */
+    public function sheet(): MorphOne
+    {
+        return $this->morphOne(Document::class, 'documentable')->where('type', Document::BOOK_SHEET);
     }
 
     // ---- Atributos derivados ----------------------------------------------

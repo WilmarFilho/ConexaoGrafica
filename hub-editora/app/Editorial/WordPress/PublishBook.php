@@ -2,6 +2,7 @@
 
 namespace App\Editorial\WordPress;
 
+use App\Editorial\Documents\PublishSheets;
 use App\Models\Book;
 use App\Models\Chapter;
 use App\Models\Person;
@@ -54,6 +55,11 @@ class PublishBook implements ShouldQueue
             SyncLog::record(null, SyncLog::OUT, 'publish.sent', $book,
                 'Livro publicado no site: '.($book->landing_url ?: 'sem URL devolvida'),
                 ['wp_post_id' => $book->wp_post_id, 'chapters' => count($payload['chapters']), 'user_id' => $this->userId]);
+
+            // Fichas PDF (frente E): geradas com as URLs recém-devolvidas e enviadas em seguida.
+            if (config('hub.documents.auto_publish')) {
+                PublishSheets::dispatch($book->id, false, $this->userId);
+            }
         } catch (Throwable $e) {
             SyncLog::record(null, SyncLog::OUT, 'publish.failed', $book, $e->getMessage(), ['user_id' => $this->userId, 'attempt' => $this->attempts()], 'error');
             throw $e; // a fila tenta de novo
