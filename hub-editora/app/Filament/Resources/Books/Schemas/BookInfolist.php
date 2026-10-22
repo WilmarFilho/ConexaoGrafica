@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Books\Schemas;
 use App\Filament\Resources\Chapters\ChapterResource;
 use App\Models\Book;
 use App\Models\Contribution;
+use App\Models\Document;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
@@ -107,6 +108,24 @@ class BookInfolist
                                 TextEntry::make('chapters_count')->hiddenLabel()
                                     ->state(fn (Book $record) => $record->chapters()->count().' capítulo(s) · '.$record->chapters()->where('status', 'approved')->count().' aprovado(s)')
                                     ->url(fn (Book $record) => ChapterResource::getUrl('index', ['tableFilters' => ['book_id' => ['value' => $record->id]]])),
+                            ]),
+
+                        Section::make('Ficha PDF')
+                            ->schema([
+                                TextEntry::make('sheet_state')->hiddenLabel()
+                                    ->state(fn (Book $record) => Document::stateLabel(($record->sheet ?? new Document)->state()))
+                                    ->badge()
+                                    ->color(fn (Book $record) => match (($record->sheet ?? new Document)->state()) {
+                                        'published' => 'success', 'stale' => 'warning', 'unpublished' => 'info', default => 'gray',
+                                    }),
+                                TextEntry::make('sheet.generated_at')->label('Gerada em')->dateTime('d/m/Y H:i')->placeholder('—'),
+                                TextEntry::make('sheet.public_url')->label('No site')->placeholder('ainda não enviada')
+                                    ->url(fn (?string $state) => $state, shouldOpenInNewTab: true)
+                                    ->limit(40),
+                                TextEntry::make('chapter_sheets')->label('Capítulos')
+                                    ->state(fn (Book $record) => Document::query()->where('documentable_type', 'chapter')
+                                        ->whereIn('documentable_id', $record->chapters()->select('id'))->published()->where('stale', false)->count()
+                                        .' de '.$record->chapters()->where('status', 'approved')->count().' ficha(s) publicada(s) e atualizada(s)'),
                             ]),
 
                         Section::make('Checklist')

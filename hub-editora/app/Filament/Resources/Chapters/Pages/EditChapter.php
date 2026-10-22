@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Chapters\Pages;
 
 use App\Filament\Resources\Books\BookResource;
+use App\Filament\Resources\Books\DocumentActions;
 use App\Filament\Resources\Chapters\ChapterActions;
 use App\Filament\Resources\Chapters\ChapterResource;
 use App\Models\Chapter;
@@ -46,6 +47,7 @@ class EditChapter extends EditRecord
                 ->url(fn (Chapter $record) => BookResource::getUrl('edit', ['record' => $record->book_id])),
             ChapterActions::submitForReview(),
             ChapterActions::approve(),
+            DocumentActions::downloadChapterSheet(),
             DeleteAction::make()->label('Remover'),
         ];
     }

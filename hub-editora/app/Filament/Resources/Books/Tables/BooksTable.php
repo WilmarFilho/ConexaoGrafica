@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Books\Tables;
 
 use App\Filament\Resources\Books\BookResource;
+use App\Filament\Resources\Books\DocumentActions;
 use App\Models\Book;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -19,7 +20,7 @@ class BooksTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->withCount('chapters')->with('contributions.person'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->withCount('chapters')->with(['contributions.person', 'sheet']))
             ->defaultSort('updated_at', 'desc')
             ->paginated([25, 50, 100])
             ->recordUrl(fn (Book $record) => BookResource::canEdit($record)
@@ -78,6 +79,8 @@ class BooksTable
                     ->color('primary')
                     ->url(fn (?string $state) => $state, shouldOpenInNewTab: true)
                     ->tooltip(fn (?string $state) => $state),
+
+                DocumentActions::column(),
 
                 TextColumn::make('updated_at')
                     ->label('Atualizado')

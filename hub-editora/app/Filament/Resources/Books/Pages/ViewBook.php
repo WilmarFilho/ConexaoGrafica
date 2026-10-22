@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Books\Pages;
 
 use App\Filament\Resources\Books\BookActions;
 use App\Filament\Resources\Books\BookResource;
+use App\Filament\Resources\Books\DocumentActions;
 use App\Models\Book;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -45,6 +46,8 @@ class ViewBook extends ViewRecord
                 ->visible(fn (Book $record) => filled($record->landing_url)),
             ...BookActions::transitions(),
             ...$deposit,
+            DocumentActions::downloadBookSheet(),
+            DocumentActions::publishSheets(),
         ];
     }
 }

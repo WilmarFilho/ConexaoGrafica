@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Chapter;
 use App\Models\CommercialLink;
 use App\Models\Contribution;
+use App\Models\Document;
 
 /**
  * Monta o corpo do `PUT /wp-json/conexao-doi/v1/publicacoes/{hub_book_id}`,
@@ -21,7 +22,7 @@ class Payload
         $book->loadMissing([
             'contributions.person', 'contributions.institution',
             'chapters.contributions.person', 'chapters.contributions.institution',
-            'commercialLinks',
+            'commercialLinks', 'documents', 'chapters.documents',
         ]);
 
         return [
@@ -57,8 +58,8 @@ class Payload
                 'contributors' => $book->contributions->map(fn (Contribution $c) => self::contributor($c))->values()->all(),
                 'toc' => self::toc($book),
                 'commercial' => $book->commercialLinks->map(fn (CommercialLink $l) => self::commercial($l))->values()->all(),
-                // A ficha PDF é da frente E (Documentos); até lá vai o registro vazio.
-                'documents' => [self::documentStub('book_sheet')],
+                // Fichas PDF já publicadas no site (frente E); sem nenhuma, vai o registro vazio.
+                'documents' => self::documents($book->documents) ?: [self::documentStub('book_sheet')],
                 'status' => $status ?? $book->status,
                 // O WP trava o slug a partir de `sent` (decisão da frente B).
                 'doi_status' => $book->doi_status,
@@ -87,7 +88,7 @@ class Payload
             'keywords' => self::strings($c->keywords),
             'references' => self::references($c->references),
             'contributors' => $c->contributions->map(fn (Contribution $x) => self::contributor($x))->values()->all(),
-            'documents' => [],
+            'documents' => self::documents($c->relationLoaded('documents') ? $c->documents : $c->documents()->get()),
             'status' => $c->status,
             'doi_status' => $c->doi_status,
         ];
@@ -139,6 +140,25 @@ class Payload
     public static function documentStub(string $type): array
     {
         return ['type' => $type, 'attachment_id' => null, 'url' => null, 'version' => null, 'generated_at' => null];
+    }
+
+    /**
+     * Só as fichas que o site já recebeu (com anexo): o WP substitui a lista a
+     * cada PUT, então mandar as publicadas é o que mantém o PDF na página.
+     *
+     * @param  iterable<Document>  $documents
+     */
+    public static function documents(iterable $documents): array
+    {
+        return collect($documents)
+            ->filter(fn (Document $d) => $d->isPublished())
+            ->map(fn (Document $d) => [
+                'type' => $d->type,
+                'attachment_id' => $d->wp_attachment_id,
+                'url' => $d->public_url,
+                'version' => $d->template_version,
+                'generated_at' => $d->generated_at?->toIso8601String(),
+            ])->values()->all();
     }
 
     private static function strings(?array $values): array

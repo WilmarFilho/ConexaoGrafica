@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Books\Pages;
 
 use App\Filament\Resources\Books\BookResource;
+use App\Filament\Resources\Books\DocumentActions;
 use App\Filament\Resources\Books\Schemas\BookWizard;
 use App\Models\Book;
 use Filament\Actions\Action;
@@ -65,6 +66,8 @@ class EditBook extends EditRecord
                 ->url(fn (Book $record) => $record->landing_url, shouldOpenInNewTab: true)
                 ->visible(fn (Book $record) => filled($record->landing_url)),
             ViewAction::make()->label('Resumo')->color('gray'),
+            DocumentActions::downloadBookSheet(),
+            DocumentActions::publishSheets(),
             DeleteAction::make()->label('Excluir rascunho'),
         ];
     }
