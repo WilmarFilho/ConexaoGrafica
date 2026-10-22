@@ -16,6 +16,12 @@ rsync -a --delete \
   "$REPO/conexao-editora/wp-content/themes/conexao-editora/" \
   "$RAIZ/wp-content/themes/conexao-editora/"
 
+echo "== plugin conexao-doi (páginas permanentes do DOI, alimentadas pelo Hub)"
+rsync -a --delete --exclude 'tests/'   "$REPO/conexao-editora/wp-content/plugins/conexao-doi/"   "$RAIZ/wp-content/plugins/conexao-doi/"
+# o segredo é gerado uma vez no servidor e nunca sai dele (o mesmo vai no .env do Hub)
+$WP config has CONEXAO_DOI_SECRET >/dev/null 2>&1 || echo "!! CONEXAO_DOI_SECRET ausente no wp-config.php: o Hub não consegue publicar"
+$WP plugin is-active conexao-doi || $WP plugin activate conexao-doi
+
 echo "== plugin da biblioteca"
 rsync -a --delete   "$REPO/conexao-editora/wp-content/plugins/conexao-biblioteca/"   "$RAIZ/wp-content/plugins/conexao-biblioteca/"
 
