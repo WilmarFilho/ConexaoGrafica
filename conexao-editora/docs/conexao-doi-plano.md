@@ -55,11 +55,11 @@ PDF original (privado) ──► Hub Editora: módulo Editorial (Filament)
 - O WordPress **não é fonte de verdade**: recebe do Hub, por REST assinado, o registro aprovado (livro + capítulos + autores + links + ficha PDF) e só renderiza. Se o produto sair de catálogo, a página continua no ar sem o botão, como a Crossref exige.
 - Plugin pequeno: dois tipos de conteúdo (`publicacao`, `capitulo`), templates seguindo os mockups, gerador de citações, metatags, redirecionamento 301 ao mudar slug.
 
-**IA (Claude API)**
+**IA (API da OpenAI — trocado em 22/10/2026 a pedido do Wilmar; o texto abaixo descreve o desenho, que é o mesmo)**
 
 - Extração de texto do PDF em PHP (`smalot/pdfparser`; os originais têm camada de texto). As primeiras ~30 páginas (capa, ficha catalográfica, autores, sumário) vão também como **PDF** para o modelo, porque o layout importa; os capítulos vão como **texto** com marcação de página, um capítulo por chamada.
 - Saída estruturada (JSON validado) com, para cada campo, a página e o trecho que o justificam. Resumo e palavras-chave só são gerados quando o PDF não traz, e sempre marcados como "sugestão da IA".
-- Modelo padrão: `claude-opus-5-5`. Custo estimado por livro de 500 páginas e 74 capítulos: **US$ 2 a 3** (≈ 370 mil tokens de entrada e 40 mil de saída). Em lote (Batch API, 50% de desconto) cai pela metade. Com `claude-sonnet-5-5` seria cerca de metade disso e com `claude-haiku-5-5` centavos; a escolha é sua, mas o custo não é fator. Chave de API no `.env` do Hub.
+- Modelo: GPT-5 (o mais capaz adequado a documentos longos, escolhido pela frente C na documentação atual da OpenAI). Volume por livro de 500 páginas e 74 capítulos: ≈ 370 mil tokens de entrada e 40 mil de saída, isto é, poucos dólares por livro; a frente C registra o custo medido. Chave `OPENAI_API_KEY` no `.env` do Hub.
 - OCR de livros digitalizados fica fora da primeira versão (3 títulos do acervo). Os demais têm texto.
 
 **Crossref**

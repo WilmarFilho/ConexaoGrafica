@@ -15,10 +15,10 @@ Versão 1.0, 22/10/2026. Vale para as quatro frentes (Hub, WordPress, IA, Crossr
 | Assistente do livro | **8 etapas**, como nas telas do Diego: Dados da obra → Autores → Publicação → Identificadores e DOI → Resumo → Capítulos → Comercialização → Revisão |
 | Caixa de compra | ligada ao **produto WooCommerce pelo ID** (preço e estoque reais, adiciona ao carrinho). Se não houver produto ou ele sair de catálogo, a página fica sem botão e continua no ar |
 | Schema Crossref | `crossref5.4.0.xsd` (book / book_metadata / content_item component_type="chapter") |
-| IA | Claude API, `claude-opus-5-5`, saída estruturada; nada publica sem aprovação humana |
+| IA | **API da OpenAI** (decisão de 22/10/2026; a chave disponível é da OpenAI), Responses API com saída estruturada (JSON schema), PDF do front matter como arquivo; nada publica sem aprovação humana |
 | Perfis novos no Hub | `editor` (cadastra e importa), `revisor` (aprova sugestões da IA e aprova o livro), `deposito` (envia à Crossref). `admin` faz tudo |
 
-Pendente (não bloqueia): credenciais Crossref, PDF do Tratado, usuários, chave da API, layout da ficha PDF, desligar o `noindex` do site (`blog_public=0` hoje).
+Pendente (não bloqueia): PDF do Tratado, layout da ficha PDF. Já resolvidos em 22/10: Crossref (membro "Conexão Gráfica Inteligente", prefixo `10.68564`, role `bcfg`; credenciais só no `.env`), chave da OpenAI (`OPENAI_API_KEY` no `.env`), `noindex` desligado, administrador do módulo = conta comercial@conexaopro.com.br no Hub.
 
 ## 2. Modelo de dados (Hub, MariaDB)
 
@@ -147,7 +147,7 @@ Datas em ISO-8601. Texto em UTF-8, sem HTML (o WP escapa na saída). O Hub envia
 | `series_title`, `series_issn` | `book_series_metadata` em vez de `book_metadata` (regra: livro de série usa outra estrutura; o gerador escolhe pelo preenchimento de `series_issn`) |
 | resumos | `jats:abstract` (opcional, aceito pelo schema) |
 
-Envio: `POST https://test.crossref.org/servlet/deposit` (homologação) ou `https://doi.crossref.org/servlet/deposit` com `operation=doMDUpload`, `login_id`, `login_passwd`, `fname` (arquivo XML). Resultado: `https://doi.crossref.org/servlet/submissionDownload?usr=…&pwd=…&doi_batch_id=…&file_name=…&type=result`. Credenciais em `CROSSREF_LOGIN`, `CROSSREF_PASSWORD`, `CROSSREF_PREFIX`, `CROSSREF_ENV` no `.env` do Hub.
+Envio: `POST https://test.crossref.org/servlet/deposit` (homologação) ou `https://doi.crossref.org/servlet/deposit` com `operation=doMDUpload`, `login_id`, `login_passwd`, `fname` (arquivo XML). Resultado: `https://doi.crossref.org/servlet/submissionDownload?usr=…&pwd=…&doi_batch_id=…&file_name=…&type=result`. Credenciais em `CROSSREF_LOGIN` (formato `e-mail/role`, role `bcfg`), `CROSSREF_PASSWORD`, `CROSSREF_PREFIX` (`10.68564`), `CROSSREF_ENV` no `.env` do Hub.
 
 ## 7. Frentes e critérios de aceite
 
