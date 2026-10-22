@@ -29,6 +29,24 @@ class EditorialTest extends TestCase
 
     // ---- Validações ----------------------------------------------------------
 
+    public function test_chapter_authors_inherit_the_affiliation_given_in_the_book(): void
+    {
+        $book = $this->makeBook();
+        $chapter = $book->chapters()->first() ?? \App\Models\Chapter::create(['book_id' => $book->id, 'title' => 'Cap', 'first_page' => 1, 'last_page' => 2]);
+        $person = \App\Models\Person::create(['name' => 'Priscila Rodrigues Barbosa Takieddine']);
+        $inst = \App\Models\Institution::create(['name' => 'Universidade do Vale do Sapucaí', 'city' => 'Pouso Alegre', 'state' => 'MG', 'country' => 'BR']);
+
+        $inChapter = \App\Models\Contribution::create(['contributable_type' => 'chapter', 'contributable_id' => $chapter->id, 'person_id' => $person->id, 'role' => 'author', 'sequence' => 1]);
+        $this->assertFalse($inChapter->fresh()->hasAffiliation(), 'ainda não há afiliação no livro');
+
+        \App\Models\Contribution::create(['contributable_type' => 'book', 'contributable_id' => $book->id, 'person_id' => $person->id, 'role' => 'author', 'sequence' => 9, 'institution_id' => $inst->id]);
+        $this->assertSame($inst->id, $inChapter->fresh()->institution_id, 'o capítulo herdou a instituição do livro');
+
+        $other = \App\Models\Chapter::create(['book_id' => $book->id, 'title' => 'Outro', 'first_page' => 3, 'last_page' => 4]);
+        $new = \App\Models\Contribution::create(['contributable_type' => 'chapter', 'contributable_id' => $other->id, 'person_id' => $person->id, 'role' => 'author', 'sequence' => 1]);
+        $this->assertSame($inst->id, $new->institution_id, 'autoria nova em capítulo já nasce com a instituição do livro');
+    }
+
     public function test_keywords_are_always_stored_as_a_list(): void
     {
         $this->assertSame(['Ultrassom', 'Contraste'], \App\Editorial\Keywords::normalize('Ultrassom, Contraste; Ultrassom'));
