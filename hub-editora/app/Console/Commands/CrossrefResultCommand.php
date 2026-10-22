@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Crossref\BookDeposits;
 use App\Crossref\CrossrefException;
 use App\Crossref\DepositService;
 use App\Models\Deposit;
@@ -50,6 +51,7 @@ class CrossrefResultCommand extends Command
         }
 
         $service = DepositService::make();
+        $sync = BookDeposits::make($service);
         $failures = 0;
 
         foreach ($deposits as $deposit) {
@@ -62,7 +64,10 @@ class CrossrefResultCommand extends Command
                 continue;
             }
 
-            $this->line(sprintf('%s: %s', $deposit->batch_id, $deposit->status_label));
+            // Espelha o resultado no doi_status do livro e dos capítulos (frente E1).
+            $synced = $sync->sync($deposit);
+
+            $this->line(sprintf('%s: %s%s', $deposit->batch_id, $deposit->status_label, $synced ? " ({$synced} registro(s) do livro atualizado(s))" : ''));
             foreach ($deposit->items as $item) {
                 $this->line(sprintf('  %-45s %-11s %s', $item->doi, $item->status_label, (string) $item->message));
             }

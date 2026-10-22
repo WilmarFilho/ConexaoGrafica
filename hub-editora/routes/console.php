@@ -67,3 +67,11 @@ Schedule::command('hub:tracking')
     ->hourly()
     ->withoutOverlapping()
     ->onOneServer();
+
+// Crossref: o HTTP 200 do depósito só diz "recebido"; o registro de cada DOI vem do
+// relatório de processamento. A cada 15 min lemos o que ainda está em sent/processing
+// e espelhamos o resultado no doi_status do livro e dos capítulos.
+Schedule::command('hub:crossref-resultado --pendentes')
+    ->everyFifteenMinutes()
+    ->withoutOverlapping()
+    ->onOneServer();

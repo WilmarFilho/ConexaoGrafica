@@ -143,6 +143,12 @@ class Book extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    /** Depósitos na Crossref (frente D). O mais recente é o que manda no doi_status. */
+    public function deposits(): HasMany
+    {
+        return $this->hasMany(Deposit::class);
+    }
+
     // ---- Atributos derivados ----------------------------------------------
 
     /** `{doi_prefix}/{doi_suffix}` — único. */
