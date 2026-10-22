@@ -17,7 +17,9 @@ class SyncLog extends Model
 
     /** Direções: in = canal → hub, out = hub → canal, manual = pessoa no painel. */
     public const IN = 'in';
+
     public const OUT = 'out';
+
     public const MANUAL = 'manual';
 
     public function channel(): BelongsTo
@@ -82,6 +84,21 @@ class SyncLog extends Model
             'import.suggested' => 'Proposta da IA pronta',
             'import.failed' => 'Importação falhou',
             'import.reprocess' => 'Importação reenviada',
+
+            // ---- Módulo Editorial (Conexão DOI) ----
+            'editorial.book_created' => 'Livro cadastrado',
+            'editorial.review_requested' => 'Livro enviado para revisão',
+            'editorial.approved' => 'Livro aprovado',
+            'editorial.returned' => 'Livro devolvido ao rascunho',
+            'editorial.chapter_review_requested' => 'Capítulo enviado para revisão',
+            'editorial.chapter_approved' => 'Capítulo aprovado',
+            'editorial.chapters_imported' => 'Capítulos importados por JSON',
+            'editorial.chapters_renumbered' => 'Sufixos DOI dos capítulos renumerados',
+            'editorial.publish_requested' => 'Publicação no site solicitada',
+            'editorial.unpublish_requested' => 'Retirada de catálogo solicitada',
+            'publish.sent' => 'Livro publicado no site',
+            'publish.unpublished' => 'Livro marcado fora de catálogo no site',
+            'publish.failed' => 'Publicação no site falhou',
             default => $this->action,
         };
     }

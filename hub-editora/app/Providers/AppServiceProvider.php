@@ -4,15 +4,18 @@ namespace App\Providers;
 
 use App\Editorial\Import\Ai\AiGateway;
 use App\Editorial\Import\Ai\OpenAiGateway;
+use App\Models\Book;
+use App\Models\Chapter;
 use App\Support\HubSettings;
 use App\Support\SecurityAudit;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,6 +39,14 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isProduction()) {
             URL::forceScheme('https');
         }
+
+        // Contribuições polimórficas do módulo Editorial guardam `book` / `chapter`
+        // (contrato, seção 2), não o nome da classe. Mapa não forçado: os
+        // demais morphs (sync_logs.subject) continuam com a classe.
+        Relation::morphMap([
+            'book' => Book::class,
+            'chapter' => Chapter::class,
+        ]);
 
         // Chaves gravadas pela tela Integrações vencem o .env.
         if (! $this->app->runningUnitTests()) {
