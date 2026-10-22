@@ -204,14 +204,7 @@ function conexao_doi_caixa_compra(int $livro_id, bool $compacta = false, bool $f
                     <?php echo $fora ? 'Esta obra não está mais à venda; a página permanece como registro permanente do DOI.' : 'Esta obra não está à venda no momento.'; ?>
                 </span>
             </p>
-            <?php
-            // mesmo fora de catálogo, a loja pode ter a página do produto
-            $loja = $compraveis ? '' : (string) ($ofertas[0]['loja'] ?? '');
-
-            if (! $fora && $loja) :
-                ?>
-                <a class="doi-compra__loja" href="<?php echo esc_url($loja); ?>">Ver na loja</a>
-            <?php endif; ?>
+            <?php // sem "Ver na loja": a página do produto redireciona para a do livro (inc/loja.php) ?>
         <?php elseif ($compacta) : ?>
             <div class="doi-compra__botoes">
                 <?php foreach ($compraveis as $i => $oferta) : ?>

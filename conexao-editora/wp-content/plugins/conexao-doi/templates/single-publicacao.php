@@ -102,11 +102,7 @@ $detalhes = array_filter([
         <div class="doi-principal">
             <figure class="doi-capa">
                 <?php echo conexao_doi_capa_html($livro_id, 'large', 'doi-capa__imagem'); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-                <?php if ($loja && ! $fora) : ?>
-                    <figcaption>
-                        <a class="btn btn--contorno btn--bloco doi-capa__loja" href="<?php echo esc_url($loja); ?>"><?php conexao_doi_icone('livro-aberto', 18); ?> Ver na loja</a>
-                    </figcaption>
-                <?php endif; ?>
+                <?php // sem "Ver na loja": a página do produto agora redireciona para esta (inc/loja.php) ?>
             </figure>
 
             <header class="doi-cabecalho">

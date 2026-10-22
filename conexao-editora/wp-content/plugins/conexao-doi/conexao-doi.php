@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Conexão DOI
  * Description: Páginas permanentes de livro e capítulo (destino do DOI) publicadas pelo Hub Editora: API REST assinada, CPTs somente leitura, citações, SEO acadêmico e caixa de compra ligada ao WooCommerce.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Conexão Pro
  * Requires PHP: 8.1
  * Requires at least: 6.5
@@ -13,7 +13,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('CONEXAO_DOI_VERSAO', '1.0.0');
+define('CONEXAO_DOI_VERSAO', '1.1.0');
 define('CONEXAO_DOI_PASTA', __DIR__);
 define('CONEXAO_DOI_URL', plugin_dir_url(__FILE__));
 
@@ -23,6 +23,7 @@ require_once __DIR__.'/inc/api.php';
 require_once __DIR__.'/inc/citacoes.php';
 require_once __DIR__.'/inc/seo.php';
 require_once __DIR__.'/inc/compra.php';
+require_once __DIR__.'/inc/loja.php';
 require_once __DIR__.'/inc/visual.php';
 
 if (is_admin()) {

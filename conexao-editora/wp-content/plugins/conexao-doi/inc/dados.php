@@ -204,6 +204,7 @@ function conexao_doi_gravar_publicacao(array $payload)
         JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
     )));
     update_post_meta($livro_id, '_conexao_recebido_em', current_time('mysql'));
+    conexao_doi_indexar_produtos($livro_id, $livro);
 
     $resposta_pessoas = [];
 
