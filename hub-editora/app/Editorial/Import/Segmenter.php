@@ -22,6 +22,9 @@ class Segmenter
 {
     private const WINDOW = 3;
 
+    /** Até quantas páginas depois da esperada um achado pode ser só o cabeçalho corrido. */
+    private const HEADER_SLACK = 3;
+
     /**
      * @param  list<array{pdf_page:int, printed_page:?int, text:string}>  $pages
      * @param  list<array{sequence:int, number:?string, title:string, section:?string, printed_page:?int}>  $toc  capítulos na ordem do sumário
@@ -51,8 +54,20 @@ class Segmenter
             $confidence = 0.0;
 
             if ($expected !== null) {
-                $found = $this->searchWindow($normalized, $key, max(1, $expected - self::WINDOW), min($total, $expected + self::WINDOW), $previousStart);
+                $from = max(1, $expected - self::WINDOW);
+                $to = min($total, $expected + self::WINDOW);
+                $found = $this->searchWindow($normalized, $key, $from, $to, $previousStart);
                 $confidence = $found !== null ? ($found === $expected ? 0.95 : 0.85) : 0.0;
+
+                // Cabeçalho corrido: o título se repete no topo das páginas seguintes e a
+                // página de abertura (com os autores) costuma ter outro layout. Se o título
+                // aparece em mais de uma página logo depois da esperada pelo sumário (às vezes
+                // só nas ímpares, por isso a contagem vai além da janela), vale a página do sumário.
+                if ($found !== null && $found > $expected && $found - $expected <= self::HEADER_SLACK
+                    && $expected > $previousStart && $this->hits($normalized, $key, $expected, min($total, $found + 4)) >= 2) {
+                    $found = $expected;
+                    $confidence = 0.9;
+                }
             }
             if ($found === null && $key !== '') {
                 $found = $this->searchAll($normalized, $key, $previousStart, $tocPages);
@@ -216,6 +231,19 @@ class Segmenter
         }
 
         return $best;
+    }
+
+    /** Em quantas páginas do intervalo o título aparece (2 ou mais = cabeçalho corrido). */
+    private function hits(array $normalized, string $key, int $from, int $to): int
+    {
+        $n = 0;
+        for ($p = $from; $p <= $to; $p++) {
+            if (isset($normalized[$p]) && str_contains($normalized[$p], $key)) {
+                $n++;
+            }
+        }
+
+        return $n;
     }
 
     private function searchAll(array $normalized, string $key, int $after, array $tocPages): ?int

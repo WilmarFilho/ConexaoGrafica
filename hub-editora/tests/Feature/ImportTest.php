@@ -123,6 +123,33 @@ class ImportTest extends TestCase
         $this->assertSame(6, $seg['chapters'][1]['pdf_last_page'], 'último localizado vai até a última página com texto');
     }
 
+    public function test_running_header_does_not_push_the_chapter_start_forward(): void
+    {
+        // Como no "Atualidades em Ultrassonografia": a abertura do capítulo (p. 23) tem layout
+        // próprio e o título não sai no texto; as páginas seguintes repetem o título no topo.
+        $p = fn (int $n, string $text) => ['pdf_page' => $n, 'printed_page' => $n, 'text' => $text];
+        $pages = [];
+        for ($n = 1; $n <= 30; $n++) {
+            $pages[] = $p($n, "{$n}
+Texto corrido da pagina {$n}.");
+        }
+        $pages[22] = $p(23, "CAPITULO 1
+Ana Exemplo Rocha
+Carlos Exemplo Lima
+Resumo do capitulo.");
+        foreach ([25, 27, 29] as $n) {
+            $pages[$n - 1] = $p($n, "{$n} Meios de Contraste em Ultrassonografia
+continua o texto.");
+        }
+        $toc = [['sequence' => 1, 'number' => '1', 'title' => 'Meios de Contraste em Ultrassonografia', 'section' => null, 'printed_page' => 23]];
+
+        $c = (new Segmenter)->segment($pages, $toc, 31)['chapters'][0];
+
+        $this->assertSame(23, $c['pdf_first_page'], 'a página do sumário vale: o título na 25 é cabeçalho');
+        $this->assertSame(23, $c['first_page']);
+        $this->assertFalse($c['needs_review']);
+    }
+
     // ------------------------------------------------------------------ job
 
     public function test_job_walks_all_states_and_builds_the_proposal(): void
