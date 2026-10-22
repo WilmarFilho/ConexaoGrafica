@@ -31,6 +31,17 @@ class UsageMeter
         ];
     }
 
+    /** Retomada: soma as chamadas já pagas numa execução anterior (`imports.usage.calls_log`). */
+    public function seed(array $previousUsage): void
+    {
+        foreach ((array) ($previousUsage['calls_log'] ?? []) as $call) {
+            if (is_array($call) && isset($call['stage'])) {
+                $this->calls[] = $call + ['chapter' => null, 'status' => null, 'cost_usd' => 0.0]
+                    + StructuredResult::emptyUsage();
+            }
+        }
+    }
+
     public function calls(): int
     {
         return count($this->calls);

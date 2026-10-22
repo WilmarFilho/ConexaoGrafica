@@ -68,6 +68,32 @@ class ProcessImport implements ShouldBeUnique, ShouldQueue
         }
     }
 
+    /** Leitura da obra pela IA e segmentação dos capítulos; grava o ponto de retomada. */
+    private function readBook(Import $import, Analyzer $analyzer, array $pages): array
+    {
+        $front = $analyzer->frontMatter($import->absolutePath(), $pages);
+        SyncLog::record(null, SyncLog::OUT, 'import.front_matter', $import,
+            sprintf('Obra "%s": %d pessoa(s), sumário com %d capítulo(s)', $front['data']['title'] ?? '?',
+                count($front['data']['contributors'] ?? []), array_sum(array_map(fn ($s) => count($s['chapters'] ?? []), $front['data']['toc'] ?? []))),
+            ['mode' => $front['mode'], 'pages' => $front['pages'], 'usage' => $analyzer->usage->toArray()['by_stage']['front_matter'] ?? null]);
+
+        $import->forceFill(['status' => Import::SEGMENTING])->save();
+
+        $segmentation = $analyzer->segment($pages, $front['data']);
+        if ($segmentation['chapters'] === []) {
+            throw new \RuntimeException('A IA não encontrou sumário com capítulos nas páginas iniciais; confira se o PDF está completo.');
+        }
+        $import->forceFill(['checkpoint' => ['front' => $front, 'segmentation' => $segmentation], 'usage' => $analyzer->usage->toArray()])->save();
+
+        $located = count(array_filter($segmentation['chapters'], fn ($c) => $c['pdf_first_page'] !== null));
+        SyncLog::record(null, SyncLog::IN, 'import.segmented', $import,
+            sprintf('%d capítulo(s) no sumário, %d localizado(s) no texto, deslocamento de página %s', count($segmentation['chapters']), $located,
+                $segmentation['offset'] === null ? 'desconhecido' : (string) $segmentation['offset']),
+            ['offset' => $segmentation['offset'], 'anchors' => $segmentation['anchors']]);
+
+        return [$front, $segmentation];
+    }
+
     private function run(Import $import, Analyzer $analyzer, PdfText $pdfText): void
     {
         $model = (string) config('hub.ai.model');
@@ -88,33 +114,36 @@ class ProcessImport implements ShouldBeUnique, ShouldQueue
             throw new \RuntimeException('O PDF não tem camada de texto (parece digitalizado); OCR está fora do escopo desta versão.');
         }
 
-        $front = $analyzer->frontMatter($import->absolutePath(), $pages);
-        SyncLog::record(null, SyncLog::OUT, 'import.front_matter', $import,
-            sprintf('Obra "%s": %d pessoa(s), sumário com %d capítulo(s)', $front['data']['title'] ?? '?',
-                count($front['data']['contributors'] ?? []), array_sum(array_map(fn ($s) => count($s['chapters'] ?? []), $front['data']['toc'] ?? []))),
-            ['mode' => $front['mode'], 'pages' => $front['pages'], 'usage' => $analyzer->usage->toArray()['by_stage']['front_matter'] ?? null]);
-
-        // 2. Segmentação -----------------------------------------------------
-        $import->forceFill(['status' => Import::SEGMENTING])->save();
-
-        $segmentation = $analyzer->segment($pages, $front['data']);
-        if ($segmentation['chapters'] === []) {
-            throw new \RuntimeException('A IA não encontrou sumário com capítulos nas páginas iniciais; confira se o PDF está completo.');
+        // Retomada: leitura da obra e segmentação já pagas numa execução anterior
+        // não são pedidas de novo, nem os capítulos que já saíram.
+        $checkpoint = (array) ($import->checkpoint ?? []);
+        if (filled($checkpoint['front'] ?? null) && filled($checkpoint['segmentation'] ?? null)) {
+            $analyzer->usage->seed((array) $import->usage);
+            $front = $checkpoint['front'];
+            $segmentation = $checkpoint['segmentation'];
+            $done = collect($import->result['chapters'] ?? [])
+                ->filter(fn ($c) => ($c['status'] ?? null) === 'suggested')
+                ->keyBy('sequence')->all();
+            $import->forceFill(['status' => Import::SEGMENTING])->save();
+            SyncLog::record(null, SyncLog::IN, 'import.resumed', $import,
+                sprintf('Retomada: leitura da obra reaproveitada e %d capítulo(s) já analisado(s)', count($done)),
+                ['done' => array_keys($done)]);
+        } else {
+            $done = [];
+            [$front, $segmentation] = $this->readBook($import, $analyzer, $pages);
         }
-        $located = count(array_filter($segmentation['chapters'], fn ($c) => $c['pdf_first_page'] !== null));
-        SyncLog::record(null, SyncLog::IN, 'import.segmented', $import,
-            sprintf('%d capítulo(s) no sumário, %d localizado(s) no texto, deslocamento de página %s', count($segmentation['chapters']), $located,
-                $segmentation['offset'] === null ? 'desconhecido' : (string) $segmentation['offset']),
-            ['offset' => $segmentation['offset'], 'anchors' => $segmentation['anchors']]);
 
         $meta = ['original_name' => $import->original_name, 'pages' => count($pages), 'pages_with_text' => $withText];
         $bookContributors = $analyzer->bookContributors($front['data']);
         $bookTitle = (string) ($front['data']['title'] ?? $import->original_name);
 
-        $chapters = [];
+        $chapters = array_values($done);
         $import->forceFill(['result' => $analyzer->buildResult($meta, $front, $segmentation, $chapters)])->save();
 
         foreach ($segmentation['chapters'] as $seg) {
+            if (isset($done[$seg['sequence']])) {
+                continue;
+            }
             $chapter = $analyzer->chapter($pages, $seg, $bookContributors, $bookTitle);
             $chapters[] = $chapter;
             if ($chapter['status'] === 'failed') {

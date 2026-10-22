@@ -440,7 +440,7 @@ class ReviewImport extends Page
             return;
         }
 
-        $import->reprocess();
+        $import->retry();
         SyncLog::record(null, SyncLog::MANUAL, 'import.reprocess', $import, "Importação #{$import->id} reenviada à fila");
         ProcessImport::dispatch($import->id);
 

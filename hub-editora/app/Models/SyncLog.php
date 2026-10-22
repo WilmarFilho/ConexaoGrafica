@@ -84,6 +84,7 @@ class SyncLog extends Model
             'import.suggested' => 'Proposta da IA pronta',
             'import.failed' => 'Importação falhou',
             'import.reprocess' => 'Importação reenviada',
+            'import.resumed' => 'Importação retomada de onde parou',
             'import.review' => 'Proposta da IA em revisão',
             'import.approved' => 'Proposta da IA aprovada',
             'import.integrated' => 'Importação integrada ao catálogo',

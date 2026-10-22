@@ -115,7 +115,7 @@ class ImportsTable
                     ->modalHeading('Reprocessar a importação?')
                     ->modalDescription('A proposta atual (e o que já foi revisado nela) é descartada; o PDF continua no disco e a IA é chamada de novo.')
                     ->action(function (Import $record) {
-                        $record->reprocess();
+                        $record->retry();
                         SyncLog::record(null, SyncLog::MANUAL, 'import.reprocess', $record, "Importação #{$record->id} reenviada à fila");
                         ProcessImport::dispatch($record->id);
                         Notification::make()->title('Importação reenviada à fila')->success()->send();

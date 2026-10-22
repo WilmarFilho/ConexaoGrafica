@@ -51,6 +51,7 @@ class Import extends Model
         return [
             'result' => 'array',
             'usage' => 'array',
+            'checkpoint' => 'array',
             'approved_at' => 'datetime',
         ];
     }
@@ -103,10 +104,28 @@ class Import extends Model
         return in_array($this->status, [self::ERROR, self::RECEIVED, self::SUGGESTED, self::REVIEW], true);
     }
 
-    /** Zera erro e proposta e volta a `received`, pronto para ProcessImport::dispatch(). */
+    /** Zera erro, proposta e ponto de retomada e volta a `received`: tudo é refeito (e pago) de novo. */
     public function reprocess(): void
     {
-        $this->forceFill(['status' => self::RECEIVED, 'error' => null, 'result' => null, 'approved_at' => null])->save();
+        $this->forceFill(['status' => self::RECEIVED, 'error' => null, 'result' => null, 'checkpoint' => null, 'approved_at' => null])->save();
+    }
+
+    /** Falhou no meio e guardou o que já foi pago (leitura da obra, capítulos prontos). */
+    public function canResume(): bool
+    {
+        return $this->status === self::ERROR && filled($this->checkpoint['front'] ?? null);
+    }
+
+    /** Volta a `received` mantendo proposta e ponto de retomada: o job continua de onde parou. */
+    public function resume(): void
+    {
+        $this->forceFill(['status' => self::RECEIVED, 'error' => null, 'approved_at' => null])->save();
+    }
+
+    /** O que a tela chama em "Reprocessar": continua se puder, senão refaz do zero. */
+    public function retry(): void
+    {
+        $this->canResume() ? $this->resume() : $this->reprocess();
     }
 
     // ---- Revisão (frente E2) ------------------------------------------------

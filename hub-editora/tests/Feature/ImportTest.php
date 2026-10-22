@@ -14,10 +14,13 @@ use App\Models\SyncLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Sleep;
+use OpenAI\Exceptions\RateLimitException;
 use OpenAI\Resources\Responses;
 use OpenAI\Responses\Responses\CreateResponse;
 use OpenAI\Testing\ClientFake;
 use OpenAI\Testing\Enums\OverrideStrategy;
+use GuzzleHttp\Psr7\Response as PsrResponse;
 use Tests\Support\FakeAiGateway;
 use Tests\Support\PdfFixture;
 use Tests\TestCase;
@@ -412,6 +415,86 @@ class ImportTest extends TestCase
             $this->assertSame(AiException::TRUNCATED, $e->reason);
         }
         $fake->assertSent(Responses::class, 3);
+    }
+
+    public function test_sdk_gateway_waits_and_retries_when_the_account_is_rate_limited(): void
+    {
+        Sleep::fake();
+        $ok = CreateResponse::fake([
+            'status' => 'completed', 'incomplete_details' => null, 'model' => 'gpt-6-astra',
+            'output' => [[
+                'id' => 'msg_1', 'type' => 'message', 'status' => 'completed', 'role' => 'assistant', 'phase' => null,
+                'content' => [['type' => 'output_text', 'text' => '{"title": "Ok", "pages": 1}', 'annotations' => []]],
+            ]],
+        ], null, OverrideStrategy::Replace);
+        $fake = new ClientFake([
+            new RateLimitException(new PsrResponse(429, ['retry-after' => '7'])),
+            new RateLimitException(new PsrResponse(429, ['x-ratelimit-reset-tokens' => '1m30s'])),
+            new RateLimitException(new PsrResponse(429)),
+            $ok,
+        ]);
+        $schema = ['type' => 'object', 'properties' => ['title' => ['type' => 'string'], 'pages' => ['type' => 'integer']], 'required' => ['title', 'pages'], 'additionalProperties' => false];
+
+        $result = (new OpenAiGateway($fake))->structured('x', [['type' => 'input_text', 'text' => 'y']], 'chapter', $schema, 1024);
+
+        $this->assertSame('Ok', $result->data['title']);
+        $fake->assertSent(Responses::class, 4);
+        // 8 s (retry-after 7 + 1), 91 s (reset de 1m30s + 1), 60 s (terceira tentativa sem dica: 15·2²)
+        Sleep::assertSequence([Sleep::for(8)->seconds(), Sleep::for(91)->seconds(), Sleep::for(60)->seconds()]);
+    }
+
+    public function test_sdk_gateway_gives_up_after_the_retry_limit(): void
+    {
+        Sleep::fake();
+        $fake = new ClientFake(array_fill(0, OpenAiGateway::MAX_ATTEMPTS, new RateLimitException(new PsrResponse(429))));
+        $schema = ['type' => 'object', 'properties' => ['t' => ['type' => 'string']], 'required' => ['t'], 'additionalProperties' => false];
+
+        try {
+            (new OpenAiGateway($fake))->structured('x', [['type' => 'input_text', 'text' => 'y']], 'chapter', $schema, 1024);
+            $this->fail('deveria desistir');
+        } catch (RateLimitException) {
+            $fake->assertSent(Responses::class, OpenAiGateway::MAX_ATTEMPTS);
+            Sleep::assertSleptTimes(OpenAiGateway::MAX_ATTEMPTS - 1);
+        }
+        $this->assertSame(0, OpenAiGateway::durationToSeconds(''));
+        $this->assertSame(1, OpenAiGateway::durationToSeconds('250ms'));
+        $this->assertSame(360, OpenAiGateway::durationToSeconds('6m0s'));
+        $this->assertSame(2, OpenAiGateway::durationToSeconds('1.5s'));
+    }
+
+    public function test_failed_import_resumes_without_paying_again_for_what_was_done(): void
+    {
+        // Chamada 1 = obra, 2 = capítulo 1, 3 = capítulo 2 (falha no meio, como o limite da conta).
+        $this->ai->failures[3] = new \RuntimeException('Request rate limit has been exceeded.');
+        $import = Import::receive($this->pdf);
+
+        ProcessImport::dispatchSync($import->id);
+        $import->refresh();
+
+        $this->assertSame(Import::ERROR, $import->status);
+        $this->assertTrue($import->canResume(), 'leitura da obra e segmentação ficaram guardadas');
+        $this->assertSame('suggested', $import->result['chapters'][0]['status']);
+        $this->assertSame(2, $import->usage['calls']);
+        $callsBefore = count($this->ai->calls);
+
+        $this->ai->failures = [];
+        $import->retry();
+        $this->assertSame(Import::RECEIVED, $import->fresh()->status);
+        $this->assertNotNull($import->fresh()->checkpoint, 'retomar não apaga o ponto de retomada');
+        ProcessImport::dispatchSync($import->id);
+        $import->refresh();
+
+        $this->assertSame(Import::SUGGESTED, $import->status);
+        $newStages = array_column(array_slice($this->ai->calls, $callsBefore), 'stage');
+        $this->assertNotContains('front_matter', $newStages, 'a obra não é lida de novo');
+        $this->assertCount(1, $newStages, 'só o capítulo que faltava');
+        $this->assertSame(['suggested', 'suggested'], array_column($import->result['chapters'], 'status'));
+        $this->assertSame(3, $import->usage['calls'], 'o custo soma as duas execuções');
+        $this->assertSame(1, SyncLog::where('action', 'import.resumed')->count());
+
+        // Reprocessar do zero apaga o ponto de retomada e lê a obra de novo.
+        $import->reprocess();
+        $this->assertNull($import->fresh()->checkpoint);
     }
 
     public function test_sdk_gateway_is_not_contacted_without_a_key(): void
