@@ -541,7 +541,7 @@ class ImportTest extends TestCase
         $body = json_decode((string) $history[1]['request']->getBody(), true);
         $this->assertSame('claude-opus-5-5', $body['model']);
         $this->assertSame(4096, $body['max_tokens']);
-        $this->assertSame('Instrucao fixa', $body['system'][0]['text']);
+        $this->assertStringStartsWith('Instrucao fixa', $body['system'][0]['text']);
         $this->assertSame(['type' => 'ephemeral'], $body['system'][0]['cache_control']);
         $this->assertSame(['effort' => 'medium', 'format' => ['type' => 'json_schema', 'schema' => $schema]], $body['output_config']);
         $this->assertSame(['type' => 'base64', 'media_type' => 'application/pdf', 'data' => base64_encode('%PDF-1.4 fake')], $body['messages'][0]['content'][0]['source']);
@@ -561,6 +561,44 @@ class ImportTest extends TestCase
         } catch (AiException $e) {
             $this->assertSame(AiException::TRUNCATED, $e->reason);
         }
+    }
+
+    public function test_anthropic_gateway_sends_schemas_without_unions_and_restores_nulls(): void
+    {
+        $schema = \App\Editorial\Import\Schemas::frontMatter();
+        $strict = AnthropicGateway::withoutNulls($schema);
+
+        $unions = 0;
+        $walk = function ($s) use (&$walk, &$unions) {
+            if (! is_array($s)) {
+                return;
+            }
+            if (is_array($s['type'] ?? null)) {
+                $unions++;
+            }
+            foreach ($s['properties'] ?? [] as $p) {
+                $walk($p);
+            }
+            $walk($s['items'] ?? null);
+        };
+        $walk($strict);
+        $this->assertSame(0, $unions, 'nenhuma união/nulo vai para a Anthropic (limite de 16)');
+        $this->assertSame($schema['required'], $strict['required'], 'continua tudo obrigatório (limite de 24 opcionais)');
+
+        $data = AnthropicGateway::restoreNulls([
+            'title' => 'Atualidades em Ultrassonografia', 'subtitle' => '', 'edition_number' => 0, 'pages' => 156,
+            'contributors' => [['name' => 'Leonardo de Souza Piber', 'orcid' => '', 'role' => 'author']],
+            'toc' => [['section' => '', 'chapters' => [['number' => '1', 'title' => 'Fígado', 'authors' => [], 'printed_page' => 0]]]],
+        ], $schema);
+
+        $this->assertNull($data['subtitle']);
+        $this->assertNull($data['edition_number']);
+        $this->assertSame(156, $data['pages']);
+        $this->assertSame('Atualidades em Ultrassonografia', $data['title']);
+        $this->assertNull($data['toc'][0]['section']);
+        $this->assertNull($data['toc'][0]['chapters'][0]['printed_page']);
+        $this->assertSame('1', $data['toc'][0]['chapters'][0]['number']);
+        $this->assertSame([], $data['toc'][0]['chapters'][0]['authors'], 'lista vazia continua lista');
     }
 
     public function test_provider_switch_picks_the_gateway_and_the_right_key(): void

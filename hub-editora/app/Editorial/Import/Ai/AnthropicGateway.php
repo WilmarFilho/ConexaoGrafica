@@ -15,9 +15,19 @@ use Psr\Http\Client\ClientInterface;
  * converte para os blocos da Anthropic, para o Analyzer não saber qual provedor usa.
  * Limite de requisições (429) e falhas passageiras: o próprio SDK espera e repete,
  * respeitando retry-after.
+ *
+ * Os schemas do Analyzer usam "tipo ou null" em dezenas de campos (formato estrito da
+ * OpenAI), e a Anthropic aceita no máximo 16 campos com união e 24 opcionais. Por isso,
+ * só aqui, todo campo vira obrigatório e não nulo, o modelo responde "" ou 0 quando não
+ * achar a informação, e na volta esses vazios voltam a ser null (restoreNulls).
  */
 class AnthropicGateway implements AiGateway
 {
+    /** Acrescentado às instruções: como dizer "não achei" sem null. */
+    public const EMPTY_RULE = "
+
+Formato da resposta: todos os campos são obrigatórios. Quando a informação não existir no documento, responda \"\" para texto e 0 para número (nunca invente um valor).";
+
     /** Uma chamada de capítulo grande pode levar minutos. */
     public const TIMEOUT_SECONDS = 900.0;
 
@@ -43,10 +53,10 @@ class AnthropicGateway implements AiGateway
             messages: [['role' => 'user', 'content' => $this->blocks($content)]],
             model: $model,
             // Instruções iguais em todas as chamadas do mesmo livro: ficam em cache.
-            system: [['type' => 'text', 'text' => $instructions, 'cacheControl' => ['type' => 'ephemeral']]],
+            system: [['type' => 'text', 'text' => $instructions.self::EMPTY_RULE, 'cacheControl' => ['type' => 'ephemeral']]],
             outputConfig: [
                 'effort' => (string) config('hub.ai.effort', 'medium'),
-                'format' => ['type' => 'json_schema', 'schema' => $schema],
+                'format' => ['type' => 'json_schema', 'schema' => self::withoutNulls($schema)],
             ],
             requestOptions: $this->options(),
         );
@@ -79,7 +89,46 @@ class AnthropicGateway implements AiGateway
             throw new AiException(AiException::INVALID_JSON, 'A resposta do modelo não é um JSON válido: '.mb_substr($text, 0, 200), $usage);
         }
 
-        return new StructuredResult($data, $usage, (string) ($message->model ?: $model), 'completed');
+        return new StructuredResult(self::restoreNulls($data, $schema), $usage, (string) ($message->model ?: $model), 'completed');
+    }
+
+    /** Troca `"type": [T, "null"]` por `"type": T` em todo o schema (sem uniões para a Anthropic). */
+    public static function withoutNulls(array $schema): array
+    {
+        if (is_array($schema['type'] ?? null) && in_array('null', $schema['type'], true)) {
+            $types = array_values(array_diff($schema['type'], ['null']));
+            $schema['type'] = count($types) === 1 ? $types[0] : $types;
+        }
+        foreach ($schema['properties'] ?? [] as $name => $prop) {
+            $schema['properties'][$name] = self::withoutNulls($prop);
+        }
+        if (isset($schema['items']) && is_array($schema['items'])) {
+            $schema['items'] = self::withoutNulls($schema['items']);
+        }
+
+        return $schema;
+    }
+
+    /** Onde o schema original aceitava null, "" e 0 voltam a ser null (o "não achei" do modelo). */
+    public static function restoreNulls(mixed $value, array $schema): mixed
+    {
+        $nullable = is_array($schema['type'] ?? null) && in_array('null', $schema['type'], true);
+        if ($nullable && ($value === '' || $value === 0 || $value === 0.0 || (is_string($value) && trim($value) === ''))) {
+            return null;
+        }
+        if (is_array($value) && isset($schema['properties'])) {
+            foreach ($schema['properties'] as $name => $prop) {
+                if (array_key_exists($name, $value)) {
+                    $value[$name] = self::restoreNulls($value[$name], $prop);
+                }
+            }
+        } elseif (is_array($value) && isset($schema['items']) && array_is_list($value)) {
+            foreach ($value as $i => $item) {
+                $value[$i] = self::restoreNulls($item, $schema['items']);
+            }
+        }
+
+        return $value;
     }
 
     /**
