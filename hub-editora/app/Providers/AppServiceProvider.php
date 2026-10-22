@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Editorial\Import\Ai\AiGateway;
+use App\Editorial\Import\Ai\OpenAiGateway;
 use App\Support\HubSettings;
 use App\Support\SecurityAudit;
 use Illuminate\Auth\Events\Failed;
@@ -19,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Importação de PDF com IA: o Analyzer fala com a API da OpenAI só por esta
+        // interface (os testes trocam por um fake; sem chave nenhuma chamada sai).
+        $this->app->bind(AiGateway::class, OpenAiGateway::class);
     }
 
     /**

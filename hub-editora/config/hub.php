@@ -96,4 +96,33 @@ return [
         'token_url' => 'https://api.amazon.com/auth/o2/token',
     ],
 
+    // Importação de livros em PDF com IA (Conexão DOI, frente C). Chave só no .env;
+    // sem ela o comando hub:importar-pdf avisa "não configurado" e não faz nada.
+    'ai' => [
+        'key' => env('OPENAI_API_KEY'),
+        // Modelo da OpenAI (Responses API). gpt-6-astra é o mais capaz; gpt-6.1-sol
+        // custa 1/5 com desempenho próximo (ver docs/importacao-ia.md).
+        'model' => env('HUB_AI_MODEL', 'gpt-6-astra'),
+        // Profundidade de raciocínio (low|medium|high|xhigh|max).
+        'effort' => env('HUB_AI_EFFORT', 'medium'),
+        // Quantas páginas iniciais (capa, ficha, autores, sumário) vão como PDF ao modelo.
+        'front_matter_pages' => (int) env('HUB_AI_FRONT_MATTER_PAGES', 30),
+        // Texto de capítulo acima disso é dividido em partes e consolidado depois.
+        'max_chapter_tokens' => (int) env('HUB_AI_MAX_CHAPTER_TOKENS', 60000),
+        // Limite de saída por chamada; inclui os tokens de raciocínio, por isso folgado.
+        'max_output_tokens' => (int) env('HUB_AI_MAX_OUTPUT_TOKENS', 32000),
+        // Ghostscript recorta as páginas iniciais do PDF; sem ele, PDFs até
+        // 'whole_pdf_max_pages' páginas vão inteiros e os maiores vão como texto.
+        'gs_bin' => env('HUB_GS_BIN', 'gs'),
+        'whole_pdf_max_pages' => (int) env('HUB_AI_WHOLE_PDF_MAX_PAGES', 100),
+        // Preço por milhão de tokens (US$, tabela da OpenAI em 22/10/2026, contexto ≤ 272K),
+        // para o custo estimado gravado em imports.usage.
+        'prices' => [
+            'gpt-6-astra' => ['input' => 10.00, 'cached_input' => 1.00, 'output' => 50.00],
+            'gpt-6.1-sol' => ['input' => 2.00, 'cached_input' => 0.10, 'output' => 10.00],
+            'gpt-6-luna' => ['input' => 0.10, 'cached_input' => 0.01, 'output' => 0.50],
+            'gpt-5.5' => ['input' => 5.00, 'cached_input' => 0.50, 'output' => 30.00],
+        ],
+    ],
+
 ];

@@ -73,6 +73,15 @@ class SyncLog extends Model
             'pii.purged' => 'Dados pessoais apagados',
             'security.digest' => 'Resumo de segurança enviado',
             'store.remapped' => 'Loja mudou de endereço',
+            // Conexão DOI, frente C: importação de PDF com IA
+            'import.received' => 'PDF recebido para importação',
+            'import.extracted' => 'Texto do PDF extraído',
+            'import.front_matter' => 'Dados da obra lidos pela IA',
+            'import.segmented' => 'Capítulos segmentados',
+            'import.chapter' => 'Capítulo analisado pela IA',
+            'import.suggested' => 'Proposta da IA pronta',
+            'import.failed' => 'Importação falhou',
+            'import.reprocess' => 'Importação reenviada',
             default => $this->action,
         };
     }
