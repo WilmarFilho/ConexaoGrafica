@@ -8,6 +8,7 @@ use App\Editorial\EditorialException;
 use App\Filament\Resources\Chapters\ChapterActions;
 use App\Filament\Resources\Chapters\Schemas\ChapterForm;
 use App\Filament\Resources\Chapters\Tables\ChaptersTable;
+use App\Filament\Resources\Imports\ImportResource;
 use App\Models\Book;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -83,6 +84,13 @@ class ChaptersRelationManager extends RelationManager
                             Notification::make()->title('Importação não feita')->body($e->getMessage())->danger()->persistent()->send();
                         }
                     }),
+
+                Action::make('importar_pdf')
+                    ->label('Importar PDF')
+                    ->icon(Heroicon::OutlinedSparkles)
+                    ->color('gray')
+                    ->visible(fn () => $canEdit && ImportResource::canAccess())
+                    ->url(fn () => ImportResource::getUrl('create', ['book' => $this->getOwnerRecord()->getKey()])),
 
                 Action::make('renumerar')
                     ->label('Renumerar sufixos DOI')

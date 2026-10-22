@@ -141,3 +141,27 @@ Livro de 500 páginas e 74 capítulos:
 | **Total** | **~585 mil** | **~140 mil** | **≈ US$ 11** (faixa 8–15) | **≈ US$ 2,25** (faixa 1,60–3) |
 
 Trocar de modelo é só `HUB_AI_MODEL` no `.env`. O custo real fica em `imports.usage.cost_usd` e na Auditoria (`import.suggested`).
+
+## Tela de revisão e integração (frente E2)
+
+Menu **Publicações → Importações (IA)** (`/admin/importacoes`), para admin, editor e revisor.
+
+| Peça | Papel |
+|---|---|
+| `ImportResource` + `ListImports` | lista (arquivo, livro, situação, capítulos/analisados/a revisar, aprovados, custo, data); ações Revisar, Reprocessar, Excluir (admin, apaga o PDF) |
+| `CreateImport` | upload do PDF (disco `local`, pasta `imports`, só `application/pdf`, até 200 MB — `config/livewire.php` sobe o limite do upload temporário) + livro opcional; cria o `Import` em `received`, log `import.received` e despacha `ProcessImport`. `?book=ID` pré-seleciona o livro (atalho da etapa 6) |
+| `ReviewImport` + `resources/views/filament/resources/imports/review.blade.php` | tela lado a lado: à esquerda o PDF num `<iframe>` (rota `hub.imports.pdf`, `ImportPdfController`, exige login + perfil editorial; `#page=N` pelos botões "ver p. N" de cada evidência); à direita o formulário por abas (`Schemas/ReviewForm`): **Obra** (campos de `book` com evidência/confiança, amarelo em `needs_review` ou confiança < 0,6), **Pessoas** (`book.contributors` editável + lista `people`), **Capítulos** (lista lateral com estado, anterior/próximo, título/autores/páginas, resumo original × sugestão da IA e `abstract_approved` editável, palavras-chave, referências; `failed` em vermelho) |
+| Ações da tela | Salvar · Aprovar obra · Aprovar capítulo N · Aprovar todos sem pendência (só `suggested` e sem `needs_review`) · Integrar ao catálogo · Reprocessar · Abrir livro |
+| `App\Editorial\Import\Integrator` | a aprovação que cria (ou atualiza, se `book_id`) o livro, capítulos, pessoas, instituições e contribuições; idempotente; transação; `status = integrated`, `reviewed_by`, `approved_at`, log `import.integrated` |
+
+Estados: abrir uma proposta `suggested` → `review` (log `import.review`); obra + todos os capítulos aprovados → `approved` (log `import.approved`); reabrir algo volta a `review`; integrar → `integrated`. `Reprocessar` vale em `error`, `received`, `suggested` e `review` (descarta a revisão em curso).
+
+O que a tela grava em `imports.result`: os campos editados (sobre o original, preservando `evidence`, `confidence`, `needs_review`), `book.approved`, `chapters[i].approved` e `chapters[i].abstract_approved`. Listas (contribuidores) são casadas pela posição original (`_idx` no formulário); por isso a lista de pessoas da obra não permite excluir (o índice é o vínculo `book_contributor_index` dos capítulos) — para descartar alguém, deixe o nome em branco.
+
+Regras do Integrator:
+- Livro novo exige título e ano; `subject_area`/`abstract` vazios entram como `''` e ficam pendentes no checklist. Livro existente: só os campos que a proposta trouxe são atualizados; DOI/slug/situação não mudam.
+- Pessoa: por ORCID válido, depois por nome normalizado (sem acento/caixa); cria com `sort_name` da proposta. Instituição: criada a partir de `affiliation {name, city, state, country}` da obra; `affiliation_text` dos capítulos só é procurado — se não casar, fica como texto livre na contribuição.
+- Capítulo: um por `sequence` (`firstOrNew`); contribuições únicas por (capítulo, pessoa, papel); `book_contributor_index` → pessoa da obra, senão resolve/cria pela mesma regra. Nada é apagado numa reexecução.
+- Os capítulos nascem `draft`; a aprovação editorial (com a regra ORCID-ou-instituição) continua no fluxo do `BookWorkflow`.
+
+Testes: `FRENTE=e2 bash deploy/testar-wip.sh ImportReviewTest` (`tests/Feature/ImportReviewTest.php`).

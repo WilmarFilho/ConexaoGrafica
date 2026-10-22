@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Storage;
  * O job ProcessImport leva até `suggested`; `review` e `approved` são da tela de
  * revisão (Filament) e `integrated` da aprovação que cria livro/capítulos/pessoas.
  * `error` é reprocessável com reprocess().
+ *
+ * A tela de revisão (frente E2) guarda no próprio `result` o que foi aprovado:
+ * `result.book.approved` e `result.chapters[i].approved` (bool), além dos campos
+ * editados (`abstract_approved` por capítulo, correções de título, autores...).
  */
 class Import extends Model
 {
@@ -61,9 +65,25 @@ class Import extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
+    public function book(): BelongsTo
+    {
+        return $this->belongsTo(Book::class);
+    }
+
     public function statusLabel(): string
     {
         return self::STATUSES[$this->status] ?? $this->status;
+    }
+
+    public static function statusColor(?string $status): string
+    {
+        return match ($status) {
+            self::RECEIVED, self::EXTRACTING, self::SEGMENTING => 'info',
+            self::SUGGESTED, self::REVIEW => 'warning',
+            self::APPROVED, self::INTEGRATED => 'success',
+            self::ERROR => 'danger',
+            default => 'gray',
+        };
     }
 
     /** Caminho absoluto do PDF no disco privado. */
@@ -77,16 +97,70 @@ class Import extends Model
         return in_array($this->status, [self::EXTRACTING, self::SEGMENTING], true);
     }
 
-    /** Pode voltar à fila: falhou, ou ainda não foi revisado por alguém. */
+    /** Pode voltar à fila: falhou, ou ainda não foi aprovado por alguém (a revisão em curso se perde). */
     public function canReprocess(): bool
     {
-        return in_array($this->status, [self::ERROR, self::RECEIVED, self::SUGGESTED], true);
+        return in_array($this->status, [self::ERROR, self::RECEIVED, self::SUGGESTED, self::REVIEW], true);
     }
 
     /** Zera erro e proposta e volta a `received`, pronto para ProcessImport::dispatch(). */
     public function reprocess(): void
     {
-        $this->forceFill(['status' => self::RECEIVED, 'error' => null, 'result' => null])->save();
+        $this->forceFill(['status' => self::RECEIVED, 'error' => null, 'result' => null, 'approved_at' => null])->save();
+    }
+
+    // ---- Revisão (frente E2) ------------------------------------------------
+
+    /** Tem proposta para revisar/aprovar/integrar. */
+    public function hasProposal(): bool
+    {
+        return in_array($this->status, [self::SUGGESTED, self::REVIEW, self::APPROVED, self::INTEGRATED], true)
+            && is_array($this->result) && filled($this->result['book'] ?? null);
+    }
+
+    /** A tela ainda aceita edições e aprovações. */
+    public function isEditable(): bool
+    {
+        return in_array($this->status, [self::SUGGESTED, self::REVIEW, self::APPROVED], true) && $this->hasProposal();
+    }
+
+    public function bookApproved(): bool
+    {
+        return (bool) ($this->result['book']['approved'] ?? false);
+    }
+
+    public function chapterApproved(int $index): bool
+    {
+        return (bool) ($this->result['chapters'][$index]['approved'] ?? false);
+    }
+
+    public function chaptersCount(): int
+    {
+        return count($this->result['chapters'] ?? []);
+    }
+
+    public function approvedChaptersCount(): int
+    {
+        return count(array_filter($this->result['chapters'] ?? [], fn ($c) => ! empty($c['approved'])));
+    }
+
+    /** Obra aprovada e todos os capítulos (ao menos um) aprovados. */
+    public function isFullyApproved(): bool
+    {
+        return $this->bookApproved() && $this->chaptersCount() > 0 && $this->approvedChaptersCount() === $this->chaptersCount();
+    }
+
+    /** "obra aprovada, 3 de 7 capítulos aprovados" */
+    public function approvalSummary(): string
+    {
+        return ($this->bookApproved() ? 'obra aprovada' : 'obra ainda não aprovada')
+            .sprintf(', %d de %d capítulo(s) aprovado(s)', $this->approvedChaptersCount(), $this->chaptersCount());
+    }
+
+    /** Custo estimado em US$ (imports.usage). */
+    public function cost(): ?float
+    {
+        return isset($this->usage['cost_usd']) ? (float) $this->usage['cost_usd'] : null;
     }
 
     /** Guarda um PDF no disco privado e cria o registro em `received`. */
