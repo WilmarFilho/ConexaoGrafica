@@ -96,4 +96,19 @@ return [
         'token_url' => 'https://api.amazon.com/auth/o2/token',
     ],
 
+    // Conexão DOI: depósito de metadados na Crossref (App\Crossref). Em `test`
+    // o envio vai para test.crossref.org (homologação); `production` registra de verdade.
+    'crossref' => [
+        'env' => env('CROSSREF_ENV', 'test'),                   // test | production
+        'login' => env('CROSSREF_LOGIN'),                        // formato e-mail/role (ex.: usuario@editora/bcfg)
+        'password' => env('CROSSREF_PASSWORD'),
+        'prefix' => env('CROSSREF_PREFIX', '10.00000'),          // 10.00000 é só exemplo; o prefixo real da editora vai no .env (10.68564)
+        'depositor_name' => env('CROSSREF_DEPOSITOR_NAME', 'Conexão Editora'),
+        'depositor_email' => env('CROSSREF_DEPOSITOR_EMAIL'),  // recebe o e-mail de resultado da Crossref
+        'registrant' => env('CROSSREF_REGISTRANT', 'Conexão Editora'),
+        // Base das páginas públicas, usada só quando o payload não traz `landing_url`
+        // (o WordPress devolve as URLs definitivas ao publicar; são elas que valem).
+        'landing_base' => env('CROSSREF_LANDING_BASE', 'https://conexaoeditora.com.br'),
+    ],
+
 ];

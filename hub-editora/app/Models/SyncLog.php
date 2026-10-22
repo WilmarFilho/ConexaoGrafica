@@ -73,6 +73,13 @@ class SyncLog extends Model
             'pii.purged' => 'Dados pessoais apagados',
             'security.digest' => 'Resumo de segurança enviado',
             'store.remapped' => 'Loja mudou de endereço',
+
+            // Conexão DOI: depósitos na Crossref (App\Crossref)
+            'deposit.created' => 'Depósito Crossref gerado',
+            'deposit.sent' => 'Depósito enviado à Crossref',
+            'deposit.pending' => 'Depósito Crossref em processamento',
+            'deposit.done' => 'Depósito Crossref concluído',
+            'deposit.failed' => 'Depósito Crossref falhou',
             default => $this->action,
         };
     }
