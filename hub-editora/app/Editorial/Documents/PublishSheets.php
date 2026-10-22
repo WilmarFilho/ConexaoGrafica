@@ -29,7 +29,11 @@ class PublishSheets implements ShouldQueue
     /** Um livro com 70+ capítulos leva alguns minutos no dompdf. */
     public int $timeout = 1200;
 
-    public function __construct(public int $bookId, public bool $force = false, public ?int $userId = null) {}
+    public function __construct(public int $bookId, public bool $force = false, public ?int $userId = null)
+    {
+        // Dezenas de PDFs por livro: vai para a fila dos trabalhos longos, longe dos pedidos.
+        $this->onQueue(\App\Jobs\ProcessImport::QUEUE);
+    }
 
     public function handle(SheetGenerator $generator): void
     {

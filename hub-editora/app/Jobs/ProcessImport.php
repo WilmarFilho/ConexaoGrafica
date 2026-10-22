@@ -34,7 +34,13 @@ class ProcessImport implements ShouldBeUnique, ShouldQueue
     /** Livro de 500 páginas e 74 capítulos leva dezenas de minutos. */
     public int $timeout = 3 * 3600;
 
-    public function __construct(public int $importId) {}
+    /** Fila própria: um livro grande leva horas e não pode segurar os pedidos da loja. */
+    public const QUEUE = 'longos';
+
+    public function __construct(public int $importId)
+    {
+        $this->onQueue(self::QUEUE);
+    }
 
     public function uniqueId(): string
     {

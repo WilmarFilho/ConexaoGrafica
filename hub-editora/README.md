@@ -37,7 +37,8 @@ Painel em <http://localhost:8095/admin>.
    projeto: `composer.phar` no diretório).
 4. Cron do cPanel:
    - `* * * * * php artisan schedule:run` — sincronizações periódicas de segurança.
-   - `* * * * * php artisan queue:work database --stop-when-empty` — fila.
+   - `* * * * * flock -n ~/.hub-queue.lock php artisan queue:work database --stop-when-empty --tries=3 --timeout=120 --max-time=50` — fila `default` (pedidos, webhooks, publicação).
+   - `* * * * * flock -n ~/.hub-queue-longos.lock php -d memory_limit=1024M artisan queue:work database --queue=longos --stop-when-empty --tries=1 --timeout=11000` — fila `longos` (importação de PDF com IA e fichas PDF), separada para um livro grande não atrasar os pedidos.
 5. `.env` de produção fora do docroot; credenciais das integrações **nunca**
    no repositório.
 
