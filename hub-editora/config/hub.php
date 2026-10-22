@@ -130,6 +130,8 @@ return [
             'gpt-6-luna' => ['input' => 0.10, 'cached_input' => 0.01, 'output' => 0.50],
             'gpt-5.5' => ['input' => 5.00, 'cached_input' => 0.50, 'output' => 30.00],
         ],
+    ],
+
     // Conexão DOI: depósito de metadados na Crossref (App\Crossref). Em `test`
     // o envio vai para test.crossref.org (homologação); `production` registra de verdade.
     'crossref' => [
