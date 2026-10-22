@@ -86,6 +86,19 @@ return [
         'composer_bin' => env('COMPOSER_BIN', rtrim((string) getenv('HOME'), '/').'/bin/composer'),
     ],
 
+    // Conexão DOI: publicação dos livros no site (plugin conexao-doi do WordPress).
+    // O Hub chama o WP com HMAC-SHA256 (contrato, seção 4); o WP nunca chama o Hub.
+    'wordpress' => [
+        'url' => env('CONEXAO_DOI_WP_URL'),        // https://conexaoeditora.com.br
+        'secret' => env('CONEXAO_DOI_WP_SECRET'),  // 64 caracteres, o mesmo CONEXAO_DOI_SECRET do wp-config.php
+    ],
+
+    // Crossref. A frente D completa com login, senha e ambiente; o prefixo de
+    // demonstração vale até a editora informar o oficial.
+    'crossref' => [
+        'prefix' => env('CROSSREF_PREFIX', '10.00000'),
+    ],
+
     // Amazon Seller Central (SP-API, autorização própria via Login with Amazon).
     'amazon' => [
         'client_id' => env('AMAZON_LWA_CLIENT_ID'),

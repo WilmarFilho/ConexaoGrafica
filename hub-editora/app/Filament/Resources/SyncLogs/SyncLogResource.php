@@ -2,8 +2,12 @@
 
 namespace App\Filament\Resources\SyncLogs;
 
+use App\Filament\Resources\Books\BookResource;
+use App\Filament\Resources\Chapters\ChapterResource;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Filament\Resources\SyncLogs\Pages\ListSyncLogs;
+use App\Models\Book;
+use App\Models\Chapter;
 use App\Models\Order;
 use App\Models\SyncLog;
 use BackedEnum;
@@ -88,13 +92,22 @@ class SyncLogResource extends Resource
                     ->color(fn (SyncLog $record) => $record->level === 'error' ? 'danger' : null),
 
                 TextColumn::make('subject_label')
-                    ->label('Pedido')
-                    ->state(fn (SyncLog $record) => $record->subject instanceof Order
-                        ? '#'.($record->subject->external_number ?: $record->subject->external_id)
-                        : null)
+                    ->label('Pedido / livro')
+                    ->state(fn (SyncLog $record) => match (true) {
+                        $record->subject instanceof Order => '#'.($record->subject->external_number ?: $record->subject->external_id),
+                        $record->subject instanceof Book => $record->subject->title,
+                        $record->subject instanceof Chapter => 'Cap. '.$record->subject->sequence.' · '.$record->subject->title,
+                        default => null,
+                    })
                     ->placeholder('—')
-                    ->extraAttributes(['class' => 'hub-mono'])
-                    ->url(fn (SyncLog $record) => $record->subject instanceof Order ? OrderResource::getUrl('view', ['record' => $record->subject]) : null),
+                    ->limit(40)
+                    ->extraAttributes(fn (SyncLog $record) => $record->subject instanceof Order ? ['class' => 'hub-mono'] : [])
+                    ->url(fn (SyncLog $record) => match (true) {
+                        $record->subject instanceof Order => OrderResource::getUrl('view', ['record' => $record->subject]),
+                        $record->subject instanceof Book => BookResource::getUrl('view', ['record' => $record->subject]),
+                        $record->subject instanceof Chapter => ChapterResource::getUrl('edit', ['record' => $record->subject]),
+                        default => null,
+                    }),
 
                 TextColumn::make('message')
                     ->label('Detalhe')

@@ -29,7 +29,26 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     /** Só pedidos, expedição e catálogo: o mínimo para separar e enviar. */
     public const ROLE_EXPEDICAO = 'expedicao';
 
-    public const ROLES = [self::ROLE_ADMIN => 'Administrador', self::ROLE_EXPEDICAO => 'Expedição'];
+    // ---- Módulo Editorial (Conexão DOI) ----
+    /** Cadastra livros, capítulos e pessoas e importa; publica no site. */
+    public const ROLE_EDITOR = 'editor';
+
+    /** Aprova sugestões da IA e aprova o livro (também pode editar). */
+    public const ROLE_REVISOR = 'revisor';
+
+    /** Envia os depósitos à Crossref; no módulo só consulta. */
+    public const ROLE_DEPOSITO = 'deposito';
+
+    public const ROLES = [
+        self::ROLE_ADMIN => 'Administrador',
+        self::ROLE_EXPEDICAO => 'Expedição',
+        self::ROLE_EDITOR => 'Editor',
+        self::ROLE_REVISOR => 'Revisor',
+        self::ROLE_DEPOSITO => 'Depósito',
+    ];
+
+    /** Quem entra no menu "Publicações". A expedição não. */
+    public const EDITORIAL_ROLES = [self::ROLE_ADMIN, self::ROLE_EDITOR, self::ROLE_REVISOR, self::ROLE_DEPOSITO];
 
     /** Senhas valem por um ano; depois o painel exige troca. */
     public const PASSWORD_MAX_AGE_DAYS = 365;
@@ -91,6 +110,32 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     public function isLocked(): bool
     {
         return $this->locked_until !== null && $this->locked_until->isFuture();
+    }
+
+    // ---- Permissões do módulo Editorial -------------------------------------
+
+    /** Vê o menu "Publicações" (livros, capítulos, pessoas, instituições). */
+    public function canAccessEditorial(): bool
+    {
+        return in_array($this->role, self::EDITORIAL_ROLES, true);
+    }
+
+    /** Cria e altera livros, capítulos, pessoas e instituições; pede revisão e publica. */
+    public function canEditEditorial(): bool
+    {
+        return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_EDITOR, self::ROLE_REVISOR], true);
+    }
+
+    /** Aprova capítulos (sugestões da IA) e livros. */
+    public function canApproveEditorial(): bool
+    {
+        return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_REVISOR], true);
+    }
+
+    /** Vê e dispara os depósitos na Crossref (ações da frente D). */
+    public function canDeposit(): bool
+    {
+        return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_DEPOSITO], true);
     }
 
     public function roleLabel(): string

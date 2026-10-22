@@ -40,6 +40,24 @@ class UserFactory extends Factory
         return $this->state(fn () => ['role' => 'expedicao']);
     }
 
+    /** Editorial: cadastra e importa, não aprova. */
+    public function editor(): static
+    {
+        return $this->state(fn () => ['role' => 'editor']);
+    }
+
+    /** Editorial: aprova capítulos e livros. */
+    public function revisor(): static
+    {
+        return $this->state(fn () => ['role' => 'revisor']);
+    }
+
+    /** Editorial: só depósitos na Crossref. */
+    public function deposito(): static
+    {
+        return $this->state(fn () => ['role' => 'deposito']);
+    }
+
     /**
      * Indicate that the model's email address should be unverified.
      */

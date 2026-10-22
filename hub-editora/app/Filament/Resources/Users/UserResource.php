@@ -69,7 +69,7 @@ class UserResource extends Resource
                 ->native(false)
                 // ninguém rebaixa o próprio acesso (e fica sem administrador)
                 ->disabled(fn (?User $record) => $record?->id === auth()->id())
-                ->helperText('Expedição: pedidos, expedição e catálogo. Administrador: também usuários, integrações e auditoria.'),
+                ->helperText('Expedição: pedidos, expedição e catálogo. Editor: cadastra livros e capítulos. Revisor: também aprova. Depósito: envia DOIs à Crossref. Administrador: tudo, inclusive usuários, integrações e auditoria.'),
         ]);
     }
 
