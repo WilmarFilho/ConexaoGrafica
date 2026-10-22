@@ -78,7 +78,7 @@ class ChapterForm
                             ->helperText('Gerada pela importação; só vale depois de aprovada por uma pessoa.'),
                         Textarea::make('abstract_approved')->label('Resumo aprovado')->rows(4)->maxLength(5000)
                             ->helperText('Ao aprovar com este campo vazio, o sistema copia o original (ou, na falta dele, a sugestão da IA).'),
-                        TagsInput::make('keywords')->label('Palavras-chave')->separator(',')->splitKeys(['Tab', ',']),
+                        TagsInput::make('keywords')->label('Palavras-chave')->splitKeys(['Tab', ',']),
                         Repeater::make('references')->label('Referências')
                             ->defaultItems(0)->collapsed()->addActionLabel('Adicionar referência')->columns(4)
                             ->itemLabel(fn (array $state) => Str::limit($state['text'] ?? 'Referência', 80))

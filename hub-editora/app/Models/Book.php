@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Editorial\DoiSuffix;
 use App\Editorial\EditorialException;
+use App\Editorial\Keywords;
 use App\Editorial\Slug;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -101,6 +102,8 @@ class Book extends Model
     protected static function booted(): void
     {
         static::saving(function (Book $book) {
+            $book->keywords = Keywords::normalize($book->keywords);
+            $book->keywords_en = Keywords::normalize($book->keywords_en);
             $book->doi_prefix = filled($book->doi_prefix) ? trim((string) $book->doi_prefix) : DoiSuffix::prefix();
             $book->doi_suffix = strtolower(trim((string) $book->doi_suffix));
 

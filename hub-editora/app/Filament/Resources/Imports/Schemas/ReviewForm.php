@@ -107,8 +107,8 @@ class ReviewForm
                 Section::make('Resumo e palavras-chave')->schema([
                     self::field(Textarea::make('book.abstract')->label('Resumo científico')->rows(6), 'abstract', $ctx),
                     Textarea::make('book.synopsis')->label('Sinopse comercial (não vai no XML)')->rows(3),
-                    self::field(TagsInput::make('book.keywords')->label('Palavras-chave')->separator(';'), 'keywords', $ctx),
-                    TagsInput::make('book.keywords_en')->label('Palavras-chave em inglês')->separator(';'),
+                    self::field(TagsInput::make('book.keywords')->label('Palavras-chave'), 'keywords', $ctx),
+                    TagsInput::make('book.keywords_en')->label('Palavras-chave em inglês'),
                 ]),
             ]);
     }
@@ -273,7 +273,7 @@ class ReviewForm
                             ]),
 
                         Section::make('Palavras-chave e referências')->schema([
-                            self::field(TagsInput::make('chapter.keywords')->label(fn () => 'Palavras-chave'.(($chapter()['keywords_source'] ?? null) === 'ai' ? ' — sugeridas pela IA' : ''))->separator(';'), 'keywords', $ctx),
+                            self::field(TagsInput::make('chapter.keywords')->label(fn () => 'Palavras-chave'.(($chapter()['keywords_source'] ?? null) === 'ai' ? ' — sugeridas pela IA' : '')), 'keywords', $ctx),
                             Repeater::make('chapter.references')
                                 ->label('Referências')
                                 ->schema([

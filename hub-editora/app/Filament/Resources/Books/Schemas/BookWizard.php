@@ -252,9 +252,9 @@ class BookWizard
             ->icon(Heroicon::OutlinedDocumentText)
             ->schema([
                 Textarea::make('abstract')->label('Resumo / sinopse científica')->required()->rows(6)->maxLength(5000),
-                TagsInput::make('keywords')->label('Palavras-chave')->separator(',')->splitKeys(['Tab', ','])->placeholder('Digite e pressione Enter'),
+                TagsInput::make('keywords')->label('Palavras-chave')->splitKeys(['Tab', ','])->placeholder('Digite e pressione Enter'),
                 Textarea::make('abstract_en')->label('Abstract (inglês)')->rows(4)->maxLength(5000),
-                TagsInput::make('keywords_en')->label('Keywords (inglês)')->separator(',')->splitKeys(['Tab', ',']),
+                TagsInput::make('keywords_en')->label('Keywords (inglês)')->splitKeys(['Tab', ',']),
                 Textarea::make('synopsis')->label('Sinopse comercial')->rows(3)->maxLength(5000)
                     ->helperText('Texto da página do site; não vai para a Crossref.'),
                 Repeater::make('references')->label('Referências da obra')

@@ -29,6 +29,21 @@ class EditorialTest extends TestCase
 
     // ---- Validações ----------------------------------------------------------
 
+    public function test_keywords_are_always_stored_as_a_list(): void
+    {
+        $this->assertSame(['Ultrassom', 'Contraste'], \App\Editorial\Keywords::normalize('Ultrassom, Contraste; Ultrassom'));
+        $this->assertSame([], \App\Editorial\Keywords::normalize(''));
+        $this->assertSame([], \App\Editorial\Keywords::normalize(null));
+        $this->assertSame(['a', 'b'], \App\Editorial\Keywords::normalize([' a ', '', 'b', 'a']));
+
+        $book = $this->makeBook();
+        $book->forceFill(['keywords' => '', 'keywords_en' => 'Ultrasound, Contrast'])->save();
+        $book->refresh();
+
+        $this->assertSame([], $book->keywords, 'texto vazio do formulário vira lista vazia, não ""');
+        $this->assertSame(['Ultrasound', 'Contrast'], $book->keywords_en);
+    }
+
     public function test_isbn13_rule_checks_the_check_digit_and_ignores_hyphens(): void
     {
         $this->assertTrue(Isbn13::isValid('978-85-333-0227-3'));

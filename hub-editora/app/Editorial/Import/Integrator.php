@@ -361,7 +361,7 @@ class Integrator
 
     private function strings(mixed $list): array
     {
-        return array_values(array_filter(array_map(fn ($v) => is_scalar($v) ? trim((string) $v) : '', is_array($list) ? $list : []), fn ($v) => $v !== ''));
+        return \App\Editorial\Keywords::normalize($list);
     }
 
     private function otherIsbns(mixed $list): array

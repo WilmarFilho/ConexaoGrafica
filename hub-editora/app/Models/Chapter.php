@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Editorial\DoiSuffix;
 use App\Editorial\EditorialException;
+use App\Editorial\Keywords;
 use App\Editorial\Slug;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,6 +49,7 @@ class Chapter extends Model
     protected static function booted(): void
     {
         static::saving(function (Chapter $chapter) {
+            $chapter->keywords = Keywords::normalize($chapter->keywords);
             $book = $chapter->book ?? Book::find($chapter->book_id);
 
             if (! $chapter->sequence) {
