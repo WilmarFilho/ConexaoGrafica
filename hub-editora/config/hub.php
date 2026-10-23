@@ -156,8 +156,14 @@ return [
     // o envio vai para test.crossref.org (homologação); `production` registra de verdade.
     'crossref' => [
         'env' => env('CROSSREF_ENV', 'test'),                   // test | production
-        'login' => env('CROSSREF_LOGIN'),                        // formato e-mail/role (ex.: usuario@editora/bcfg)
-        'password' => env('CROSSREF_PASSWORD'),
+        // O ambiente de teste (sandbox) tem senha própria: CROSSREF_TEST_* valem em `test`
+        // e, se faltarem, caem nas de produção. Em `production` só valem CROSSREF_LOGIN/PASSWORD.
+        'login' => env('CROSSREF_ENV', 'test') === 'test'
+            ? env('CROSSREF_TEST_LOGIN', env('CROSSREF_LOGIN'))
+            : env('CROSSREF_LOGIN'),                             // formato e-mail/role (ex.: usuario@editora/bcfg)
+        'password' => env('CROSSREF_ENV', 'test') === 'test'
+            ? env('CROSSREF_TEST_PASSWORD', env('CROSSREF_PASSWORD'))
+            : env('CROSSREF_PASSWORD'),
         'prefix' => env('CROSSREF_PREFIX', '10.00000'),          // 10.00000 é só exemplo; o prefixo real da editora vai no .env (10.68564)
         'depositor_name' => env('CROSSREF_DEPOSITOR_NAME', 'Conexão Editora'),
         'depositor_email' => env('CROSSREF_DEPOSITOR_EMAIL'),  // recebe o e-mail de resultado da Crossref
