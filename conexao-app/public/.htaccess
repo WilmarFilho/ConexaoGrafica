@@ -1,0 +1,27 @@
+# App do leitor (build web em /app/): rotas do app voltam ao index.html.
+Options -Indexes
+
+# Tipos que o Apache do servidor não conhece (o worker do pdf.js é módulo: precisa de tipo JavaScript)
+AddType text/javascript .mjs
+AddType application/wasm .wasm
+AddType application/manifest+json .webmanifest
+AddType application/octet-stream .bcmap .pfb .icc
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /app/
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /app/index.html [L]
+</IfModule>
+
+# index, service worker e manifesto sempre revalidados (versão nova chega na hora);
+# arquivos com hash no nome podem ficar em cache por um ano.
+<IfModule mod_headers.c>
+<FilesMatch "^(index\.html|sw\.js|manifest\.webmanifest)$">
+Header set Cache-Control "no-cache"
+</FilesMatch>
+<FilesMatch "\.[0-9a-zA-Z_-]{8,}\.(js|css|woff2?)$">
+Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+</IfModule>

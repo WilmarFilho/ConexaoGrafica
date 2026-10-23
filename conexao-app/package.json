@@ -1,0 +1,50 @@
+{
+  "name": "conexao-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "App do leitor Conexão Editora (web/PWA, Android e iOS com Capacitor)",
+  "type": "module",
+  "scripts": {
+    "pdfjs:copiar": "node scripts/copiar-pdfjs.mjs",
+    "predev": "npm run pdfjs:copiar",
+    "dev": "vite",
+    "dev:mock": "vite --mode mock",
+    "prebuild": "npm run pdfjs:copiar",
+    "build": "tsc -p tsconfig.json && vite build",
+    "build:mock": "npm run pdfjs:copiar && tsc -p tsconfig.json && vite build --mode mock",
+    "build:native": "npm run pdfjs:copiar && tsc -p tsconfig.json && vite build --mode native",
+    "build:native:mock": "npm run pdfjs:copiar && tsc -p tsconfig.json && vite build --mode native-mock",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json",
+    "cap:sync": "npm run build:native && cap sync",
+    "cap:sync:mock": "npm run build:native:mock && cap sync",
+    "android:apk": "npm run cap:sync:mock && cd android && gradlew.bat assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/app": "8.1.1",
+    "@capacitor/browser": "8.0.4",
+    "@capacitor/core": "8.5.2",
+    "@capacitor/filesystem": "8.1.3",
+    "@capacitor/ios": "8.5.2",
+    "@capacitor/network": "8.0.1",
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/screen-orientation": "8.0.1",
+    "@capacitor/share": "8.0.2",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.3",
+    "@fontsource/nunito": "5.2.7",
+    "pdfjs-dist": "6.4.299",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-router": "7.18.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@vitejs/plugin-react": "5.2.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.7"
+  }
+}
