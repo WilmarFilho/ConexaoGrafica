@@ -104,6 +104,19 @@ a { text-underline-offset: 2px; }
     gap: 4px !important;
 }
 
+/* rola sem mostrar a barra (roda do mouse e toque continuam funcionando) */
+.fi-sidebar-nav,
+.fi-sidebar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.fi-sidebar-nav::-webkit-scrollbar,
+.fi-sidebar::-webkit-scrollbar {
+    display: none;
+    width: 0;
+}
+
 .fi-sidebar-group-label,
 .fi-sidebar-group-btn .fi-sidebar-group-label {
     font-family: var(--hub-mono) !important;
