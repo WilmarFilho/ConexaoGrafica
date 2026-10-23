@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Crossref\BookDeposits;
 use App\Editorial\EditorialException;
+use App\Editorial\WordPress\PublishBook;
 use App\Filament\Resources\Books\BookResource;
 use App\Filament\Resources\Books\DepositActions;
 use App\Filament\Resources\Books\Pages\EditBook;
@@ -321,6 +322,8 @@ class BookDepositTest extends TestCase
 
         $this->assertSame('processing', $book->fresh()->doi_status);
         $this->assertSame(['processing', 'processing'], $book->chapters()->pluck('doi_status')->all());
+        // O site recebe o novo estado do DOI (página do livro e produto), sem refazer as fichas.
+        Queue::assertPushed(PublishBook::class, fn (PublishBook $job) => $job->bookId === $book->id && $job->sheets === false);
 
         // Livro sem URL pública: o botão existe, mas o serviço explica.
         $book->update(['landing_url' => null]);

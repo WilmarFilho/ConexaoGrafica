@@ -4,6 +4,7 @@ namespace App\Crossref;
 
 use App\Editorial\EditorialException;
 use App\Editorial\WordPress\Payload;
+use App\Editorial\WordPress\PublishBook;
 use App\Jobs\SendDeposit;
 use App\Models\Book;
 use App\Models\Chapter;
@@ -218,6 +219,11 @@ class BookDeposits
                 sprintf('DOIs do livro atualizados pelo depósito %s (%s): %s', $deposit->batch_id, $deposit->status_label,
                     $counts->map(fn ($n, $s) => "{$n} ".mb_strtolower(Book::DOI_STATUSES[$s] ?? $s))->implode(', ')),
                 ['deposit_id' => $deposit->id, 'deposit_status' => $deposit->status, 'changed' => $changed, 'counts' => $counts->all()]);
+
+            // O site mostra a situação do DOI (página do livro e produto da loja): reenvia só o estado, sem refazer as fichas.
+            if ($book->fresh()?->isPublished()) {
+                PublishBook::dispatch($book->id, null, false);
+            }
         }
 
         return $changed;

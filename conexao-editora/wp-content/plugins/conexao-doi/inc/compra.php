@@ -171,6 +171,29 @@ function conexao_doi_capa_url(int $livro_id, string $tamanho = 'large'): string
     return $id ? (string) wp_get_attachment_image_url($id, $tamanho) : '';
 }
 
+/**
+ * Capa e páginas de amostra da galeria do produto ligado, no formato da faixa
+ * "Leia uma amostra" do tema (conexao_amostras_produto); vazio sem galeria.
+ *
+ * @return array<int, array{id: int, grande: string, mini: string, rotulo: string}>
+ */
+function conexao_doi_amostras(int $livro_id): array
+{
+    if (! function_exists('conexao_amostras_produto')) {
+        return [];
+    }
+
+    foreach (conexao_doi_ofertas($livro_id) as $oferta) {
+        foreach ([$oferta['pai'], $oferta['produto']] as $produto) {
+            if ($produto instanceof WC_Product && ($amostras = conexao_amostras_produto($produto))) {
+                return $amostras;
+            }
+        }
+    }
+
+    return [];
+}
+
 /** A capa pronta para a página (ou o placeholder do tema). */
 function conexao_doi_capa_html(int $livro_id, string $tamanho = 'large', string $classe = ''): string
 {

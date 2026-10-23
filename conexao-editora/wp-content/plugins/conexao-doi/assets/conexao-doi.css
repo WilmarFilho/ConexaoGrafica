@@ -83,6 +83,11 @@
   padding-inline: 4px;
 }
 
+/* faixa "Leia uma amostra" (estilo do tema): o gap da grade já separa da capa */
+.doi-capa .produto__amostras {
+  margin-top: 0;
+}
+
 /* ---------- cabeçalho ---------- */
 .doi-cabecalho {
   min-width: 0;

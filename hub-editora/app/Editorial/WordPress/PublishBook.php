@@ -24,7 +24,8 @@ class PublishBook implements ShouldQueue
 
     public int $backoff = 60;
 
-    public function __construct(public int $bookId, public ?int $userId = null) {}
+    /** @param  bool  $sheets  false quando só o estado mudou (ex.: resultado da Crossref): as fichas não mudam */
+    public function __construct(public int $bookId, public ?int $userId = null, public bool $sheets = true) {}
 
     public function handle(): void
     {
@@ -57,7 +58,7 @@ class PublishBook implements ShouldQueue
                 ['wp_post_id' => $book->wp_post_id, 'chapters' => count($payload['chapters']), 'user_id' => $this->userId]);
 
             // Fichas PDF (frente E): geradas com as URLs recém-devolvidas e enviadas em seguida.
-            if (config('hub.documents.auto_publish')) {
+            if ($this->sheets && config('hub.documents.auto_publish')) {
                 PublishSheets::dispatch($book->id, false, $this->userId);
             }
         } catch (Throwable $e) {

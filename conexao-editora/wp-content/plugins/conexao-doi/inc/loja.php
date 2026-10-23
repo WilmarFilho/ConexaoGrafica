@@ -97,3 +97,106 @@ add_action('init', function (): void {
     }
     update_option('conexao_doi_indice_loja', CONEXAO_DOI_VERSAO, false);
 }, 30);
+
+// ---- Painel da loja: o produto mostra se já tem livro DOI ----------------------
+
+/** Livro ligado ao produto para o painel (inclui fora de catálogo); 0 se não houver. */
+function conexao_doi_livro_do_produto_admin(int $produto_id): int
+{
+    static $cache = [];
+    if (! array_key_exists($produto_id, $cache)) {
+        $livros = get_posts([
+            'post_type' => 'publicacao',
+            'post_status' => 'publish',
+            'numberposts' => 1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'meta_query' => [['key' => CONEXAO_DOI_META_WOO, 'value' => $produto_id, 'type' => 'NUMERIC']],
+        ]);
+        $cache[$produto_id] = (int) ($livros[0] ?? 0);
+    }
+
+    return $cache[$produto_id];
+}
+
+/** Situação do registro na Crossref, em português. */
+function conexao_doi_rotulo_registro(string $doi_status): string
+{
+    return [
+        'none' => 'DOI atribuído, ainda não registrado',
+        'validated' => 'DOI validado, ainda não registrado',
+        'ready' => 'Na fila para registro',
+        'sent' => 'Enviado à Crossref',
+        'processing' => 'Em processamento na Crossref',
+        'registered' => 'Registrado na Crossref',
+        'failed' => 'Registro falhou (reenviar pelo Hub)',
+    ][$doi_status] ?? $doi_status;
+}
+
+add_action('add_meta_boxes_product', function (): void {
+    add_meta_box('conexao-doi-produto', 'DOI do livro', 'conexao_doi_metabox_produto', 'product', 'side', 'high');
+});
+
+function conexao_doi_metabox_produto(WP_Post $post): void
+{
+    $livro = conexao_doi_livro_do_produto_admin($post->ID);
+
+    if (! $livro) {
+        echo '<p><span class="dashicons dashicons-minus" style="color:#8c8f94"></span> <strong>Sem DOI.</strong></p>';
+        echo '<p class="description">Nenhum livro DOI ligado a este produto. O livro é cadastrado no Hub Editora (Publicações › Livros) e ligado ao produto lá.</p>';
+
+        return;
+    }
+
+    $doi = (string) get_post_meta($livro, CONEXAO_DOI_META_DOI, true);
+    $estado = (string) get_post_meta($livro, CONEXAO_DOI_META_DOI_STATUS, true) ?: 'none';
+    $fora = get_post_meta($livro, CONEXAO_DOI_META_STATUS, true) === 'unpublished';
+    $ok = $estado === 'registered';
+
+    printf(
+        '<p><span class="dashicons %s" style="color:%s"></span> <strong>%s</strong></p>',
+        $ok ? 'dashicons-yes-alt' : 'dashicons-clock',
+        $ok ? '#00a32a' : '#dba617',
+        esc_html(conexao_doi_rotulo_registro($estado))
+    );
+    if ($doi !== '') {
+        printf('<p>DOI: <a href="%s" target="_blank" rel="noopener"><code>%s</code></a></p>', esc_url('https://doi.org/'.$doi), esc_html($doi));
+    }
+    printf('<p>Livro: <a href="%s" target="_blank">%s</a></p>', esc_url((string) get_permalink($livro)), esc_html(get_the_title($livro)));
+    echo $fora
+        ? '<p class="description">Livro fora de catálogo: a página do DOI continua no ar.</p>'
+        : '<p class="description">Na loja, este produto abre a página do livro (o endereço /product/ redireciona para ela). Os dados do DOI são editados no Hub Editora.</p>';
+}
+
+add_filter('manage_edit-product_columns', function (array $colunas): array {
+    $novas = [];
+    foreach ($colunas as $chave => $rotulo) {
+        $novas[$chave] = $rotulo;
+        if ($chave === 'name') {
+            $novas['conexao_doi'] = 'DOI';
+        }
+    }
+
+    return isset($novas['conexao_doi']) ? $novas : $colunas + ['conexao_doi' => 'DOI'];
+}, 20);
+
+add_action('manage_product_posts_custom_column', function (string $coluna, int $post_id): void {
+    if ($coluna !== 'conexao_doi') {
+        return;
+    }
+    $livro = conexao_doi_livro_do_produto_admin($post_id);
+    if (! $livro) {
+        echo '<span aria-hidden="true">–</span><span class="screen-reader-text">Sem DOI</span>';
+
+        return;
+    }
+    $estado = (string) get_post_meta($livro, CONEXAO_DOI_META_DOI_STATUS, true) ?: 'none';
+    printf(
+        '<span class="dashicons %s" style="color:%s" title="%s"></span> <a href="%s" target="_blank">%s</a>',
+        $estado === 'registered' ? 'dashicons-yes-alt' : 'dashicons-clock',
+        $estado === 'registered' ? '#00a32a' : '#dba617',
+        esc_attr(conexao_doi_rotulo_registro($estado)),
+        esc_url((string) get_permalink($livro)),
+        $estado === 'registered' ? 'Registrado' : 'Atribuído'
+    );
+}, 10, 2);
