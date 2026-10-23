@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use App\Filament\Resources\Books\BookResource;
+use App\Models\Book;
 use App\Models\Product;
 use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
@@ -26,7 +28,7 @@ class ProductsTable
     {
         return $table
             // um livro tem um vínculo por formato no mesmo canal: conta canais, não vínculos
-            ->modifyQueryUsing(fn (Builder $query) => $query->withCount([
+            ->modifyQueryUsing(fn (Builder $query) => $query->with('books:id,product_id,title,doi_prefix,doi_suffix,status,doi_status')->withCount([
                 'channelRefs as channel_refs_count' => fn (Builder $q) => $q->select(DB::raw('count(distinct channel_id)')),
             ]))
             ->defaultSort('name')
@@ -84,6 +86,16 @@ class ProductsTable
                     ->sortable()
                     ->toggleable(),
 
+                TextColumn::make('doi')
+                    ->label('DOI')
+                    ->state(fn (Product $record) => $record->doiBook()?->doiStatusLabel())
+                    ->badge()
+                    ->color(fn (Product $record) => Book::doiStatusColor($record->doiBook()?->doi_status))
+                    ->icon(fn (Product $record) => $record->doiBook()?->doi_status === 'registered' ? Heroicon::OutlinedCheckBadge : Heroicon::OutlinedDocumentText)
+                    ->tooltip(fn (Product $record) => ($book = $record->doiBook()) ? $book->doi.' · livro '.mb_strtolower($book->statusLabel()) : 'Nenhum livro DOI ligado a este produto')
+                    ->url(fn (Product $record) => ($book = $record->doiBook()) && BookResource::canView($book) ? BookResource::getUrl('view', ['record' => $book]) : null)
+                    ->placeholder('—'),
+
                 TextColumn::make('channel_refs_count')
                     ->label('Canais')
                     ->badge()
@@ -100,6 +112,11 @@ class ProductsTable
                     ->query(fn (Builder $query, array $data) => filled($data['value'] ?? null)
                         ? $query->whereJsonContains('formats', $data['value'])
                         : $query),
+
+                SelectFilter::make('doi')
+                    ->label('DOI')
+                    ->options(Product::DOI_FILTERS)
+                    ->query(fn (Builder $query, array $data) => $query->doiSituation($data['value'] ?? null)),
 
                 Filter::make('sem_medidas')
                     ->label('Sem peso ou medidas')

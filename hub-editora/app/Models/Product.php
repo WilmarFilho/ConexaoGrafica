@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
@@ -85,6 +86,40 @@ class Product extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /** Livros do Editorial (DOI) ligados a este produto; na prática, um. */
+    public function books(): HasMany
+    {
+        return $this->hasMany(Book::class);
+    }
+
+    /** O livro DOI do produto (o mais recente, se houver mais de um). */
+    public function doiBook(): ?Book
+    {
+        return $this->relationLoaded('books')
+            ? $this->books->sortByDesc('id')->first()
+            : $this->books()->latest('id')->first();
+    }
+
+    /**
+     * Situação DOI do produto para filtro e coluna: sem livro, livro cadastrado
+     * (DOI ainda não registrado) ou DOI registrado na Crossref.
+     */
+    public const DOI_FILTERS = [
+        'sem' => 'Sem livro DOI',
+        'cadastrado' => 'Livro cadastrado, DOI não registrado',
+        'registrado' => 'DOI registrado',
+    ];
+
+    public function scopeDoiSituation(Builder $query, ?string $situation): void
+    {
+        match ($situation) {
+            'sem' => $query->whereDoesntHave('books'),
+            'cadastrado' => $query->whereHas('books')->whereDoesntHave('books', fn (Builder $b) => $b->where('doi_status', 'registered')),
+            'registrado' => $query->whereHas('books', fn (Builder $b) => $b->where('doi_status', 'registered')),
+            default => null,
+        };
     }
 
     /** Sem peso e dimensões não dá para cotar frete: a Central de Expedição sinaliza. */

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Products\Schemas;
 
+use App\Filament\Resources\Books\BookResource;
+use App\Models\Book;
 use App\Models\Product;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
@@ -59,6 +61,35 @@ class ProductForm
                                 TextInput::make('stock_physical')->label('Estoque físico')->numeric()->default(0)
                                     ->helperText('Atualizado pela loja quando ela controla estoque.'),
                             ]),
+
+                        Section::make('Livro DOI')
+                            ->schema([
+                                TextEntry::make('doi_book_title')
+                                    ->label('Livro')
+                                    ->state(fn (?Product $record) => $record?->doiBook()?->title)
+                                    ->url(fn (?Product $record) => ($book = $record?->doiBook()) && BookResource::canView($book) ? BookResource::getUrl('view', ['record' => $book]) : null)
+                                    ->color('primary')
+                                    ->placeholder('Nenhum livro DOI ligado a este produto. O vínculo é feito no cadastro do livro, campo "Produto do catálogo do Hub".'),
+                                TextEntry::make('doi_book_doi')
+                                    ->label('DOI')
+                                    ->state(fn (?Product $record) => $record?->doiBook()?->doi)
+                                    ->copyable()
+                                    ->extraAttributes(['class' => 'hub-mono'])
+                                    ->visible(fn (?Product $record) => (bool) $record?->doiBook()),
+                                TextEntry::make('doi_book_doi_status')
+                                    ->label('Situação na Crossref')
+                                    ->state(fn (?Product $record) => $record?->doiBook()?->doiStatusLabel())
+                                    ->badge()
+                                    ->color(fn (?Product $record) => Book::doiStatusColor($record?->doiBook()?->doi_status))
+                                    ->visible(fn (?Product $record) => (bool) $record?->doiBook()),
+                                TextEntry::make('doi_book_status')
+                                    ->label('Etapa do livro')
+                                    ->state(fn (?Product $record) => $record?->doiBook()?->statusLabel())
+                                    ->badge()
+                                    ->color(fn (?Product $record) => Book::statusColor($record?->doiBook()?->status))
+                                    ->visible(fn (?Product $record) => (bool) $record?->doiBook()),
+                            ])
+                            ->hiddenOn('create'),
 
                         Section::make('Nos canais')
                             ->schema([
