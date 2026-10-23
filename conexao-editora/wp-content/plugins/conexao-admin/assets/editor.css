@@ -1,0 +1,38 @@
+/* Conexão Admin · área de texto do editor clássico (TinyMCE), escura como o painel */
+html,
+body.mce-content-body {
+  background: #0D0D0D;
+}
+
+body.mce-content-body {
+  color: #C9C9C9;
+  font: 400 13.5px/1.6 Inter, system-ui, sans-serif;
+}
+
+body.mce-content-body a {
+  color: #5B9BFF;
+}
+
+body.mce-content-body h1,
+body.mce-content-body h2,
+body.mce-content-body h3,
+body.mce-content-body h4,
+body.mce-content-body strong {
+  color: #F2F2F2;
+}
+
+body.mce-content-body blockquote {
+  border-left: 3px solid #234A8A;
+  margin-left: 0;
+  padding-left: 14px;
+}
+
+body.mce-content-body code,
+body.mce-content-body pre {
+  background: #1C1C1C;
+  color: #F2F2F2;
+}
+
+body.mce-content-body ::selection {
+  background: #234A8A;
+}

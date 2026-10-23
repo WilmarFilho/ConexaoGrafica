@@ -1,0 +1,393 @@
+/* Conexão Admin · tela de login (quadro WPLogin) */
+
+:root {
+  --cxa-fundo: #0A0A0A;
+  --cxa-lateral: #0D0D0D;
+  --cxa-cartao: #111111;
+  --cxa-borda-cartao: #222222;
+  --cxa-borda-campo: #2A2A2A;
+  --cxa-texto: #F2F2F2;
+  --cxa-texto-2: #C9C9C9;
+  --cxa-mudo: #8D8D8D;
+  --cxa-acento: #5B9BFF;
+  --cxa-acento-claro: #8DB8FF;
+  --cxa-perigo: #FF8A8A;
+  --cxa-perigo-fundo: #331414;
+  --cxa-perigo-borda: #5A2323;
+  --cxa-ok: #5BD98A;
+  --cxa-ok-fundo: #0E2A1A;
+  --cxa-ok-borda: #1F4A30;
+  --cxa-info-fundo: #10203A;
+  --cxa-info-borda: #1E3A66;
+}
+
+html,
+body.login {
+  background-color: var(--cxa-fundo);
+}
+
+body.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 48px 24px;
+  box-sizing: border-box;
+  color: var(--cxa-texto);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* grade fina com dois blocos de acento, como no quadro */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMid slice'%3E%3Cg opacity='.5'%3E%3Cg stroke='%23161616' stroke-width='1' fill='none'%3E%3Cpath d='M0 150h1440M0 300h1440M0 450h1440M0 600h1440M0 750h1440M180 0v900M360 0v900M540 0v900M720 0v900M900 0v900M1080 0v900M1260 0v900'/%3E%3C/g%3E%3Crect x='1080' y='600' width='180' height='150' fill='%230F1E38'/%3E%3Crect x='180' y='150' width='180' height='150' fill='%230F1E38' opacity='.6'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+}
+
+body.login a {
+  color: var(--cxa-acento);
+  text-decoration: none;
+}
+
+body.login a:hover,
+body.login a:focus {
+  color: var(--cxa-acento-claro);
+}
+
+#login {
+  width: 100%;
+  max-width: 400px;
+  padding: 0;
+  margin: 0;
+}
+
+#login::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* marca: logo + nome em Fraunces + eyebrow */
+.login h1.wp-login-logo {
+  margin: 0 0 28px;
+  text-align: center;
+}
+
+.login h1.wp-login-logo a {
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  padding-top: 58px;
+  overflow: visible;
+  text-indent: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%235B9BFF'/%3E%3Cpath d='M14 32V16h8a6 6 0 0 1 0 12h-8' stroke='%230A0A0A' stroke-width='3' fill='none'/%3E%3Cpath d='M28 16h8M28 24h6M28 32h8' stroke='%230A0A0A' stroke-width='3'/%3E%3C/svg%3E") no-repeat top center / 48px 48px;
+  color: var(--cxa-texto);
+  font: italic 400 24px/1.25 Fraunces, Georgia, serif;
+}
+
+.login h1.wp-login-logo::after {
+  content: "Painel do site · wp-admin";
+  display: block;
+  margin-top: 4px;
+  color: var(--cxa-acento);
+  font: 400 10.5px/1.5 "DM Mono", ui-monospace, monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.login h1.wp-login-logo a:focus {
+  box-shadow: none;
+  outline: 2px solid var(--cxa-acento);
+  outline-offset: 4px;
+}
+
+/* cartão do formulário */
+.login form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 28px;
+  background: var(--cxa-cartao);
+  border: 1px solid var(--cxa-borda-cartao);
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.login form > p,
+.login form > div {
+  flex: 0 0 100%;
+}
+
+.login form .user-pass-wrap {
+  margin-top: 16px;
+}
+
+.login label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--cxa-texto-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.login form .input,
+.login input[type="text"],
+.login input[type="password"],
+.login input[type="email"] {
+  width: 100%;
+  height: 42px;
+  min-height: 42px;
+  margin: 0;
+  padding: 0 12px;
+  background: var(--cxa-lateral);
+  border: 1px solid var(--cxa-borda-campo);
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--cxa-texto);
+  font: 400 14px Inter, system-ui, sans-serif;
+}
+
+.login form .input:focus,
+.login input[type="text"]:focus,
+.login input[type="password"]:focus {
+  border-color: var(--cxa-acento);
+  box-shadow: 0 0 0 3px rgba(91, 155, 255, .18);
+  outline: none;
+}
+
+.login .wp-pwd {
+  position: relative;
+}
+
+.login .wp-pwd .input {
+  padding-right: 42px;
+}
+
+.login .button.wp-hide-pw {
+  top: 1px;
+  right: 1px;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  color: var(--cxa-mudo);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.login .button.wp-hide-pw:hover,
+.login .button.wp-hide-pw:focus {
+  color: var(--cxa-texto);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.login .button.wp-hide-pw .dashicons {
+  top: 0;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
+/* "Lembrar-me" e "Perdeu a senha?" na mesma linha */
+.login form .forgetmenot {
+  flex: 1 1 auto;
+  order: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 14px 0 22px;
+  float: none;
+}
+
+.login form .forgetmenot label {
+  display: inline;
+  margin: 0;
+  color: var(--cxa-texto);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.login .cxa-perdeu {
+  flex: 0 0 auto;
+  order: 2;
+  margin: 14px 0 22px;
+  font-size: 13px;
+}
+
+.login form p.submit {
+  order: 3;
+  flex: 0 0 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.login input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  margin: 0 6px 0 0;
+  background: var(--cxa-lateral);
+  border: 1px solid var(--cxa-borda-campo);
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+.login input[type="checkbox"]:checked {
+  background: var(--cxa-acento);
+  border-color: var(--cxa-acento);
+}
+
+.login input[type="checkbox"]:checked::before {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 9px;
+  margin: 1px 0 0 5px;
+  border: solid var(--cxa-fundo);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.login .wp-tooltip__toggle {
+  color: var(--cxa-mudo);
+}
+
+.login .button-primary,
+.login .button.button-large {
+  float: none;
+  width: 100%;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 16px;
+  background: var(--cxa-acento);
+  border: 1px solid var(--cxa-acento);
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--cxa-fundo);
+  font: 500 14px Inter, system-ui, sans-serif;
+  text-shadow: none;
+}
+
+.login .button-primary:hover,
+.login .button-primary:focus {
+  background: var(--cxa-acento-claro);
+  border-color: var(--cxa-acento-claro);
+  color: var(--cxa-fundo);
+  box-shadow: none;
+}
+
+.login .button-primary:focus-visible {
+  outline: 2px solid var(--cxa-acento-claro);
+  outline-offset: 2px;
+}
+
+.login .button:not(.button-primary):not(.wp-hide-pw) {
+  background: transparent;
+  border: 1px solid var(--cxa-borda-campo);
+  border-radius: 4px;
+  color: var(--cxa-texto);
+}
+
+/* o #nav só some na tela de login, onde o link já está no formulário */
+.login-action-login #nav {
+  display: none;
+}
+
+.login #nav,
+.login #backtoblog {
+  margin: 18px 0 0;
+  padding: 0;
+  font-size: 12.5px;
+}
+
+.login #backtoblog {
+  float: left;
+}
+
+.login .privacy-policy-page-link {
+  float: right;
+  width: auto;
+  margin: 18px 0 0;
+  text-align: right;
+  font-size: 12.5px;
+}
+
+.login #nav a,
+.login #backtoblog a,
+.login .privacy-policy-page-link a {
+  color: var(--cxa-mudo);
+}
+
+.login #nav a:hover,
+.login #backtoblog a:hover,
+.login .privacy-policy-page-link a:hover {
+  color: var(--cxa-texto);
+}
+
+/* mensagens */
+.login .message,
+.login .notice,
+.login .success,
+.login #login_error {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  background: #1C1C1C;
+  border: 1px solid var(--cxa-info-borda);
+  border-left: 3px solid var(--cxa-acento);
+  border-radius: 6px;
+  box-shadow: none;
+  color: var(--cxa-texto);
+}
+
+.login #login_error,
+.login .notice-error {
+  border-color: var(--cxa-perigo-borda);
+  border-left-color: var(--cxa-perigo);
+}
+
+.login .success {
+  border-color: var(--cxa-ok-borda);
+  border-left-color: var(--cxa-ok);
+}
+
+.login .language-switcher {
+  display: none;
+}
+
+/* recuperar senha e redefinir: mesmos campos */
+.login .reset-pass-submit,
+.login #lostpasswordform p.submit {
+  margin-top: 16px;
+}
+
+.login .indicator-hint,
+.login .description {
+  color: var(--cxa-mudo);
+}
+
+#pass-strength-result {
+  border-radius: 4px;
+  color: var(--cxa-fundo);
+}
+
+@media (max-width: 480px) {
+  body.login {
+    padding: 32px 16px;
+  }
+
+  .login form {
+    padding: 20px;
+  }
+
+  .login #backtoblog,
+  .login .privacy-policy-page-link {
+    float: none;
+    text-align: left;
+  }
+}

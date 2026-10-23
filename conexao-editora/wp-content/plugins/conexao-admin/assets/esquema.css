@@ -1,0 +1,14 @@
+/*
+ * Conexão Admin · esquema de cores "Conexão Editora".
+ * Entra no lugar do colors.css do esquema do núcleo (modern, fresh…) para que
+ * as cores dele não briguem com o tema. O visual vem todo do admin.css.
+ */
+body.admin-color-conexao {
+  --wp-admin-theme-color: #5B9BFF;
+  --wp-admin-theme-color--rgb: 91, 155, 255;
+  --wp-admin-theme-color-darker-10: #3B82F6;
+  --wp-admin-theme-color-darker-10--rgb: 59, 130, 246;
+  --wp-admin-theme-color-darker-20: #2563EB;
+  --wp-admin-theme-color-darker-20--rgb: 37, 99, 235;
+  --wp-admin-border-width-focus: 1.5px;
+}

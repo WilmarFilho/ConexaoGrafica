@@ -32,6 +32,10 @@ chmod 750 "$BIBLIOTECA"
 $WP config has CONEXAO_BIBLIOTECA_DIR >/dev/null 2>&1 || $WP config set CONEXAO_BIBLIOTECA_DIR "$BIBLIOTECA" --type=constant
 $WP plugin is-active conexao-biblioteca || $WP plugin activate conexao-biblioteca
 
+echo "== plugin do painel (visual do wp-admin e do login)"
+rsync -a --delete   "$REPO/conexao-editora/wp-content/plugins/conexao-admin/"   "$RAIZ/wp-content/plugins/conexao-admin/"
+$WP plugin is-active conexao-admin || $WP plugin activate conexao-admin
+
 echo "== banco e caches"
 $WP core update-db
 $WP rewrite flush --hard
