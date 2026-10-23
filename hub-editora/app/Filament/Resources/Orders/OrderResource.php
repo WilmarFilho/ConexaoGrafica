@@ -32,6 +32,12 @@ class OrderResource extends Resource
 
     protected static ?int $navigationSort = 10;
 
+    /** Equipe da editora; a conta de vendedor só vê o portal do vendedor. */
+    public static function canAccess(): bool
+    {
+        return (bool) auth()->user()?->isStaff();
+    }
+
     protected static ?string $recordTitleAttribute = 'external_number';
 
     public static function infolist(Schema $schema): Schema

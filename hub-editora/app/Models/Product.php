@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Vendors\Commissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -27,6 +29,7 @@ class Product extends Model
             'physical' => 'boolean',
             'active' => 'boolean',
             'formats' => 'array',
+            'vendor_commission_pct' => 'decimal:2',
         ];
     }
 
@@ -37,6 +40,13 @@ class Product extends Model
             if (is_array($product->formats)) {
                 $product->formats = self::sortFormats($product->formats);
                 $product->physical = (bool) array_intersect($product->formats, self::SHIPPED_FORMATS);
+            }
+        });
+
+        // Trocar o vendedor ou o % refaz as comissões ainda não repassadas dos pedidos do livro.
+        static::updated(function (Product $product) {
+            if ($product->wasChanged(['vendor_id', 'vendor_commission_pct'])) {
+                $product->syncCommissions();
             }
         });
     }
@@ -86,6 +96,29 @@ class Product extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
+    /** Refaz as comissões dos pedidos deste livro; devolve quantos pedidos. */
+    public function syncCommissions(): int
+    {
+        $orders = Order::query()
+            ->whereHas('items', fn (Builder $q) => $q->where('product_id', $this->id))
+            ->orWhereIn('id', VendorCommission::query()->where('product_id', $this->id)->select('order_id'))
+            ->get();
+        $orders->each(fn (Order $order) => Commissions::make()->syncOrder($order));
+
+        return $orders->count();
+    }
+
+    /** % do vendedor neste livro: o do produto, senão o do vendedor. */
+    public function effectiveCommissionPct(): ?float
+    {
+        return $this->vendor ? (float) ($this->vendor_commission_pct ?? $this->vendor->commission_pct) : null;
     }
 
     /** Livros do Editorial (DOI) ligados a este produto; na prática, um. */

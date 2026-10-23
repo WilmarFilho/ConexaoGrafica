@@ -20,7 +20,7 @@ class AlertsBanner extends Widget
 
     public static function canView(): bool
     {
-        return IntegrationAlerts::openIssues() !== [];
+        return (bool) auth()->user()?->isStaff() && IntegrationAlerts::openIssues() !== [];
     }
 
     public function getIssues(): array

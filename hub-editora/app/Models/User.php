@@ -11,12 +11,13 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 
-#[Fillable(['name', 'email', 'password', 'password_changed_at', 'role'])]
+#[Fillable(['name', 'email', 'password', 'password_changed_at', 'role', 'vendor_id'])]
 #[Hidden(['password', 'remember_token', 'app_authentication_secret', 'app_authentication_recovery_codes'])]
 class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery
 {
@@ -39,12 +40,17 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     /** Envia os depósitos à Crossref; no módulo só consulta. */
     public const ROLE_DEPOSITO = 'deposito';
 
+    // ---- Multivendor ----
+    /** Autor/parceiro: só vê as próprias vendas, comissões e repasses (sem dados de cliente). */
+    public const ROLE_VENDEDOR = 'vendedor';
+
     public const ROLES = [
         self::ROLE_ADMIN => 'Administrador',
         self::ROLE_EXPEDICAO => 'Expedição',
         self::ROLE_EDITOR => 'Editor',
         self::ROLE_REVISOR => 'Revisor',
         self::ROLE_DEPOSITO => 'Depósito',
+        self::ROLE_VENDEDOR => 'Vendedor',
     ];
 
     /** Quem entra no menu "Publicações". A expedição não. */
@@ -99,12 +105,30 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->disabled_at === null && ! $this->isLocked();
+        return $this->disabled_at === null && ! $this->isLocked()
+            && (! $this->isVendor() || $this->vendor_id !== null);
     }
 
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
+    }
+
+    /** Conta de vendedor (portal do vendedor). */
+    public function isVendor(): bool
+    {
+        return $this->role === self::ROLE_VENDEDOR;
+    }
+
+    /** Equipe da editora: vê pedidos, catálogo e expedição. Vendedor não. */
+    public function isStaff(): bool
+    {
+        return ! $this->isVendor();
+    }
+
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
     }
 
     public function isLocked(): bool

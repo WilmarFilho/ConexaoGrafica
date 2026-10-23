@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\ProductChannelRef;
 use App\Models\SyncLog;
 use App\Support\IntegrationAlerts;
+use App\Vendors\Commissions;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -111,6 +112,8 @@ class ImportOrders
                 unset($item['external_product_id'], $item['shipping_cents'], $item['discount_cents']);
                 $order->items()->create([...$item, 'product_id' => $productId]);
             }
+
+            Commissions::make()->syncOrder($order);
 
             if ($isNew || $changed) {
                 SyncLog::record($this->channel, SyncLog::IN, $isNew ? 'order.imported' : 'order.updated', $order,

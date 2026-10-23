@@ -6,11 +6,13 @@ use App\Filament\Resources\Books\BookResource;
 use App\Models\Book;
 use App\Models\Product;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class ProductForm
@@ -60,6 +62,20 @@ class ProductForm
                                 Toggle::make('active')->label('Ativo')->default(true),
                                 TextInput::make('stock_physical')->label('Estoque físico')->numeric()->default(0)
                                     ->helperText('Atualizado pela loja quando ela controla estoque.'),
+                            ]),
+
+                        Section::make('Vendedor')
+                            ->description('Livro de autor/parceiro do multivendor: cada venda gera comissão para ele.')
+                            ->schema([
+                                Select::make('vendor_id')->label('Vendedor')
+                                    ->relationship('vendor', 'name')
+                                    ->searchable()->preload()
+                                    ->placeholder('Da editora (sem comissão)')
+                                    ->live(),
+                                TextInput::make('vendor_commission_pct')->label('% próprio deste livro')
+                                    ->numeric()->minValue(0)->maxValue(100)->step(0.01)->suffix('%')
+                                    ->visible(fn (Get $get) => filled($get('vendor_id')))
+                                    ->helperText('Vazio: usa o % do vendedor.'),
                             ]),
 
                         Section::make('Livro DOI')

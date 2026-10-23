@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\ProductChannelRef;
 use App\Models\SyncLog;
 use App\Support\IntegrationAlerts;
+use App\Vendors\Commissions;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -114,6 +115,8 @@ class ImportOrders
                 unset($item['external_product_id']);
                 $order->items()->create([...$item, 'product_id' => $ref?->product_id, 'format' => $ref?->format]);
             }
+
+            Commissions::make()->syncOrder($order);
 
             // Atualização sem mudança de etapa não vira ruído no histórico.
             if ($isNew || $changed) {

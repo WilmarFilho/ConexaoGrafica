@@ -13,6 +13,11 @@ class LatestOrders extends TableWidget
 {
     protected static ?int $sort = 4;
 
+    public static function canView(): bool
+    {
+        return (bool) auth()->user()?->isStaff();
+    }
+
     protected int|string|array $columnSpan = 8;
 
     protected static ?string $heading = 'Últimos pedidos';

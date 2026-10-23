@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Filament\Actions\ChangeOrderStatusAction;
 use App\Models\Order;
 use App\Models\Shipment;
+use App\Models\Vendor;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Support\Enums\FontWeight;
@@ -127,6 +128,14 @@ class OrdersTable
                     ->label('Expedição')
                     ->options(OrderStatus::class)
                     ->multiple(),
+
+                SelectFilter::make('vendedor')
+                    ->label('Vendedor')
+                    ->options(fn () => Vendor::query()->orderBy('name')->pluck('name', 'id'))
+                    ->searchable()
+                    ->query(fn (Builder $query, array $data) => filled($data['value'] ?? null)
+                        ? $query->whereHas('items.product', fn (Builder $q) => $q->where('vendor_id', $data['value']))
+                        : $query),
 
                 SelectFilter::make('payment_status')
                     ->label('Pagamento')

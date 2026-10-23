@@ -42,7 +42,7 @@ class EditorialAccessTest extends TestCase
 
     public function test_roles_have_labels_and_the_expected_editorial_permissions(): void
     {
-        $this->assertSame(['admin', 'expedicao', 'editor', 'revisor', 'deposito'], array_keys(User::ROLES));
+        $this->assertSame(['admin', 'expedicao', 'editor', 'revisor', 'deposito', 'vendedor'], array_keys(User::ROLES));
         $this->assertSame('Depósito', (new User(['role' => 'deposito']))->roleLabel());
 
         $perm = fn (string $role) => [

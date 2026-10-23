@@ -17,6 +17,11 @@ class ChannelsHealth extends Widget
 {
     protected static ?int $sort = 3;
 
+    public static function canView(): bool
+    {
+        return (bool) auth()->user()?->isStaff();
+    }
+
     protected int|string|array $columnSpan = 4;
 
     protected string $view = 'filament.widgets.channels-health';

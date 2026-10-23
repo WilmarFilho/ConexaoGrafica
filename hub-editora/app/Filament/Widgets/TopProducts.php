@@ -11,6 +11,11 @@ class TopProducts extends Widget
 {
     protected static ?int $sort = 5;
 
+    public static function canView(): bool
+    {
+        return (bool) auth()->user()?->isStaff();
+    }
+
     protected int|string|array $columnSpan = 4;
 
     protected string $view = 'filament.widgets.top-products';

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Vendors\Commissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +25,16 @@ class Order extends Model
             'paid_at' => 'datetime',
             'raw' => 'array',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // Pedido novo ainda não tem itens: o importador sincroniza depois de criá-los.
+        static::updated(function (Order $order) {
+            if ($order->wasChanged(['status', 'payment_status'])) {
+                Commissions::make()->syncOrder($order);
+            }
+        });
     }
 
     public function channel(): BelongsTo

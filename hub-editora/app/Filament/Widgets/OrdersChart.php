@@ -15,6 +15,11 @@ class OrdersChart extends ChartWidget
 {
     protected static ?int $sort = 2;
 
+    public static function canView(): bool
+    {
+        return (bool) auth()->user()?->isStaff();
+    }
+
     protected int|string|array $columnSpan = 8;
 
     protected ?string $heading = 'Pedidos pagos por dia';

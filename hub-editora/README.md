@@ -90,10 +90,32 @@ Sem o segredo configurado no `.env` a rota responde 503 e não processa nada.
 ## Regras que valem desde o primeiro dia
 
 - Pedido-filho de vendor (MVX no WooCommerce) **não** entra: só `parent = 0`.
+  O multivendor mora no hub (abaixo): a comissão sai dos itens do pedido pai.
 - Status interno padronizado (`NOVO … ENTREGUE / CANCELADO / PROBLEMA`) e
   uma tabela de tradução por canal.
 - Idempotência por `(canal, id_externo)`: reprocessar um webhook não duplica.
 - Toda chamada externa registra log auditável (quem, quando, o quê, resposta).
+
+## Multivendor (vendedores, comissões e repasses)
+
+Autores e parceiros que vendem pela editora (no lugar do MVX da loja). Menu
+"Vendedores" (só administrador) e portal do vendedor (perfil Vendedor).
+
+- O livro (produto) tem um vendedor; a comissão é `valor dos itens` (sem frete,
+  já com desconto) × `%` do livro, senão o do vendedor (padrão 65%, como no MVX).
+- Uma comissão por pedido + livro, recalculada a cada importação e a cada mudança
+  de etapa/pagamento (`App\Vendors\Commissions`). Pedido sem pagamento: pendente;
+  pago: a repassar; cancelado/estornado: cancelada.
+- `Comissões a partir de` no vendedor: pedidos anteriores não geram comissão
+  (acertados fora do hub).
+- Repasse: junta as comissões a repassar até uma data (rascunho "a pagar"), a
+  editora transfere e registra o pagamento. Comissão já repassada não muda; se o
+  pedido cair depois, nasce estorno negativo que desconta no repasse seguinte.
+- Portal do vendedor (`/admin/minhas-vendas`, `/admin/meus-repasses`): só as
+  vendas e repasses dele, sem dados do cliente. Não vê pedidos, catálogo nem
+  expedição.
+- `php artisan hub:vendors-sync` recalcula; `hub:vendors-import-mvx arquivo.json
+  --desde=AAAA-MM-DD` traz vendedores e livros do MVX.
 
 ## Identidade visual
 

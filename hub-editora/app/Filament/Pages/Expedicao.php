@@ -47,6 +47,12 @@ class Expedicao extends Page implements HasTable
 
     protected static ?int $navigationSort = 20;
 
+    /** Equipe da editora; a conta de vendedor só vê o portal do vendedor. */
+    public static function canAccess(): bool
+    {
+        return (bool) auth()->user()?->isStaff();
+    }
+
     protected string $view = 'filament.pages.expedicao';
 
     public static function getNavigationBadge(): ?string

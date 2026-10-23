@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductChannelRef;
 use App\Models\SyncLog;
+use App\Models\VendorCommission;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -170,8 +171,11 @@ class ImportProducts
         foreach ($candidates->skip(1) as $other) {
             OrderItem::query()->where('product_id', $other->id)->update(['product_id' => $keeper->id]);
             ProductChannelRef::query()->where('product_id', $other->id)->update(['product_id' => $keeper->id]);
+            if ($keeper->exists) {
+                VendorCommission::moveProduct($other->id, $keeper->id);
+            }
 
-            foreach (['weight_grams', 'width_cm', 'height_cm', 'depth_cm', 'isbn'] as $field) {
+            foreach (['weight_grams', 'width_cm', 'height_cm', 'depth_cm', 'isbn', 'vendor_id', 'vendor_commission_pct'] as $field) {
                 if (blank($keeper->{$field}) && filled($other->{$field})) {
                     $keeper->{$field} = $other->{$field};
                 }

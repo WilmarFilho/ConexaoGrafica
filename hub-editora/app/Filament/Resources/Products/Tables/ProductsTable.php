@@ -28,7 +28,7 @@ class ProductsTable
     {
         return $table
             // um livro tem um vínculo por formato no mesmo canal: conta canais, não vínculos
-            ->modifyQueryUsing(fn (Builder $query) => $query->with('books:id,product_id,title,doi_prefix,doi_suffix,status,doi_status')->withCount([
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['books:id,product_id,title,doi_prefix,doi_suffix,status,doi_status', 'vendor:id,name'])->withCount([
                 'channelRefs as channel_refs_count' => fn (Builder $q) => $q->select(DB::raw('count(distinct channel_id)')),
             ]))
             ->defaultSort('name')
@@ -86,6 +86,13 @@ class ProductsTable
                     ->sortable()
                     ->toggleable(),
 
+                TextColumn::make('vendor.name')
+                    ->label('Vendedor')
+                    ->badge()
+                    ->color('info')
+                    ->placeholder('Editora')
+                    ->toggleable(),
+
                 TextColumn::make('doi')
                     ->label('DOI')
                     ->state(fn (Product $record) => $record->doiBook()?->doiStatusLabel())
@@ -112,6 +119,12 @@ class ProductsTable
                     ->query(fn (Builder $query, array $data) => filled($data['value'] ?? null)
                         ? $query->whereJsonContains('formats', $data['value'])
                         : $query),
+
+                SelectFilter::make('vendor_id')
+                    ->label('Vendedor')
+                    ->relationship('vendor', 'name')
+                    ->searchable()
+                    ->preload(),
 
                 SelectFilter::make('doi')
                     ->label('DOI')

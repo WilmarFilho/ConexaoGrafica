@@ -16,6 +16,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
@@ -69,7 +70,16 @@ class UserResource extends Resource
                 ->native(false)
                 // ninguém rebaixa o próprio acesso (e fica sem administrador)
                 ->disabled(fn (?User $record) => $record?->id === auth()->id())
-                ->helperText('Expedição: pedidos, expedição e catálogo. Editor: cadastra livros e capítulos. Revisor: também aprova. Depósito: envia DOIs à Crossref. Administrador: tudo, inclusive usuários, integrações e auditoria.'),
+                ->live()
+                ->helperText('Expedição: pedidos, expedição e catálogo. Editor: cadastra livros e capítulos. Revisor: também aprova. Depósito: envia DOIs à Crossref. Vendedor: só as próprias vendas e repasses. Administrador: tudo, inclusive usuários, integrações e auditoria.'),
+            Select::make('vendor_id')->label('Vendedor')
+                ->relationship('vendor', 'name')
+                ->searchable()->preload()
+                ->visible(fn (Get $get) => $get('role') === User::ROLE_VENDEDOR)
+                ->required(fn (Get $get) => $get('role') === User::ROLE_VENDEDOR)
+                ->dehydrateStateUsing(fn ($state, Get $get) => $get('role') === User::ROLE_VENDEDOR ? $state : null)
+                ->dehydratedWhenHidden()
+                ->helperText('A conta só enxerga as vendas, comissões e repasses deste vendedor.'),
         ]);
     }
 
@@ -81,7 +91,7 @@ class UserResource extends Resource
                 TextColumn::make('name')->label('Nome')->weight(FontWeight::Medium)->searchable(),
                 TextColumn::make('email')->label('E-mail')->searchable()->copyable(),
                 TextColumn::make('role')->label('Perfil')->badge()
-                    ->formatStateUsing(fn (string $state) => User::ROLES[$state] ?? $state)
+                    ->formatStateUsing(fn (string $state, User $record) => (User::ROLES[$state] ?? $state).($record->vendor ? ' · '.$record->vendor->name : ''))
                     ->color(fn (string $state) => $state === User::ROLE_ADMIN ? 'primary' : 'gray'),
                 TextColumn::make('situacao')->label('Situação')->badge()
                     ->state(fn (User $record) => match (true) {
