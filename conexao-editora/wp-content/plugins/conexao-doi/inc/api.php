@@ -6,6 +6,7 @@
  *   GET  /wp-json/conexao-doi/v1/publicacoes/{hub_book_id}              estado atual
  *   POST /wp-json/conexao-doi/v1/publicacoes/{hub_book_id}/despublicar  fora de catálogo
  *   POST /wp-json/conexao-doi/v1/documentos                             PDF da ficha
+ *   GET  /wp-json/conexao-doi/v1/produtos                               produtos publicados da loja (seletor do Hub)
  *
  * Autenticação sem usuário WP: X-Conexao-Timestamp (unix) e
  * X-Conexao-Signature = hex(hmac_sha256(timestamp . "\n" . corpo, segredo)),
@@ -41,6 +42,12 @@ add_action('rest_api_init', function (): void {
     register_rest_route('conexao-doi/v1', '/documentos', [
         'methods' => 'POST',
         'callback' => 'conexao_doi_api_documento',
+        'permission_callback' => 'conexao_doi_api_autoriza',
+    ]);
+
+    register_rest_route('conexao-doi/v1', '/produtos', [
+        'methods' => 'GET',
+        'callback' => 'conexao_doi_api_produtos',
         'permission_callback' => 'conexao_doi_api_autoriza',
     ]);
 });
@@ -305,4 +312,25 @@ function conexao_doi_registrar_documento(WP_Post $alvo, array $documento): void
 
         update_post_meta($livro->ID, CONEXAO_DOI_META_DADOS, wp_slash(wp_json_encode($dados, $json)));
     }
+}
+
+/**
+ * Produtos publicados desta loja, para o Hub ligar o livro ao produto certo
+ * (o catálogo do Hub mistura IDs da loja antiga). Só leitura.
+ */
+function conexao_doi_api_produtos(): WP_REST_Response
+{
+    if (! function_exists('wc_get_products')) {
+        return new WP_REST_Response(['products' => []]);
+    }
+
+    $produtos = wc_get_products(['status' => 'publish', 'limit' => -1, 'orderby' => 'title', 'order' => 'ASC', 'type' => ['simple', 'variable']]);
+
+    return new WP_REST_Response(['products' => array_map(static fn (WC_Product $p) => [
+        'id' => $p->get_id(),
+        'name' => html_entity_decode($p->get_name(), ENT_QUOTES, 'UTF-8'),
+        'sku' => (string) $p->get_sku(),
+        'type' => $p->get_type(),
+        'virtual' => $p->is_virtual(),
+    ], $produtos)]);
 }

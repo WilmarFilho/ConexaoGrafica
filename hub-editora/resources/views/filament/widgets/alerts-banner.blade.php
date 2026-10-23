@@ -6,7 +6,7 @@
             <div style="flex:1;min-width:0;">
                 <div class="hub-alert-title">{{ count($issues) === 1 ? '1 integração precisa de atenção' : count($issues).' integrações precisam de atenção' }}</div>
                 @foreach ($issues as $i)
-                    <div class="hub-alert-body"><strong style="color:#FF8A8A;font-weight:500;">{{ $i['channel'] }}:</strong> {{ $i['message'] }}</div>
+                    <div class="hub-alert-body"><strong style="color:var(--hub-danger);font-weight:500;">{{ $i['channel'] }}:</strong> {{ $i['message'] }}</div>
                 @endforeach
                 <div class="hub-alert-foot">Um e-mail é enviado aos usuários quando um canal cai (no máximo a cada 6 horas).</div>
             </div>

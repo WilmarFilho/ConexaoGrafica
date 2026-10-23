@@ -9,7 +9,7 @@
         </div>
     </form>
 
-    <p style="color:#8D8D8D;font-size:12px;margin-top:8px;">
+    <p style="color:var(--hub-muted);font-size:12px;margin-top:8px;">
         Segredos ficam criptografados no banco do hub e nunca são exibidos de volta. O que estiver aqui vence o arquivo <code>.env</code> do servidor.
     </p>
 </x-filament-panels::page>

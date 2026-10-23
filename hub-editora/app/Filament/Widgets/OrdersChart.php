@@ -76,9 +76,9 @@ class OrdersChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'plugins' => ['legend' => ['position' => 'bottom', 'labels' => ['color' => '#C9C9C9', 'usePointStyle' => true, 'boxWidth' => 8]]],
+            'plugins' => ['legend' => ['position' => 'bottom', 'labels' => ['color' => '#8D8D8D', 'usePointStyle' => true, 'boxWidth' => 8]]],
             'scales' => [
-                'y' => ['beginAtZero' => true, 'ticks' => ['precision' => 0, 'color' => '#8D8D8D', 'font' => ['family' => 'DM Mono']], 'grid' => ['color' => '#1C1C1C'], 'border' => ['display' => false]],
+                'y' => ['beginAtZero' => true, 'ticks' => ['precision' => 0, 'color' => '#8D8D8D', 'font' => ['family' => 'DM Mono']], 'grid' => ['color' => 'rgba(141, 141, 141, 0.18)'], 'border' => ['display' => false]],
                 'x' => ['grid' => ['display' => false], 'ticks' => ['color' => '#8D8D8D', 'font' => ['family' => 'DM Mono']]],
             ],
             'interaction' => ['mode' => 'index', 'intersect' => false],

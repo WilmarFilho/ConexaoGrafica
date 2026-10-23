@@ -171,11 +171,11 @@ class Integracoes extends Page implements HasSchemas
             default => false,
         };
 
-        $dot = $configured ? '#5BD98A' : '#F5B544';
+        $dot = $configured ? 'var(--hub-success)' : 'var(--hub-warning)';
         $label = $configured ? 'Configurado' : 'Sem credenciais';
 
         $sync = $channel?->last_sync_at
-            ? ' · última sincronização '.$channel->last_sync_at->diffForHumans().($channel->last_sync_status === 'error' ? ' <span style="color:#FF8A8A">com erro</span>' : '')
+            ? ' · última sincronização '.$channel->last_sync_at->diffForHumans().($channel->last_sync_status === 'error' ? ' <span style="color:var(--hub-danger)">com erro</span>' : '')
             : '';
 
         return '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'.$dot.';margin-right:6px"></span>'.$label.$sync;

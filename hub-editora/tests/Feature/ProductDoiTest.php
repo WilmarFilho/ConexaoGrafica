@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\Books\Schemas\BookWizard;
 use App\Filament\Resources\Products\Pages\EditProduct;
 use App\Filament\Resources\Products\Pages\ListProducts;
 use App\Models\Product;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 use Tests\Support\MakesEditorialFixtures;
 use Tests\TestCase;
@@ -80,5 +83,28 @@ class ProductDoiTest extends TestCase
 
         Livewire::test(EditProduct::class, ['record' => $sem->getRouteKey()])
             ->assertSee('Nenhum livro DOI ligado a este produto');
+    }
+
+    public function test_book_product_selector_lists_only_the_site_store_and_keeps_the_saved_value(): void
+    {
+        config(['hub.wordpress.url' => 'https://loja.test', 'hub.wordpress.secret' => str_repeat('s', 40)]);
+        Cache::forget('hub.wp.products');
+        Http::fake(['loja.test/wp-json/conexao-doi/v1/produtos' => Http::response(['products' => [
+            ['id' => 249, 'name' => 'Atualidades em Ultrassonografia', 'sku' => '', 'type' => 'simple', 'virtual' => true],
+            ['id' => 300, 'name' => 'Tratado', 'sku' => 'T1', 'type' => 'variable', 'virtual' => false],
+        ]])]);
+
+        $options = BookWizard::wooProducts(7216);
+
+        $this->assertSame([249, 300, 7216], array_keys($options));
+        $this->assertSame('Atualidades em Ultrassonografia · E-book (ID 249)', $options[249]);
+        $this->assertSame('Tratado · com variações (ID 300)', $options[300]);
+        $this->assertSame('Produto fora da loja (ID 7216)', $options[7216]);
+        Http::assertSent(fn ($request) => $request->hasHeader('X-Conexao-Signature') && $request->method() === 'GET');
+
+        // Site fora do ar: volta ao catálogo do Hub em vez de quebrar o formulário.
+        Cache::forget('hub.wp.products');
+        Http::fake(['loja.test/*' => Http::response('erro', 500)]);
+        $this->assertIsArray(BookWizard::wooProducts());
     }
 }

@@ -9,7 +9,7 @@
         <circle cx="22.5" cy="21.5" r="1.8" fill="#5B9BFF"></circle>
     </svg>
     <span style="display: inline-flex; flex-direction: column; line-height: 1.1;">
-        <span style="font: 600 15px Inter, system-ui, sans-serif; color: #F2F2F2;">Hub</span>
+        <span style="font: 600 15px Inter, system-ui, sans-serif; color: var(--hub-fg);">Hub</span>
         <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #5B9BFF;">Editora</span>
     </span>
 </span>

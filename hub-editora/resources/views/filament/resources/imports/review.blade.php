@@ -9,43 +9,43 @@
     <style>
         .hub-review { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
         @media (max-width: 1100px) { .hub-review { grid-template-columns: minmax(0, 1fr); } .hub-review-pdf { position: static !important; height: 70vh !important; } }
-        .hub-review-pdf { position: sticky; top: 1rem; height: calc(100vh - 7rem); display: flex; flex-direction: column; background: #111111; border: 1px solid #222222; border-radius: 6px; overflow: hidden; }
-        .hub-review-pdf-bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid #222222; font-size: 12px; color: #8D8D8D; }
-        .hub-review-pdf-bar input { width: 64px; padding: 2px 6px; border: 1px solid #2A2A2A; border-radius: 4px; font-size: 12px; background: #111111; color: #F2F2F2; }
-        .hub-review-pdf-bar a, .hub-review-pdf-bar button { color: #5B9BFF; font-weight: 600; background: none; border: 0; cursor: pointer; }
+        .hub-review-pdf { position: sticky; top: 1rem; height: calc(100vh - 7rem); display: flex; flex-direction: column; background: var(--hub-surface); border: 1px solid var(--hub-border); border-radius: 6px; overflow: hidden; }
+        .hub-review-pdf-bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--hub-border); font-size: 12px; color: var(--hub-muted); }
+        .hub-review-pdf-bar input { width: 64px; padding: 2px 6px; border: 1px solid var(--hub-border-input); border-radius: 4px; font-size: 12px; background: var(--hub-surface); color: var(--hub-fg); }
+        .hub-review-pdf-bar a, .hub-review-pdf-bar button { color: var(--hub-accent); font-weight: 600; background: none; border: 0; cursor: pointer; }
         .hub-review-pdf-holder { flex: 1; min-height: 0; }
         .hub-pdf-frame { width: 100%; height: 100%; border: 0; display: block; }
         .hub-review-form { min-width: 0; }
-        .hub-needs-review { background: #1F1A0A; border: 1px solid #4D3A0E; border-radius: 6px; padding: 8px 10px; }
+        .hub-needs-review { background: var(--hub-warning-bg); border: 1px solid var(--hub-warning-bd); border-radius: 6px; padding: 8px 10px; }
         .hub-banner { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 4px; }
-        .hub-pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #1A1A1A; color: #C9C9C9; }
-        .hub-pill-ok { background: #0E2A1A; color: #5BD98A; }
-        .hub-pill-warn { background: #2E2208; color: #F5B544; }
-        .hub-pill-danger { background: #331414; color: #FF8A8A; }
-        .hub-note { width: 100%; font-size: 12px; color: #8D8D8D; }
-        .hub-ev { font-size: 12px; color: #8D8D8D; }
-        .hub-ev-btn { color: #5B9BFF; font-weight: 600; background: none; border: 0; padding: 0; cursor: pointer; }
+        .hub-pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--hub-chip); color: var(--hub-fg2); }
+        .hub-pill-ok { background: var(--hub-success-bg); color: var(--hub-success); }
+        .hub-pill-warn { background: var(--hub-warning-bg); color: var(--hub-warning); }
+        .hub-pill-danger { background: var(--hub-danger-bg); color: var(--hub-danger); }
+        .hub-note { width: 100%; font-size: 12px; color: var(--hub-muted); }
+        .hub-ev { font-size: 12px; color: var(--hub-muted); }
+        .hub-ev-btn { color: var(--hub-accent); font-weight: 600; background: none; border: 0; padding: 0; cursor: pointer; }
         .hub-ev-btn:hover { text-decoration: underline; }
-        .hub-flag { color: #F5B544; font-weight: 600; }
-        .hub-flag-ai { color: #7CB4FF; }
-        .hub-conf { color: #5BD98A; }
+        .hub-flag { color: var(--hub-warning); font-weight: 600; }
+        .hub-flag-ai { color: var(--hub-info); }
+        .hub-conf { color: var(--hub-success); }
         .hub-chapters { display: flex; flex-direction: column; gap: 6px; }
         .hub-chapters-nav { display: flex; gap: 6px; margin-bottom: 6px; }
-        .hub-chapters-nav button { flex: 1; font-size: 12px; font-weight: 600; padding: 6px 8px; border: 1px solid #2A2A2A; border-radius: 8px; background: #111111; color: #5B9BFF; cursor: pointer; }
-        .hub-chapters-nav button:disabled { color: #6A6A6A; cursor: default; }
-        .hub-chapter { display: flex; gap: 8px; align-items: flex-start; width: 100%; text-align: left; padding: 8px 10px; border: 1px solid #222222; border-radius: 6px; background: #111111; cursor: pointer; font-size: 13px; line-height: 1.3; }
-        .hub-chapter:hover { border-color: #5B9BFF; }
-        .hub-chapter-current { border-color: #5B9BFF; background: #0F1E38; }
-        .hub-chapter-approved { border-left: 4px solid #5BD98A; }
-        .hub-chapter-failed { border-left: 4px solid #FF8A8A; }
-        .hub-chapter-needs { border-left: 4px solid #F5B544; }
-        .hub-chapter-n { font-family: 'DM Mono', monospace; color: #8D8D8D; min-width: 2ch; }
-        .hub-chapter-meta { display: block; font-size: 11px; color: #8D8D8D; margin-top: 2px; }
+        .hub-chapters-nav button { flex: 1; font-size: 12px; font-weight: 600; padding: 6px 8px; border: 1px solid var(--hub-border-input); border-radius: 8px; background: var(--hub-surface); color: var(--hub-accent); cursor: pointer; }
+        .hub-chapters-nav button:disabled { color: var(--hub-disabled); cursor: default; }
+        .hub-chapter { display: flex; gap: 8px; align-items: flex-start; width: 100%; text-align: left; padding: 8px 10px; border: 1px solid var(--hub-border); border-radius: 6px; background: var(--hub-surface); cursor: pointer; font-size: 13px; line-height: 1.3; }
+        .hub-chapter:hover { border-color: var(--hub-accent); }
+        .hub-chapter-current { border-color: var(--hub-accent); background: var(--hub-accent-surface); }
+        .hub-chapter-approved { border-left: 4px solid var(--hub-success); }
+        .hub-chapter-failed { border-left: 4px solid var(--hub-danger); }
+        .hub-chapter-needs { border-left: 4px solid var(--hub-warning); }
+        .hub-chapter-n { font-family: 'DM Mono', monospace; color: var(--hub-muted); min-width: 2ch; }
+        .hub-chapter-meta { display: block; font-size: 11px; color: var(--hub-muted); margin-top: 2px; }
         .hub-people { width: 100%; font-size: 13px; border-collapse: collapse; margin-top: 12px; }
-        .hub-people th, .hub-people td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #222222; vertical-align: top; }
-        .hub-people th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #8D8D8D; }
-        .hub-warnings { background: #2E2208; border: 1px solid #4D3A0E; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #F5B544; margin-bottom: 4px; }
-        .hub-status-card { background: #111111; border: 1px solid #222222; border-radius: 6px; padding: 20px 24px; display: flex; flex-direction: column; gap: 8px; }
+        .hub-people th, .hub-people td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--hub-border); vertical-align: top; }
+        .hub-people th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--hub-muted); }
+        .hub-warnings { background: var(--hub-warning-bg); border: 1px solid var(--hub-warning-bd); border-radius: 6px; padding: 10px 14px; font-size: 13px; color: var(--hub-warning); margin-bottom: 4px; }
+        .hub-status-card { background: var(--hub-surface); border: 1px solid var(--hub-border); border-radius: 6px; padding: 20px 24px; display: flex; flex-direction: column; gap: 8px; }
     </style>
 
     @if (! $import->hasProposal())
@@ -56,7 +56,7 @@
                 <span class="hub-note">{{ $import->original_name }} · enviado em {{ $import->created_at?->format('d/m/Y H:i') }}{{ $import->creator ? ' por '.$import->creator->name : '' }}</span>
             </div>
             @if ($import->status === \App\Models\Import::ERROR)
-                <p style="color:#FF8A8A;font-size:14px;"><strong>Falhou:</strong> {{ $import->error }}</p>
+                <p style="color:var(--hub-danger);font-size:14px;"><strong>Falhou:</strong> {{ $import->error }}</p>
                 <p class="hub-note">Use "Reprocessar" para chamar a IA de novo com o mesmo PDF. Se o PDF não tem camada de texto, não há o que fazer nesta versão (OCR fora do escopo).</p>
             @elseif ($import->status === \App\Models\Import::RECEIVED)
                 <p class="hub-note">Na fila. O processamento começa quando o worker (queue:work database) pegar o job; esta página atualiza sozinha.</p>

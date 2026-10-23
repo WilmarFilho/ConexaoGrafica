@@ -1,6 +1,6 @@
 /*
- * Identidade do Hub Editora (redesign out/2026, linguagem "ASTER"): escuro,
- * editorial, números em mono. Aplicada por cima do tema escuro do Filament,
+ * Identidade do Hub Editora (redesign out/2026, linguagem "ASTER"): editorial,
+ * números em mono; escuro por padrão, com variante clara pelo menu do usuário. Aplicada por cima do tema escuro do Filament,
  * sem build: o painel injeta este arquivo inline (AdminPanelProvider).
  *
  * As paletas primary/gray do Filament já vêm dos tokens (escala 50–950); aqui
@@ -9,34 +9,38 @@
  */
 
 :root {
-    /* superfícies: profundidade por cor, não por sombra */
-    --hub-bg: #0A0A0A;
-    --hub-sidebar: #0D0D0D;
-    --hub-surface: #111111;
-    --hub-surface-head: #0E0E0E;
-    --hub-elevated: #1C1C1C;
-    --hub-line: #1C1C1C;
-    --hub-border-sidebar: #1F1F1F;
-    --hub-border: #222222;
-    --hub-border-input: #2A2A2A;
+    /* variante clara (tokens do Claude Design); o escuro redefine em .dark */
+    --hub-bg: #F6F5F2;
+    --hub-sidebar: #FFFFFF;
+    --hub-surface: #FFFFFF;
+    --hub-surface-head: #FAF9F7;
+    --hub-elevated: #FFFFFF;
+    --hub-line: #EEEBE6;
+    --hub-border-sidebar: #E6E3DD;
+    --hub-border: #E6E3DD;
+    --hub-border-input: #D6D3CD;
+    --hub-hover: #F1EFEB;
+    --hub-row-hover: #FAF9F7;
+    --hub-chip: #F1EFEB;
+    --hub-chip-bd: #E0DCD5;
 
-    /* texto */
-    --hub-fg: #F2F2F2;
-    --hub-fg2: #C9C9C9;
-    --hub-muted: #8D8D8D;
-    --hub-disabled: #6A6A6A;
+    --hub-fg: #24292F;
+    --hub-fg2: #3D434B;
+    --hub-muted: #6A6F7A;
+    --hub-disabled: #9AA0A8;
 
-    /* acento */
-    --hub-accent: #5B9BFF;
-    --hub-accent-hover: #8DB8FF;
-    --hub-accent-surface: #0F1E38;
-    --hub-accent-border: #234A8A;
+    --hub-accent: #2563EB;
+    --hub-accent-hover: #1D4ED8;
+    --hub-accent-surface: #EAF2FF;
+    --hub-accent-border: #ADCBFF;
+    --hub-on-accent: #FFFFFF;
 
-    /* semânticas: texto / fundo / borda */
-    --hub-success: #5BD98A; --hub-success-bg: #0E2A1A; --hub-success-bd: #1F4A30;
-    --hub-warning: #F5B544; --hub-warning-bg: #2E2208; --hub-warning-bd: #4D3A0E;
-    --hub-danger: #FF8A8A;  --hub-danger-bg: #331414;  --hub-danger-bd: #5A2323;
-    --hub-info: #7CB4FF;    --hub-info-bg: #10203A;    --hub-info-bd: #1E3A66;
+    --hub-success: #15803D; --hub-success-bg: #E8F5EC; --hub-success-bd: #B7DEC3;
+    --hub-warning: #A15C07; --hub-warning-bg: #FFF4E0; --hub-warning-bd: #F3D27A;
+    --hub-danger: #B91C1C;  --hub-danger-bg: #FDECEC;  --hub-danger-bd: #F3C2C2;
+    --hub-info: #1D4ED8;    --hub-info-bg: #EAF2FF;    --hub-info-bd: #ADCBFF;
+    --hub-alert-bg: #FDECEC;
+    --hub-alert-title: #8F1D1D;
 
     --hub-serif: "Fraunces", Georgia, serif;
     --hub-sans: "Inter", system-ui, sans-serif;
@@ -46,6 +50,41 @@
     --hub-r-ctl: 4px;
     --hub-r-card: 6px;
     --hub-r-modal: 10px;
+}
+
+/* tema escuro (padrão): o Filament põe .dark no <html> */
+.dark {
+    --hub-bg: #0A0A0A;
+    --hub-sidebar: #0D0D0D;
+    --hub-surface: #111111;
+    --hub-surface-head: #0E0E0E;
+    --hub-elevated: #1C1C1C;
+    --hub-line: #1C1C1C;
+    --hub-border-sidebar: #1F1F1F;
+    --hub-border: #222222;
+    --hub-border-input: #2A2A2A;
+    --hub-hover: #151515;
+    --hub-row-hover: #141414;
+    --hub-chip: #1A1A1A;
+    --hub-chip-bd: #2C2C2C;
+
+    --hub-fg: #F2F2F2;
+    --hub-fg2: #C9C9C9;
+    --hub-muted: #8D8D8D;
+    --hub-disabled: #6A6A6A;
+
+    --hub-accent: #5B9BFF;
+    --hub-accent-hover: #8DB8FF;
+    --hub-accent-surface: #0F1E38;
+    --hub-accent-border: #234A8A;
+    --hub-on-accent: #0A0A0A;
+
+    --hub-success: #5BD98A; --hub-success-bg: #0E2A1A; --hub-success-bd: #1F4A30;
+    --hub-warning: #F5B544; --hub-warning-bg: #2E2208; --hub-warning-bd: #4D3A0E;
+    --hub-danger: #FF8A8A;  --hub-danger-bg: #331414;  --hub-danger-bd: #5A2323;
+    --hub-info: #7CB4FF;    --hub-info-bg: #10203A;    --hub-info-bd: #1E3A66;
+    --hub-alert-bg: #1F0D0D;
+    --hub-alert-title: #FFB4B4;
 }
 
 html, body, .fi-body {
@@ -139,7 +178,7 @@ a { text-underline-offset: 2px; }
 }
 
 .fi-sidebar-item-btn:hover {
-    background-color: #151515 !important;
+    background-color: var(--hub-hover) !important;
 }
 
 .fi-sidebar-item-label {
@@ -201,7 +240,7 @@ a { text-underline-offset: 2px; }
 
 .fi-global-search-field .fi-input-wrp {
     background: var(--hub-surface) !important;
-    border: 1px solid #262626;
+    border: 1px solid var(--hub-border-input);
     border-radius: var(--hub-r-ctl) !important;
     min-width: 360px;
     box-shadow: none !important;
@@ -347,7 +386,7 @@ a { text-underline-offset: 2px; }
 }
 
 .fi-ta-row:hover {
-    background-color: #141414 !important;
+    background-color: var(--hub-row-hover) !important;
 }
 
 .fi-ta-row.fi-selected,
@@ -389,9 +428,9 @@ a { text-underline-offset: 2px; }
     padding: 0 8px !important;
     font-size: 12px !important;
     font-weight: 500 !important;
-    background: #1A1A1A !important;
+    background: var(--hub-chip) !important;
     color: var(--hub-fg2) !important;
-    box-shadow: inset 0 0 0 1px #2C2C2C !important;
+    box-shadow: inset 0 0 0 1px var(--hub-chip-bd) !important;
     --tw-ring-shadow: 0 0 #0000 !important;
 }
 
@@ -419,7 +458,7 @@ a { text-underline-offset: 2px; }
 /* primário: azul elétrico com texto escuro */
 .fi-btn.fi-color-primary:not(.fi-outlined):not(.fi-link) {
     background-color: var(--hub-accent) !important;
-    color: #0A0A0A !important;
+    color: var(--hub-on-accent) !important;
 }
 
 .fi-btn.fi-color-primary:not(.fi-outlined):not(.fi-link):hover {
@@ -428,7 +467,7 @@ a { text-underline-offset: 2px; }
 
 .fi-btn.fi-color-primary:not(.fi-outlined):not(.fi-link) .fi-icon,
 .fi-btn.fi-color-primary:not(.fi-outlined):not(.fi-link) .fi-loading-indicator {
-    color: #0A0A0A !important;
+    color: var(--hub-on-accent) !important;
 }
 
 /* secundário (cinza): contorno */
@@ -440,7 +479,7 @@ a { text-underline-offset: 2px; }
 }
 
 .fi-btn.fi-color-gray:not(.fi-link):hover {
-    background-color: #151515 !important;
+    background-color: var(--hub-hover) !important;
 }
 
 /* sucesso / perigo: superfície tingida com borda */
@@ -566,7 +605,7 @@ a { text-underline-offset: 2px; }
 .fi-fo-wizard-header-step.fi-completed .fi-fo-wizard-header-step-indicator {
     background-color: var(--hub-accent) !important;
     border-color: var(--hub-accent) !important;
-    color: #0A0A0A !important;
+    color: var(--hub-on-accent) !important;
 }
 
 /* ---------- modais, menus, notificações ---------- */
@@ -598,7 +637,7 @@ a { text-underline-offset: 2px; }
 }
 
 .fi-dropdown-list-item:hover {
-    background-color: #242424 !important;
+    background-color: var(--hub-hover) !important;
 }
 
 .fi-no-notification {
@@ -689,13 +728,13 @@ a { text-underline-offset: 2px; }
     display: flex;
     gap: 14px;
     align-items: flex-start;
-    background: #1F0D0D;
+    background: var(--hub-alert-bg);
     border: 1px solid var(--hub-danger-bd);
     border-radius: var(--hub-r-card);
     padding: 14px 18px;
 }
 
-.hub-alert-title { font-weight: 500; color: #FFB4B4; }
+.hub-alert-title { font-weight: 500; color: var(--hub-alert-title); }
 .hub-alert-icon { color: var(--hub-danger); flex: 0 0 16px; margin-top: 2px; }
 .hub-alert-body { font-size: 13px; color: var(--hub-fg2); }
 .hub-alert-foot { font-size: 12px; color: var(--hub-muted); margin-top: 6px; }

@@ -74,8 +74,9 @@ class AdminPanelProvider extends PanelProvider
                 'info' => Color::hex('#7CB4FF'),
             ])
             ->font('Inter')
-            // Só o tema escuro foi desenhado: fica fixo (sem alternância no menu).
-            ->darkMode(true, isForced: true)
+            // Escuro por padrão; o menu do usuário alterna claro/escuro/sistema
+            // (a escolha fica no navegador). Os tokens claros estão no hub-theme.css.
+            ->darkMode(true)
             ->defaultThemeMode(ThemeMode::Dark)
             ->sidebarWidth('15rem')
             ->maxContentWidth('full')

@@ -61,6 +61,15 @@ class Client
     }
 
     /**
+     * Produtos publicados da loja do site (seletor do livro):
+     * [{id, name, sku, type, virtual}], em ordem de título.
+     */
+    public function products(): array
+    {
+        return (array) ($this->send('get', '/produtos', [])['products'] ?? []);
+    }
+
+    /**
      * Upload da ficha PDF (frente E gera o arquivo). JSON com o conteúdo em
      * base64, assinado como qualquer outro corpo (decisão da frente B: sem
      * multipart). Devolve `attachment_id` e `url`.

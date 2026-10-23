@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Books\Schemas;
 
 use App\Editorial\BookWorkflow;
 use App\Editorial\DoiSuffix;
+use App\Editorial\WordPress\Client;
 use App\Editorial\WordPress\Payload;
 use App\Filament\Resources\Books\BookActions;
 use App\Filament\Resources\Books\Pages\EditBook;
@@ -36,8 +37,10 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * As 8 etapas do cadastro de livro (contrato, seção 1; telas do Diego):
@@ -305,7 +308,7 @@ class BookWizard
                         Select::make('modality')->label('Modalidade')->options(CommercialLink::MODALITIES)->required()->native(false)->columnSpan(3),
                         TextInput::make('label')->label('Texto do botão')->required()->maxLength(120)->columnSpan(3),
                         Select::make('woo_product_id')->label('Produto na loja (Woo)')
-                            ->options(fn () => self::wooProducts())
+                            ->options(fn ($state) => self::wooProducts($state))
                             ->searchable()->native(false)
                             ->placeholder('Buscar no catálogo')
                             ->columnSpan(3),
@@ -319,8 +322,45 @@ class BookWizard
             ]);
     }
 
-    /** Produtos da loja WooCommerce vinculados no catálogo do Hub: id Woo → "Título · Formato (ID)". */
-    public static function wooProducts(): array
+    /**
+     * Produtos da loja do site (conexaoeditora.com.br): id Woo → "Título · Formato (ID)".
+     * A lista vem do próprio site (o catálogo do Hub também guarda IDs da loja
+     * antiga, o que duplicava o mesmo livro); sem o site, cai no catálogo do Hub.
+     * O valor já salvo continua na lista mesmo que o produto tenha saído da loja.
+     */
+    public static function wooProducts(int|string|null $current = null): array
+    {
+        $options = self::siteProducts() ?? self::catalogProducts();
+
+        if (filled($current) && ! isset($options[(int) $current])) {
+            $options[(int) $current] = "Produto fora da loja (ID {$current})";
+        }
+
+        return $options;
+    }
+
+    /** @return array<int, string>|null null quando o site não responde */
+    private static function siteProducts(): ?array
+    {
+        if (! Client::isConfigured()) {
+            return null;
+        }
+
+        try {
+            $products = Cache::remember('hub.wp.products', now()->addMinutes(10), fn () => Client::fromConfig()->products());
+        } catch (Throwable) {
+            return null;
+        }
+
+        return collect($products)
+            ->mapWithKeys(fn (array $p) => [(int) $p['id'] => $p['name']
+                .' · '.(($p['type'] ?? '') === 'variable' ? 'com variações' : (! empty($p['virtual']) ? 'E-book' : 'Impresso'))
+                ." (ID {$p['id']})"])
+            ->all();
+    }
+
+    /** Catálogo do Hub (vínculos do canal WooCommerce), a lista antiga. */
+    private static function catalogProducts(): array
     {
         return ProductChannelRef::query()
             ->whereHas('channel', fn ($query) => $query->where('slug', Channel::WOOCOMMERCE))
@@ -391,7 +431,7 @@ class BookWizard
         $html = '<dl style="display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;font-size:.9rem">';
         foreach ($rows as $k => $v) {
             $safe = in_array($k, ['DOI', 'ISBN impresso', 'ISBN e-book', 'Situação', 'Página pública'], true) ? $v : e($v);
-            $html .= '<dt style="color:#8D8D8D">'.e($k).'</dt><dd style="font-weight:500">'.$safe.'</dd>';
+            $html .= '<dt style="color:var(--hub-muted)">'.e($k).'</dt><dd style="font-weight:500">'.$safe.'</dd>';
         }
 
         return $html.'</dl>';
@@ -401,15 +441,15 @@ class BookWizard
     {
         $html = '<ul style="display:grid;gap:6px;font-size:.9rem">';
         foreach (BookWorkflow::checklist($book) as $item) {
-            [$mark, $color] = $item['ok'] ? ['✓', '#5BD98A'] : ($item['stage'] === 'info' ? ['○', '#8D8D8D'] : ['⚠', '#F5B544']);
+            [$mark, $color] = $item['ok'] ? ['✓', 'var(--hub-success)'] : ($item['stage'] === 'info' ? ['○', 'var(--hub-muted)'] : ['⚠', 'var(--hub-warning)']);
             $stage = match ($item['stage']) {
                 'review' => 'obrigatório',
                 'approve' => 'para aprovar',
                 default => 'opcional',
             };
             $html .= '<li><span style="color:'.$color.';font-weight:600">'.$mark.'</span> '.e($item['label'])
-                .' <span style="color:#8D8D8D;font-size:.8rem">('.$stage.')</span>'
-                .(! $item['ok'] && $item['detail'] ? '<div style="color:#8D8D8D;font-size:.8rem;margin-left:1.4em">'.e($item['detail']).'</div>' : '')
+                .' <span style="color:var(--hub-muted);font-size:.8rem">('.$stage.')</span>'
+                .(! $item['ok'] && $item['detail'] ? '<div style="color:var(--hub-muted);font-size:.8rem;margin-left:1.4em">'.e($item['detail']).'</div>' : '')
                 .'</li>';
         }
 
