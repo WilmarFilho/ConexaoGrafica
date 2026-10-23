@@ -121,7 +121,7 @@ class OrderInfolist
         $line1 = trim($o->ship_street.', '.($o->ship_number ?: 's/n').($o->ship_complement ? ' · '.$o->ship_complement : ''));
         $line2 = trim(($o->ship_district ? $o->ship_district.' · ' : '').$o->ship_city.' / '.$o->ship_state);
         $zip = $o->ship_zip ? '<span class="hub-mono">CEP '.e($o->ship_zip).'</span>' : '';
-        $ref = $o->ship_reference ? '<span style="color:#6A6F7A">Ref.: '.e($o->ship_reference).'</span>' : '';
+        $ref = $o->ship_reference ? '<span style="color:#8D8D8D">Ref.: '.e($o->ship_reference).'</span>' : '';
 
         return implode('<br>', array_filter([e($line1), e($line2), $zip, $ref]));
     }

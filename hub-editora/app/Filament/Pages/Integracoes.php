@@ -25,6 +25,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\HtmlString;
 use Throwable;
+use UnitEnum;
 
 /**
  * Integrações: situação de cada canal, teste de conexão e troca de chaves.
@@ -41,6 +42,8 @@ class Integracoes extends Page implements HasSchemas
     use InteractsWithSchemas;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPuzzlePiece;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Administração';
 
     protected static ?string $navigationLabel = 'Integrações';
 
@@ -168,11 +171,11 @@ class Integracoes extends Page implements HasSchemas
             default => false,
         };
 
-        $dot = $configured ? '#15803D' : '#B45309';
+        $dot = $configured ? '#5BD98A' : '#F5B544';
         $label = $configured ? 'Configurado' : 'Sem credenciais';
 
         $sync = $channel?->last_sync_at
-            ? ' · última sincronização '.$channel->last_sync_at->diffForHumans().($channel->last_sync_status === 'error' ? ' <span style="color:#B91C1C">com erro</span>' : '')
+            ? ' · última sincronização '.$channel->last_sync_at->diffForHumans().($channel->last_sync_status === 'error' ? ' <span style="color:#FF8A8A">com erro</span>' : '')
             : '';
 
         return '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'.$dot.';margin-right:6px"></span>'.$label.$sync;

@@ -129,26 +129,26 @@ class DepositActions
         $html = '<div style="display:grid;gap:10px;font-size:.9rem;text-align:left">';
 
         if ($prod) {
-            $html .= '<div style="padding:8px 10px;border-radius:6px;background:#FEF2F2;color:#991B1B;border:1px solid #FECACA">'
+            $html .= '<div style="padding:8px 10px;border-radius:6px;background:#331414;color:#FF8A8A;border:1px solid #5A2323">'
                 .'<strong>Ambiente: produção</strong> (doi.crossref.org). Os DOIs passam a existir de verdade e '
                 .'<strong>a Crossref cobra por DOI registrado</strong>: '.$n.' DOI(s) neste lote. Atualização do mesmo DOI não gera nova cobrança.</div>';
         } else {
-            $html .= '<div style="padding:8px 10px;border-radius:6px;background:#EFF6FF;color:#1E3A8A;border:1px solid #BFDBFE">'
+            $html .= '<div style="padding:8px 10px;border-radius:6px;background:#10203A;color:#7CB4FF;border:1px solid #1E3A66">'
                 .'<strong>Ambiente: homologação</strong> (test.crossref.org). Nada é registrado de verdade nem cobrado; em produção a Crossref cobra por DOI.</div>';
         }
 
         if ($book->doi_status === 'registered') {
-            $html .= '<div style="color:#6A6F7A">O livro já está registrado: este envio atualiza os metadados e as URLs dos mesmos DOIs (o sufixo não muda).</div>';
+            $html .= '<div style="color:#8D8D8D">O livro já está registrado: este envio atualiza os metadados e as URLs dos mesmos DOIs (o sufixo não muda).</div>';
         }
 
         if ($why = BookDeposits::blocker($book)) {
-            $html .= '<div style="color:#B45309"><strong>⚠</strong> '.e($why).'</div>';
+            $html .= '<div style="color:#F5B544"><strong>⚠</strong> '.e($why).'</div>';
         }
 
         $html .= '<div><strong>'.$n.' DOI(s) no lote</strong></div>'
             .'<ul class="hub-mono" style="display:grid;gap:4px;font-size:.8rem;max-height:16rem;overflow:auto;padding-right:4px">';
         foreach ($dois as $d) {
-            $html .= '<li>'.e($d['doi']).' <span style="color:#6A6F7A;font-family:inherit">— '.e($d['label']).'</span></li>';
+            $html .= '<li>'.e($d['doi']).' <span style="color:#8D8D8D;font-family:inherit">— '.e($d['label']).'</span></li>';
         }
 
         return $html.'</ul></div>';
@@ -170,24 +170,24 @@ class DepositActions
     {
         $deposit->loadMissing('items');
 
-        $html = '<div style="font-size:.85rem;text-align:left"><div style="color:#6A6F7A;margin-bottom:8px">'
+        $html = '<div style="font-size:.85rem;text-align:left"><div style="color:#8D8D8D;margin-bottom:8px">'
             .'Lote <span class="hub-mono">'.e($deposit->batch_id).'</span> · '.e($deposit->environment_label).' · '.e($deposit->status_label)
             .($deposit->submitted_at ? ' · enviado em '.$deposit->submitted_at->format('d/m/Y H:i') : '')
             .($deposit->result_at ? ' · resultado em '.$deposit->result_at->format('d/m/Y H:i') : '')
-            .'</div><table style="width:100%;border-collapse:collapse"><thead><tr style="color:#6A6F7A;font-size:.78rem;text-align:left">'
+            .'</div><table style="width:100%;border-collapse:collapse"><thead><tr style="color:#8D8D8D;font-size:.78rem;text-align:left">'
             .'<th style="padding:4px 6px">DOI</th><th style="padding:4px 6px">Alvo</th><th style="padding:4px 6px">Estado</th><th style="padding:4px 6px">Mensagem</th></tr></thead><tbody>';
 
         foreach ($deposit->items as $item) {
             $color = match ($item->status) {
-                DepositItem::REGISTERED => '#15803D',
-                DepositItem::FAILED => '#B91C1C',
-                default => '#B45309',
+                DepositItem::REGISTERED => '#5BD98A',
+                DepositItem::FAILED => '#FF8A8A',
+                default => '#F5B544',
             };
-            $html .= '<tr style="border-top:1px solid #E5E7EB">'
+            $html .= '<tr style="border-top:1px solid #222222">'
                 .'<td class="hub-mono" style="padding:4px 6px;white-space:nowrap">'.e($item->doi).'</td>'
                 .'<td style="padding:4px 6px">'.($item->target_type === DepositItem::BOOK ? 'Livro' : 'Capítulo').' #'.(int) $item->target_id.'</td>'
                 .'<td style="padding:4px 6px;color:'.$color.';font-weight:600">'.e($item->status_label).'</td>'
-                .'<td style="padding:4px 6px;color:#6A6F7A">'.e((string) $item->message ?: '—').'</td></tr>';
+                .'<td style="padding:4px 6px;color:#8D8D8D">'.e((string) $item->message ?: '—').'</td></tr>';
         }
 
         return $html.'</tbody></table></div>';

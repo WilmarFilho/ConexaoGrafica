@@ -49,9 +49,10 @@ class OrdersChart extends ChartWidget
             ->groupBy('channel_id');
 
         $palette = [
-            Channel::WOOCOMMERCE => '#2E6BD6',
-            Channel::PAGARME => '#15803D',
-            Channel::AMAZON => '#B45309',
+            // cores de canal do redesign (mesmas dos selos)
+            Channel::WOOCOMMERCE => '#5B9BFF',
+            Channel::PAGARME => '#5BD98A',
+            Channel::AMAZON => '#F5B544',
         ];
 
         $datasets = [];
@@ -64,7 +65,7 @@ class OrdersChart extends ChartWidget
                 'backgroundColor' => $palette[$channel->slug].'22',
                 'fill' => true,
                 'tension' => 0.35,
-                'pointRadius' => 2,
+                'pointRadius' => 0,
                 'borderWidth' => 2,
             ];
         }
@@ -75,10 +76,10 @@ class OrdersChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'plugins' => ['legend' => ['position' => 'bottom']],
+            'plugins' => ['legend' => ['position' => 'bottom', 'labels' => ['color' => '#C9C9C9', 'usePointStyle' => true, 'boxWidth' => 8]]],
             'scales' => [
-                'y' => ['beginAtZero' => true, 'ticks' => ['precision' => 0], 'grid' => ['color' => '#EEEBE6']],
-                'x' => ['grid' => ['display' => false]],
+                'y' => ['beginAtZero' => true, 'ticks' => ['precision' => 0, 'color' => '#8D8D8D', 'font' => ['family' => 'DM Mono']], 'grid' => ['color' => '#1C1C1C'], 'border' => ['display' => false]],
+                'x' => ['grid' => ['display' => false], 'ticks' => ['color' => '#8D8D8D', 'font' => ['family' => 'DM Mono']]],
             ],
             'interaction' => ['mode' => 'index', 'intersect' => false],
         ];

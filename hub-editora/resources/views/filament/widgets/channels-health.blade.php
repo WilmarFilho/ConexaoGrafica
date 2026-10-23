@@ -1,31 +1,31 @@
 <x-filament-widgets::widget>
     <x-filament::section heading="Canais" description="Configuração e última sincronização">
         @php
-            $dot = ['ok' => '#15803D', 'off' => '#B45309', 'error' => '#B91C1C'];
+            $dot = ['ok' => '#5BD98A', 'off' => '#F5B544', 'error' => '#FF8A8A'];
         @endphp
-        <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
             @foreach ($this->getRows() as $r)
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #EEEBE6;">
-                    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                        <span style="flex:none;width:9px;height:9px;border-radius:50%;background:{{ $dot[$r['state']] }};"></span>
+                <div class="hub-list-row" style="align-items:center;justify-content:space-between;">
+                    <div style="display:flex;align-items:flex-start;gap:10px;min-width:0;">
+                        <span class="hub-dot" style="background:{{ $dot[$r['state']] }};margin-top:6px;"></span>
                         <div style="min-width:0;">
-                            <div style="font-weight:600;color:#24292F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $r['name'] }}</div>
-                            <div style="font-size:12px;color:#6A6F7A;">
+                            <div style="font-size:13px;font-weight:500;color:#F2F2F2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $r['name'] }}</div>
+                            <div class="hub-muted" style="font-size:12px;">
                                 {{ $r['label'] }}@if ($r['sync']) · sync {{ $r['sync'] }}@endif
-                                @if ($r['errors']) · <span style="color:#B91C1C">{{ $r['errors'] }} erro(s) desde o último sucesso</span>@endif
+                                @if ($r['errors']) · <span style="color:#FF8A8A">{{ $r['errors'] }} erro(s) desde o último sucesso</span>@endif
                             </div>
                         </div>
                     </div>
                     @if ($r['orders30'] !== null)
-                        <div class="hub-mono" style="flex:none;text-align:right;font-size:13px;color:#24292F;">
-                            {{ $r['orders30'] }}<span style="color:#6A6F7A;font-size:11px;"> / 30d</span>
+                        <div class="hub-mono" style="flex:none;text-align:right;font-size:12.5px;color:#C9C9C9;">
+                            {{ $r['orders30'] }} / 30d
                         </div>
                     @endif
                 </div>
             @endforeach
         </div>
-        <div style="margin-top:10px;font-size:12px;">
-            <a href="{{ \App\Filament\Pages\Integracoes::getUrl() }}" style="color:#2E6BD6;font-weight:600;">Abrir integrações →</a>
+        <div style="margin-top:12px;font-size:13px;">
+            <a href="{{ \App\Filament\Pages\Integracoes::getUrl() }}" style="color:#5B9BFF;">Abrir integrações →</a>
         </div>
     </x-filament::section>
 </x-filament-widgets::widget>

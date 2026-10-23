@@ -2,18 +2,16 @@
     <x-filament::section heading="Mais vendidos" description="Últimos 30 dias, pedidos pagos">
         @php $rows = $this->getRows(); @endphp
         @if (! $rows)
-            <div style="color:#6A6F7A;font-size:13px;">Sem vendas no período.</div>
+            <div class="hub-muted" style="font-size:13px;">Sem vendas no período.</div>
         @else
-            <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;flex-direction:column;gap:12px;">
                 @foreach ($rows as $r)
                     <div>
                         <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;">
-                            <span style="color:#24292F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $r['name'] }}</span>
-                            <span class="hub-mono" style="flex:none;color:#6A6F7A;">{{ $r['qty'] }} un · {{ $r['money'] }}</span>
+                            <span style="color:#F2F2F2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $r['name'] }}</span>
+                            <span class="hub-mono hub-muted" style="flex:none;font-size:12px;">{{ $r['qty'] }} un · {{ $r['money'] }}</span>
                         </div>
-                        <div style="height:6px;background:#EEEBE6;border-radius:3px;margin-top:4px;overflow:hidden;">
-                            <div style="height:100%;width:{{ $r['pct'] }}%;background:#2E6BD6;border-radius:3px;"></div>
-                        </div>
+                        <div class="hub-bar" style="margin-top:6px;"><span style="width:{{ $r['pct'] }}%;"></span></div>
                     </div>
                 @endforeach
             </div>

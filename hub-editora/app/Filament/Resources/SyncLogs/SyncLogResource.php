@@ -20,6 +20,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 /**
  * Auditoria: tudo que entrou, saiu ou foi mudado à mão. Somente leitura.
@@ -35,6 +36,8 @@ class SyncLogResource extends Resource
     protected static ?string $model = SyncLog::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Administração';
 
     protected static ?string $navigationLabel = 'Auditoria';
 

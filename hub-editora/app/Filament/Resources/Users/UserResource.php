@@ -25,6 +25,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 /**
  * Usuários do painel. Ninguém digita senha de outra pessoa: a conta nasce
@@ -39,6 +40,8 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Administração';
 
     protected static ?string $navigationLabel = 'Usuários';
 

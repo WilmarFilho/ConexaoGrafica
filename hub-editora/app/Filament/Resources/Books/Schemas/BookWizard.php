@@ -391,7 +391,7 @@ class BookWizard
         $html = '<dl style="display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;font-size:.9rem">';
         foreach ($rows as $k => $v) {
             $safe = in_array($k, ['DOI', 'ISBN impresso', 'ISBN e-book', 'Situação', 'Página pública'], true) ? $v : e($v);
-            $html .= '<dt style="color:#6A6F7A">'.e($k).'</dt><dd style="font-weight:500">'.$safe.'</dd>';
+            $html .= '<dt style="color:#8D8D8D">'.e($k).'</dt><dd style="font-weight:500">'.$safe.'</dd>';
         }
 
         return $html.'</dl>';
@@ -401,15 +401,15 @@ class BookWizard
     {
         $html = '<ul style="display:grid;gap:6px;font-size:.9rem">';
         foreach (BookWorkflow::checklist($book) as $item) {
-            [$mark, $color] = $item['ok'] ? ['✓', '#15803D'] : ($item['stage'] === 'info' ? ['○', '#6A6F7A'] : ['⚠', '#B45309']);
+            [$mark, $color] = $item['ok'] ? ['✓', '#5BD98A'] : ($item['stage'] === 'info' ? ['○', '#8D8D8D'] : ['⚠', '#F5B544']);
             $stage = match ($item['stage']) {
                 'review' => 'obrigatório',
                 'approve' => 'para aprovar',
                 default => 'opcional',
             };
             $html .= '<li><span style="color:'.$color.';font-weight:600">'.$mark.'</span> '.e($item['label'])
-                .' <span style="color:#6A6F7A;font-size:.8rem">('.$stage.')</span>'
-                .(! $item['ok'] && $item['detail'] ? '<div style="color:#6A6F7A;font-size:.8rem;margin-left:1.4em">'.e($item['detail']).'</div>' : '')
+                .' <span style="color:#8D8D8D;font-size:.8rem">('.$stage.')</span>'
+                .(! $item['ok'] && $item['detail'] ? '<div style="color:#8D8D8D;font-size:.8rem;margin-left:1.4em">'.e($item['detail']).'</div>' : '')
                 .'</li>';
         }
 
