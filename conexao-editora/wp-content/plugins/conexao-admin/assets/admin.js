@@ -57,3 +57,61 @@
   separador.appendChild(botao);
   aplica();
 })();
+
+/* Conexão Admin: botão "Modo claro / Modo escuro" da barra do topo.
+   Troca a classe do <body> (e do editor clássico) na hora e grava a escolha do usuário. */
+(function () {
+  var item = document.querySelector('#wp-admin-bar-cxa-tema > .ab-item');
+  var dados = window.cxaTema;
+
+  if (!item || !dados) {
+    return;
+  }
+
+  item.setAttribute('role', 'button');
+
+  function aplica(claro) {
+    document.body.classList.toggle('cxa-claro', claro);
+
+    var rotulo = item.querySelector('.cxa-tema__rotulo');
+    if (rotulo) {
+      rotulo.textContent = claro ? 'Modo escuro' : 'Modo claro';
+    }
+
+    // iframes do TinyMCE
+    if (window.tinymce && window.tinymce.editors) {
+      window.tinymce.editors.forEach(function (editor) {
+        var corpo = editor.getBody && editor.getBody();
+        if (corpo) {
+          corpo.classList.toggle('cxa-claro', claro);
+        }
+      });
+    }
+  }
+
+  item.addEventListener('click', function (evento) {
+    evento.preventDefault();
+
+    var claro = !document.body.classList.contains('cxa-claro');
+    aplica(claro);
+
+    var corpo = new FormData();
+    corpo.append('action', 'conexao_admin_tema');
+    corpo.append('nonce', dados.nonce);
+    corpo.append('tema', claro ? 'claro' : 'escuro');
+
+    fetch(dados.ajax, { method: 'POST', body: corpo, credentials: 'same-origin' })
+      .then(function (resposta) {
+        return resposta.json();
+      })
+      .then(function (json) {
+        if (!json || !json.success) {
+          throw new Error('falhou');
+        }
+      })
+      .catch(function () {
+        // não gravou: volta ao que estava
+        aplica(!claro);
+      });
+  });
+})();

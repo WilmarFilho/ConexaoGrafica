@@ -36,3 +36,39 @@ body.mce-content-body pre {
 body.mce-content-body ::selection {
   background: #234A8A;
 }
+
+/* modo claro (a classe cxa-claro chega ao <body> do editor pelo tiny_mce_before_init) */
+html:has(body.mce-content-body.cxa-claro),
+body.mce-content-body.cxa-claro {
+  background: #FFFFFF;
+}
+
+body.mce-content-body.cxa-claro {
+  color: #3D434B;
+}
+
+body.mce-content-body.cxa-claro a {
+  color: #2563EB;
+}
+
+body.mce-content-body.cxa-claro h1,
+body.mce-content-body.cxa-claro h2,
+body.mce-content-body.cxa-claro h3,
+body.mce-content-body.cxa-claro h4,
+body.mce-content-body.cxa-claro strong {
+  color: #24292F;
+}
+
+body.mce-content-body.cxa-claro blockquote {
+  border-left-color: #ADCBFF;
+}
+
+body.mce-content-body.cxa-claro code,
+body.mce-content-body.cxa-claro pre {
+  background: #F3F2EF;
+  color: #24292F;
+}
+
+body.mce-content-body.cxa-claro ::selection {
+  background: #D6E6FF;
+}

@@ -13,12 +13,15 @@ const CONEXAO_ADMIN_ESQUEMA = 'conexao';
 // esquema de cores "Conexão Editora": a folha dele só zera o que o esquema do
 // núcleo pintaria; o visual inteiro vem do admin.css, carregado em todas as telas
 add_action('admin_init', function (): void {
+    // as cores dos ícones em SVG (pintados pelo svg-painter do núcleo) seguem o modo do usuário
+    $claro = conexao_admin_tema() === 'claro';
+
     wp_admin_css_color(
         CONEXAO_ADMIN_ESQUEMA,
         'Conexão Editora',
         CONEXAO_ADMIN_URL.'assets/esquema.css',
-        ['#0A0A0A', '#111111', '#5B9BFF', '#8DB8FF'],
-        ['base' => '#C9C9C9', 'focus' => '#8DB8FF', 'current' => '#8DB8FF']
+        $claro ? ['#F6F5F2', '#FFFFFF', '#2563EB', '#1D4ED8'] : ['#0A0A0A', '#111111', '#5B9BFF', '#8DB8FF'],
+        $claro ? ['base' => '#6A6F7A', 'focus' => '#1D4ED8', 'current' => '#1D4ED8'] : ['base' => '#C9C9C9', 'focus' => '#8DB8FF', 'current' => '#8DB8FF']
     );
 }, 1);
 

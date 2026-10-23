@@ -23,6 +23,8 @@ body.cxa {
   --cxa-elevado: #1C1C1C;
   --cxa-elevado-borda: #2A2A2A;
   --cxa-hover: #151515;
+  --cxa-recuo: #0D0D0D;
+  --cxa-sombra-modal: 0 24px 64px rgba(0, 0, 0, .6);
   --cxa-campo: #0D0D0D;
   --cxa-campo-borda: #2A2A2A;
   --cxa-texto: #F2F2F2;
@@ -44,6 +46,7 @@ body.cxa {
   --cxa-perigo: #FF8A8A;
   --cxa-perigo-fundo: #331414;
   --cxa-perigo-borda: #5A2323;
+  --cxa-perigo-hover: #FFB4B4;
   --cxa-info: #7CB4FF;
   --cxa-info-fundo: #10203A;
   --cxa-info-borda: #1E3A66;
@@ -65,6 +68,67 @@ body.cxa {
   --wp-components-color-accent-darker-10: #3B82F6;
   --wp-components-color-accent-darker-20: #2563EB;
   --wp-components-color-accent-inverted: #0A0A0A;
+}
+
+/* Modo claro ("variante clara" dos tokens). Vale para quem escolheu o modo
+ * claro (body.cxa-claro, gravado por usuário) e, nos dois modos, para o miolo
+ * das telas React do WooCommerce (ver seção 14). */
+body.cxa.cxa-claro,
+body.cxa.woocommerce_page_wc-admin #wpbody,
+body.cxa.woocommerce_page_wc-admin #wpbody-content,
+body.cxa.woocommerce_page_wc-admin #wpcontent {
+  --cxa-fundo: #F6F5F2;
+  --cxa-lateral: #FFFFFF;
+  --cxa-lateral-borda: #E6E3DD;
+  --cxa-cartao: #FFFFFF;
+  --cxa-cartao-borda: #E6E3DD;
+  --cxa-cabeca-tabela: #FAF9F7;
+  --cxa-linha: #EEECE7;
+  --cxa-elevado: #F3F2EF;
+  --cxa-elevado-borda: #D6D3CD;
+  --cxa-hover: #FAF9F7;
+  --cxa-recuo: #FAF9F7;
+  --cxa-sombra-modal: 0 24px 64px rgba(36, 41, 47, .18);
+  --cxa-campo: #FFFFFF;
+  --cxa-campo-borda: #D6D3CD;
+  --cxa-texto: #24292F;
+  --cxa-texto-2: #3D434B;
+  --cxa-mudo: #6A6F7A;
+  --cxa-desligado: #8C919B;
+  --cxa-acento: #2563EB;
+  --cxa-acento-claro: #1D4ED8;
+  --cxa-acento-escuro: #1E40AF;
+  --cxa-acento-texto: #FFFFFF;
+  --cxa-acento-sup: #EAF2FF;
+  --cxa-acento-sup-borda: #ADCBFF;
+  --cxa-ok: #15803D;
+  --cxa-ok-fundo: #E8F5EC;
+  --cxa-ok-borda: #B7DEC3;
+  --cxa-aviso: #A15C07;
+  --cxa-aviso-fundo: #FFF4E0;
+  --cxa-aviso-borda: #F3D27A;
+  --cxa-perigo: #B91C1C;
+  --cxa-perigo-fundo: #FDECEC;
+  --cxa-perigo-borda: #F3C2C2;
+  --cxa-perigo-hover: #7F1D1D;
+  --cxa-info: #1D4ED8;
+  --cxa-info-fundo: #EAF2FF;
+  --cxa-info-borda: #ADCBFF;
+  --cxa-neutro-fundo: #F3F2EF;
+  --cxa-neutro-borda: #E0DDD7;
+  --cxa-foco: 0 0 0 3px rgba(37, 99, 235, .18);
+
+  --wp-admin-theme-color: #2563EB;
+  --wp-admin-theme-color--rgb: 37, 99, 235;
+  --wp-admin-theme-color-darker-10: #1D4ED8;
+  --wp-admin-theme-color-darker-10--rgb: 29, 78, 216;
+  --wp-admin-theme-color-darker-20: #1E40AF;
+  --wp-admin-theme-color-darker-20--rgb: 30, 64, 175;
+  --wp-components-color-accent: #2563EB;
+  --wp-components-color-accent-darker-10: #1D4ED8;
+  --wp-components-color-accent-darker-20: #1E40AF;
+  --wp-components-color-accent-inverted: #FFFFFF;
+  color-scheme: light;
 }
 
 /* 2. Base -------------------------------------------------------------------- */
@@ -300,8 +364,8 @@ body.cxa .contextual-help-tabs a {
 /* 3. Barra do topo ----------------------------------------------------------- */
 
 #wpadminbar {
-  background: var(--cxa-lateral, #0D0D0D);
-  box-shadow: inset 0 -1px 0 var(--cxa-lateral-borda, #1F1F1F);
+  background: var(--cxa-lateral);
+  box-shadow: inset 0 -1px 0 var(--cxa-lateral-borda);
   font-family: Inter, system-ui, sans-serif;
 }
 
@@ -310,7 +374,7 @@ body.cxa .contextual-help-tabs a {
 #wpadminbar a.ab-item,
 #wpadminbar > #wp-toolbar span.ab-label,
 #wpadminbar > #wp-toolbar span.noticon {
-  color: #C9C9C9;
+  color: var(--cxa-texto-2);
   font-size: 12.5px;
 }
 
@@ -318,15 +382,15 @@ body.cxa .contextual-help-tabs a {
 #wpadminbar .ab-icon::before,
 #wpadminbar .ab-item::before,
 #wpadminbar .ab-item::after {
-  color: #8D8D8D;
+  color: var(--cxa-mudo);
 }
 
 #wpadminbar .ab-top-menu > li.hover > .ab-item,
 #wpadminbar.nojq .quicklinks .ab-top-menu > li > .ab-item:focus,
 #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
 #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus {
-  background: #1C1C1C;
-  color: #F2F2F2;
+  background: var(--cxa-elevado);
+  color: var(--cxa-texto);
 }
 
 #wpadminbar:not(.mobile) > #wp-toolbar li:hover span.ab-label,
@@ -336,13 +400,13 @@ body.cxa .contextual-help-tabs a {
 #wpadminbar:not(.mobile) li:hover .ab-item::after,
 #wpadminbar li.hover .ab-icon::before,
 #wpadminbar li.hover .ab-item::before {
-  color: #F2F2F2;
+  color: var(--cxa-texto);
 }
 
 #wpadminbar .menupop .ab-sub-wrapper,
 #wpadminbar .shortlink-input {
-  background: #111111;
-  border: 1px solid #222222;
+  background: var(--cxa-cartao);
+  border: 1px solid var(--cxa-cartao-borda);
   border-top: 0;
   border-radius: 0 0 6px 6px;
   box-shadow: none;
@@ -350,13 +414,13 @@ body.cxa .contextual-help-tabs a {
 
 #wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
 #wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
-  background: #1C1C1C;
+  background: var(--cxa-elevado);
 }
 
 #wpadminbar .quicklinks .menupop ul li a,
 #wpadminbar .quicklinks .menupop ul li .ab-item,
 #wpadminbar .quicklinks .menupop.hover ul li a {
-  color: #C9C9C9;
+  color: var(--cxa-texto-2);
 }
 
 #wpadminbar .quicklinks .menupop ul li a:hover,
@@ -365,12 +429,12 @@ body.cxa .contextual-help-tabs a {
 #wpadminbar .quicklinks .menupop ul li .ab-item:focus,
 #wpadminbar li:hover .ab-item,
 #wpadminbar .menupop .menupop > .ab-item:hover::before {
-  color: #8DB8FF;
+  color: var(--cxa-acento-claro);
 }
 
 /* a marca no lugar da casinha */
 #wpadminbar #wp-admin-bar-site-name > .ab-item {
-  color: #F2F2F2;
+  color: var(--cxa-texto);
   font-weight: 500;
 }
 
@@ -380,7 +444,7 @@ body.cxa .contextual-help-tabs a {
   width: 14px;
   height: 14px;
   margin-right: 8px;
-  background: #F2F2F2;
+  background: var(--cxa-texto);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='5'/%3E%3Cpath d='M8 16V8h4a3 3 0 0 1 0 6H8'/%3E%3C/svg%3E") center / 14px no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='5'/%3E%3Cpath d='M8 16V8h4a3 3 0 0 1 0 6H8'/%3E%3C/svg%3E") center / 14px no-repeat;
 }
@@ -394,10 +458,10 @@ body.cxa .contextual-help-tabs a {
   height: 16px;
   margin-left: 4px;
   padding: 0 5px;
-  border: 1px solid #2C2C2C;
+  border: 1px solid var(--cxa-neutro-borda);
   border-radius: 999px;
-  background: #1A1A1A;
-  color: #C9C9C9;
+  background: var(--cxa-neutro-fundo);
+  color: var(--cxa-texto-2);
   font: 400 10.5px/16px "DM Mono", ui-monospace, monospace;
   text-align: center;
   vertical-align: 1px;
@@ -410,20 +474,87 @@ body.cxa .contextual-help-tabs a {
   margin: -3px 0 0 8px;
   border: 0;
   border-radius: 50%;
-  background: #0F1E38;
+  background: var(--cxa-acento-sup);
 }
 
 #wpadminbar #wp-admin-bar-user-info .display-name {
-  color: #F2F2F2;
+  color: var(--cxa-texto);
 }
 
 #wpadminbar #wp-admin-bar-user-info .username {
-  color: #8D8D8D;
+  color: var(--cxa-mudo);
 }
 
 #wpadminbar #adminbarsearch::before,
 #wpadminbar .quicklinks li#wp-admin-bar-my-account.with-avatar > a img {
-  color: #8D8D8D;
+  color: var(--cxa-mudo);
+}
+
+/* ícones de terceiros na barra e no menu (SVG com cor fixa clara) */
+#wpadminbar #wp-admin-bar-rank-math .rank-math-icon svg {
+  fill: var(--cxa-mudo) !important;
+}
+
+body.cxa-claro #adminmenu #toplevel_page_cookie-notice .wp-menu-image,
+body.cxa-claro #adminmenu #toplevel_page_rank-math .wp-menu-image,
+body.cxa-claro #adminmenu #toplevel_page_melhor-envio .wp-menu-image img {
+  filter: brightness(0) opacity(.55);
+}
+
+/* botão "Modo claro / Modo escuro" (sol no escuro, lua no claro) */
+#wpadminbar #wp-admin-bar-cxa-tema > .ab-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+#wpadminbar #wp-admin-bar-cxa-tema .ab-icon {
+  float: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  background-color: var(--cxa-mudo);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'/%3E%3C/svg%3E") center / 14px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'/%3E%3C/svg%3E") center / 14px no-repeat;
+}
+
+body.cxa-claro #wpadminbar #wp-admin-bar-cxa-tema .ab-icon {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z'/%3E%3C/svg%3E");
+}
+
+#wpadminbar #wp-admin-bar-cxa-tema .ab-icon::before {
+  content: none;
+}
+
+#wpadminbar #wp-admin-bar-cxa-tema:hover .ab-icon,
+#wpadminbar #wp-admin-bar-cxa-tema > .ab-item:focus .ab-icon {
+  background-color: var(--cxa-texto);
+}
+
+@media screen and (max-width: 782px) {
+  #wpadminbar li#wp-admin-bar-cxa-tema {
+    display: block;
+  }
+
+  #wpadminbar #wp-admin-bar-cxa-tema > .ab-item {
+    justify-content: center;
+    width: 46px;
+    padding: 0;
+  }
+
+  #wpadminbar #wp-admin-bar-cxa-tema .ab-icon {
+    width: 22px;
+    height: 22px;
+    -webkit-mask-size: 22px;
+    mask-size: 22px;
+  }
+
+  #wpadminbar #wp-admin-bar-cxa-tema .ab-label {
+    display: none;
+  }
 }
 
 /* 4. Menu lateral ------------------------------------------------------------ */
@@ -871,7 +1002,7 @@ body.cxa .button-link-delete:hover,
 body.cxa .submitdelete:hover,
 body.cxa .row-actions .trash a:hover,
 body.cxa .row-actions .delete a:hover {
-  color: #FFB4B4;
+  color: var(--cxa-perigo-hover);
   background: none;
   border-color: transparent;
 }
@@ -1069,6 +1200,15 @@ body.cxa .notice-dismiss:focus::before {
 body.cxa .notice.inline,
 body.cxa .notice-alt {
   background: var(--cxa-elevado);
+}
+
+/* no modo claro o aviso é branco sobre o fundo creme */
+body.cxa.cxa-claro .notice,
+body.cxa.cxa-claro div.updated,
+body.cxa.cxa-claro div.error,
+body.cxa.cxa-claro .update-nag,
+body.cxa.cxa-claro .notice.inline {
+  background: var(--cxa-cartao);
 }
 
 /* 8. Tabelas (WP_List_Table) ------------------------------------------------- */
@@ -1725,7 +1865,7 @@ body.cxa .media-menu {
 }
 
 body.cxa .media-modal-content {
-  box-shadow: 0 24px 64px rgba(0, 0, 0, .6);
+  box-shadow: var(--cxa-sombra-modal);
 }
 
 body.cxa .media-frame-title h1,
@@ -1938,7 +2078,7 @@ body.cxa .wc-backbone-modal-main article {
 
 body.cxa .wc-backbone-modal-content {
   border-radius: 10px;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, .6);
+  box-shadow: var(--cxa-sombra-modal);
 }
 
 body.cxa .wc-backbone-modal-main .wc-backbone-modal-header h1 {
@@ -2253,50 +2393,13 @@ body.cxa .woocommerce-BlankState::before {
 /* 14. WooCommerce React (só o essencial) -------------------------------------
  * As telas React (Início, Clientes, Análises, Marketing, Extensões) têm
  * dezenas de componentes com fundo branco fixo. Para não arriscar texto claro
- * em fundo claro, o miolo delas usa uma versão clara dos tokens (mesma
- * tipografia e acento); menu e barra do topo continuam escuros. */
+ * em fundo claro, o miolo delas usa sempre os tokens do modo claro (definidos
+ * na seção 1, junto com body.cxa-claro); no modo escuro, menu e barra do topo
+ * continuam escuros. */
 
 body.cxa.woocommerce_page_wc-admin #wpbody,
 body.cxa.woocommerce_page_wc-admin #wpbody-content,
 body.cxa.woocommerce_page_wc-admin #wpcontent {
-  --cxa-fundo: #F2F2F2;
-  --cxa-lateral: #FFFFFF;
-  --cxa-lateral-borda: #E2E2E2;
-  --cxa-cartao: #FFFFFF;
-  --cxa-cartao-borda: #E2E2E2;
-  --cxa-cabeca-tabela: #F7F7F7;
-  --cxa-linha: #ECECEC;
-  --cxa-elevado: #F2F2F2;
-  --cxa-elevado-borda: #D4D4D4;
-  --cxa-hover: #F7F7F7;
-  --cxa-campo: #FFFFFF;
-  --cxa-campo-borda: #C9C9C9;
-  --cxa-texto: #111111;
-  --cxa-texto-2: #2A2A2A;
-  --cxa-mudo: #6A6A6A;
-  --cxa-desligado: #8D8D8D;
-  --cxa-acento: #2563EB;
-  --cxa-acento-claro: #1D4ED8;
-  --cxa-acento-texto: #FFFFFF;
-  --cxa-acento-sup: #EAF2FF;
-  --cxa-acento-sup-borda: #ADCBFF;
-  --cxa-ok: #1F7A45;
-  --cxa-ok-fundo: #E3F6EA;
-  --cxa-ok-borda: #A9DDBC;
-  --cxa-aviso: #8A5A00;
-  --cxa-aviso-fundo: #FDF1D8;
-  --cxa-aviso-borda: #F1D08A;
-  --cxa-perigo: #B42323;
-  --cxa-perigo-fundo: #FBE6E6;
-  --cxa-perigo-borda: #F0B4B4;
-  --cxa-info: #1D4ED8;
-  --cxa-info-fundo: #EAF2FF;
-  --cxa-info-borda: #ADCBFF;
-  --wp-admin-theme-color: #2563EB;
-  --wp-admin-theme-color--rgb: 37, 99, 235;
-  --wp-admin-theme-color-darker-10: #1D4ED8;
-  --wp-admin-theme-color-darker-20: #1E3A8A;
-  color-scheme: light;
   color: var(--cxa-texto);
   background-color: var(--cxa-fundo);
 }
@@ -2307,13 +2410,13 @@ body.cxa.woocommerce_page_wc-admin .woocommerce-layout__main {
 }
 
 body.cxa.woocommerce_page_wc-admin .woocommerce-layout__header {
-  background: #FFFFFF;
-  border-bottom: 1px solid #E2E2E2;
+  background: var(--cxa-cartao);
+  border-bottom: 1px solid var(--cxa-cartao-borda);
 }
 
 body.cxa.woocommerce_page_wc-admin .woocommerce-layout__header .woocommerce-layout__header-heading,
 body.cxa.woocommerce_page_wc-admin .woocommerce-layout__header h1 {
-  color: #111111;
+  color: var(--cxa-texto);
   font: italic 400 22px var(--cxa-serif);
 }
 
@@ -2324,7 +2427,7 @@ body.cxa.woocommerce_page_wc-admin .woocommerce-summary,
 body.cxa.woocommerce_page_wc-admin .woocommerce-chart {
   border-radius: 6px;
   box-shadow: none;
-  border: 1px solid #E2E2E2;
+  border: 1px solid var(--cxa-cartao-borda);
 }
 
 body.cxa.woocommerce_page_wc-admin .woocommerce-table__table th,
@@ -2344,7 +2447,7 @@ body.cxa.woocommerce_page_wc-admin .woocommerce-chart__footer .woocommerce-legen
 
 body.cxa.woocommerce_page_wc-admin .components-button.is-primary {
   background: var(--wp-admin-theme-color);
-  color: #FFFFFF;
+  color: var(--cxa-acento-texto);
 }
 
 /* 15. Painel (index.php) ------------------------------------------------------ */
@@ -2433,7 +2536,7 @@ body.cxa .cxa-kpi {
   flex-direction: column;
   gap: 4px;
   padding: 12px 14px;
-  background: var(--cxa-lateral);
+  background: var(--cxa-recuo);
   border: 1px solid var(--cxa-cartao-borda);
   border-radius: 4px;
   color: var(--cxa-texto);
@@ -3202,7 +3305,7 @@ body.cxa .cb-modelo--vazio { background: var(--cxa-perigo-fundo); border-color: 
 body.cxa #conexao-biblioteca .cb-envio {
   margin-top: 10px;
   padding: 10px;
-  background: var(--cxa-lateral);
+  background: var(--cxa-recuo);
   border: 1px solid var(--cxa-cartao-borda);
   border-radius: 4px;
 }
@@ -3415,7 +3518,7 @@ body.cxa #conexao-doi-dados .widefat th {
 }
 
 body.cxa #conexao-doi-dados pre {
-  background: var(--cxa-lateral) !important;
+  background: var(--cxa-recuo) !important;
   border: 1px solid var(--cxa-cartao-borda);
   border-radius: 4px;
   color: var(--cxa-texto-2);

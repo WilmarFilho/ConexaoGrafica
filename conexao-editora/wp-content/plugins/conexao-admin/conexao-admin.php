@@ -21,6 +21,7 @@ define('CONEXAO_ADMIN_FONTES', 'https://fonts.googleapis.com/css2?family=Fraunce
 require_once __DIR__.'/inc/login.php';
 
 if (is_admin()) {
+    require_once __DIR__.'/inc/tema.php';
     require_once __DIR__.'/inc/marca.php';
     require_once __DIR__.'/inc/menu.php';
     require_once __DIR__.'/inc/limpeza.php';
