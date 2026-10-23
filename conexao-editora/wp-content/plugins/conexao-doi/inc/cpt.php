@@ -55,7 +55,7 @@ function conexao_doi_registra_cpts(): void
         'capabilities' => ['create_posts' => 'do_not_allow'],
     ];
 
-    register_post_type('publicacao', $comum + [
+    register_post_type('publicacao', array_merge($comum, [
         'labels' => [
             'name' => 'Publicações (DOI)',
             'singular_name' => 'Publicação',
@@ -68,9 +68,9 @@ function conexao_doi_registra_cpts(): void
         ],
         'menu_icon' => 'dashicons-book-alt',
         'menu_position' => 26,
-    ]);
+    ]));
 
-    register_post_type('capitulo', $comum + [
+    register_post_type('capitulo', array_merge($comum, [
         'labels' => [
             'name' => 'Capítulos',
             'singular_name' => 'Capítulo',
@@ -82,7 +82,7 @@ function conexao_doi_registra_cpts(): void
             'not_found' => 'Nenhum capítulo recebido do Hub Editora.',
         ],
         'show_in_menu' => 'edit.php?post_type=publicacao',
-    ]);
+    ]));
 
     // a taxonomia `autor` é do tema (produtos); as publicações entram nela para
     // a página /autores/ e os filtros continuarem valendo
