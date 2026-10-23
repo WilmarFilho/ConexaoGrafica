@@ -88,6 +88,11 @@ return [
 
     // Conexão DOI: publicação dos livros no site (plugin conexao-doi do WordPress).
     // O Hub chama o WP com HMAC-SHA256 (contrato, seção 4); o WP nunca chama o Hub.
+    // App do leitor: o site (plugin conexao-app) consulta pedidos por e-mail, assinado.
+    'app' => [
+        'secret' => env('HUB_APP_SECRET'), // 64 caracteres, o mesmo CONEXAO_APP_HUB_SECRET do wp-config.php
+    ],
+
     'wordpress' => [
         'url' => env('CONEXAO_DOI_WP_URL'),        // https://conexaoeditora.com.br
         'secret' => env('CONEXAO_DOI_WP_SECRET'),  // 64 caracteres, o mesmo CONEXAO_DOI_SECRET do wp-config.php
