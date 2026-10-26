@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Conexão App
  * Description: Servidor do app do leitor (web, Android e iOS): login por token de aparelho, estante com os livros da biblioteca, PDF, progresso e marcadores sincronizados e pedidos de todos os canais (Hub Editora). Contrato em docs/app-leitor-contrato.md.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Conexão Pro
  * Requires PHP: 8.1
  * Requires at least: 6.5
@@ -13,7 +13,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('CONEXAO_APP_VERSAO', '1.1.0');
+define('CONEXAO_APP_VERSAO', '1.2.0');
 define('CONEXAO_APP_NS', 'conexao-app/v1');
 
 // o Hub é o mesmo em todos os ambientes; o segredo fica só no wp-config
@@ -30,6 +30,7 @@ require_once __DIR__.'/inc/leitura.php';
 require_once __DIR__.'/inc/pedidos.php';
 require_once __DIR__.'/inc/email.php';
 require_once __DIR__.'/inc/acesso-web.php';
+require_once __DIR__.'/inc/exclusao.php';
 require_once __DIR__.'/inc/rotas.php';
 
 register_activation_hook(__FILE__, function (): void {

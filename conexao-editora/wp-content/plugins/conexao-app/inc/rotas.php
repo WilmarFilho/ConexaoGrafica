@@ -21,6 +21,7 @@ add_action('rest_api_init', function (): void {
         ['/eu', 'GET', 'conexao_app_rota_eu', $token],
         ['/aparelhos', 'GET', 'conexao_app_rota_aparelhos', $token],
         ['/aparelhos/(?P<id>\d{1,18})', 'DELETE', 'conexao_app_rota_desconecta', $token],
+        ['/conta/excluir', 'POST', 'conexao_app_rota_exclui_conta', $token],
         ['/estante', 'GET', 'conexao_app_rota_estante', $token],
         ['/livros/(?P<id>\d{1,18})', 'GET', 'conexao_app_rota_livro', $token],
         ['/livros/(?P<id>\d{1,18})/pdf', ['GET', 'HEAD'], 'conexao_app_rota_pdf', $token],
