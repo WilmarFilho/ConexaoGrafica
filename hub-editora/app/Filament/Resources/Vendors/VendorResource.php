@@ -24,11 +24,13 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -94,7 +96,7 @@ class VendorResource extends Resource
                         ]),
 
                     Section::make('Observações')
-                        ->collapsed()
+                        ->collapsed(fn (?Vendor $record) => blank($record?->notes))
                         ->schema([
                             Textarea::make('notes')->hiddenLabel()->rows(3)->maxLength(5000),
                         ]),
@@ -145,6 +147,10 @@ class VendorResource extends Resource
                 TextColumn::make('name')->label('Vendedor')->weight(FontWeight::Medium)
                     ->description(fn (Vendor $record) => $record->email)
                     ->searchable(['name', 'legal_name', 'email', 'document'])->sortable(),
+                IconColumn::make('notes')->label('')
+                    ->icon(fn (?string $state) => filled($state) ? Heroicon::OutlinedChatBubbleBottomCenterText : null)
+                    ->color('warning')
+                    ->tooltip(fn (Vendor $record) => filled($record->notes) ? Str::limit($record->notes, 300) : null),
                 TextColumn::make('commission_pct')->label('Comissão')->alignEnd()
                     ->formatStateUsing(fn ($state) => number_format((float) $state, 2, ',', '.').'%')
                     ->extraAttributes(['class' => 'hub-mono']),
