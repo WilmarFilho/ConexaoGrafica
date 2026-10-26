@@ -26,9 +26,8 @@ workflows:
         bundle_identifier: br.com.conexaoeditora.leitor
       vars:
         BUNDLE_ID: br.com.conexaoeditora.leitor
-        # ID numérico do app (App Store Connect → app → Informações do app → ID da Apple).
-        # Sem ele o primeiro build sai como 1; para os seguintes, preencha aqui.
-        APP_STORE_APPLE_ID: ""
+        # Para numerar os builds seguintes, acrescente aqui APP_STORE_APPLE_ID: <número>
+        # (App Store Connect → app → Informações do app → ID da Apple). Sem ele o build sai como 1.
         XCODE_PROJECT: ios/App/App.xcodeproj # Capacitor 8 usa Swift Package Manager: não há .xcworkspace nem Pods
         XCODE_SCHEME: App
       node: 22
@@ -44,7 +43,10 @@ workflows:
         script: |
           set -e
           # primeiro build: ainda não há nenhum no TestFlight, então começa em 1
-          ULTIMO=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
+          ULTIMO=0
+          if [ -n "${APP_STORE_APPLE_ID:-}" ]; then
+            ULTIMO=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
+          fi
           case "$ULTIMO" in ''|*[!0-9]*) ULTIMO=0 ;; esac
           NOVO=$((ULTIMO + 1))
           echo "Build número $NOVO (último no App Store Connect: $ULTIMO)"
