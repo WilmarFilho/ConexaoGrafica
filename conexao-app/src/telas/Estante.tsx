@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { api, ErroApi, mensagemDeErro, modoDemonstracao } from '../api';
+import { api, ErroApi, mensagemDeErro } from '../api';
+import { mostrarAvisosDemo, semLinksDeCompra } from '../vitrine';
 import type { Estante as DadosEstante, Livro } from '../api/tipos';
 import { CONFIG } from '../config';
 import { Icone } from '../componentes/Icone';
@@ -89,7 +90,7 @@ export function Estante() {
       </header>
 
       <div className="pagina">
-        {modoDemonstracao && <p className="selo-demo">Dados de exemplo · modo de demonstração</p>}
+        {mostrarAvisosDemo && <p className="selo-demo">Dados de exemplo · modo de demonstração</p>}
 
         {(buscaAberta || busca) && !semNada && (
           <div className="busca">
@@ -112,12 +113,16 @@ export function Estante() {
 
         {(dados || !online) && semNada && !carregando && (
           online ? (
-            <Vazio icone="estante" titulo="Sua estante está vazia" texto="Os e-books que você comprar na loja aparecem aqui para ler no app, inclusive sem internet.">
-              <button type="button" className="botao botao--primario" onClick={() => void abrirExterno(CONFIG.lojaUrl)}>
-                <Icone nome="loja" tamanho={20} />
-                <span>Conhecer a loja</span>
-              </button>
-            </Vazio>
+            semLinksDeCompra ? (
+              <Vazio icone="estante" titulo="Sua estante está vazia" texto="Os livros digitais que você adquirir aparecem aqui para ler no app, inclusive sem internet." />
+            ) : (
+              <Vazio icone="estante" titulo="Sua estante está vazia" texto="Os livros digitais que você adquirir aparecem aqui para ler no app, inclusive sem internet.">
+                <button type="button" className="botao botao--primario" onClick={() => void abrirExterno(CONFIG.lojaUrl)}>
+                  <Icone nome="loja" tamanho={20} />
+                  <span>Conhecer a loja</span>
+                </button>
+              </Vazio>
+            )
           ) : (
             <Vazio icone="sem-internet" titulo="Nenhum livro baixado" texto="Sem internet, só os livros baixados no aparelho podem ser lidos. Quando a conexão voltar, toque em “Baixar para ler offline” na página do livro." />
           )

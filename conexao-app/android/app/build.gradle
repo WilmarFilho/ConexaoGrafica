@@ -1,5 +1,16 @@
 apply plugin: 'com.android.application'
 
+// Assinatura de release: as chaves ficam FORA do repositório.
+// Padrão: C:/dev/ConexaoGrafica-chaves/keystore.properties (pasta irmã do repositório).
+// Outro caminho: variável de ambiente CONEXAO_KEYSTORE_PROPERTIES.
+// O arquivo tem storeFile (relativo ao próprio arquivo ou absoluto), storePassword, keyAlias e keyPassword.
+def keystorePropertiesFile = System.getenv('CONEXAO_KEYSTORE_PROPERTIES')     ? new File(System.getenv('CONEXAO_KEYSTORE_PROPERTIES'))     : rootProject.file('../../../ConexaoGrafica-chaves/keystore.properties')
+def keystoreProperties = new Properties()
+def temChaveRelease = keystorePropertiesFile.exists()
+if (temChaveRelease) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+
 android {
     namespace = "br.com.conexaoeditora.leitor"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -8,7 +19,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +27,24 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (temChaveRelease) {
+            release {
+                def arquivo = new File(keystoreProperties['storeFile'])
+                storeFile arquivo.isAbsolute() ? arquivo : new File(keystorePropertiesFile.parentFile, keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            if (temChaveRelease) {
+                signingConfig signingConfigs.release
+            } else {
+                logger.warn("keystore.properties não encontrado: o release sai sem assinatura.")
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

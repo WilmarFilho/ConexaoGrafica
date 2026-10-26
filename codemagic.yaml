@@ -1,0 +1,62 @@
+# Codemagic: build do app iOS "Conexão Editora" (pasta conexao-app) e envio ao TestFlight.
+#
+# Configuração no Codemagic (uma vez só):
+#  1. App Store Connect → Usuários e acesso → Integrações → App Store Connect API: gere uma chave de equipe
+#     com acesso "App Manager". Baixe o arquivo .p8 (só dá para baixar uma vez) e anote o Issuer ID e o Key ID.
+#  2. Codemagic → Team settings → Team integrations → Developer Portal → Connect: cadastre essa chave
+#     com o nome exato  conexao_asc  (o mesmo usado em "integrations" abaixo).
+#  3. Codemagic → Add application → GitHub → WilmarFilho/ConexaoGrafica → tipo "codemagic.yaml".
+#     O app com o bundle br.com.conexaoeditora.leitor já precisa existir no App Store Connect (Meus apps → +).
+#     Depois é só abrir o app no Codemagic e iniciar o workflow "ios-release" (início manual).
+#
+# Resultado: IPA assinado (distribuição App Store) enviado ao TestFlight. O envio para revisão
+# é feito à mão no App Store Connect, escolhendo esse build na versão 1.0.0.
+
+workflows:
+  ios-release:
+    name: iOS · App Store (TestFlight)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    working_directory: conexao-app
+    integrations:
+      app_store_connect: conexao_asc
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: br.com.conexaoeditora.leitor
+      vars:
+        BUNDLE_ID: br.com.conexaoeditora.leitor
+        # ID numérico do app (App Store Connect → app → Informações do app → ID da Apple).
+        # Sem ele o primeiro build sai como 1; para os seguintes, preencha aqui.
+        APP_STORE_APPLE_ID: ""
+        XCODE_PROJECT: ios/App/App.xcodeproj # Capacitor 8 usa Swift Package Manager: não há .xcworkspace nem Pods
+        XCODE_SCHEME: App
+      node: 22
+      xcode: latest
+    scripts:
+      - name: Instalar dependências
+        script: npm ci
+      - name: Build web (API real) e cópia para o projeto iOS
+        script: npm run cap:sync
+      - name: Usar os perfis de assinatura
+        script: xcode-project use-profiles --project "$XCODE_PROJECT"
+      - name: Número do build (último do App Store Connect + 1)
+        script: |
+          set -e
+          # primeiro build: ainda não há nenhum no TestFlight, então começa em 1
+          ULTIMO=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
+          case "$ULTIMO" in ''|*[!0-9]*) ULTIMO=0 ;; esac
+          NOVO=$((ULTIMO + 1))
+          echo "Build número $NOVO (último no App Store Connect: $ULTIMO)"
+          sed -i '' -E "s/CURRENT_PROJECT_VERSION = [0-9]+;/CURRENT_PROJECT_VERSION = $NOVO;/g" "$XCODE_PROJECT/project.pbxproj"
+      - name: Gerar o IPA
+        script: xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - conexao-app/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false

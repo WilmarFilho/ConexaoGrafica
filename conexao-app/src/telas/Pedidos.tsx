@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { api, ErroApi, mensagemDeErro, modoDemonstracao } from '../api';
+import { api, ErroApi, mensagemDeErro } from '../api';
+import { mostrarAvisosDemo, semLinksDeCompra } from '../vitrine';
 import type { ListaPedidos, Pedido } from '../api/tipos';
 import { CONFIG } from '../config';
 import { useAviso } from '../componentes/Feedback';
@@ -41,7 +42,7 @@ export function Pedidos() {
     <PuxarParaAtualizar aoAtualizar={carregar} desativado={!online}>
       <Cabecalho titulo="Meus pedidos" grande />
       <div className="pagina">
-        {modoDemonstracao && <p className="selo-demo">Dados de exemplo · modo de demonstração</p>}
+        {mostrarAvisosDemo && <p className="selo-demo">Dados de exemplo · modo de demonstração</p>}
         {!online && dados && <p className="alerta alerta--info">Sem internet: mostrando a última lista carregada.</p>}
         {dados && dados.email_verificado === false && <CartaoConfirmarEmail />}
 
@@ -55,11 +56,13 @@ export function Pedidos() {
         )}
 
         {dados && dados.pedidos.length === 0 && (
-          <Vazio icone="pedidos" titulo="Nenhum pedido por aqui" texto="Quando você comprar livros impressos ou e-books, poderá acompanhar cada pedido nesta tela, do pagamento até a entrega.">
-            <button type="button" className="botao botao--primario" onClick={() => void abrirExterno(CONFIG.lojaUrl)}>
-              <Icone nome="loja" tamanho={20} />
-              <span>Ir para a loja</span>
-            </button>
+          <Vazio icone="pedidos" titulo="Nenhum pedido por aqui" texto="Seus pedidos de livros impressos e digitais aparecem aqui, com a situação de cada um, do pagamento até a entrega.">
+            {!semLinksDeCompra && (
+              <button type="button" className="botao botao--primario" onClick={() => void abrirExterno(CONFIG.lojaUrl)}>
+                <Icone nome="loja" tamanho={20} />
+                <span>Ir para a loja</span>
+              </button>
+            )}
           </Vazio>
         )}
 
@@ -71,7 +74,7 @@ export function Pedidos() {
           </ul>
         )}
         {dados?.fonte === 'loja' && dados.email_verificado !== false && dados.pedidos.length > 0 && (
-          <p className="texto-suave texto-pequeno">Mostrando os pedidos da loja do site. Pedidos de outros canais podem demorar a aparecer.</p>
+          <p className="texto-suave texto-pequeno">Mostrando os pedidos feitos no site. Pedidos de outros canais podem demorar a aparecer.</p>
         )}
       </div>
     </PuxarParaAtualizar>

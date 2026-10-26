@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { api, ErroApi, mensagemDeErro, modoDemonstracao } from '../api';
+import { useNavigate } from 'react-router';
+import { api, ErroApi, mensagemDeErro } from '../api';
+import { mostrarAvisosDemo, semLinksDeCompra } from '../vitrine';
 import type { ListaAparelhos } from '../api/tipos';
 import { CONFIG } from '../config';
 import { useAviso, useConfirmar } from '../componentes/Feedback';
@@ -15,6 +17,7 @@ import { tamanhoArquivo } from '../util/formato';
 
 export function Conta() {
   const { usuario, sair } = useSessao();
+  const navegar = useNavigate();
   const online = useOnline();
   const avisar = useAviso();
   const confirmar = useConfirmar();
@@ -215,16 +218,18 @@ export function Conta() {
                 </button>
               </li>
             )}
-            <li>
-              <button type="button" onClick={() => void abrirExterno(CONFIG.lojaUrl)}>
-                <Icone nome="loja" />
-                <span>
-                  Loja Conexão Editora
-                  <small>Conheça novos títulos</small>
-                </span>
-                <Icone nome="externo" tamanho={18} />
-              </button>
-            </li>
+            {!semLinksDeCompra && (
+              <li>
+                <button type="button" onClick={() => void abrirExterno(CONFIG.lojaUrl)}>
+                  <Icone nome="loja" />
+                  <span>
+                    Loja Conexão Editora
+                    <small>Conheça novos títulos</small>
+                  </span>
+                  <Icone nome="externo" tamanho={18} />
+                </button>
+              </li>
+            )}
             <li>
               <button type="button" onClick={() => void abrirExterno(`${CONFIG.siteUrl}/politica-de-privacidade/`)}>
                 <Icone nome="escudo" />
@@ -238,9 +243,13 @@ export function Conta() {
         <Botao variante="perigo" bloco icone="sair" carregando={saindo} onClick={confirmarSaida}>
           Sair da conta
         </Botao>
+        <button type="button" className="botao botao--texto botao--bloco botao--perigo-texto" onClick={() => navegar('/conta/excluir')}>
+          <Icone nome="lixeira" tamanho={18} />
+          <span>Excluir conta</span>
+        </button>
         <p className="versao">
           Conexão Editora · versão {CONFIG.versao}
-          {modoDemonstracao ? ' · modo de demonstração' : ''}
+          {mostrarAvisosDemo ? ' · modo de demonstração' : ''}
         </p>
       </div>
     </>

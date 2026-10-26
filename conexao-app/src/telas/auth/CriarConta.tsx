@@ -44,7 +44,7 @@ export function CriarConta() {
   return (
     <TelaAuth
       titulo="Criar conta"
-      subtitulo="Sua conta vale para o app e para a loja da Conexão Editora."
+      subtitulo="Sua conta vale para o app e para o site da Conexão Editora."
       voltar="/entrar"
       rodape={
         <p>

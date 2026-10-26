@@ -17,6 +17,7 @@ import { armazem } from '../../plataforma/arquivos';
 import { lerCache } from '../../plataforma/armazenamento';
 import { barraStatusVisivel, ehNativo, travarOrientacao } from '../../plataforma/nativo';
 import { CONFIG } from '../../config';
+import { modoCapturas } from '../../vitrine';
 import { abrirDocumento, type FonteDocumento } from './pdf';
 import { PaginaPdf } from './PaginaPdf';
 import { PainelAjustes, PainelBusca, PainelMarcadores, PainelSumario, type Resultado } from './Paineis';
@@ -119,7 +120,7 @@ export function Leitor() {
         setMarcadores(leitura.marcadores);
         setDoc(documento);
         setAbertura({ fase: 'pronto' });
-        if (inicial > 1) avisar(`Continuando da página ${inicial}.`);
+        if (inicial > 1 && !modoCapturas) avisar(`Continuando da página ${inicial}.`);
       } catch (e) {
         if (!vivo || ehAbort(e)) return;
         const semConexao = e instanceof ErroApi && e.codigo === 'sem_conexao';

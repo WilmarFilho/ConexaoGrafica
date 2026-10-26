@@ -21,6 +21,7 @@ import { Pedidos } from './telas/Pedidos';
 import { PedidoDetalhe } from './telas/Pedido';
 import { ConfirmarEmail } from './telas/ConfirmarEmail';
 import { Conta } from './telas/Conta';
+import { ContaExcluida, ExcluirConta, ExcluirContaPublica } from './telas/conta/ExcluirConta';
 
 // O leitor (pdf.js) é carregado só quando um livro é aberto.
 const Leitor = lazy(() => import('./telas/leitor/Leitor').then((m) => ({ default: m.Leitor })));
@@ -89,6 +90,8 @@ function Rotas() {
         <Route path="/criar-conta" element={<CriarConta />} />
         <Route path="/esqueci-senha" element={<EsqueciSenha />} />
         <Route path="/limite-aparelhos" element={<LimiteAparelhos />} />
+        <Route path="/excluir-conta" element={<ExcluirContaPublica />} />
+        <Route path="/conta-excluida" element={<ContaExcluida />} />
         <Route path="*" element={<Navigate to="/entrar" replace />} />
       </Routes>
     );
@@ -103,7 +106,10 @@ function Rotas() {
         <Route path="/pedidos/confirmar-email" element={<ConfirmarEmail />} />
         <Route path="/pedidos/:ref" element={<PedidoDetalhe />} />
         <Route path="/conta" element={<Conta />} />
+        <Route path="/conta/excluir" element={<ExcluirConta />} />
       </Route>
+      <Route path="/excluir-conta" element={<ExcluirContaPublica />} />
+      <Route path="/conta-excluida" element={<ContaExcluida />} />
       <Route
         path="/ler/:id"
         element={

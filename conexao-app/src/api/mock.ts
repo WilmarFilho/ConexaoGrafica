@@ -1,17 +1,21 @@
 /**
  * MODO DE DEMONSTRAÇÃO (VITE_MOCK=1)
  * Dados de EXEMPLO para usar e testar o app sem o servidor. Nada aqui é real:
- * livros, autores, pedidos e aparelhos são fictícios. O PDF é public/mock/amostra.pdf.
+ * livros, autores, pedidos e aparelhos são fictícios. O PDF é public/mock/amostra.pdf
+ * (no modo de capturas de tela, ?capturas=ios|ipad|android|android-tablet, usa public/mock/vitrine.pdf
+ * e esconde as marcas de "amostra" para as imagens das lojas).
  *
  * Atalhos:
  *  - qualquer e-mail e senha entram;
  *  - senha "errada" → "E-mail ou senha incorretos.";
  *  - e-mail começando com "limite" (ex.: limite@exemplo.com) → tela de limite de aparelhos;
- *  - confirmação de e-mail (Pedidos): o código é 123456.
+ *  - confirmação de e-mail (Pedidos): o código é 123456;
+ *  - excluir conta: senha "errada" → senha incorreta; e-mail começando com "equipe" → conta da equipe (403).
  */
 import { CONFIG } from '../config';
 import { abrirPorPartes, lerComProgresso, tokenAtual, notificar401 } from './cliente';
 import { ErroApi, ehAbort } from './erros';
+import { modoCapturas } from '../vitrine';
 import type { Api, Aparelho, DadosAparelho, Leitura, Livro, Marcador, Pedido, RespostaLogin, Situacao, Usuario } from './tipos';
 
 const CHAVE = 'cx-mock-estado';
@@ -45,7 +49,7 @@ function estadoInicial(): Estado {
       104: { pagina: 34, total_paginas: TOTAL_PAGINAS_AMOSTRA, atualizado_em: diasAtras(20), marcadores: [] },
     },
     proximoId: 100,
-    emailVerificado: false,
+    emailVerificado: !!modoCapturas,
   };
 }
 
@@ -109,7 +113,16 @@ function emailParcial(email: string) {
   return `${u.slice(0, 2)}***@${d ?? ''}`;
 }
 
+const APARELHOS_CAPTURAS: Record<string, { atual: [string, Aparelho['plataforma']]; outros: [string, Aparelho['plataforma']][] }> = {
+  ios: { atual: ['iPhone de Ana', 'ios'], outros: [['iPad de Ana', 'ios'], ['Chrome · Windows', 'web']] },
+  ipad: { atual: ['iPad de Ana', 'ios'], outros: [['iPhone de Ana', 'ios'], ['Chrome · Windows', 'web']] },
+  android: { atual: ['Galaxy S24', 'android'], outros: [['Galaxy Tab S9', 'android'], ['Chrome · Windows', 'web']] },
+  'android-tablet': { atual: ['Galaxy Tab S9', 'android'], outros: [['Galaxy S24', 'android'], ['Chrome · Windows', 'web']] },
+};
+
 function aparelhosDeExemplo(): Aparelho[] {
+  const cap = APARELHOS_CAPTURAS[modoCapturas];
+  if (cap) return cap.outros.map(([nome, plataforma], i) => ({ id: 21 + i, nome, plataforma, usado_em: diasAtras(1 + i * 3, 20), criado_em: diasAtras(90) }));
   return [
     { id: 11, nome: 'iPhone de Ana', plataforma: 'ios', usado_em: diasAtras(1, 21), criado_em: diasAtras(120) },
     { id: 12, nome: 'Chrome · Windows', plataforma: 'web', usado_em: diasAtras(4, 9), criado_em: diasAtras(60) },
@@ -123,7 +136,9 @@ function novoToken() {
   return 'cxa_' + btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-function entrar(email: string, nome: string, aparelho: DadosAparelho, substituir?: number, limite = false): RespostaLogin {
+function entrar(email: string, nome: string, dados: DadosAparelho, substituir?: number, limite = false): RespostaLogin {
+  const cap = APARELHOS_CAPTURAS[modoCapturas];
+  const aparelho = cap ? { ...dados, nome: cap.atual[0], plataforma: cap.atual[1] } : dados;
   const mesmoUsuario = estado.usuario?.email === email;
   if (!mesmoUsuario) {
     estado.usuario = { id: 7, nome, email, iniciais: iniciais(nome) };
@@ -168,7 +183,7 @@ function capa(titulo: string, autor: string, cor1: string, cor2: string) {
 <rect x="52" y="200" width="70" height="8" rx="4" fill="#fff" opacity=".85"/>
 ${texto}
 <text x="52" y="780" font-family="Nunito, Arial, sans-serif" font-weight="700" font-size="30" fill="#fff" opacity=".92">${autor}</text>
-<text x="52" y="840" font-family="Nunito, Arial, sans-serif" font-weight="700" font-size="22" fill="#fff" opacity=".7" letter-spacing="3">AMOSTRA · CONEXÃO EDITORA</text>
+<text x="52" y="840" font-family="Nunito, Arial, sans-serif" font-weight="700" font-size="22" fill="#fff" opacity=".7" letter-spacing="3">${modoCapturas ? 'CONEXÃO EDITORA' : 'AMOSTRA · CONEXÃO EDITORA'}</text>
 </svg>`;
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
@@ -182,14 +197,13 @@ const LIVROS_BASE: Livro[] = [
     capa: capa('Fundamentos de Ultrassonografia Clínica', 'Helena D. Campos', '#0096D6', '#0B4F8A'),
     modelo: 'pdf',
     disponivel: true,
-    tamanho_bytes: 115346,
+    tamanho_bytes: modoCapturas ? 18_874_368 : 115346,
     atualizado_em: diasAtras(30),
     progresso: null,
     descricao:
-      'Livro de EXEMPLO usado no modo de demonstração do app. Este texto simula a descrição de uma obra técnica: ' +
-      'apresenta os princípios físicos do ultrassom, a técnica de exame por regiões e um roteiro para a escrita do laudo, ' +
-      'com casos comentados e mais de cem figuras.',
-    ficha: { paginas: 34, idioma: 'Português', editora: 'Conexão Editora', ano: 2025, isbn: '978-00-00000-01-0', doi: '10.99999/amostra.0101', dimensoes: '16 × 23 cm', pagina_doi: `${CONFIG.siteUrl}/` },
+      'Um guia direto para quem está começando no ultrassom: apresenta os princípios físicos do método, a técnica de exame ' +
+      'por regiões e um roteiro claro para a escrita do laudo, com casos comentados e mais de cem figuras.',
+    ficha: { paginas: 34, idioma: 'Português', editora: 'Conexão Editora', ano: 2025, isbn: '978-00-00000-01-0', doi: '10.99999/ce.2025.101', dimensoes: '16 × 23 cm', pagina_doi: `${CONFIG.siteUrl}/` },
     avaliacao: { media: 4.6, quantidade: 18 },
   },
   {
@@ -200,11 +214,11 @@ const LIVROS_BASE: Livro[] = [
     capa: capa('Direito Digital e Sociedade', 'Marina Albuquerque', '#3A4E8C', '#14213D'),
     modelo: 'pdf',
     disponivel: true,
-    tamanho_bytes: 115346,
+    tamanho_bytes: modoCapturas ? 18_874_368 : 115346,
     atualizado_em: diasAtras(50),
     progresso: null,
-    descricao: 'Livro de EXEMPLO. Discute proteção de dados pessoais, responsabilidade de plataformas e direitos fundamentais na rede.',
-    ficha: { paginas: 34, idioma: 'Português', editora: 'Conexão Editora', ano: 2024, isbn: '978-00-00000-02-7', doi: '10.99999/amostra.0102', dimensoes: '14 × 21 cm', pagina_doi: `${CONFIG.siteUrl}/` },
+    descricao: 'Proteção de dados pessoais, responsabilidade das plataformas e direitos fundamentais na rede, explicados com casos reais da jurisprudência brasileira.',
+    ficha: { paginas: 34, idioma: 'Português', editora: 'Conexão Editora', ano: 2024, isbn: '978-00-00000-02-7', doi: '10.99999/ce.2025.102', dimensoes: '14 × 21 cm', pagina_doi: `${CONFIG.siteUrl}/` },
     avaliacao: { media: 4.2, quantidade: 7 },
   },
   {
@@ -215,10 +229,10 @@ const LIVROS_BASE: Livro[] = [
     capa: capa('Educação e Família no Século XXI', 'Paulo H. Mendes', '#E07A2E', '#B23A48'),
     modelo: 'pdf',
     disponivel: true,
-    tamanho_bytes: 115346,
+    tamanho_bytes: modoCapturas ? 18_874_368 : 115346,
     atualizado_em: diasAtras(80),
     progresso: null,
-    descricao: 'Livro de EXEMPLO. Reflexões sobre a parceria entre escola e família, com relatos de professores e propostas práticas.',
+    descricao: 'Reflexões sobre a parceria entre escola e família, com relatos de professores e propostas práticas para o dia a dia.',
     ficha: { paginas: 34, idioma: 'Português', editora: 'Conexão Editora', ano: 2023, isbn: '978-00-00000-03-4', doi: null, dimensoes: '14 × 21 cm', pagina_doi: null },
     avaliacao: { media: 0, quantidade: 0 },
   },
@@ -230,11 +244,11 @@ const LIVROS_BASE: Livro[] = [
     capa: capa('Crônicas do Cerrado', 'Luíza Ferraz', '#5E8C31', '#2F4F1F'),
     modelo: 'pdf',
     disponivel: true,
-    tamanho_bytes: 115346,
+    tamanho_bytes: modoCapturas ? 18_874_368 : 115346,
     atualizado_em: diasAtras(120),
     progresso: null,
-    descricao: 'Livro de EXEMPLO. Crônicas curtas sobre a vida no Centro-Oeste, entre memórias de infância e a cidade que cresce.',
-    ficha: { paginas: 34, idioma: 'Português', editora: 'Conexão Editora', ano: 2022, isbn: '978-00-00000-04-1', doi: '10.99999/amostra.0104', dimensoes: '13 × 19 cm', pagina_doi: `${CONFIG.siteUrl}/` },
+    descricao: 'Crônicas curtas sobre a vida no Centro-Oeste, entre memórias de infância e a cidade que cresce.',
+    ficha: { paginas: 34, idioma: 'Português', editora: 'Conexão Editora', ano: 2022, isbn: '978-00-00000-04-1', doi: '10.99999/ce.2025.104', dimensoes: '13 × 19 cm', pagina_doi: `${CONFIG.siteUrl}/` },
     avaliacao: { media: 4.9, quantidade: 31 },
   },
   {
@@ -248,7 +262,7 @@ const LIVROS_BASE: Livro[] = [
     tamanho_bytes: null,
     atualizado_em: diasAtras(300),
     progresso: null,
-    descricao: 'Livro de EXEMPLO no formato antigo (flipbook): abre no leitor do site, dentro do app.',
+    descricao: 'Experiências de pesquisa com história oral em comunidades do interior, com métodos de entrevista, transcrição e arquivo.',
     ficha: { paginas: 210, idioma: 'Português', editora: 'Conexão Editora', ano: 2021, isbn: '978-00-00000-05-8', doi: null, dimensoes: '16 × 23 cm', pagina_doi: null },
     avaliacao: { media: 0, quantidade: 0 },
     leitor_url: `${CONFIG.siteUrl}/minha-conta/biblioteca/`,
@@ -264,13 +278,15 @@ const LIVROS_BASE: Livro[] = [
     tamanho_bytes: null,
     atualizado_em: diasAtras(2),
     progresso: null,
-    descricao: 'Livro de EXEMPLO ainda sem arquivo: aparece como "em breve".',
+    descricao: 'Fundamentos de epidemiologia, planejamento e gestão em saúde coletiva, com exercícios comentados.',
     ficha: { paginas: null, idioma: 'Português', editora: 'Conexão Editora', ano: 2026, isbn: null, doi: null, dimensoes: null, pagina_doi: null },
     avaliacao: { media: 0, quantidade: 0 },
   },
 ];
 
-function comProgresso(l: Livro): Livro {
+function comProgresso(livro: Livro): Livro {
+  // Fora do modo de capturas, a descrição deixa claro que é um livro de exemplo.
+  const l = livro.descricao && !modoCapturas ? { ...livro, descricao: `Livro de exemplo (modo de demonstração). ${livro.descricao}` } : livro;
   const leitura = estado.leituras[l.id];
   if (!leitura || l.modelo !== 'pdf') return { ...l, progresso: null };
   return {
@@ -425,7 +441,7 @@ export const apiMock: Api = {
     if (!l || l.modelo !== 'pdf') throw new ErroApi(404, 'nao_encontrado');
     let resp: Response;
     try {
-      resp = await fetch(`${CONFIG.base}mock/amostra.pdf`, { signal: opcoes.signal });
+      resp = await fetch(`${CONFIG.base}mock/${modoCapturas ? 'vitrine' : 'amostra'}.pdf`, { signal: opcoes.signal });
     } catch (e) {
       if (ehAbort(e)) throw e;
       throw ErroApi.semConexao();
@@ -444,7 +460,7 @@ export const apiMock: Api = {
     await chamada(() => null);
     const l = LIVROS_BASE.find((x) => x.id === id);
     if (!l || l.modelo !== 'pdf') throw new ErroApi(404, 'nao_encontrado');
-    const fonte = await abrirPorPartes(`${CONFIG.base}mock/amostra.pdf`, {}, tamanho, signal);
+    const fonte = await abrirPorPartes(`${CONFIG.base}mock/${modoCapturas ? 'vitrine' : 'amostra'}.pdf`, {}, tamanho, signal);
     const u = estado.usuario!;
     return fonte ? { ...fonte, marca: `${u.nome} · ${emailParcial(u.email)}` } : null;
   },
@@ -487,6 +503,13 @@ export const apiMock: Api = {
         ? { pedidos: todos, fonte: 'hub' as const, email_verificado: true }
         : { pedidos: todos.filter((p) => p.ref.startsWith('loja-')), fonte: 'loja' as const, email_verificado: false };
     }),
+  async excluirConta(senha) {
+    await chamada(() => {
+      if (senha === 'errada') throw new ErroApi(422, 'invalido', 'Senha incorreta. Confira e tente de novo.');
+      if (estado.usuario?.email.startsWith('equipe')) throw new ErroApi(403, 'sem_acesso', 'Contas da equipe não podem ser excluídas pelo app.');
+      estado = estadoInicial();
+    });
+  },
   async enviarCodigoEmail() {
     await chamada(() => null);
   },

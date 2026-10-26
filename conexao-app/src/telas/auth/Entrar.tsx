@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { api, ErroApi, mensagemDeErro } from '../../api';
 import { Botao, Campo, CampoSenha } from '../../componentes/ui';
 import { guardarLoginPendente, useSessao } from '../../estado/sessao';
@@ -10,6 +10,9 @@ import { AvisoDemonstracao, TelaAuth } from './TelaAuth';
 export function Entrar() {
   const { entrar, aviso, limparAviso } = useSessao();
   const navegar = useNavigate();
+  // Volta para uma página pública depois de entrar (só destinos conhecidos).
+  const voltar = useSearchParams()[0].get('voltar');
+  const destino = voltar === '/excluir-conta' ? voltar : null;
   const [email, setEmail] = useState(() => lerPref('ultimo-email', ''));
   const [senha, setSenha] = useState('');
   const [manter, setManter] = useState(true);
@@ -30,6 +33,7 @@ export function Entrar() {
     try {
       const r = await api.login({ email: email.trim(), senha, aparelho: await dadosDoAparelho() });
       gravarPref('ultimo-email', email.trim());
+      if (destino) navegar(destino, { replace: true });
       await entrar(r, manter);
     } catch (falha) {
       if (falha instanceof ErroApi && falha.codigo === 'limite_aparelhos') {
@@ -46,7 +50,7 @@ export function Entrar() {
   return (
     <TelaAuth
       titulo="Acesse sua conta"
-      subtitulo="Use o mesmo e-mail e senha da loja conexaoeditora.com.br."
+      subtitulo="Use o mesmo e-mail e senha do site conexaoeditora.com.br."
       rodape={
         <p>
           Ainda não tem conta? <Link to="/criar-conta">Criar conta</Link>

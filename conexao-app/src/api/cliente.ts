@@ -204,5 +204,6 @@ export const apiReal: Api = {
   pedidos: () => req<ListaPedidos>('GET', '/pedidos'),
   pedido: (ref) => req<Pedido>('GET', `/pedidos/${encodeURIComponent(ref)}`),
   enviarCodigoEmail: () => req<void>('POST', '/email/codigo'),
+  excluirConta: (senha) => req<void>('POST', '/conta/excluir', { corpo: { senha } }),
   confirmarEmail: (codigo) => req<void>('POST', '/email/confirmar', { corpo: { codigo } }),
 };

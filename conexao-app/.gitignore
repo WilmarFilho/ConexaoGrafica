@@ -32,3 +32,6 @@ ios/App/output/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Capturas de tela (perfis temporários do Chrome)
+.capturas-perfil/

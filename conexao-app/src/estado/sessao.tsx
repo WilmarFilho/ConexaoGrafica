@@ -15,6 +15,8 @@ interface ContextoSessao {
   aviso: string | null;
   entrar(resposta: RespostaLogin, manterConectado?: boolean): Promise<void>;
   sair(): Promise<void>;
+  /** Depois de excluir a conta: apaga tudo deste aparelho sem chamar /sair (o token já foi revogado). */
+  encerrarAposExclusao(): Promise<void>;
   atualizarUsuario(u: Usuario): void;
   limparAviso(): void;
 }
@@ -107,14 +109,21 @@ export function SessaoProvider({ children }: { children: ReactNode }) {
     setFase('anonimo');
   }, []);
 
+  const encerrarAposExclusao = useCallback(async () => {
+    await limparTudo();
+    setUsuario(null);
+    setAviso(null);
+    setFase('anonimo');
+  }, []);
+
   const atualizarUsuario = useCallback((u: Usuario) => {
     setUsuario(u);
     void gravarUsuario(u);
   }, []);
 
   const valor = useMemo(
-    () => ({ fase, usuario, aviso, entrar, sair, atualizarUsuario, limparAviso: () => setAviso(null) }),
-    [fase, usuario, aviso, entrar, sair, atualizarUsuario]
+    () => ({ fase, usuario, aviso, entrar, sair, encerrarAposExclusao, atualizarUsuario, limparAviso: () => setAviso(null) }),
+    [fase, usuario, aviso, entrar, sair, encerrarAposExclusao, atualizarUsuario]
   );
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }

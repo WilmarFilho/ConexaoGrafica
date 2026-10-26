@@ -207,5 +207,7 @@ export interface Api {
   pedidos(): Promise<ListaPedidos>;
   pedido(ref: string): Promise<Pedido>;
   enviarCodigoEmail(): Promise<void>;
+  /** Exclui a conta (exige a senha). 204; 422 senha errada; 403 conta da equipe; 429 muitas tentativas. */
+  excluirConta(senha: string): Promise<void>;
   confirmarEmail(codigo: string): Promise<void>;
 }

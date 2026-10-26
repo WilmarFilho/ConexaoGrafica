@@ -2,14 +2,18 @@
 
 Texto original escrito para o teste (não é obra de terceiros). Tem sumário (outline) com
 capítulos e seções, texto pesquisável e algumas figuras coloridas para testar os temas do leitor.
-Uso: python scripts/gerar-amostra-pdf.py
+Uso: python scripts/gerar-amostra-pdf.py            → public/mock/amostra.pdf (marcado como AMOSTRA)
+     python scripts/gerar-amostra-pdf.py --vitrine  → public/mock/vitrine.pdf (sem as marcas, para as capturas de tela das lojas)
 """
 import math
 import random
+import sys
 from pathlib import Path
 
+VITRINE = "--vitrine" in sys.argv
+
 RAIZ = Path(__file__).resolve().parent.parent
-SAIDA = RAIZ / "public" / "mock" / "amostra.pdf"
+SAIDA = RAIZ / "public" / "mock" / ("vitrine.pdf" if VITRINE else "amostra.pdf")
 L, A = 420, 595  # A5 em pontos
 MARGEM = 46
 
@@ -106,12 +110,13 @@ CINZA = (0.45, 0.5, 0.55)
 
 
 def cabecalho(p, n):
-    p.texto(MARGEM, A - 28, "AMOSTRA · dados de exemplo do app Conexão Editora", "F1", 7.5, CINZA)
+    p.texto(MARGEM, A - 28, "Guia do Leitor Digital · Conexão Editora" if VITRINE else "AMOSTRA · dados de exemplo do app Conexão Editora", "F1", 7.5, CINZA)
     p.texto(L / 2 - 6, 24, str(n), "F1", 8.5, CINZA)
 
 
 def main():
     random.seed(42)
+    frases = [f for i, f in enumerate(FRASES) if not (VITRINE and i in (18, 21))]
     paginas = []
     outline = []  # [(titulo, indice_pagina, [(sub, indice)])]
 
@@ -123,15 +128,22 @@ def main():
     capa.circ(L / 2, 420, 34, (1, 1, 1))
     capa.texto(MARGEM, 290, "Guia do Leitor Digital", "F2", 26, (1, 1, 1))
     capa.texto(MARGEM, 262, "Livro de demonstração do aplicativo", "F1", 13, (1, 1, 1))
-    capa.texto(MARGEM, 120, "Equipe Conexão Editora (exemplo)", "F2", 11, (1, 1, 1))
-    capa.texto(MARGEM, 60, "AMOSTRA · conteúdo fictício para testes", "F1", 9, (0.9, 0.96, 1))
+    capa.texto(MARGEM, 120, "Equipe Conexão Editora" if VITRINE else "Equipe Conexão Editora (exemplo)", "F2", 11, (1, 1, 1))
+    if not VITRINE:
+        capa.texto(MARGEM, 60, "AMOSTRA · conteúdo fictício para testes", "F1", 9, (0.9, 0.96, 1))
     paginas.append(capa)
 
     aviso = Pagina()
     cabecalho(aviso, 2)
-    aviso.texto(MARGEM, A - 90, "Sobre esta amostra", "F2", 18, AZUL_ESC)
+    aviso.texto(MARGEM, A - 90, "Apresentação" if VITRINE else "Sobre esta amostra", "F2", 18, AZUL_ESC)
     y = A - 125
-    for linha in quebrar("Este arquivo foi gerado automaticamente para testar o leitor do aplicativo da Conexão Editora no modo de demonstração. Nenhum texto aqui é de um livro real. " + FRASES[18] + " " + FRASES[21], 62):
+    texto_aviso = (
+        "Este guia mostra como aproveitar a leitura digital no aplicativo da Conexão Editora: virar páginas, ampliar figuras, "
+        "marcar trechos, buscar palavras e ler sem internet. " + FRASES[0] + " " + FRASES[6]
+        if VITRINE
+        else "Este arquivo foi gerado automaticamente para testar o leitor do aplicativo da Conexão Editora no modo de demonstração. Nenhum texto aqui é de um livro real. " + FRASES[18] + " " + FRASES[21]
+    )
+    for linha in quebrar(texto_aviso, 62):
         aviso.texto(MARGEM, y, linha)
         y -= 15
     paginas.append(aviso)
@@ -167,7 +179,7 @@ def main():
                     p.texto(MARGEM, y - 136, f"Figura {c}.{parte}: gráfico ilustrativo (dados fictícios).", "F3", 9, CINZA)
                     y -= 160
                 while y > 70:
-                    paragrafo = " ".join(random.sample(FRASES, 3))
+                    paragrafo = " ".join(random.sample(frases, 3))
                     for linha in quebrar(paragrafo, 62):
                         if y <= 60:
                             break
@@ -180,10 +192,10 @@ def main():
 
     fim = Pagina()
     cabecalho(fim, len(paginas) + 1)
-    fim.texto(MARGEM, A / 2, "Fim da amostra", "F2", 18, AZUL_ESC)
-    fim.texto(MARGEM, A / 2 - 24, "Obrigado por testar o leitor da Conexão Editora.", "F1", 11)
+    fim.texto(MARGEM, A / 2, "Fim" if VITRINE else "Fim da amostra", "F2", 18, AZUL_ESC)
+    fim.texto(MARGEM, A / 2 - 24, "Obrigado pela leitura." if VITRINE else "Obrigado por testar o leitor da Conexão Editora.", "F1", 11)
     paginas.append(fim)
-    outline.append(("Fim da amostra", len(paginas) - 1, []))
+    outline.append(("Fim" if VITRINE else "Fim da amostra", len(paginas) - 1, []))
 
     y = A - 125
     for t, n in linhas_sumario:

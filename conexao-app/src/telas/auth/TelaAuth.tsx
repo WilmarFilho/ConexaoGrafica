@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import logo from '../../assets/marca/logo.png';
 import logoBranco from '../../assets/marca/logo-branco.png';
-import { modoDemonstracao } from '../../api';
+import { mostrarAvisosDemo } from '../../vitrine';
 import { FaixaSemInternet } from '../../componentes/FaixaSemInternet';
 import { BotaoIcone } from '../../componentes/ui';
 import { temaEfetivo, useTema } from '../../estado/tema';
@@ -28,7 +28,7 @@ export function TelaAuth({ titulo, subtitulo, voltar, children, rodape }: { titu
 }
 
 export function AvisoDemonstracao({ children }: { children: ReactNode }) {
-  if (!modoDemonstracao) return null;
+  if (!mostrarAvisosDemo) return null;
   return (
     <aside className="demo" aria-label="Modo de demonstração">
       <strong>Modo de demonstração</strong>
