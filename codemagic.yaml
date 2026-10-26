@@ -31,7 +31,7 @@ workflows:
         XCODE_PROJECT: ios/App/App.xcodeproj # Capacitor 8 usa Swift Package Manager: não há .xcworkspace nem Pods
         XCODE_SCHEME: App
       node: 22
-      xcode: latest
+      xcode: 26.5 # "latest" fica horas na fila quando o pool lota; 26.5 é a mesma da Kyarem
     scripts:
       - name: Instalar dependências
         script: npm ci
