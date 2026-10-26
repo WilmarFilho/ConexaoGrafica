@@ -26,8 +26,7 @@ workflows:
         bundle_identifier: br.com.conexaoeditora.leitor
       vars:
         BUNDLE_ID: br.com.conexaoeditora.leitor
-        # Para numerar os builds seguintes, acrescente aqui APP_STORE_APPLE_ID: <número>
-        # (App Store Connect → app → Informações do app → ID da Apple). Sem ele o build sai como 1.
+        APP_STORE_APPLE_ID: 6827244720 # ID da Apple do app; numera os builds (último no App Store Connect + 1)
         XCODE_PROJECT: ios/App/App.xcodeproj # Capacitor 8 usa Swift Package Manager: não há .xcworkspace nem Pods
         XCODE_SCHEME: App
       node: 22
