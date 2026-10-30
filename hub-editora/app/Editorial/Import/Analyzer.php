@@ -30,6 +30,9 @@ class Analyzer
 
     public const FORMAT = 'conexao-doi/import-proposal@1';
 
+    /** Com menos palavras-chave impressas que isso, a IA completa a lista da obra. */
+    private const MIN_BOOK_KEYWORDS = 3;
+
     /** Caracteres por token, estimativa conservadora para português. */
     private const CHARS_PER_TOKEN = 3.2;
 
@@ -183,7 +186,7 @@ class Analyzer
     public function bookSummary(array $frontMatter, array $chapters): ?array
     {
         $needAbstract = $this->cleanText($frontMatter['abstract'] ?? null) === null;
-        $needKeywords = $this->strings($frontMatter['keywords'] ?? []) === [];
+        $needKeywords = count($this->strings($frontMatter['keywords'] ?? [])) < self::MIN_BOOK_KEYWORDS;
         if (! $needAbstract && ! $needKeywords) {
             return null;
         }
@@ -251,8 +254,15 @@ class Analyzer
         }
         $keywords = $this->strings($fm['keywords'] ?? []);
         $keywordsSource = $keywords !== [] ? 'pdf' : null;
-        if ($keywords === [] && ($bookAi['keywords'] ?? []) !== []) {
-            $keywords = $bookAi['keywords'];
+        if (count($keywords) < self::MIN_BOOK_KEYWORDS && ($bookAi['keywords'] ?? []) !== []) {
+            // Impressas (em geral o assunto da ficha catalográfica) na frente, completadas pela IA até 6.
+            $seen = array_map(fn ($k) => mb_strtolower($k), $keywords);
+            foreach ($bookAi['keywords'] as $k) {
+                if (count($keywords) < 6 && ! in_array(mb_strtolower($k), $seen, true)) {
+                    $keywords[] = $k;
+                    $seen[] = mb_strtolower($k);
+                }
+            }
             $keywordsSource = 'ai';
             $evidence['keywords'] = ['pdf_page' => null, 'excerpt' => null, 'confidence' => 0.7, 'source' => 'ai'];
         }

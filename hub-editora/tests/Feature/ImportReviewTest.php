@@ -106,7 +106,7 @@ class ImportReviewTest extends TestCase
         $this->assertSame('978-65-00000-00-9', $book->isbn_print);
         $this->assertSame('978-65-00000-01-6', $book->isbn_ebook);
         $this->assertSame('Medicina', $book->subject_area);
-        $this->assertSame(['Doencas raras', 'Genetica'], $book->keywords);
+        $this->assertSame(['Doencas raras', 'Genetica', 'Genetica medica', 'Politicas publicas de saude', 'Diagnostico'], $book->keywords);
         $this->assertStringStartsWith('Esta obra reune', $book->abstract, 'sem resumo impresso: entra o sugerido pela IA a partir dos capítulos');
         $this->assertSame('conexao.2026.001', $book->doi_suffix, 'sufixo pelo DoiSuffix');
         $this->assertSame('tratado-de-doencas-raras', $book->slug);

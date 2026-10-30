@@ -204,8 +204,9 @@ continua o texto.");
         $this->assertStringStartsWith('Esta obra reune', $book['abstract']);
         $this->assertSame('ai', $book['evidence']['abstract']['source']);
         $this->assertNotContains('abstract', $book['needs_review']);
-        $this->assertSame(['Doencas raras', 'Genetica'], $book['keywords'], 'palavras-chave impressas não são trocadas');
-        $this->assertSame('pdf', $book['keywords_source']);
+        $this->assertSame(['Doencas raras', 'Genetica', 'Genetica medica', 'Politicas publicas de saude', 'Diagnostico'], $book['keywords'],
+            'menos de 3 impressas: ficam na frente e a IA completa, sem repetir');
+        $this->assertSame('ai', $book['keywords_source']);
         $summaryInput = $this->ai->calls[3]['content'][0]['text'];
         $this->assertStringContainsString(PdfFixture::CH2, $summaryInput);
         $this->assertStringContainsString('Este capitulo apresenta', $summaryInput, 'leva os resumos dos capítulos, não o PDF');
@@ -290,7 +291,7 @@ continua o texto.");
 
     public function test_book_with_printed_abstract_and_keywords_skips_the_summary_call(): void
     {
-        $this->useFrontMatter(['abstract' => 'Resumo impresso da obra.']);
+        $this->useFrontMatter(['abstract' => 'Resumo impresso da obra.', 'keywords' => ['Doencas raras', 'Genetica', 'Saude publica']]);
 
         $import = Import::receive($this->pdf, 'livro.pdf');
         ProcessImport::dispatchSync($import->id);
