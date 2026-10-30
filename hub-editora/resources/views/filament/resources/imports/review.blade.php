@@ -50,7 +50,7 @@
 
     @if (! $import->hasProposal())
         {{-- Ainda na fila / processando / erro: acompanha e oferece reprocessar. --}}
-        <div class="hub-status-card" @if ($import->isProcessing() || $import->status === \App\Models\Import::RECEIVED) wire:poll.10s @endif>
+        <div class="hub-status-card" @if ($import->isProcessing() || $import->status === \App\Models\Import::RECEIVED) wire:poll.10s="syncProposal" @endif>
             <div class="hub-banner">
                 <span class="hub-pill {{ $import->status === \App\Models\Import::ERROR ? 'hub-pill-danger' : 'hub-pill-warn' }}">{{ $import->statusLabel() }}</span>
                 <span class="hub-note">{{ $import->original_name }} · enviado em {{ $import->created_at?->format('d/m/Y H:i') }}{{ $import->creator ? ' por '.$import->creator->name : '' }}</span>

@@ -42,18 +42,48 @@ class ReviewImport extends Page
     /** Índice do capítulo em edição (em `result.chapters`). */
     public int $current = 0;
 
+    /**
+     * Hash de `result` quando o formulário foi carregado. Um salvamento com formulário
+     * mais velho que o `result` gravado é descartado e a tela recarregada: evita que uma
+     * aba aberta enquanto a IA ainda rodava grave campos vazios por cima da proposta pronta.
+     */
+    public string $resultHash = '';
+
     public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
         abort_unless(ImportResource::canAccess(), 403);
 
-        $import = $this->getRecord();
+        $this->startReview($this->getRecord());
+        $this->fillForm();
+    }
+
+    /** Proposta pronta aberta pela primeira vez → `review`. */
+    private function startReview(Import $import): void
+    {
         if ($import->status === Import::SUGGESTED) {
             $import->forceFill(['status' => Import::REVIEW, 'reviewed_by' => auth()->id()])->save();
             SyncLog::record(null, SyncLog::MANUAL, 'import.review', $import, "Revisão da importação #{$import->id} iniciada");
         }
+    }
 
+    /**
+     * Chamado pelo `wire:poll` enquanto a IA trabalha: quando o `result` muda (capítulo
+     * novo, proposta pronta), recarrega o formulário e, se a proposta ficou pronta, inicia a revisão.
+     */
+    public function syncProposal(): void
+    {
+        $import = $this->getRecord();
+        if (self::hash($import->result) === $this->resultHash) {
+            return;
+        }
+        $this->startReview($import);
         $this->fillForm();
+    }
+
+    private static function hash(mixed $result): string
+    {
+        return md5((string) json_encode($result));
     }
 
     public function getTitle(): string
@@ -90,13 +120,15 @@ class ReviewImport extends Page
 
     protected function fillForm(): void
     {
-        $r = $this->getRecord()->result ?? [];
+        $import = $this->getRecord();
+        $r = $import->result ?? [];
         $this->current = max(0, min($this->current, max(0, count($r['chapters'] ?? []) - 1)));
 
         $this->form->fill([
             'book' => $this->withIndexes($r['book'] ?? [], ['contributors']),
             'chapter' => $this->chapterData($r, $this->current),
         ]);
+        $this->resultHash = self::hash($import->result);
     }
 
     private function chapterData(array $r, int $i): array
@@ -122,12 +154,26 @@ class ReviewImport extends Page
         return $data;
     }
 
-    /** Grava o formulário de volta em `result` (obra + capítulo atual). */
+    /**
+     * Grava o formulário de volta em `result` (obra + capítulo atual). Se o `result`
+     * mudou desde que o formulário foi carregado, não grava: recarrega a tela e avisa.
+     *
+     * @throws StaleFormException
+     */
     protected function persist(): Import
     {
         $import = $this->getRecord();
         if (! $import->isEditable()) {
             return $import;
+        }
+        if (self::hash($import->result) !== $this->resultHash) {
+            $this->fillForm();
+            Notification::make()
+                ->title('A proposta mudou desde que a tela foi aberta')
+                ->body('A IA terminou a leitura ou alguém salvou em outra janela. A tela foi recarregada com a versão atual; refaça a alteração, se ainda precisar.')
+                ->warning()->persistent()->send();
+
+            throw new StaleFormException;
         }
 
         $state = $this->form->getState();
@@ -138,9 +184,16 @@ class ReviewImport extends Page
             $r['chapters'][$this->current] = self::merge($r['chapters'][$this->current], $state['chapter'], ['contributors']);
         }
 
-        $import->forceFill(['result' => $r])->save();
+        $this->storeResult($import, $r);
 
         return $import;
+    }
+
+    /** Grava `result` e atualiza o hash: o que esta tela acabou de salvar não conta como mudança externa. */
+    private function storeResult(Import $import, array $r): void
+    {
+        $import->forceFill(['result' => $r])->save();
+        $this->resultHash = self::hash($import->refresh()->result);
     }
 
     /** Campos do formulário sobre o original; listas casadas por `_idx` (evidência, confiança e pendências ficam). */
@@ -183,14 +236,22 @@ class ReviewImport extends Page
             return;
         }
 
-        $this->persist();
+        try {
+            $this->persist();
+        } catch (StaleFormException) {
+            return;
+        }
         $this->current = $index;
         $this->fillForm();
     }
 
     public function save(): void
     {
-        $this->persist();
+        try {
+            $this->persist();
+        } catch (StaleFormException) {
+            return;
+        }
         Notification::make()->title('Revisão salva')->success()->send();
     }
 
@@ -316,7 +377,11 @@ class ReviewImport extends Page
 
     public function toggleBook(): void
     {
-        $import = $this->persist();
+        try {
+            $import = $this->persist();
+        } catch (StaleFormException) {
+            return;
+        }
         $r = $import->result;
         $approving = empty($r['book']['approved']);
 
@@ -333,7 +398,7 @@ class ReviewImport extends Page
         }
 
         $r['book']['approved'] = $approving;
-        $import->forceFill(['result' => $r])->save();
+        $this->storeResult($import, $r);
         $this->syncStatus($import);
 
         Notification::make()->title($approving ? 'Obra aprovada' : 'Obra reaberta para revisão')->success()->send();
@@ -341,7 +406,11 @@ class ReviewImport extends Page
 
     public function toggleChapter(int $index): void
     {
-        $import = $this->persist();
+        try {
+            $import = $this->persist();
+        } catch (StaleFormException) {
+            return;
+        }
         $r = $import->result;
         if (! isset($r['chapters'][$index])) {
             return;
@@ -355,7 +424,7 @@ class ReviewImport extends Page
         }
 
         $r['chapters'][$index]['approved'] = $approving;
-        $import->forceFill(['result' => $r])->save();
+        $this->storeResult($import, $r);
         $this->syncStatus($import);
 
         $seq = $r['chapters'][$index]['sequence'] ?? $index + 1;
@@ -364,7 +433,11 @@ class ReviewImport extends Page
 
     public function approveAllClean(): void
     {
-        $import = $this->persist();
+        try {
+            $import = $this->persist();
+        } catch (StaleFormException) {
+            return;
+        }
         $r = $import->result;
         $ok = 0;
         $left = 0;
@@ -381,7 +454,7 @@ class ReviewImport extends Page
             }
         }
 
-        $import->forceFill(['result' => $r])->save();
+        $this->storeResult($import, $r);
         $this->syncStatus($import);
 
         Notification::make()
@@ -407,7 +480,11 @@ class ReviewImport extends Page
 
     public function integrate(): void
     {
-        $import = $this->persist();
+        try {
+            $import = $this->persist();
+        } catch (StaleFormException) {
+            return;
+        }
 
         if (! $import->isFullyApproved() || $import->status !== Import::APPROVED) {
             Notification::make()->title('Não foi possível')

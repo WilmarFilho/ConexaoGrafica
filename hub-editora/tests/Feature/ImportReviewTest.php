@@ -297,6 +297,68 @@ class ImportReviewTest extends TestCase
         $this->assertFalse($this->approveAll($fresh)->canReprocess());
     }
 
+    public function test_page_opened_while_the_ai_is_running_reloads_the_form_when_the_proposal_arrives(): void
+    {
+        $this->panel($this->user('editor'));
+        $import = Import::receive($this->pdf, 'tratado.pdf');
+
+        // A aba fica aberta na fila; o wire:poll chama syncProposal e nada muda.
+        $page = Livewire::test(ReviewImport::class, ['record' => $import->getRouteKey()])->assertOk()->assertSee('Na fila');
+        $page->call('syncProposal');
+        $this->assertSame(Import::RECEIVED, $import->fresh()->status);
+
+        // A IA termina com a aba ainda aberta: o próximo poll carrega a proposta e inicia a revisão.
+        ProcessImport::dispatchSync($import->id);
+        $this->assertSame(Import::SUGGESTED, $import->fresh()->status);
+
+        $page->call('syncProposal')
+            ->assertSet('data.book.title', PdfFixture::TITLE)
+            ->assertSet('data.chapter.title', PdfFixture::CH1);
+        $this->assertSame(Import::REVIEW, $import->fresh()->status, 'proposta pronta aberta → review');
+        $this->assertSame(1, SyncLog::where('action', 'import.review')->count());
+
+        // Salvar agora grava a proposta carregada, não o formulário vazio de antes.
+        $page->call('save')->assertNotified('Revisão salva');
+        $this->assertSame(PdfFixture::TITLE, $import->fresh()->result['book']['title']);
+        $this->assertCount(4, $import->fresh()->result['book']['contributors']);
+    }
+
+    public function test_a_stale_form_never_overwrites_a_proposal_that_changed_meanwhile(): void
+    {
+        $this->panel($this->user('editor'));
+        $import = $this->proposal();
+        $page = Livewire::test(ReviewImport::class, ['record' => $import->getRouteKey()]);
+
+        // Outra janela (ou a IA) grava uma versão nova do result depois de a aba abrir.
+        $r = $import->fresh()->result;
+        $r['book']['title'] = 'Titulo salvo em outra janela';
+        $import->forceFill(['result' => $r])->save();
+
+        $page->set('data.book.abstract', 'Resumo digitado na aba velha')
+            ->call('save')
+            ->assertNotified('A proposta mudou desde que a tela foi aberta')
+            ->assertNotNotified('Revisão salva')
+            ->assertSet('data.book.title', 'Titulo salvo em outra janela');
+        $book = $import->fresh()->result['book'];
+        $this->assertSame('Titulo salvo em outra janela', $book['title']);
+        $this->assertStringStartsWith('Esta obra reune', $book['abstract'], 'o resumo da aba velha não entrou');
+
+        // Navegar e aprovar também passam pela mesma trava.
+        $r['book']['title'] = 'Titulo mudado de novo';
+        $import->forceFill(['result' => $r])->save();
+        $page->call('goTo', 1)->assertSet('current', 0)->assertNotified('A proposta mudou desde que a tela foi aberta');
+        $r['book']['title'] = 'Titulo mudado pela terceira vez';
+        $import->forceFill(['result' => $r])->save();
+        $page->callAction('aprovar_obra')->assertNotified('A proposta mudou desde que a tela foi aberta');
+        $this->assertFalse($import->fresh()->bookApproved());
+
+        // Recarregada, a tela volta a salvar normalmente.
+        $page->set('data.book.abstract', 'Resumo digitado depois de recarregar')->call('save')->assertNotified('Revisão salva');
+        $this->assertSame('Resumo digitado depois de recarregar', $import->fresh()->result['book']['abstract']);
+        $page->callAction('aprovar_obra')->assertNotified('Obra aprovada');
+        $page->call('goTo', 1)->assertSet('current', 1);
+    }
+
     public function test_page_shows_progress_or_error_while_there_is_no_proposal(): void
     {
         $this->panel($this->user('editor'));
