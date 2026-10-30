@@ -22,6 +22,11 @@ Regras obrigatórias:
 - Responda só com o JSON pedido.
 TXT;
 
+    /** Como redigir os resumos (capítulo e obra): versão curta do texto, não descrição dele. */
+    private const ABSTRACT_STYLE = <<<'TXT'
+Estilo do resumo redigido: escreva uma versão curta do próprio conteúdo, em linguagem científica direta e impessoal, apresentando os conceitos, achados, recomendações e conclusões em si. Não descreva o texto nem deixe claro que é um resumo: nada de "O capítulo aborda", "Este capítulo", "A obra reúne", "Os autores descrevem", "São apresentados", "São revisados", "Discute-se", "Conclui-se que". Comece pelo próprio assunto: por exemplo, "O papel da ultrassonografia na avaliação da hidronefrose no adulto..." e não "O capítulo aborda o papel da ultrassonografia...".
+TXT;
+
     public static function frontMatter(): string
     {
         return self::RULES."\n\n".<<<'TXT'
@@ -50,10 +55,11 @@ Extraia:
 - Título confirmado no texto (e subtítulo, título em inglês, número, se impressos).
 - Autores do capítulo na ordem impressa, com a afiliação resumida se o capítulo a trouxer (nota de rodapé, sobrescrito, fim do capítulo).
 - abstract_original: o resumo impresso no capítulo, literal, se houver. Caso contrário, null.
-- abstract_ai: APENAS quando não houver resumo impresso, redija um resumo em português, 120 a 250 palavras, um só parágrafo, só texto (sem tabelas, listas, citações ou referências), descrevendo objetivo, conteúdo e conclusões do capítulo com base no texto. Se houver resumo impresso, abstract_ai deve ser null.
+- abstract_ai: APENAS quando não houver resumo impresso, redija um resumo em português, 120 a 250 palavras, um só parágrafo, só texto (sem tabelas, listas, citações ou referências), com o objetivo, o conteúdo e as conclusões do capítulo com base no texto. Se houver resumo impresso, abstract_ai deve ser null.
 - keywords_original: as palavras-chave impressas. keywords_ai: 3 a 6 sugeridas APENAS se não houver impressas.
 - references: a lista de referências do capítulo, se houver, uma por entrada, com o DOI só quando impresso.
-TXT;
+
+TXT.self::ABSTRACT_STYLE;
     }
 
     public static function chapterPart(int $part, int $total, string $bookTitle): string
@@ -74,6 +80,23 @@ Material: as extrações parciais (JSON) das partes de um capítulo longo do liv
 
 Pessoas já identificadas na obra:
 {$people}
-TXT;
+
+TXT.self::ABSTRACT_STYLE;
+    }
+
+    /** Resumo e palavras-chave da obra, quando o PDF não os traz impressos. */
+    public static function bookSummary(): string
+    {
+        return <<<'TXT'
+Você é o assistente editorial da Conexão Editora (Goiânia, GO, Brasil). Um revisor humano confere tudo antes de aprovar.
+
+Material: os dados de um livro acadêmico e a lista dos capítulos com o resumo e as palavras-chave de cada um (JSON), já extraídos do próprio livro. O livro não traz resumo nem palavras-chave da obra impressos, então você vai redigi-los.
+
+- abstract: resumo da obra em português, de 150 a 300 palavras, um só parágrafo, só texto (sem listas, tabelas, citações ou referências), com os principais temas e conclusões dos capítulos em conjunto, com base apenas no material enviado. Não cite nomes de pessoas nem dados (ISBN, ano, editora) que não estejam no material.
+- keywords: de 4 a 6 palavras-chave da obra em português, termos do assunto que um pesquisador usaria para encontrá-la; sem nomes de pessoas, numeração ou siglas soltas; maiúscula só na primeira letra e em nomes próprios.
+
+Responda só com o JSON pedido.
+
+TXT.self::ABSTRACT_STYLE;
     }
 }

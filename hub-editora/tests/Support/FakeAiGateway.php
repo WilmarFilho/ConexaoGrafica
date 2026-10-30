@@ -8,7 +8,7 @@ use Tests\Support\PdfFixture as F;
 
 /**
  * API da OpenAI simulada: identifica a etapa pelo nome do schema pedido (front_matter,
- * chapter_part, chapter) e devolve JSON plausível para o livro do PdfFixture.
+ * chapter_part, chapter, book_summary) e devolve JSON plausível para o livro do PdfFixture.
  * Cada chamada custa 1.000 tokens de entrada e 200 de saída.
  * `failures` permite forçar uma exceção na n-ésima chamada (1-based).
  */
@@ -35,6 +35,7 @@ class FakeAiGateway implements AiGateway
         $data = match ($stage) {
             'front_matter' => $this->frontMatter(),
             'chapter_part' => $this->part($text),
+            'book_summary' => $this->bookSummary(),
             default => str_contains($text, F::CH2) || str_contains($text, 'key_points') ? $this->chapter2() : $this->chapter1(),
         };
 
@@ -117,6 +118,14 @@ class FakeAiGateway implements AiGateway
             'references' => [],
             'evidence' => [['field' => 'title', 'pdf_page' => 6, 'excerpt' => F::CH2, 'confidence' => 0.97]],
             'notes' => null,
+        ];
+    }
+
+    public function bookSummary(): array
+    {
+        return [
+            'abstract' => trim(str_repeat('Esta obra reune capitulos sobre a historia e a genetica das doencas raras, para profissionais de saude e estudantes. ', 9)),
+            'keywords' => ['Doencas raras', 'Genetica medica', 'Politicas publicas de saude', 'Diagnostico'],
         ];
     }
 

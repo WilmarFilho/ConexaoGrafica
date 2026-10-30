@@ -16,7 +16,8 @@ use Throwable;
  * Processa uma importação de PDF (Conexão DOI, frente C) pela fila `database`:
  *
  *   received → extracting (texto por página + dados da obra via IA)
- *            → segmenting (capítulos ↔ páginas; um capítulo por chamada à IA)
+ *            → segmenting (capítulos ↔ páginas; um capítulo por chamada à IA;
+ *                          no fim, resumo e palavras-chave da obra se o PDF não os traz)
  *            → suggested (proposta completa em imports.result)
  *            → error (mensagem em imports.error; Import::reprocess() volta a received)
  *
@@ -157,8 +158,17 @@ class ProcessImport implements ShouldBeUnique, ShouldQueue
             ])->save();
         }
 
-        // 3. Proposta --------------------------------------------------------
-        $result = $analyzer->buildResult($meta, $front, $segmentation, $chapters);
+        // 3. Resumo e palavras-chave da obra que o PDF não traz ------------------
+        $bookAi = $analyzer->bookSummary($front['data'], $chapters);
+        if ($bookAi !== null) {
+            $words = $bookAi['abstract'] !== null ? str_word_count(\Illuminate\Support\Str::ascii($bookAi['abstract'])) : 0;
+            SyncLog::record(null, SyncLog::OUT, 'import.book_summary', $import,
+                sprintf('Sugestão da IA para a obra: %s; %d palavra(s)-chave', $words > 0 ? "resumo com {$words} palavras" : 'sem resumo novo', count($bookAi['keywords'])),
+                ['abstract_words' => $words, 'keywords' => $bookAi['keywords']]);
+        }
+
+        // 4. Proposta --------------------------------------------------------
+        $result = $analyzer->buildResult($meta, $front, $segmentation, $chapters, bookAi: $bookAi);
         $usage = $analyzer->usage->toArray();
         $import->forceFill(['status' => Import::SUGGESTED, 'result' => $result, 'usage' => $usage, 'error' => null])->save();
 

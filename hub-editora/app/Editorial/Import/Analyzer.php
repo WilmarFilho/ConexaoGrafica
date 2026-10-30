@@ -20,11 +20,13 @@ use Illuminate\Support\Str;
  *     autores ligados aos da obra, resumo (original preservado ou sugerido), palavras-chave,
  *     referências; tudo com evidência {pdf_page, excerpt} e confiança 0–1.
  *     Capítulo longo é dividido em partes e consolidado numa chamada final.
+ *  4. bookSummary(): resumo e palavras-chave da obra, se o PDF não os traz, redigidos
+ *     a partir dos capítulos (sem reler o PDF).
  */
 class Analyzer
 {
     /** Sobe quando qualquer prompt ou schema muda; fica gravado em imports.prompt_version. */
-    public const PROMPT_VERSION = '2026-10-22.1';
+    public const PROMPT_VERSION = '2026-10-30.1';
 
     public const FORMAT = 'conexao-doi/import-proposal@1';
 
@@ -168,17 +170,92 @@ class Analyzer
         return $this->mergeChapter($base, $data, $bookContributors);
     }
 
+    // ------------------------------------------------------ 4. resumo da obra
+
+    /**
+     * Resumo e palavras-chave da obra que o PDF não traz impressos, redigidos a partir
+     * dos títulos, resumos e palavras-chave dos capítulos já analisados (sem reler o PDF).
+     * Devolve só o que faltava; null quando nada falta, não há capítulo analisado ou a IA falhou
+     * (aí o campo fica vazio e em needs_review, como antes).
+     *
+     * @return array{abstract:?string, keywords:list<string>}|null
+     */
+    public function bookSummary(array $frontMatter, array $chapters): ?array
+    {
+        $needAbstract = $this->cleanText($frontMatter['abstract'] ?? null) === null;
+        $needKeywords = $this->strings($frontMatter['keywords'] ?? []) === [];
+        if (! $needAbstract && ! $needKeywords) {
+            return null;
+        }
+
+        $items = [];
+        foreach ($chapters as $c) {
+            if (($c['status'] ?? null) !== 'suggested') {
+                continue;
+            }
+            $items[] = array_filter([
+                'numero' => $c['number'] ?? null,
+                'secao' => $c['section'] ?? null,
+                'titulo' => $c['title'],
+                'resumo' => $c['abstract_original'] ?? $c['abstract_ai'] ?? null,
+                'palavras_chave' => $c['keywords'] ?? [],
+            ]);
+        }
+        if ($items === []) {
+            return null;
+        }
+
+        $book = array_filter([
+            'titulo' => $frontMatter['title'] ?? null,
+            'subtitulo' => $frontMatter['subtitle'] ?? null,
+            'tipo' => $frontMatter['type'] ?? null,
+            'area' => $frontMatter['subject_area'] ?? null,
+            'subarea' => $frontMatter['subject_subarea'] ?? null,
+        ]);
+        $json = json_encode(['obra' => $book, 'capitulos' => $items], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        try {
+            $result = $this->ai->structured(Prompts::bookSummary(), [['type' => 'input_text', 'text' => $json]], 'book_summary', Schemas::bookSummary(), $this->maxOutput());
+            $this->usage->add('book_summary', $result);
+        } catch (AiException $e) {
+            $this->usage->add('book_summary', $e->usage, null, $e->reason);
+
+            return null;
+        }
+
+        return [
+            'abstract' => $needAbstract ? $this->cleanText($result->data['abstract'] ?? null) : null,
+            'keywords' => $needKeywords ? array_slice($this->strings($result->data['keywords'] ?? []), 0, 8) : [],
+        ];
+    }
+
     // ------------------------------------------------------------ proposta
 
     /**
      * Monta o `result` final. Pode ser chamado com capítulos ainda sem análise
-     * (progresso parcial): eles ficam com status 'pending'.
+     * (progresso parcial): eles ficam com status 'pending'. `$bookAi` é a saída de
+     * bookSummary(): preenche resumo e palavras-chave da obra que o PDF não trouxe.
      */
-    public function buildResult(array $import, array $frontMatter, array $segmentation, array $chapters, array $warnings = []): array
+    public function buildResult(array $import, array $frontMatter, array $segmentation, array $chapters, array $warnings = [], ?array $bookAi = null): array
     {
         $fm = $frontMatter['data'];
         $contributors = $this->bookContributors($fm);
         $evidence = $this->evidenceMap($fm['evidence'] ?? []);
+
+        $abstract = $this->cleanText($fm['abstract'] ?? null);
+        $abstractSource = $abstract !== null ? 'pdf' : null;
+        if ($abstract === null && ($bookAi['abstract'] ?? null) !== null) {
+            $abstract = $bookAi['abstract'];
+            $abstractSource = 'ai';
+            $evidence['abstract'] = ['pdf_page' => null, 'excerpt' => null, 'confidence' => 0.7, 'source' => 'ai'];
+        }
+        $keywords = $this->strings($fm['keywords'] ?? []);
+        $keywordsSource = $keywords !== [] ? 'pdf' : null;
+        if ($keywords === [] && ($bookAi['keywords'] ?? []) !== []) {
+            $keywords = $bookAi['keywords'];
+            $keywordsSource = 'ai';
+            $evidence['keywords'] = ['pdf_page' => null, 'excerpt' => null, 'confidence' => 0.7, 'source' => 'ai'];
+        }
 
         $book = [
             'title' => $fm['title'] ?? null,
@@ -202,10 +279,11 @@ class Analyzer
             'isbn_print' => $this->isbn($fm['isbn_print'] ?? null),
             'isbn_ebook' => $this->isbn($fm['isbn_ebook'] ?? null),
             'other_isbns' => array_values(array_map(fn ($o) => ['type' => $o['type'] ?? null, 'value' => $o['value'] ?? null], (array) ($fm['other_isbns'] ?? []))),
-            'keywords' => array_values((array) ($fm['keywords'] ?? [])),
+            'keywords' => $keywords,
+            'keywords_source' => $keywordsSource,
             'keywords_en' => [],
-            'abstract' => $fm['abstract'] ?? null,
-            'abstract_source' => ($fm['abstract'] ?? null) ? 'pdf' : null,
+            'abstract' => $abstract,
+            'abstract_source' => $abstractSource,
             'synopsis' => null,
             'references' => [],
             'contributors' => $contributors,
@@ -214,6 +292,12 @@ class Analyzer
             'notes' => $fm['notes'] ?? null,
         ];
         $book['needs_review'] = $this->bookNeedsReview($book, $evidence);
+        if ($abstractSource === 'ai') {
+            $words = str_word_count(Str::ascii($abstract));
+            if ($words < 120 || $words > 330) {
+                $book['needs_review'][] = 'abstract'; // fora da faixa pedida (150–300, com folga)
+            }
+        }
         if (($fm['isbn_print'] ?? null) && $book['isbn_print'] === null) {
             $book['needs_review'][] = 'isbn_print';
             $warnings[] = 'ISBN impresso lido pela IA não passou na validação ISBN-13: '.$fm['isbn_print'];

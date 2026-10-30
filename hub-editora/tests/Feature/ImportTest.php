@@ -175,8 +175,8 @@ continua o texto.");
         $this->assertSame('gpt-6-astra', $import->model);
         $this->assertSame(Analyzer::PROMPT_VERSION, $import->prompt_version);
 
-        // Chamadas: 1 obra + 2 capítulos; a obra foi como PDF inteiro (6 páginas, sem Ghostscript).
-        $this->assertSame(['front_matter', 'chapter', 'chapter'], array_column($this->ai->calls, 'stage'));
+        // Chamadas: 1 obra + 2 capítulos + resumo da obra; a obra foi como PDF inteiro (6 páginas, sem Ghostscript).
+        $this->assertSame(['front_matter', 'chapter', 'chapter', 'book_summary'], array_column($this->ai->calls, 'stage'));
         $doc = $this->ai->calls[0]['content'][0];
         $this->assertSame('input_file', $doc['type']);
         $this->assertStringStartsWith('data:application/pdf;base64,', $doc['file_data']);
@@ -200,7 +200,18 @@ continua o texto.");
         $this->assertSame(2026, $book['publication_year']);
         $this->assertSame(['pdf_page' => 2, 'excerpt' => 'ISBN 978-65-00000-00-9 (impresso)', 'confidence' => 0.95], $book['evidence']['isbn_print']);
         $this->assertSame([['section' => 'Secao 1 - Fundamentos', 'chapters' => [1, 2]]], $book['toc']);
-        $this->assertContains('abstract', $book['needs_review'], 'sem resumo impresso: revisor escreve');
+        $this->assertSame('ai', $book['abstract_source'], 'sem resumo impresso: a IA sugere a partir dos capítulos');
+        $this->assertStringStartsWith('Esta obra reune', $book['abstract']);
+        $this->assertSame('ai', $book['evidence']['abstract']['source']);
+        $this->assertNotContains('abstract', $book['needs_review']);
+        $this->assertSame(['Doencas raras', 'Genetica'], $book['keywords'], 'palavras-chave impressas não são trocadas');
+        $this->assertSame('pdf', $book['keywords_source']);
+        $summaryInput = $this->ai->calls[3]['content'][0]['text'];
+        $this->assertStringContainsString(PdfFixture::CH2, $summaryInput);
+        $this->assertStringContainsString('Este capitulo apresenta', $summaryInput, 'leva os resumos dos capítulos, não o PDF');
+        foreach ([1, 3] as $call) {
+            $this->assertStringContainsString('Não descreva o texto nem deixe claro que é um resumo', $this->ai->calls[$call]['instructions'], 'resumo como versão curta do texto');
+        }
         $this->assertNotContains('title', $book['needs_review']);
 
         $editors = array_values(array_filter($book['contributors'], fn ($c) => $c['role'] === 'editor'));
@@ -243,10 +254,10 @@ continua o texto.");
 
         $this->assertSame(['chapters' => 2, 'analyzed' => 2, 'failed' => 0, 'needs_review' => 0, 'abstracts_from_pdf' => 1, 'abstracts_from_ai' => 1], $r['summary']);
 
-        // Uso e custo (gpt-6-astra): 3 chamadas × (1.000 × US$10 + 200 × US$50) / 1M = US$ 0,06.
+        // Uso e custo (gpt-6-astra): 4 chamadas × (1.000 × US$10 + 200 × US$50) / 1M = US$ 0,08.
         $u = $import->usage;
-        $this->assertSame([3, 3000, 600], [$u['calls'], $u['input_tokens'], $u['output_tokens']]);
-        $this->assertEqualsWithDelta(0.06, $u['cost_usd'], 0.0001);
+        $this->assertSame([4, 4000, 800], [$u['calls'], $u['input_tokens'], $u['output_tokens']]);
+        $this->assertEqualsWithDelta(0.08, $u['cost_usd'], 0.0001);
         $this->assertTrue($u['price_known']);
         $this->assertSame(1, $u['by_stage']['front_matter']['calls']);
         $this->assertSame(2, $u['by_stage']['chapter']['calls']);
@@ -254,8 +265,68 @@ continua o texto.");
 
         // Auditoria de cada etapa, com o import como sujeito. Nada em books/chapters (não existem nesta frente).
         $actions = SyncLog::where('subject_type', (new Import)->getMorphClass())->where('subject_id', $import->id)->orderBy('id')->pluck('action')->all();
-        $this->assertSame(['import.extracted', 'import.front_matter', 'import.segmented', 'import.suggested'], $actions);
-        $this->assertStringContainsString('US$ 0,06', SyncLog::where('action', 'import.suggested')->first()->message);
+        $this->assertSame(['import.extracted', 'import.front_matter', 'import.segmented', 'import.book_summary', 'import.suggested'], $actions);
+        $this->assertStringContainsString('US$ 0,08', SyncLog::where('action', 'import.suggested')->first()->message);
+    }
+
+    public function test_book_without_printed_abstract_and_keywords_gets_both_from_the_chapters(): void
+    {
+        $this->useFrontMatter(['abstract' => null, 'keywords' => [], 'evidence' => [
+            ['field' => 'keywords', 'pdf_page' => 2, 'excerpt' => '1. Doencas raras I. Silva, Maria Exemplo da.', 'confidence' => 0.6],
+        ]]);
+
+        $import = Import::receive($this->pdf, 'livro.pdf');
+        ProcessImport::dispatchSync($import->id);
+        $book = $import->fresh()->result['book'];
+
+        $this->assertSame('book_summary', array_column($this->ai->calls, 'stage')[3]);
+        $this->assertSame(['ai', 'ai'], [$book['abstract_source'], $book['keywords_source']]);
+        $this->assertSame(['Doencas raras', 'Genetica medica', 'Politicas publicas de saude', 'Diagnostico'], $book['keywords']);
+        $this->assertSame('ai', $book['evidence']['keywords']['source'], 'a linha da ficha catalográfica não fica como evidência');
+        $this->assertNotContains('abstract', $book['needs_review']);
+        $this->assertNotContains('keywords', $book['needs_review']);
+        $this->assertStringContainsString('4 palavra(s)-chave', SyncLog::where('action', 'import.book_summary')->first()->message);
+    }
+
+    public function test_book_with_printed_abstract_and_keywords_skips_the_summary_call(): void
+    {
+        $this->useFrontMatter(['abstract' => 'Resumo impresso da obra.']);
+
+        $import = Import::receive($this->pdf, 'livro.pdf');
+        ProcessImport::dispatchSync($import->id);
+        $book = $import->fresh()->result['book'];
+
+        $this->assertNotContains('book_summary', array_column($this->ai->calls, 'stage'));
+        $this->assertSame(['Resumo impresso da obra.', 'pdf'], [$book['abstract'], $book['abstract_source']]);
+    }
+
+    public function test_failed_book_summary_leaves_the_fields_for_the_reviewer(): void
+    {
+        $this->ai->failures[4] = new AiException('refusal', 'Recusado');
+
+        $import = Import::receive($this->pdf, 'livro.pdf');
+        ProcessImport::dispatchSync($import->id);
+        $import->refresh();
+
+        $this->assertSame(Import::SUGGESTED, $import->status);
+        $this->assertNull($import->result['book']['abstract']);
+        $this->assertContains('abstract', $import->result['book']['needs_review']);
+        $this->assertSame(1, $import->usage['by_stage']['book_summary']['calls']);
+    }
+
+    /** Troca campos da leitura da obra devolvida pela IA simulada. */
+    private function useFrontMatter(array $override): void
+    {
+        $this->ai = new class($override) extends FakeAiGateway
+        {
+            public function __construct(private array $override) {}
+
+            public function frontMatter(): array
+            {
+                return array_replace(parent::frontMatter(), $this->override);
+            }
+        };
+        $this->app->instance(AiGateway::class, $this->ai);
     }
 
     public function test_api_failure_marks_error_and_the_import_can_be_reprocessed(): void
@@ -519,9 +590,9 @@ continua o texto.");
         $this->assertSame(Import::SUGGESTED, $import->status);
         $newStages = array_column(array_slice($this->ai->calls, $callsBefore), 'stage');
         $this->assertNotContains('front_matter', $newStages, 'a obra não é lida de novo');
-        $this->assertCount(1, $newStages, 'só o capítulo que faltava');
+        $this->assertSame(['chapter', 'book_summary'], $newStages, 'só o capítulo que faltava e o resumo da obra');
         $this->assertSame(['suggested', 'suggested'], array_column($import->result['chapters'], 'status'));
-        $this->assertSame(3, $import->usage['calls'], 'o custo soma as duas execuções');
+        $this->assertSame(4, $import->usage['calls'], 'o custo soma as duas execuções');
         $this->assertSame(1, SyncLog::where('action', 'import.resumed')->count());
 
         // Reprocessar do zero apaga o ponto de retomada e lê a obra de novo.

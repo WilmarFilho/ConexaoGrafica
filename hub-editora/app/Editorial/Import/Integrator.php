@@ -152,8 +152,12 @@ class Integrator
                 } elseif (! $empty) {
                     $book->{$field} = $value;
                 }
-            } elseif (! $empty) {
-                $book->{$field} = $value; // atualiza só o que a proposta trouxe
+            } elseif ($empty) {
+                continue; // atualiza só o que a proposta trouxe
+            } elseif (in_array($field, ['abstract', 'keywords'], true) && ($b[$field.'_source'] ?? null) === 'ai' && filled($book->{$field})) {
+                continue; // sugestão da IA não troca o que já estava cadastrado no livro
+            } else {
+                $book->{$field} = $value;
             }
         }
 

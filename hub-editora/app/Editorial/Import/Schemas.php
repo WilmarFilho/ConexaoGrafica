@@ -90,6 +90,15 @@ class Schemas
         ]);
     }
 
+    /** Resumo e palavras-chave da obra redigidos a partir dos capítulos. */
+    public static function bookSummary(): array
+    {
+        return self::object([
+            'abstract' => self::str('Resumo da obra redigido por você, 150 a 300 palavras, português, um parágrafo, só texto'),
+            'keywords' => self::list(self::str(), '4 a 6 palavras-chave da obra'),
+        ]);
+    }
+
     private static function contributor(bool $withRole): array
     {
         $props = [

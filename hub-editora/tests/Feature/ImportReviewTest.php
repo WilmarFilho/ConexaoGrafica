@@ -107,7 +107,7 @@ class ImportReviewTest extends TestCase
         $this->assertSame('978-65-00000-01-6', $book->isbn_ebook);
         $this->assertSame('Medicina', $book->subject_area);
         $this->assertSame(['Doencas raras', 'Genetica'], $book->keywords);
-        $this->assertSame('', $book->abstract, 'sem resumo na proposta: fica vazio e pendente no checklist');
+        $this->assertStringStartsWith('Esta obra reune', $book->abstract, 'sem resumo impresso: entra o sugerido pela IA a partir dos capítulos');
         $this->assertSame('conexao.2026.001', $book->doi_suffix, 'sufixo pelo DoiSuffix');
         $this->assertSame('tratado-de-doencas-raras', $book->slug);
 
@@ -172,7 +172,7 @@ class ImportReviewTest extends TestCase
         $this->assertSame($existing->id, $book->id);
         $this->assertSame(1, Book::count());
         $this->assertSame(PdfFixture::TITLE, $book->title, 'o que a proposta trouxe atualiza');
-        $this->assertSame('Resumo que já existia', $book->abstract, 'o que a proposta não trouxe fica');
+        $this->assertSame('Resumo que já existia', $book->abstract, 'a sugestão da IA não troca o resumo já cadastrado');
         $this->assertSame('conexao.2026.001', $book->doi_suffix, 'DOI não muda');
         $this->assertSame(2, $book->chapters()->count());
     }
