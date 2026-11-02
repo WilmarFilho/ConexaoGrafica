@@ -949,6 +949,132 @@
         }
     }
 
+    /* ficha em PDF: nome e e-mail antes de abrir (leads do conexao-doi) */
+    var modalFicha = document.querySelector('[data-ficha-modal]');
+
+    if (modalFicha) {
+        var formFicha = modalFicha.querySelector('[data-ficha-form]');
+        var erroFicha = modalFicha.querySelector('[data-ficha-erro]');
+        var enviarFicha = modalFicha.querySelector('[data-ficha-enviar]');
+        var fichaAtual = null;
+
+        var mostrarErroFicha = function (texto) {
+            erroFicha.textContent = texto;
+            erroFicha.hidden = !texto;
+        };
+
+        // nome e e-mail ficam neste navegador para a próxima ficha
+        try {
+            var leitor = JSON.parse(window.localStorage.getItem('conexao-ficha-leitor') || 'null');
+
+            if (leitor) {
+                formFicha.elements.nome.value = leitor.nome || '';
+                formFicha.elements.email.value = leitor.email || '';
+            }
+        } catch (erro) {}
+
+        document.addEventListener('click', function (evento) {
+            var botao = evento.target.closest('[data-ficha]');
+
+            if (!botao) {
+                return;
+            }
+
+            evento.preventDefault();
+            fichaAtual = botao.getAttribute('data-ficha');
+            modalFicha.querySelector('[data-ficha-rotulo]').textContent = botao.getAttribute('data-ficha-tipo') === 'capitulo' ? 'do capítulo' : 'do livro';
+            mostrarErroFicha('');
+            modalFicha.showModal();
+            (formFicha.elements.nome.value ? formFicha.elements.email.value ? enviarFicha : formFicha.elements.email : formFicha.elements.nome).focus();
+        });
+
+        modalFicha.querySelector('[data-ficha-fechar]').addEventListener('click', function () {
+            modalFicha.close();
+        });
+
+        // clique fora da caixa fecha
+        modalFicha.addEventListener('click', function (evento) {
+            if (evento.target === modalFicha) {
+                modalFicha.close();
+            }
+        });
+
+        formFicha.addEventListener('submit', function (evento) {
+            evento.preventDefault();
+
+            var campos = formFicha.elements;
+
+            if (campos.nome.value.trim().length < 2) {
+                mostrarErroFicha('Informe seu nome.');
+                campos.nome.focus();
+                return;
+            }
+
+            if (!campos.email.checkValidity() || !campos.email.value) {
+                mostrarErroFicha('Informe um e-mail válido.');
+                campos.email.focus();
+                return;
+            }
+
+            if (!campos.aceite.checked) {
+                mostrarErroFicha('Para abrir a ficha, aceite a política de privacidade.');
+                campos.aceite.focus();
+                return;
+            }
+
+            // a aba nova abre já no clique (senão o navegador bloqueia) e recebe o PDF depois
+            var janela = window.open('', '_blank');
+            enviarFicha.disabled = true;
+            mostrarErroFicha('');
+
+            fetch(formFicha.dataset.api, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    post_id: Number(fichaAtual),
+                    nome: campos.nome.value.trim(),
+                    email: campos.email.value.trim(),
+                    aceite: true,
+                    novidades: campos.novidades.checked,
+                    site: campos.site.value
+                })
+            })
+                .then(function (resposta) {
+                    return resposta.json().then(function (dados) {
+                        if (!resposta.ok || !dados.url) {
+                            throw new Error(dados && dados.message ? dados.message : 'Não foi possível abrir a ficha agora.');
+                        }
+
+                        return dados.url;
+                    });
+                })
+                .then(function (url) {
+                    try {
+                        window.localStorage.setItem('conexao-ficha-leitor', JSON.stringify({ nome: campos.nome.value.trim(), email: campos.email.value.trim() }));
+                    } catch (erro) {}
+
+                    if (janela) {
+                        janela.location = url;
+                    } else {
+                        window.location.href = url;
+                    }
+
+                    modalFicha.close();
+                })
+                .catch(function (erro) {
+                    if (janela) {
+                        janela.close();
+                    }
+
+                    mostrarErroFicha(erro.message || 'Não foi possível abrir a ficha agora.');
+                })
+                .then(function () {
+                    enviarFicha.disabled = false;
+                });
+        });
+    }
+
     /* favoritar capítulo: guardado só neste navegador */
     var favoritar = document.querySelector('[data-favoritar]');
 

@@ -211,7 +211,8 @@ function conexao_doi_api_documento(WP_REST_Request $request)
     $documento = [
         'type' => $tipo,
         'attachment_id' => $anexo,
-        'url' => wp_get_attachment_url($anexo),
+        // o arquivo fica na pasta protegida; o Hub recebe a página, onde a ficha se abre com o cadastro
+        'url' => $alvo ? (string) get_permalink($alvo) : '',
         'version' => $campos['version'] ?? null,
         'generated_at' => $campos['generated_at'] ?? null,
     ];
@@ -236,7 +237,19 @@ function conexao_doi_guardar_pdf(string $bytes, string $nome, int $post_id)
         $nome .= '.pdf';
     }
 
-    $gravado = wp_upload_bits($nome, null, $bytes);
+    // a ficha vai para a pasta protegida, com nome sorteado: só sai pelo link assinado (leads.php)
+    conexao_doi_fichas_protege_pasta();
+    $pasta = static function (array $dirs): array {
+        $dirs['subdir'] = '/'.CONEXAO_DOI_FICHAS_PASTA;
+        $dirs['path'] = $dirs['basedir'].$dirs['subdir'];
+        $dirs['url'] = $dirs['baseurl'].$dirs['subdir'];
+
+        return $dirs;
+    };
+
+    add_filter('upload_dir', $pasta);
+    $gravado = wp_upload_bits(conexao_doi_fichas_nome($nome), null, $bytes);
+    remove_filter('upload_dir', $pasta);
 
     if (! empty($gravado['error'])) {
         return new WP_Error('conexao_doi_upload', (string) $gravado['error'], ['status' => 500]);

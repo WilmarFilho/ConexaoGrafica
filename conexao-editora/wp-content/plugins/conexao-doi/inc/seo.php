@@ -201,11 +201,7 @@ function conexao_doi_cabecalho(): void
     $meta('name', 'citation_keywords', implode('; ', (array) ($obra['keywords'] ?? [])));
     $meta('name', 'citation_abstract_html_url', $url);
 
-    $pdf = conexao_doi_documento_url($obra);
-
-    if ($pdf !== '') {
-        $meta('name', 'citation_pdf_url', $pdf);
-    }
+    // sem citation_pdf_url: a ficha só sai depois do cadastro (leads.php)
 
     echo '<script type="application/ld+json">'.wp_json_encode(conexao_doi_json_ld($c, $url, $capa, $descricao), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).'</script>'."\n";
     echo "<!-- /Conexão DOI -->\n";

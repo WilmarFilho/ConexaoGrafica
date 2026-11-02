@@ -27,7 +27,7 @@ $doi = (string) ($capitulo['doi'] ?? '');
 $numero = (string) (($capitulo['number'] ?? '') ?: ($capitulo['sequence'] ?? ''));
 $autores = conexao_doi_lista($capitulo['contributors'] ?? []);
 $url = (string) get_permalink($post_capitulo);
-$pdf = conexao_doi_documento_url($capitulo);
+$tem_ficha = conexao_doi_ficha_anexo($post_capitulo->ID) > 0;
 $livro_url = $post_livro ? (string) get_permalink($post_livro) : '';
 $livro_titulo = $livro ? conexao_doi_titulo_completo($livro) : ($post_livro ? $post_livro->post_title : '');
 $fora = ($livro_id && conexao_doi_fora_de_catalogo($livro_id))
@@ -174,11 +174,11 @@ get_header();
                         </button>
                     </li>
                     <li>
-                        <?php if ($pdf !== '') : ?>
-                            <a class="capitulo__acao" href="<?php echo esc_url($pdf); ?>" target="_blank" rel="noopener" data-ficha title="Ficha do capítulo (PDF)">
+                        <?php if ($tem_ficha) : ?>
+                            <button class="capitulo__acao" type="button" data-ficha="<?php echo (int) $post_capitulo->ID; ?>" data-ficha-tipo="capitulo" title="Ficha do capítulo (PDF)">
                                 <span class="capitulo__acao-caixa"><?php echo conexao_livro_svg('ficha'); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
                                 <span class="capitulo__acao-rotulo">PDF</span>
-                            </a>
+                            </button>
                         <?php else : ?>
                             <span class="capitulo__acao capitulo__acao--inativa" aria-disabled="true" title="A ficha em PDF ainda não está disponível">
                                 <span class="capitulo__acao-caixa"><?php echo conexao_livro_svg('ficha'); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
@@ -459,6 +459,10 @@ get_header();
             <?php endif; ?>
         </aside>
     </div>
+
+    <?php if ($tem_ficha) : ?>
+        <?php get_template_part('template-parts/livro/ficha-modal'); ?>
+    <?php endif; ?>
 </div>
 <?php
 get_footer();

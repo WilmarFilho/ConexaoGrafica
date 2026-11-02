@@ -153,7 +153,8 @@ function conexao_livro_contexto(?WC_Product $produto, int $publicacao_id = 0): a
         'palavras' => $palavras,
         'descricao' => $descricao,
         'biblio' => $biblio,
-        'ficha_pdf' => $doi_ativo && function_exists('conexao_doi_documento_url') ? conexao_doi_documento_url($livro) : '',
+        // a ficha abre pelo pop-up de cadastro (lead); aqui só o post que tem ficha
+        'ficha_post' => $doi_ativo && function_exists('conexao_doi_ficha_anexo') && conexao_doi_ficha_anexo($publicacao_id) ? $publicacao_id : 0,
         'licencas' => array_values(array_filter((array) ($livro['licenses'] ?? []), 'is_array')),
     ];
 }

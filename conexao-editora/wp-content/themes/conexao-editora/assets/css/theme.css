@@ -9595,3 +9595,152 @@ textarea.campo__entrada {
     translate: -50% 0;
   }
 }
+
+/* pop-up da ficha em PDF (nome e e-mail antes de abrir) */
+.ficha-modal {
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--livro-tinta, #2a2a2a);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .18);
+}
+
+.ficha-modal::backdrop {
+  background: rgba(19, 19, 19, .55);
+}
+
+.ficha-modal__caixa {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  padding: 36px 32px 32px;
+}
+
+.ficha-modal__fechar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #777;
+  cursor: pointer;
+}
+
+.ficha-modal__icone {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 15px;
+  background: #d3eef9;
+}
+
+.ficha-modal__titulo {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.ficha-modal__texto {
+  margin: 0 0 4px;
+  font-family: "Inter", var(--fonte);
+  font-size: 14px;
+  line-height: 21px;
+  color: #777;
+}
+
+.ficha-modal__campo {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ficha-modal__campo input {
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  font-family: "Inter", var(--fonte);
+  font-size: 16px;
+  color: #2a2a2a;
+}
+
+.ficha-modal__campo input:focus {
+  border-color: #0197d4;
+  outline: 2px solid #d3eef9;
+}
+
+.ficha-modal__isca {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.ficha-modal__marca {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  font-family: "Inter", var(--fonte);
+  font-size: 13px;
+  line-height: 19px;
+  color: #777;
+  cursor: pointer;
+}
+
+.ficha-modal__marca input {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: #0197d4;
+}
+
+.ficha-modal__marca a {
+  color: #0197d4;
+}
+
+.ficha-modal__erro {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fdecec;
+  font-size: 14px;
+  color: #a61b1b;
+}
+
+.ficha-modal__enviar {
+  height: 56px;
+  margin-top: 6px;
+  border: 1px solid #0197d4;
+  border-radius: 15px;
+  background: #0197d4;
+  font-family: var(--fonte);
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+
+.ficha-modal__enviar:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+@media (max-width: 480px) {
+  .ficha-modal__caixa {
+    padding: 28px 20px 24px;
+  }
+}

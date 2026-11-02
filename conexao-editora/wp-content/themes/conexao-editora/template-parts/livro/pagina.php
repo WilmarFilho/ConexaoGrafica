@@ -143,11 +143,11 @@ get_header();
                         <?php endif; ?>
 
                         <span class="livro__acoes">
-                            <?php if ($c['ficha_pdf'] !== '') : ?>
-                                <a class="livro__acao" href="<?php echo esc_url((string) $c['ficha_pdf']); ?>" target="_blank" rel="noopener" data-ficha
-                                   aria-label="Baixar a ficha do livro em PDF" title="Ficha do livro (PDF)">
+                            <?php if ($c['ficha_post']) : ?>
+                                <button class="livro__acao" type="button" data-ficha="<?php echo (int) $c['ficha_post']; ?>" data-ficha-tipo="livro"
+                                        aria-label="Abrir a ficha do livro em PDF" title="Ficha do livro (PDF)">
                                     <?php echo conexao_livro_svg('ficha'); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-                                </a>
+                                </button>
                             <?php endif; ?>
                             <button class="livro__acao compartilhar" type="button" data-compartilhar
                                     data-url="<?php echo esc_url((string) $c['url']); ?>"
@@ -398,6 +398,10 @@ get_header();
     </div>
 
     <?php get_template_part('template-parts/livro/sugestoes', null, ['produto' => $produto]); ?>
+
+    <?php if ($c['ficha_post']) : ?>
+        <?php get_template_part('template-parts/livro/ficha-modal'); ?>
+    <?php endif; ?>
 </div>
 <?php
 get_footer();
