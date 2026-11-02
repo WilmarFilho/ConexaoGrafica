@@ -9744,3 +9744,665 @@ textarea.campo__entrada {
     padding: 28px 20px 24px;
   }
 }
+
+/* =====================================================================
+   Minha conta (WooCommerce): perfil e menu à esquerda, conteúdo num
+   cartão à direita, no visual da loja. Os miolos (pedidos, endereços,
+   dados, biblioteca, carteira) vêm do WooCommerce e são estilizados aqui.
+   ===================================================================== */
+.minha-conta {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+  margin-bottom: 70px;
+}
+
+.minha-conta__lateral {
+  display: grid;
+  gap: 16px;
+}
+
+/* o CSS do WooCommerce flutua o menu (30%) e o conteúdo (68%); aqui é grade */
+.minha-conta .woocommerce-MyAccount-navigation,
+.minha-conta .woocommerce-MyAccount-content {
+  float: none;
+  width: auto;
+}
+
+.minha-conta__perfil {
+  padding: 26px 22px 22px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+  text-align: center;
+}
+
+.minha-conta__iniciais {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--azul-nav);
+  color: var(--azul-escuro);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.minha-conta__nome {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+}
+
+.minha-conta__email {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--tinta-media);
+  overflow-wrap: anywhere;
+}
+
+.minha-conta__menu {
+  padding: 10px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+}
+
+.minha-conta__menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.minha-conta__menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: var(--raio);
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color .15s;
+}
+
+.minha-conta__menu a:hover {
+  background: var(--azul-lavado);
+  color: var(--azul);
+}
+
+.minha-conta__menu .is-active a {
+  background: var(--azul-nav);
+  color: var(--azul-escuro);
+}
+
+.minha-conta__menu .icone {
+  flex: none;
+  color: var(--azul);
+}
+
+.minha-conta__menu .woocommerce-MyAccount-navigation-link--customer-logout {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--linha);
+}
+
+.minha-conta__menu .woocommerce-MyAccount-navigation-link--customer-logout a,
+.minha-conta__menu .woocommerce-MyAccount-navigation-link--customer-logout .icone {
+  color: var(--tinta-media);
+}
+
+.minha-conta__conteudo {
+  min-width: 0;
+  padding: 34px 36px 40px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+  font-size: 14px;
+  color: var(--tinta);
+}
+
+.minha-conta__titulo {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--tinta-forte);
+}
+
+.minha-conta__boas-vindas {
+  margin: 0 0 26px;
+  color: var(--tinta-media);
+}
+
+/* painel: cartões com atalhos */
+.minha-conta__cartoes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.minha-conta__cartao {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 22px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+  background: #fff;
+}
+
+.minha-conta__cartao--destaque {
+  grid-column: 1 / -1;
+  background: var(--azul-lavado);
+  border-color: transparent;
+}
+
+.minha-conta__cartao-icone {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 4px;
+  border-radius: 12px;
+  background: var(--azul-nav);
+  color: var(--azul-escuro);
+}
+
+.minha-conta__cartao h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+}
+
+.minha-conta__cartao p {
+  margin: 0;
+  color: var(--tinta-media);
+}
+
+.minha-conta__cartao .btn {
+  justify-self: start;
+  margin-top: 8px;
+}
+
+.minha-conta__capas {
+  display: flex;
+  gap: 10px;
+  margin: 6px 0 4px;
+}
+
+.minha-conta__capas img {
+  display: block;
+  width: 56px;
+  height: 78px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: var(--sombra-card);
+}
+
+.minha-conta__link {
+  justify-self: start;
+  margin-top: 4px;
+  font-weight: 700;
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.minha-conta__link:hover {
+  text-decoration: underline;
+}
+
+.minha-conta__ultimos {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.minha-conta__ultimos li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.minha-conta__ultimos a {
+  font-weight: 700;
+  color: var(--tinta-forte);
+  text-decoration: none;
+}
+
+.minha-conta__ultimos time {
+  margin-left: auto;
+  color: var(--tinta-fraca);
+}
+
+/* situação do pedido como pílula (painel e tabela) */
+.minha-conta__situacao,
+.minha-conta .woocommerce-orders-table__cell-order-status {
+  color: var(--tinta-media);
+}
+
+.minha-conta__situacao {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--cinza-filtros);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.minha-conta__situacao--processing,
+.minha-conta__situacao--completed {
+  background: #E4F6EC;
+  color: #1B7A43;
+}
+
+.minha-conta__situacao--on-hold,
+.minha-conta__situacao--pending {
+  background: #FFF3D6;
+  color: #8A5A00;
+}
+
+.minha-conta__situacao--cancelled,
+.minha-conta__situacao--failed,
+.minha-conta__situacao--refunded {
+  background: #FDE8E8;
+  color: #A61B1B;
+}
+
+/* avisos do WooCommerce */
+.minha-conta .woocommerce-info,
+.minha-conta .woocommerce-message,
+.minha-conta .woocommerce-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 0 0 18px;
+  padding: 14px 18px;
+  border: 1px solid #BFE6F6;
+  border-radius: var(--raio);
+  background: var(--azul-lavado);
+  color: var(--tinta);
+  list-style: none;
+}
+
+.minha-conta .woocommerce-message {
+  background: #E4F6EC;
+  border-color: #BFE7CF;
+}
+
+.minha-conta .woocommerce-error {
+  background: #FDE8E8;
+  border-color: #F3C2C2;
+}
+
+.minha-conta .woocommerce-info .button,
+.minha-conta .woocommerce-message .button,
+.minha-conta .woocommerce-error .button {
+  order: 2;
+  margin-left: auto;
+}
+
+/* botões do WooCommerce com a cara dos nossos */
+.minha-conta .button,
+.minha-conta button[type="submit"],
+.minha-conta .woocommerce-Button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 24px;
+  border: 1px solid var(--azul);
+  border-radius: 999px;
+  background: var(--azul);
+  color: #fff;
+  font-family: var(--fonte);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.minha-conta .button:hover,
+.minha-conta button[type="submit"]:hover {
+  background: var(--azul-escuro);
+  border-color: var(--azul-escuro);
+  color: #fff;
+}
+
+.minha-conta .woocommerce-orders-table .button,
+.minha-conta .woocommerce-pagination .button,
+.minha-conta .woocommerce-Address .edit {
+  background: transparent;
+  color: var(--azul);
+}
+
+.minha-conta .woocommerce-orders-table .button:hover {
+  background: var(--azul);
+  color: #fff;
+}
+
+/* tabela de pedidos */
+.minha-conta table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 20px;
+}
+
+.minha-conta thead th {
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--linha);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--tinta-media);
+}
+
+.minha-conta tbody td,
+.minha-conta tfoot th,
+.minha-conta tfoot td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--linha);
+  vertical-align: middle;
+  text-align: left;
+}
+
+.minha-conta .woocommerce-orders-table__cell-order-number a {
+  font-weight: 800;
+  color: var(--tinta-forte);
+  text-decoration: none;
+}
+
+.minha-conta .woocommerce-orders-table__cell-order-actions {
+  text-align: right;
+}
+
+.minha-conta .woocommerce-orders-table__cell-order-actions .button {
+  padding: 7px 16px;
+  margin-left: 6px;
+}
+
+.minha-conta .woocommerce-pagination {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* detalhe do pedido */
+.minha-conta .woocommerce-order-details__title,
+.minha-conta .woocommerce-column__title,
+.minha-conta .woocommerce-Address-title h2,
+.minha-conta .woocommerce-Address-title h3,
+.minha-conta fieldset legend {
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+}
+
+.minha-conta .woocommerce-order-details,
+.minha-conta .woocommerce-customer-details {
+  margin-top: 28px;
+}
+
+.minha-conta .woocommerce-table--order-details tfoot th {
+  font-weight: 600;
+  color: var(--tinta-media);
+}
+
+.minha-conta .woocommerce-table--order-details tfoot tr:last-child th,
+.minha-conta .woocommerce-table--order-details tfoot tr:last-child td {
+  font-weight: 800;
+  color: var(--tinta-forte);
+}
+
+.minha-conta address {
+  padding: 16px 18px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  font-style: normal;
+  line-height: 1.6;
+}
+
+/* endereços: dois cartões */
+.minha-conta .woocommerce-Addresses {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.minha-conta .woocommerce-Addresses::before,
+.minha-conta .woocommerce-Addresses::after,
+.minha-conta .u-columns::before,
+.minha-conta .u-columns::after {
+  display: none;
+}
+
+.minha-conta .woocommerce-Address {
+  float: none !important;
+  width: auto !important;
+}
+
+.minha-conta .woocommerce-Address-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.minha-conta .woocommerce-Address-title .edit {
+  padding: 6px 14px;
+  font-size: 11px;
+}
+
+/* formulários (dados da conta, endereço) */
+.minha-conta .form-row {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.minha-conta .form-row label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+}
+
+.minha-conta .form-row .required {
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.minha-conta .form-row-first,
+.minha-conta .form-row-last {
+  float: none !important;
+  width: auto !important;
+}
+
+.minha-conta .woocommerce-EditAccountForm,
+.minha-conta .woocommerce-address-fields,
+.minha-conta .woocommerce-address-fields__field-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+}
+
+.minha-conta .woocommerce-EditAccountForm > .form-row-wide,
+.minha-conta .woocommerce-EditAccountForm > fieldset,
+.minha-conta .woocommerce-EditAccountForm > p:last-child,
+.minha-conta .woocommerce-EditAccountForm > .clear,
+.minha-conta .woocommerce-address-fields > *,
+.minha-conta .woocommerce-address-fields__field-wrapper > .form-row-wide,
+.minha-conta .woocommerce-address-fields__field-wrapper > .clear {
+  grid-column: 1 / -1;
+}
+
+.minha-conta .clear {
+  display: none;
+}
+
+.minha-conta fieldset {
+  margin: 10px 0 0;
+  padding: 22px 0 0;
+  border: 0;
+  border-top: 1px solid var(--linha);
+}
+
+.minha-conta input[type="text"],
+.minha-conta input[type="email"],
+.minha-conta input[type="tel"],
+.minha-conta input[type="password"],
+.minha-conta select,
+.minha-conta textarea,
+.minha-conta .select2-container--default .select2-selection--single {
+  width: 100%;
+  height: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--linha-forte);
+  border-radius: var(--raio);
+  background: #fff;
+  font-family: var(--fonte);
+  font-size: 14px;
+  color: var(--tinta);
+}
+
+.minha-conta textarea {
+  height: auto;
+  padding: 12px 16px;
+}
+
+.minha-conta input:focus,
+.minha-conta select:focus,
+.minha-conta textarea:focus {
+  border-color: var(--azul);
+  outline: 2px solid var(--azul-nav);
+}
+
+.minha-conta .select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 44px;
+  padding-left: 0;
+  color: var(--tinta);
+}
+
+.minha-conta .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 44px;
+}
+
+.minha-conta .password-input {
+  display: block;
+  position: relative;
+}
+
+.minha-conta .show-password-input {
+  top: 13px;
+  right: 14px;
+}
+
+.minha-conta .form-row em,
+.minha-conta #account_display_name_description {
+  font-size: 12px;
+  color: var(--tinta-fraca);
+}
+
+/* biblioteca dentro do cartão: cantos iguais aos demais */
+.minha-conta .biblioteca__topo h2 {
+  display: none;
+}
+
+.minha-conta .biblioteca__livro {
+  border-radius: var(--raio);
+}
+
+@media (max-width: 960px) {
+  .minha-conta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .minha-conta__lateral {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .minha-conta__perfil {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2px 14px;
+    text-align: left;
+  }
+
+  .minha-conta__iniciais {
+    grid-row: 1 / 3;
+    width: 52px;
+    height: 52px;
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .minha-conta__menu ul {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .minha-conta__menu a {
+    white-space: nowrap;
+  }
+
+  .minha-conta__menu .woocommerce-MyAccount-navigation-link--customer-logout {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .minha-conta__conteudo {
+    padding: 24px 20px 28px;
+  }
+
+  .minha-conta__cartoes,
+  .minha-conta .woocommerce-Addresses,
+  .minha-conta .woocommerce-EditAccountForm,
+  .minha-conta .woocommerce-address-fields__field-wrapper {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .minha-conta .woocommerce-orders-table thead {
+    display: none;
+  }
+
+  .minha-conta .woocommerce-orders-table tr {
+    display: grid;
+    gap: 6px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--linha);
+  }
+
+  .minha-conta .woocommerce-orders-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0;
+    border: 0;
+  }
+
+  .minha-conta .woocommerce-orders-table td::before {
+    content: attr(data-title);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tinta-media);
+  }
+
+  .minha-conta .woocommerce-orders-table__cell-order-actions::before {
+    display: none;
+  }
+}
