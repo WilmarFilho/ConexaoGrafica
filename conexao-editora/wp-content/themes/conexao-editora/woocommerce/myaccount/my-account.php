@@ -21,7 +21,8 @@ if (is_wc_endpoint_url('view-order')) {
     $atual = 'view-order';
 }
 
-$titulos = wc_get_account_menu_items() + ['view-order' => 'Pedido'];
+$pedido_visto = $atual === 'view-order' ? wc_get_order((int) get_query_var('view-order')) : null;
+$titulos = wc_get_account_menu_items() + ['view-order' => $pedido_visto ? 'Pedido #'.$pedido_visto->get_order_number() : 'Pedido'];
 $titulo = $atual === 'dashboard' ? 'Olá, '.(explode(' ', trim($usuario->display_name))[0] ?: 'leitor') : ($titulos[$atual] ?? 'Minha conta');
 ?>
 <div class="minha-conta minha-conta--<?php echo esc_attr($atual); ?>">

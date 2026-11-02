@@ -12,6 +12,7 @@ define('CONEXAO_VERSION', '0.1.3');
 require_once get_template_directory().'/inc/icons.php';
 require_once get_template_directory().'/inc/template-tags.php';
 require_once get_template_directory().'/inc/conta.php';
+require_once get_template_directory().'/inc/conta-telas.php';
 require_once get_template_directory().'/inc/cpf.php';
 require_once get_template_directory().'/inc/contato.php';
 require_once get_template_directory().'/inc/emails.php';

@@ -10159,10 +10159,13 @@ textarea.campo__entrada {
   color: var(--tinta-media);
 }
 
-.minha-conta .woocommerce-table--order-details tfoot tr:last-child th,
-.minha-conta .woocommerce-table--order-details tfoot tr:last-child td {
-  font-weight: 800;
+.minha-conta .woocommerce-table--order-details tfoot td {
+  font-weight: 700;
   color: var(--tinta-forte);
+}
+
+.minha-conta .woocommerce-table--order-details tfoot > tr > * {
+  background: #FBFDFE;
 }
 
 .minha-conta address {
@@ -10313,6 +10316,394 @@ textarea.campo__entrada {
 .minha-conta #account_display_name_description {
   font-size: 12px;
   color: var(--tinta-fraca);
+}
+
+/* ---- refino das telas da conta (pedidos, pedido, endereços, dados, carteira) ---- */
+
+/* avisos: o ícone do WooCommerce entra no fluxo, sem cobrir o texto */
+.minha-conta .woocommerce-info::before,
+.minha-conta .woocommerce-message::before,
+.minha-conta .woocommerce-error::before {
+  position: static;
+  margin: 0;
+  color: var(--azul);
+}
+
+.minha-conta .woocommerce-message::before {
+  color: #1B7A43;
+}
+
+.minha-conta .woocommerce-error::before {
+  color: #A61B1B;
+}
+
+/* tabelas (pedidos e itens do pedido) num cartão de cantos arredondados */
+.minha-conta .woocommerce-orders-table,
+.minha-conta .woocommerce-table--order-details {
+  width: 100%;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+.minha-conta .woocommerce-orders-table thead th,
+.minha-conta .woocommerce-table--order-details thead th {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--linha);
+  background: var(--azul-lavado);
+  font-size: 11px;
+  color: var(--tinta-media);
+}
+
+.minha-conta .woocommerce-orders-table tbody th,
+.minha-conta .woocommerce-orders-table tbody td,
+.minha-conta .woocommerce-table--order-details tbody td,
+.minha-conta .woocommerce-table--order-details tfoot th,
+.minha-conta .woocommerce-table--order-details tfoot td {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--linha);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.minha-conta .woocommerce-orders-table tbody tr:last-child > *,
+.minha-conta .woocommerce-table--order-details tfoot tr:last-child > * {
+  border-bottom: 0;
+}
+
+.minha-conta .woocommerce-orders-table tbody tr:hover > * {
+  background: #F7FBFE;
+}
+
+.minha-conta .woocommerce-orders-table__cell-order-total strong {
+  display: block;
+  color: var(--tinta-forte);
+}
+
+.minha-conta__fraco {
+  display: block;
+  font-size: 12px;
+  color: var(--tinta-fraca);
+}
+
+.minha-conta__entrega-digital {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--azul);
+  text-decoration: none;
+}
+
+a.minha-conta__entrega-digital:hover {
+  text-decoration: underline;
+}
+
+.minha-conta .woocommerce-orders-table__header-order-actions,
+.minha-conta .woocommerce-orders-table__cell-order-actions {
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.minha-conta .woocommerce-orders-table__cell-order-actions .button {
+  border-color: var(--linha-forte);
+  font-size: 11px;
+}
+
+.minha-conta .woocommerce-orders-table__cell-order-actions .button:hover {
+  border-color: var(--azul);
+  background: var(--azul);
+  color: #fff;
+}
+
+/* pedido: voltar, faixa de resumo, itens */
+.minha-conta__voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.minha-conta__voltar:hover {
+  text-decoration: underline;
+}
+
+.minha-conta__resumo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 0 30px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+  overflow: hidden;
+  background: var(--linha);
+}
+
+.minha-conta__resumo > div {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 16px 18px;
+  background: var(--azul-lavado);
+}
+
+.minha-conta__resumo dt {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--tinta-media);
+}
+
+.minha-conta__resumo dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tinta-forte);
+}
+
+.minha-conta__resumo .minha-conta__situacao {
+  justify-self: start;
+}
+
+.minha-conta__notas {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 30px;
+  padding: 0;
+  list-style: none;
+}
+
+.minha-conta__notas li {
+  padding: 14px 18px;
+  border-left: 3px solid var(--azul);
+  border-radius: var(--raio);
+  background: var(--azul-lavado);
+}
+
+.minha-conta__notas time {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tinta-media);
+}
+
+.minha-conta__notas p {
+  margin: 4px 0 0;
+}
+
+.minha-conta .woocommerce-order-details {
+  margin-top: 0;
+}
+
+.minha-conta .woocommerce-table--order-details .product-name a {
+  font-weight: 700;
+  color: var(--tinta-forte);
+  text-decoration: none;
+}
+
+.minha-conta .woocommerce-table--order-details .product-name a:hover {
+  color: var(--azul);
+}
+
+.minha-conta .woocommerce-table--order-details .product-quantity {
+  margin-left: 4px;
+  font-weight: 600;
+  color: var(--tinta-media);
+}
+
+.minha-conta .woocommerce-table--order-details th:last-child,
+.minha-conta .woocommerce-table--order-details td:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.minha-conta .biblioteca__chamada {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin: 18px 0 0;
+  padding: 16px 20px;
+  border-radius: var(--raio-grande);
+  background: var(--azul-lavado);
+  font-weight: 600;
+  color: var(--tinta-forte);
+}
+
+.minha-conta .biblioteca__chamada a {
+  display: inline-flex;
+  padding: 9px 20px;
+  border-radius: 999px;
+  background: var(--azul);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.minha-conta .biblioteca__chamada a:hover {
+  background: var(--azul-escuro);
+}
+
+.minha-conta .order-again {
+  margin: 18px 0 0;
+}
+
+/* dados do cliente no pedido */
+.minha-conta .woocommerce-customer-details .woocommerce-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.minha-conta .woocommerce-customer-details .woocommerce-column {
+  float: none;
+  width: auto;
+}
+
+.minha-conta address {
+  background: #fff;
+  color: var(--tinta);
+}
+
+.minha-conta address p {
+  margin: 8px 0 0;
+  padding: 0 !important;
+}
+
+.minha-conta address p::before {
+  display: none !important;
+}
+
+.minha-conta address dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  margin: 8px 0 0;
+}
+
+.minha-conta address dt {
+  font-weight: 700;
+  color: var(--tinta-forte);
+}
+
+.minha-conta address dt::after {
+  content: ":";
+}
+
+.minha-conta address dd {
+  margin: 0;
+}
+
+/* endereços: título, botão e endereço dentro do mesmo cartão */
+.minha-conta .woocommerce-Addresses + p,
+.minha-conta .woocommerce-MyAccount-content > p:first-of-type {
+  color: var(--tinta-media);
+}
+
+.minha-conta .woocommerce-Address {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 20px 22px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+  background: #fff;
+}
+
+.minha-conta .woocommerce-Address-title h2,
+.minha-conta .woocommerce-Address-title h3 {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  text-align: left !important;
+}
+
+.minha-conta .woocommerce-Address-title .edit {
+  flex: none;
+  padding: 7px 16px;
+  border: 1px solid var(--linha-forte);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.minha-conta .woocommerce-Address-title .edit:hover {
+  border-color: var(--azul);
+  background: var(--azul);
+  color: #fff;
+}
+
+.minha-conta .woocommerce-Address address {
+  padding: 0;
+  border: 0;
+}
+
+/* dados da conta: senha num bloco à parte */
+.minha-conta .woocommerce-EditAccountForm fieldset {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 18px;
+  margin: 12px 0 22px;
+  padding: 22px 22px 6px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-grande);
+  background: #F7FBFE;
+}
+
+.minha-conta .woocommerce-EditAccountForm fieldset legend {
+  float: left;
+  grid-column: 1 / -1;
+  width: 100%;
+  margin: 0 0 4px;
+  padding: 0;
+}
+
+.minha-conta .woocommerce-EditAccountForm fieldset legend + * {
+  clear: both;
+}
+
+.minha-conta .woocommerce-EditAccountForm fieldset .form-row {
+  grid-column: auto;
+}
+
+.minha-conta .woocommerce-EditAccountForm fieldset .form-row label {
+  font-size: 12px;
+}
+
+.minha-conta .woocommerce-EditAccountForm #conexao_cpf {
+  max-width: 260px;
+}
+
+/* carteira vazia */
+.minha-conta--payment-methods .woocommerce-info,
+.minha-conta--payment-methods .woocommerce-Message {
+  background: var(--azul-lavado);
+  border-color: #BFE6F6;
+}
+
+@media (max-width: 960px) {
+  .minha-conta__resumo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .minha-conta .woocommerce-customer-details .woocommerce-columns,
+  .minha-conta .woocommerce-EditAccountForm fieldset {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* biblioteca dentro do cartão: cantos iguais aos demais */
