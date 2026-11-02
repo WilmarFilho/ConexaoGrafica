@@ -20,6 +20,7 @@ require_once get_template_directory().'/inc/manuscrito.php';
 require_once get_template_directory().'/inc/catalogo.php';
 require_once get_template_directory().'/inc/categorias.php';
 require_once get_template_directory().'/inc/produto.php';
+require_once get_template_directory().'/inc/livro.php';
 require_once get_template_directory().'/inc/migracao.php';
 require_once get_template_directory().'/inc/autores.php';
 require_once get_template_directory().'/inc/eventos.php';
@@ -58,7 +59,7 @@ add_action('after_setup_theme', function () {
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style(
         'conexao-fonts',
-        'https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300..900;1,400&display=swap',
+        'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:ital,wght@0,300..900;1,400&display=swap',
         [],
         null
     );

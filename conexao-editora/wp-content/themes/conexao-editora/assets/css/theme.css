@@ -34,7 +34,8 @@
 
   --fonte: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
 
-  --container: 1200px;
+  /* 1600px de conteúdo (Figma "Site - Conexão Editora", quadro de 1920) mais 20px de respiro de cada lado */
+  --container: 1640px;
   --raio: 10px;
   --raio-grande: 16px;
   --sombra-card: 0 6px 20px rgba(15, 45, 70, .08);
@@ -7588,4 +7589,1309 @@ textarea.campo__entrada {
 
 #resultados {
   scroll-margin-top: 16px;
+}
+
+/* =====================================================================
+   Página do livro, com ou sem DOI (Figma "Site - Conexão Editora", quadro
+   2197:568, 1920 de largura e 1600 de conteúdo). Medidas em px do Figma.
+   ===================================================================== */
+.pagina--livro {
+  --livro-cinza: #777;
+  --livro-tinta: #2a2a2a;
+  --livro-preto: #131313;
+  --livro-azul: #0197d4;
+  --livro-azul-claro: #d3eef9;
+  --livro-linha: #ccc;
+  padding-top: 37px;
+}
+
+.pagina--livro .trilha {
+  gap: 14px;
+  margin-bottom: 53px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--livro-cinza);
+}
+
+.pagina--livro .trilha a {
+  color: var(--livro-cinza);
+}
+
+.pagina--livro .trilha__atual {
+  color: var(--livro-azul);
+}
+
+.livro-icone {
+  display: block;
+  flex: none;
+}
+
+.livro {
+  display: grid;
+  grid-template-columns: minmax(0, 1111px) 398px;
+  column-gap: 91px;
+  align-items: start;
+}
+
+.livro__principal {
+  min-width: 0;
+}
+
+/* capa (caixa de 500) + texto (coluna de 569) */
+.livro__topo {
+  display: grid;
+  grid-template-columns: 500px minmax(0, 569px);
+  column-gap: 39px;
+  align-items: start;
+}
+
+.livro__capa {
+  margin: 0;
+}
+
+.livro__capa-moldura {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 500px;
+  height: 500px;
+  border: 1px solid var(--livro-linha);
+}
+
+.livro__capa-imagem {
+  display: block;
+  width: 270px;
+  height: 392px;
+  object-fit: cover;
+  border-radius: 15px;
+}
+
+.livro__amostras {
+  margin-top: 18px;
+}
+
+.livro__amostras-titulo {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--livro-cinza);
+}
+
+.livro__amostras-trilho {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+
+.livro__titulo {
+  margin: -4px 0 0;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 35px;
+  color: var(--livro-tinta);
+}
+
+.livro__resumo {
+  max-width: 516px;
+  margin: 20px 0 0;
+  font-family: "Inter", var(--fonte);
+  font-size: 18px;
+  line-height: 25px;
+  color: var(--livro-cinza);
+}
+
+.livro__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  margin-top: 30px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--livro-linha);
+  font-size: 18px;
+  line-height: 25px;
+  color: var(--livro-cinza);
+}
+
+.livro__autores {
+  margin: 0 48px 0 0;
+  font-weight: 500;
+}
+
+.livro__autores-rotulo {
+  font-weight: 600;
+}
+
+.livro__estrelas {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.livro__avaliacoes {
+  margin-left: 16px;
+  font-weight: 500;
+}
+
+.livro__acoes {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  margin-left: auto;
+}
+
+.livro__acao {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--livro-azul);
+  cursor: pointer;
+}
+
+.livro__ficha {
+  display: grid;
+  grid-template-columns: repeat(4, 116px);
+  row-gap: 35px;
+  margin: 22px 0 0 -9px;
+  padding: 0;
+  list-style: none;
+}
+
+.livro__ficha li {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  text-align: center;
+  font-family: "Inter", var(--fonte);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--livro-cinza);
+}
+
+.livro__ficha-icone {
+  display: flex;
+  align-items: center;
+  height: 31px;
+  margin-bottom: 12px;
+}
+
+.livro__ficha strong {
+  font-weight: 700;
+}
+
+/* DOI e ISBNs */
+.livro__ids {
+  display: flex;
+  align-items: center;
+  margin-top: 31px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--livro-linha);
+}
+
+.livro__ids-rotulo,
+.livro__palavras-rotulo {
+  flex: none;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-cinza);
+}
+
+/* a Nunito renderiza o rótulo uns 6px mais largo que no Figma: a pílula fica em x=111 */
+.livro__ids-rotulo {
+  margin-right: 9px;
+}
+
+.livro__doi {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 15px;
+  background: var(--livro-azul-claro);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--livro-azul);
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.livro__copiar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 48px;
+  margin-left: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 15px;
+  background: #e9e9e9;
+  cursor: pointer;
+}
+
+.livro__copiar-feito {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  translate: -50% 0;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--livro-azul);
+}
+
+.livro__ids-separador {
+  flex: none;
+  width: 1px;
+  height: 48px;
+  background: var(--livro-linha);
+  margin: 0 39px 0 37px;
+}
+
+.livro__isbn + .livro__ids-separador {
+  margin: 0 25px 0 11px;
+}
+
+.livro__isbn {
+  min-width: 172px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  color: var(--livro-cinza);
+}
+
+.livro__isbn strong {
+  font-weight: 700;
+}
+
+.livro__crossref {
+  flex: none;
+  margin: -6px 2px -5px auto;
+}
+
+.livro__crossref img {
+  display: block;
+  mix-blend-mode: darken;
+}
+
+/* palavras-chave */
+.livro__palavras {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 32px;
+}
+
+/* com muitas palavras as pílulas quebram em linhas; o rótulo fica na altura da primeira */
+.livro__palavras-rotulo {
+  margin-right: 18px;
+  line-height: 48px;
+}
+
+.livro__palavras ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.livro__palavras li {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 15px;
+  background: var(--livro-azul-claro);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--livro-cinza);
+}
+
+/* abas */
+.livro-abas {
+  margin-top: 73px;
+}
+
+.livro-abas__botoes {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--livro-linha);
+}
+
+.livro-abas__botao {
+  position: relative;
+  padding: 0 27px 10px;
+  border: 0;
+  background: none;
+  font-family: var(--fonte);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-cinza);
+  cursor: pointer;
+}
+
+.livro-abas__qtd {
+  color: #999;
+}
+
+.livro-abas__botao.abas__botao--ativa {
+  font-weight: 700;
+  color: var(--livro-azul);
+}
+
+.livro-abas__botao.abas__botao--ativa::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--livro-azul);
+}
+
+.livro-abas__painel {
+  padding-top: 41px;
+}
+
+.livro-texto {
+  max-width: 1097px;
+  font-family: "Inter", var(--fonte);
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--livro-cinza);
+}
+
+.livro-texto p {
+  margin: 0 0 1em;
+}
+
+.livro-secao {
+  margin: 36px 0 16px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--livro-tinta);
+}
+
+.livro-abas__painel > .livro-secao:first-child {
+  margin-top: 0;
+}
+
+.livro-sumario + .livro-sumario {
+  margin-top: 28px;
+}
+
+.livro-sumario__parte {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--livro-azul);
+}
+
+.livro-sumario__lista,
+.livro-capitulos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.livro-sumario__lista li,
+.livro-capitulos__item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.livro-sumario__numero,
+.livro-capitulos__numero {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--livro-azul);
+}
+
+.livro-sumario__texto {
+  display: grid;
+  gap: 4px;
+}
+
+.livro-sumario__texto a,
+.livro-capitulos__texto h3 a {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--livro-tinta);
+  text-decoration: none;
+}
+
+.livro-sumario__texto a:hover,
+.livro-capitulos__texto h3 a:hover {
+  color: var(--livro-azul);
+}
+
+.livro-sumario__autores,
+.livro-capitulos__autores {
+  font-family: "Inter", var(--fonte);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--livro-cinza);
+}
+
+.livro-sumario__paginas {
+  font-size: 14px;
+  white-space: nowrap;
+  color: var(--livro-cinza);
+}
+
+.livro-capitulos__item {
+  grid-template-columns: 34px minmax(0, 1fr);
+}
+
+.livro-capitulos__texto h3 {
+  margin: 0 0 4px;
+}
+
+.livro-capitulos__autores,
+.livro-capitulos__meta {
+  margin: 0;
+}
+
+.livro-capitulos__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--livro-cinza);
+}
+
+.livro-capitulos__meta a {
+  color: var(--livro-azul);
+}
+
+.livro-detalhes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 40px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.livro-detalhes div {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.livro-detalhes dt {
+  font-weight: 500;
+  color: var(--livro-cinza);
+}
+
+.livro-detalhes dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--livro-tinta);
+  overflow-wrap: anywhere;
+}
+
+.livro-licencas {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.livro-licenca {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 16px 20px;
+  border: 1px solid var(--livro-azul);
+  border-radius: 15px;
+  font-family: "Inter", var(--fonte);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--livro-cinza);
+}
+
+.livro-licenca__selos {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.livro-licenca__selo {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--livro-azul);
+  border-radius: 50%;
+  font-family: var(--fonte);
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--livro-azul);
+}
+
+.livro-licenca__texto strong {
+  display: block;
+  margin-bottom: 2px;
+  font-family: var(--fonte);
+  font-size: 16px;
+}
+
+.livro-licenca__texto a {
+  color: var(--livro-tinta);
+}
+
+/* coluna da direita: compra + frete numa caixa só, bibliográficas abaixo */
+.livro__lateral {
+  display: grid;
+  gap: 36px;
+}
+
+.livro-caixa {
+  border: 1px solid var(--livro-linha);
+}
+
+.livro-compra {
+  display: grid;
+  /* botões de 343 a 31px da borda externa (30 + 1 da borda), como no Figma */
+  padding: 0 23px 38px 30px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.livro-compra__preco {
+  margin: 24px 0 0;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 44px;
+  color: var(--livro-preto);
+}
+
+.livro-compra__preco .woocommerce-Price-currencySymbol {
+  font-weight: 600;
+}
+
+.livro-compra__preco del {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--livro-cinza);
+}
+
+.livro-compra__parcelas {
+  margin: 11px 0 0;
+  min-height: 25px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-cinza);
+}
+
+.livro-compra .formatos {
+  margin: 29px 0 0;
+}
+
+.livro-compra .formatos__titulo {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-preto);
+}
+
+.livro-compra .formatos__opcao {
+  gap: 12px;
+  padding-block: 0;
+  height: 32px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--livro-cinza);
+}
+
+.livro-compra .formatos__opcao input {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--livro-cinza);
+}
+
+.livro-compra .formatos__opcao input:checked {
+  border-color: var(--livro-azul);
+  background: var(--livro-azul);
+  box-shadow: inset 0 0 0 4px #fff;
+}
+
+.livro-compra .formatos__opcao input:checked + span {
+  font-weight: 600;
+  color: var(--livro-azul);
+}
+
+/* o preço da variação escolhida já aparece no topo da caixa */
+.livro-compra .single_variation_wrap .woocommerce-variation-price,
+.livro-compra .single_variation_wrap .woocommerce-variation-availability,
+.livro-compra .single_variation_wrap .woocommerce-variation-description {
+  display: none;
+}
+
+.livro-compra .variations_form,
+.livro-compra .compra__form {
+  margin: 0;
+}
+
+.livro-compra .variations_button,
+.livro-compra .compra__form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 22px;
+}
+
+.livro-compra .variations_button .quantity,
+.livro-compra .compra__form .quantity {
+  order: 0;
+  margin: 0 0 9px;
+}
+
+.livro-qtd {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 48px);
+  align-self: flex-start;
+  height: 48px;
+}
+
+.livro-qtd .qty {
+  order: 1;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid #dbdbdb;
+  border-radius: 0;
+  background: #fafafa;
+  font-family: var(--fonte);
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  color: #000;
+  -moz-appearance: textfield;
+}
+
+.livro-qtd .qty::-webkit-outer-spin-button,
+.livro-qtd .qty::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.livro-qtd__botao {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  background: var(--livro-azul-claro);
+  font-family: var(--fonte);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--livro-cinza);
+  cursor: pointer;
+}
+
+.livro-qtd__botao--menos {
+  order: 0;
+  border-radius: 15px 0 0 15px;
+}
+
+.livro-qtd__botao--mais {
+  order: 2;
+  border-radius: 0 15px 15px 0;
+}
+
+.livro-compra .compra__principal,
+.livro-compra .variations_form .variations_button button.single_add_to_cart_button.button.alt,
+.livro-compra__carrinho {
+  width: 343px;
+  max-width: 100%;
+  height: 60px;
+  padding: 0 16px;
+  border-radius: 15px;
+  font-family: var(--fonte);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.livro-compra .compra__principal {
+  order: 1;
+  border: 1px solid var(--livro-azul);
+  background: var(--livro-azul);
+  color: #fff;
+}
+
+.livro-compra .variations_form .variations_button button.single_add_to_cart_button.button.alt,
+.livro-compra__carrinho {
+  order: 2;
+  border: 1px solid var(--livro-azul);
+  background: transparent;
+  color: var(--livro-azul);
+}
+
+.livro-compra__seguro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 17px;
+  margin: 22px 0 0;
+  font-family: "Inter", var(--fonte);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 12px;
+  text-transform: uppercase;
+  color: var(--livro-cinza);
+}
+
+.livro-frete {
+  padding: 42px 26px 40px 27px;
+  border: 0;
+  border-top: 1px solid var(--livro-linha);
+  border-radius: 0;
+  background: none;
+}
+
+.livro-frete__titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 19px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-tinta);
+}
+
+.livro-frete__linha {
+  display: flex;
+  align-items: center;
+  width: 343px;
+  max-width: 100%;
+  height: 48px;
+  padding: 0 4px 0 24px;
+  border-radius: 100px;
+  background: #f0f0f0;
+}
+
+.livro-frete__linha input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--fonte);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--livro-tinta);
+}
+
+.livro-frete .frete__resposta:empty {
+  display: none;
+}
+
+.livro-frete__linha input::placeholder {
+  color: var(--livro-cinza);
+}
+
+.livro-frete__linha input:focus {
+  outline: none;
+}
+
+.livro-frete__calcular {
+  flex: none;
+  width: 104px;
+  height: 40px;
+  border: 1px solid var(--livro-azul);
+  border-radius: 100px;
+  background: var(--livro-azul);
+  font-family: var(--fonte);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-transform: uppercase;
+  color: #fff;
+  cursor: pointer;
+}
+
+.livro-biblio {
+  padding: 28px 29px 48px 31px;
+  border: 1px solid var(--livro-linha);
+}
+
+.livro-biblio__titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-tinta);
+}
+
+.livro-biblio dl {
+  margin: 31px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.livro-biblio dl div {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+}
+
+.livro-biblio dt {
+  line-height: 30px;
+  color: var(--livro-cinza);
+}
+
+.livro-biblio dd {
+  margin: 0;
+  padding-block: 5px;
+  line-height: 20px;
+  color: var(--livro-tinta);
+  overflow-wrap: anywhere;
+}
+
+.livro-faixa {
+  margin: -30px 0 30px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #fff6e0;
+  font-size: 15px;
+  color: #6b4e00;
+}
+
+.pagina--livro .produto-sugestoes {
+  margin-top: 80px;
+}
+
+/* telas menores que o quadro: as colunas encolhem na mesma proporção */
+@media (max-width: 1639px) {
+  .livro {
+    grid-template-columns: minmax(0, 1fr) 398px;
+    column-gap: clamp(28px, 5.7vw, 91px);
+  }
+
+  .livro__topo {
+    grid-template-columns: minmax(260px, 500px) minmax(0, 1fr);
+    column-gap: clamp(20px, 2.4vw, 39px);
+  }
+
+  .livro__capa-moldura {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .livro__capa-imagem {
+    width: 54%;
+    height: auto;
+    aspect-ratio: 270 / 392;
+  }
+
+  .livro__ficha {
+    grid-template-columns: repeat(4, minmax(0, 116px));
+  }
+}
+
+/* abaixo de 1240 a coluna da compra desce para logo depois do topo */
+@media (max-width: 1239px) {
+  .livro {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .livro__principal,
+  .livro__lateral {
+    display: contents;
+  }
+
+  .livro__topo { order: 1; }
+  .livro-caixa { order: 2; margin-top: 32px; }
+  .livro__ids { order: 3; }
+  .livro__palavras { order: 4; }
+  .livro-abas { order: 5; }
+  .livro-biblio { order: 6; margin-top: 40px; }
+
+  .livro-caixa,
+  .livro-biblio {
+    width: 100%;
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 800px) {
+  .pagina--livro {
+    padding-top: 20px;
+  }
+
+  .pagina--livro .trilha {
+    margin-bottom: 24px;
+    font-size: 14px;
+    flex-wrap: wrap;
+  }
+
+  .livro__topo {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 24px;
+  }
+
+  .livro__capa-moldura {
+    max-width: 420px;
+    margin-inline: auto;
+  }
+
+  .livro__titulo {
+    margin-top: 0;
+    font-size: 24px;
+    line-height: 31px;
+  }
+
+  .livro__resumo {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .livro__meta {
+    font-size: 16px;
+  }
+
+  .livro__autores {
+    flex-basis: 100%;
+    margin-right: 0;
+  }
+
+  .livro__ficha {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-left: 0;
+    row-gap: 24px;
+  }
+
+  .livro__ids {
+    flex-wrap: wrap;
+    row-gap: 14px;
+  }
+
+  .livro__ids-separador {
+    display: none;
+  }
+
+  .livro__isbn {
+    min-width: 0;
+    margin-right: 24px;
+  }
+
+  .livro__crossref {
+    margin: 0;
+  }
+
+  .livro__palavras {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .livro__palavras li {
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .livro-abas {
+    margin-top: 40px;
+  }
+
+  .livro-abas__botoes {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .livro-abas__botao {
+    flex: none;
+    padding-inline: 16px;
+    font-size: 16px;
+  }
+
+  .livro-detalhes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .livro-detalhes div {
+    grid-template-columns: 140px minmax(0, 1fr);
+  }
+
+  .livro-compra,
+  .livro-frete,
+  .livro-biblio {
+    padding-inline: 20px;
+  }
+}
+
+/* avaliações (formulário e lista do WooCommerce) na página do livro */
+.livro-abas__painel #reviews {
+  max-width: 820px;
+  font-family: "Inter", var(--fonte);
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--livro-cinza);
+}
+
+.livro-abas__painel .woocommerce-Reviews-title,
+.livro-abas__painel #reply-title {
+  display: block;
+  margin: 0 0 12px;
+  font-family: var(--fonte);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  color: var(--livro-tinta);
+}
+
+.livro-abas__painel .woocommerce-noreviews {
+  margin: 0 0 32px;
+}
+
+.livro-abas__painel #review_form_wrapper {
+  padding: 28px 31px 32px;
+  border: 1px solid var(--livro-linha);
+}
+
+.livro-abas__painel .comment-notes {
+  margin: 0 0 22px;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.livro-abas__painel .comment-form > p {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.livro-abas__painel .comment-form label {
+  font-family: var(--fonte);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--livro-tinta);
+}
+
+.livro-abas__painel .comment-form .required {
+  color: var(--livro-azul);
+  text-decoration: none;
+}
+
+.livro-abas__painel .comment-form input[type="text"],
+.livro-abas__painel .comment-form input[type="email"],
+.livro-abas__painel .comment-form textarea {
+  width: 100%;
+  max-width: 640px;
+  padding: 12px 18px;
+  border: 1px solid var(--livro-linha);
+  border-radius: 15px;
+  background: #fff;
+  font-family: "Inter", var(--fonte);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--livro-tinta);
+}
+
+.livro-abas__painel .comment-form input[type="text"],
+.livro-abas__painel .comment-form input[type="email"] {
+  height: 48px;
+}
+
+.livro-abas__painel .comment-form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.livro-abas__painel .comment-form input:focus,
+.livro-abas__painel .comment-form textarea:focus {
+  border-color: var(--livro-azul);
+  outline: 2px solid var(--livro-azul-claro);
+}
+
+.livro-abas__painel .comment-form-cookies-consent {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.livro-abas__painel .comment-form-cookies-consent label {
+  font-family: "Inter", var(--fonte);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--livro-cinza);
+}
+
+.livro-abas__painel .comment-form-cookies-consent input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--livro-azul);
+}
+
+.livro-abas__painel .form-submit {
+  margin: 8px 0 0;
+}
+
+.livro-abas__painel .form-submit input[type="submit"] {
+  height: 48px;
+  padding: 0 36px;
+  border: 1px solid var(--livro-azul);
+  border-radius: 15px;
+  background: var(--livro-azul);
+  font-family: var(--fonte);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+
+.livro-abas__painel .form-submit input[type="submit"]:hover {
+  border-color: var(--azul-escuro);
+  background: var(--azul-escuro);
+}
+
+/* nota: o WooCommerce troca o <select> por cinco links (p.stars); viram as estrelas do layout */
+.livro-abas__painel .comment-form-rating #rating {
+  max-width: 220px;
+}
+
+.livro-abas__painel p.stars {
+  margin: 0;
+}
+
+.livro-abas__painel p.stars span {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.livro-abas__painel p.stars a {
+  display: block;
+  width: 26px;
+  height: 26px;
+  overflow: hidden;
+  text-indent: 200%;
+  white-space: nowrap;
+  background: url("../img/produto/estrela-vazia.svg") center / 26px no-repeat;
+}
+
+.livro-abas__painel p.stars:hover a,
+.livro-abas__painel p.stars.selected a {
+  background-image: url("../img/produto/estrela-cheia.svg");
+  background-size: 24px;
+}
+
+.livro-abas__painel p.stars a:hover ~ a,
+.livro-abas__painel p.stars.selected a.active ~ a {
+  background-image: url("../img/produto/estrela-vazia.svg");
+  background-size: 26px;
+}
+
+.livro-abas__painel p.stars.selected:hover a {
+  background-image: url("../img/produto/estrela-cheia.svg");
+  background-size: 24px;
+}
+
+.livro-abas__painel p.stars.selected:hover a:hover ~ a {
+  background-image: url("../img/produto/estrela-vazia.svg");
+  background-size: 26px;
+}
+
+/* lista de avaliações */
+.livro-abas__painel .commentlist {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.livro-abas__painel .commentlist .comment_container {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 16px;
+  padding: 20px 24px;
+  border: 1px solid var(--livro-linha);
+}
+
+.livro-abas__painel .commentlist .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.livro-abas__painel .commentlist .meta {
+  margin: 4px 0 6px;
+  font-size: 14px;
+}
+
+.livro-abas__painel .commentlist .woocommerce-review__author {
+  font-family: var(--fonte);
+  font-size: 16px;
+  color: var(--livro-tinta);
+}
+
+.livro-abas__painel .commentlist .description p {
+  margin: 0;
+}
+
+.livro-abas__painel .star-rating {
+  position: relative;
+  width: 120px;
+  height: 22px;
+  overflow: hidden;
+  font-size: 0;
+  background: url("../img/produto/estrela-vazia.svg") 0 0 / 24px repeat-x;
+}
+
+.livro-abas__painel .star-rating span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  font-size: 0;
+  background: url("../img/produto/estrela-cheia.svg") 0 0 / 24px repeat-x;
+}
+
+@media (max-width: 1239px) {
+  /* itens da coluna única: sem isso a barra de abas cresce até a soma das abas */
+  .livro__topo,
+  .livro__ids,
+  .livro__palavras,
+  .livro-abas {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 800px) {
+  .livro-abas__painel #review_form_wrapper {
+    padding: 20px;
+  }
 }

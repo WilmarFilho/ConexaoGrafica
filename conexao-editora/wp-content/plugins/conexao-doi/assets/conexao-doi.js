@@ -3,7 +3,8 @@
 (function () {
     'use strict';
 
-    var raiz = document.querySelector('.doi-pagina');
+    // .pagina--livro: a página do livro do tema (com ou sem DOI) usa as mesmas citações e o copiar
+    var raiz = document.querySelector('.doi-pagina, .pagina--livro');
 
     if (!raiz) {
         return;
@@ -45,7 +46,8 @@
         }
     }
 
-    var listas = raiz.querySelectorAll('[role="tablist"]');
+    // a barra principal da página do livro do tema é tratada pelo theme.js
+    var listas = raiz.querySelectorAll('[role="tablist"]:not(.livro-abas__botoes)');
 
     listas.forEach(function (lista) {
         var abas = Array.prototype.slice.call(lista.querySelectorAll('[role="tab"]'));

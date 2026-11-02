@@ -11,6 +11,15 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+// Com o tema da editora, a página do livro é a mesma de todo livro (com ou sem DOI):
+// template-parts/livro/pagina.php do tema. Este arquivo fica como reserva para outro tema.
+if (function_exists('conexao_pagina_livro')) {
+    the_post();
+    conexao_pagina_livro(conexao_livro_produto_da_publicacao(get_the_ID()), get_the_ID());
+
+    return;
+}
+
 get_header();
 
 the_post();

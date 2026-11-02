@@ -853,7 +853,7 @@
 
             if (alvoParcelas && variacao.display_price) {
                 var parcela = (variacao.display_price / vezes).toFixed(2).replace('.', ',');
-                alvoParcelas.textContent = 'ou ' + vezes + 'x de R$' + parcela + ' sem juros';
+                alvoParcelas.textContent = 'ou ' + vezes + 'x de R$ ' + parcela + ' sem juros';
             } else if (alvoParcelas) {
                 // formato grátis: não há parcela
                 alvoParcelas.textContent = '';
@@ -889,6 +889,37 @@
             }
         });
     }
+
+    /* página do livro: a quantidade vira o seletor [−] 1 [+] do layout */
+    document.querySelectorAll('.livro-compra .quantity').forEach(function (caixa) {
+        var campo = caixa.querySelector('input.qty');
+
+        if (!campo || caixa.querySelector('.livro-qtd__botao')) {
+            return;
+        }
+
+        caixa.classList.add('livro-qtd');
+
+        [['-1', '−', 'Diminuir quantidade'], ['1', '+', 'Aumentar quantidade']].forEach(function (dados, i) {
+            var botao = document.createElement('button');
+            botao.type = 'button';
+            botao.className = 'livro-qtd__botao livro-qtd__botao--' + (i ? 'mais' : 'menos');
+            botao.textContent = dados[1];
+            botao.setAttribute('aria-label', dados[2]);
+            botao.addEventListener('click', function () {
+                var minimo = Number(campo.min || 1);
+                var maximo = campo.max ? Number(campo.max) : Infinity;
+                campo.value = Math.min(maximo, Math.max(minimo, Number(campo.value || 1) + Number(dados[0])));
+                campo.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+
+            if (i) {
+                caixa.appendChild(botao);
+            } else {
+                caixa.insertBefore(botao, caixa.firstChild);
+            }
+        });
+    });
 
     /* abas da página do livro */
     var abas = document.querySelector('[data-abas]');
@@ -971,7 +1002,8 @@
     var capa = document.querySelector('[data-amostras]');
 
     if (capa) {
-        var grande = capa.querySelector(':scope > img');
+        // na página do livro a capa fica dentro da moldura (data-amostras-grande)
+        var grande = capa.querySelector(':scope > img') || capa.querySelector('[data-amostras-grande]');
         var miniaturas = capa.querySelectorAll('.produto__amostra');
 
         miniaturas.forEach(function (miniatura) {

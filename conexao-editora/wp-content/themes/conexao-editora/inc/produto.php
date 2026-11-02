@@ -418,6 +418,9 @@ add_action('woocommerce_after_add_to_cart_button', function (): void {
     }
 });
 
+// preços redondos sem centavos, como no layout ("R$ 297"); com centavos continua "R$ 49,50"
+add_filter('woocommerce_price_trim_zeros', '__return_true');
+
 // o carrinho vazio do tema já diz que está vazio: sem o aviso repetido do WooCommerce
 remove_action('woocommerce_cart_is_empty', 'wc_empty_cart_message', 10);
 
