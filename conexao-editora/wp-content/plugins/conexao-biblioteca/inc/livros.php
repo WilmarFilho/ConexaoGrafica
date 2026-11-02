@@ -64,13 +64,25 @@ function conexao_biblioteca_livro(int $produto_id): array
 }
 
 /**
- * Sumário digitado no produto, para PDF sem marcadores: [{titulo, pagina}],
- * com a página do PDF (não a impressa). Os leitores usam só quando o arquivo
- * não traz o próprio sumário.
+ * Sumário para PDF sem marcadores: o digitado no produto ou, sem ele, o do
+ * Hub (capítulos com a página já convertida para a do PDF, inc/sumario.php).
+ * Os leitores usam só quando o arquivo não traz o próprio sumário.
  *
- * @return list<array{titulo: string, pagina: int}>
+ * @return list<array{titulo: string, pagina: int, nivel?: int}>
  */
 function conexao_biblioteca_sumario(int $produto_id): array
+{
+    $itens = conexao_biblioteca_sumario_digitado($produto_id);
+
+    if (! $itens && function_exists('conexao_biblioteca_sumario_do_hub')) {
+        $itens = conexao_biblioteca_sumario_do_hub($produto_id);
+    }
+
+    return $itens;
+}
+
+/** Só o sumário digitado no campo "Sumário do leitor". */
+function conexao_biblioteca_sumario_digitado(int $produto_id): array
 {
     $itens = get_post_meta(conexao_biblioteca_produto_base($produto_id), CONEXAO_LIVRO_SUMARIO, true);
 

@@ -21,6 +21,7 @@ require_once __DIR__.'/inc/livros.php';
 require_once __DIR__.'/inc/acesso.php';
 require_once __DIR__.'/inc/leitor.php';
 require_once __DIR__.'/inc/marca.php';
+require_once __DIR__.'/inc/sumario.php';
 require_once __DIR__.'/inc/conta.php';
 
 if (is_admin()) {

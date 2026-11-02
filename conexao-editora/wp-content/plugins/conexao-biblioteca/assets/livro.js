@@ -269,7 +269,7 @@ async function iniciar(palco) {
             try {
                 itens = (JSON.parse(palco.dataset.sumario || '[]') || [])
                     .filter((i) => i && i.titulo && i.pagina >= 1 && i.pagina <= total)
-                    .map((i) => ({ titulo: String(i.titulo), pagina: Number(i.pagina) - 1, nivel: 0 }));
+                    .map((i) => ({ titulo: String(i.titulo), pagina: Number(i.pagina) - 1, nivel: Number(i.nivel) || 0 }));
             } catch (erro) {
                 itens = [];
             }
