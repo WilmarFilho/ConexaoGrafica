@@ -14,6 +14,7 @@ const CONEXAO_LIVRO_PDF = '_conexao_livro_pdf';             // caminho relativo 
 const CONEXAO_LIVRO_PDF_DADOS = '_conexao_livro_pdf_dados'; // nome original, tamanho, data
 const CONEXAO_LIVRO_FLIPBOOK = '_conexao_livro_flipbook';   // nome da pasta dentro de flipbooks/
 const CONEXAO_LIVRO_COMBO = '_conexao_livro_combo';         // produtos liberados por este (coleções)
+const CONEXAO_LIVRO_SUMARIO = '_conexao_livro_sumario';     // sumário digitado: [{titulo, pagina}] (PDF sem marcadores)
 
 /** O produto "dono" do livro: a variação responde pelo produto pai. */
 function conexao_biblioteca_produto_base(int $produto_id): int
@@ -60,6 +61,40 @@ function conexao_biblioteca_livro(int $produto_id): array
     }
 
     return $livro;
+}
+
+/**
+ * Sumário digitado no produto, para PDF sem marcadores: [{titulo, pagina}],
+ * com a página do PDF (não a impressa). Os leitores usam só quando o arquivo
+ * não traz o próprio sumário.
+ *
+ * @return list<array{titulo: string, pagina: int}>
+ */
+function conexao_biblioteca_sumario(int $produto_id): array
+{
+    $itens = get_post_meta(conexao_biblioteca_produto_base($produto_id), CONEXAO_LIVRO_SUMARIO, true);
+
+    return is_array($itens) ? array_values(array_filter($itens, static fn ($i) => is_array($i) && ($i['titulo'] ?? '') !== '' && (int) ($i['pagina'] ?? 0) > 0)) : [];
+}
+
+/** Texto do campo (uma linha por item, "página | título") → lista; linhas sem número são ignoradas. */
+function conexao_biblioteca_sumario_do_texto(string $texto): array
+{
+    $itens = [];
+
+    foreach (preg_split('/\r?\n/', $texto) ?: [] as $linha) {
+        if (preg_match('/^\s*(\d{1,4})\s*[|\-–:.\t ]\s*(.+?)\s*$/u', $linha, $m)) {
+            $itens[] = ['titulo' => sanitize_text_field($m[2]), 'pagina' => (int) $m[1]];
+        }
+    }
+
+    return $itens;
+}
+
+/** Lista → texto do campo. */
+function conexao_biblioteca_sumario_para_texto(array $itens): string
+{
+    return implode("\n", array_map(static fn ($i) => $i['pagina'].' | '.$i['titulo'], $itens));
 }
 
 /** A página de abertura do flipbook: o .html da raiz que não seja índice. */

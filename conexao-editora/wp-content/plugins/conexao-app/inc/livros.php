@@ -183,6 +183,8 @@ function conexao_app_livro(int $produto_id, int $usuario_id, bool $completo, $le
         'leitor_url' => $arquivo['modelo'] === 'flipbook' && function_exists('conexao_biblioteca_url_leitor') ? conexao_biblioteca_url_leitor($produto_id) : null,
         'progresso' => conexao_app_progresso($leitura ?: null),
         'avaliacao' => ['media' => round($media, 1), 'quantidade' => (int) $produto->get_review_count()],
+        // PDF sem marcadores: o sumário digitado no produto (páginas do PDF)
+        'sumario' => function_exists('conexao_biblioteca_sumario') ? conexao_biblioteca_sumario($produto_id) : [],
     ];
 
     if ($completo) {

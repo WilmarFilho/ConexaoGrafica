@@ -65,6 +65,7 @@ async function iniciar(palco) {
     let flip = null;
     let atual = Math.min(total - 1, Math.max(0, lerProgresso(chaveProgresso)));
     let medidaAtual = '';
+    let esperaSincronizar = 0;
 
     function medidas() {
         const larguraPalco = palco.clientWidth;
@@ -114,16 +115,33 @@ async function iniciar(palco) {
         });
 
         flip.loadFromHTML(paginas.map((p) => p.el));
+        palco.livroFlip = flip; // para testes e depuração
 
-        flip.on('flip', (e) => {
-            atual = e.data;
-            atualizarIndicador();
-            desenharPerto();
-            guardarProgresso(chaveProgresso, atual);
-        });
+        // os eventos chegam em ordens diferentes conforme a virada (seta, arrasto, salto):
+        // sincroniza na hora e de novo depois que a animação (700 ms) acabou
+        const sincronizarDepois = () => {
+            sincronizar();
+            clearTimeout(esperaSincronizar);
+            esperaSincronizar = setTimeout(sincronizar, 900);
+        };
+
+        flip.on('flip', sincronizarDepois);
+        flip.on('changeState', sincronizarDepois);
 
         atualizarIndicador();
         desenharPerto(true);
+    }
+
+    /** O que está aberto agora, pela própria biblioteca (o evento nem sempre traz a página certa). */
+    function sincronizar() {
+        if (!flip) {
+            return;
+        }
+
+        atual = flip.getCurrentPageIndex();
+        atualizarIndicador();
+        desenharPerto();
+        guardarProgresso(chaveProgresso, atual);
     }
 
     function atualizarIndicador() {
@@ -195,9 +213,13 @@ async function iniciar(palco) {
 
     // controles
     const ir = (n) => {
-        if (flip) {
-            flip.flip(Math.min(total - 1, Math.max(0, n)));
+        if (!flip) {
+            return;
         }
+
+        // salto direto (sumário, campo de página): abre a dupla certa na hora; a
+        // biblioteca avisa pelo evento 'flip', que sincroniza o indicador
+        flip.turnToPage(Math.min(total - 1, Math.max(0, n)));
     };
 
     document.querySelectorAll('[data-livro-anterior]').forEach((b) => b.addEventListener('click', () => flip && flip.flipPrev()));
@@ -240,7 +262,18 @@ async function iniciar(palco) {
     const gaveta = document.querySelector('[data-livro-gaveta]');
 
     if (botaoSumario && gaveta) {
-        const itens = await sumario(pdf);
+        let itens = await sumario(pdf);
+
+        // PDF sem marcadores: o sumário digitado no produto (página do PDF, 1-based)
+        if (!itens.length) {
+            try {
+                itens = (JSON.parse(palco.dataset.sumario || '[]') || [])
+                    .filter((i) => i && i.titulo && i.pagina >= 1 && i.pagina <= total)
+                    .map((i) => ({ titulo: String(i.titulo), pagina: Number(i.pagina) - 1, nivel: 0 }));
+            } catch (erro) {
+                itens = [];
+            }
+        }
 
         if (!itens.length) {
             botaoSumario.hidden = true;

@@ -10,17 +10,19 @@ import { lerSumario, textoDaPagina, type ItemSumario } from './pdf';
 
 // ---------------- Sumário ----------------
 
-export function PainelSumario({ doc, paginaAtual, aoIr }: { doc: PDFDocumentProxy; paginaAtual: number; aoIr: (p: number) => void }) {
+export function PainelSumario({ doc, paginaAtual, aoIr, reserva }: { doc: PDFDocumentProxy; paginaAtual: number; aoIr: (p: number) => void; reserva?: { titulo: string; pagina: number }[] | null }) {
   const [itens, setItens] = useState<ItemSumario[] | null>(null);
   useEffect(() => {
     let vivo = true;
+    // sem marcadores no PDF, vale o sumário digitado no produto
+    const doProduto = (): ItemSumario[] => (reserva ?? []).filter((i) => i.titulo && i.pagina >= 1).map((i) => ({ titulo: i.titulo, pagina: i.pagina, filhos: [] }));
     lerSumario(doc)
-      .then((s) => vivo && setItens(s))
-      .catch(() => vivo && setItens([]));
+      .then((s) => vivo && setItens(s.length ? s : doProduto()))
+      .catch(() => vivo && setItens(doProduto()));
     return () => {
       vivo = false;
     };
-  }, [doc]);
+  }, [doc, reserva]);
 
   if (!itens) return <Carregando texto="Lendo o sumário…" />;
   if (!itens.length) {

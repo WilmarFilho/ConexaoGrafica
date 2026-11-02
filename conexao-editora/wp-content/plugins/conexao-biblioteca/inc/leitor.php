@@ -306,7 +306,8 @@ function conexao_biblioteca_tela(int $produto_id, array $livro): void
 
     <?php if ($modo_livro) : ?>
         <main class="leitor__palco leitor__palco--livro">
-            <div class="livro" data-livro-flip data-arquivo="<?php echo esc_url(conexao_biblioteca_url_leitor($produto_id, 'pdf/')); ?>" data-produto="<?php echo (int) $produto_id; ?>">
+            <div class="livro" data-livro-flip data-arquivo="<?php echo esc_url(conexao_biblioteca_url_leitor($produto_id, 'pdf/')); ?>" data-produto="<?php echo (int) $produto_id; ?>"
+                 data-sumario="<?php echo esc_attr((string) wp_json_encode(conexao_biblioteca_sumario($produto_id))); ?>">
                 <p class="livro__aviso">Abrindo o livro…</p>
             </div>
 

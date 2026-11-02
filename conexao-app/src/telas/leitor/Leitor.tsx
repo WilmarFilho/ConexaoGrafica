@@ -624,7 +624,7 @@ export function Leitor() {
       </footer>
 
       <Folha aberta={painel === 'sumario'} aoFechar={() => setPainel(null)} titulo="Sumário" lateral={lateral} className="folha--leitor">
-        <PainelSumario doc={doc} paginaAtual={pagina} aoIr={(p) => (irPara(p), setPainel(null))} />
+        <PainelSumario doc={doc} paginaAtual={pagina} aoIr={(p) => (irPara(p), setPainel(null))} reserva={livro?.sumario} />
       </Folha>
       <Folha aberta={painel === 'busca'} aoFechar={() => setPainel(null)} titulo="Buscar no livro" lateral={lateral} className="folha--leitor">
         <PainelBusca

@@ -83,6 +83,8 @@ export interface Livro {
    * de uso único em POST /livros/{id}/acesso-web e abre esse link.
    */
   leitor_url?: string | null;
+  /** Sumário digitado no produto (páginas do PDF), para arquivo sem marcadores próprios. */
+  sumario?: { titulo: string; pagina: number }[] | null;
 }
 
 export interface Estante {
