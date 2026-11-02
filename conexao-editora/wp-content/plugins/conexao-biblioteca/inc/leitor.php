@@ -267,6 +267,10 @@ function conexao_biblioteca_tela(int $produto_id, array $livro): void
         conexao_biblioteca_preparando($titulo);
     }
 
+    // PDF: modo livro (páginas que viram) por padrão; ?modo=rolagem abre o visualizador com zoom e busca
+    $modo_livro = $livro['modelo'] === 'pdf' && (($_GET['modo'] ?? '') !== 'rolagem');
+    $origem = '';
+
     if ($livro['modelo'] === 'pdf') {
         $origem = CONEXAO_BIBLIOTECA_URL.'assets/pdfjs/web/viewer.html?file='
             .rawurlencode(conexao_biblioteca_url_leitor($produto_id, 'pdf/'));
@@ -289,21 +293,63 @@ function conexao_biblioteca_tela(int $produto_id, array $livro): void
     <meta name="robots" content="noindex, nofollow">
     <title><?php echo esc_html($titulo); ?> · Conexão Editora</title>
     <link rel="stylesheet" href="<?php echo esc_url(CONEXAO_BIBLIOTECA_URL.'assets/leitor.css?v='.CONEXAO_BIBLIOTECA_VERSAO); ?>">
+    <?php if ($modo_livro) : ?>
+        <link rel="stylesheet" href="<?php echo esc_url(CONEXAO_BIBLIOTECA_URL.'assets/livro.css?v='.CONEXAO_BIBLIOTECA_VERSAO); ?>">
+    <?php endif; ?>
 </head>
-<body class="leitor leitor--<?php echo esc_attr($livro['modelo']); ?>">
+<body class="leitor leitor--<?php echo esc_attr($livro['modelo']); ?><?php echo $modo_livro ? ' leitor--modo-livro' : ''; ?>">
     <header class="leitor__barra">
         <a class="leitor__voltar" href="<?php echo esc_url($biblioteca); ?>">&larr; Minha biblioteca</a>
         <h1 class="leitor__titulo"><?php echo esc_html($titulo); ?></h1>
         <button class="leitor__tela-cheia" type="button" data-tela-cheia>Tela cheia</button>
     </header>
 
-    <main class="leitor__palco">
-        <iframe class="leitor__livro" src="<?php echo esc_url($origem); ?>" title="<?php echo esc_attr($titulo); ?>"
-                allow="fullscreen" allowfullscreen data-livro data-modelo="<?php echo esc_attr($livro['modelo']); ?>"></iframe>
+    <?php if ($modo_livro) : ?>
+        <main class="leitor__palco leitor__palco--livro">
+            <div class="livro" data-livro-flip data-arquivo="<?php echo esc_url(conexao_biblioteca_url_leitor($produto_id, 'pdf/')); ?>" data-produto="<?php echo (int) $produto_id; ?>">
+                <p class="livro__aviso">Abrindo o livro…</p>
+            </div>
 
-        <?php // identifica a cópia em tela: desestimula print e repasse ?>
-        <div class="leitor__marca" aria-hidden="true" data-marca="<?php echo esc_attr($marca); ?>"></div>
-    </main>
+            <div class="livro__controles">
+                <button class="livro__botao" type="button" data-livro-sumario aria-expanded="false" aria-controls="livro-sumario">Sumário</button>
+
+                <div class="livro__navegacao">
+                    <button class="livro__botao" type="button" data-livro-anterior aria-label="Página anterior">&larr;</button>
+                    <label class="livro__indicador">
+                        <span class="tela-leitor">Página</span>
+                        <input type="text" inputmode="numeric" value="1" data-livro-pagina aria-label="Ir para a página">
+                        <span>de <span data-livro-total>…</span></span>
+                    </label>
+                    <button class="livro__botao" type="button" data-livro-proxima aria-label="Próxima página">&rarr;</button>
+                </div>
+
+                <a class="livro__modo" href="<?php echo esc_url(add_query_arg('modo', 'rolagem', conexao_biblioteca_url_leitor($produto_id))); ?>">Modo rolagem (zoom e busca)</a>
+            </div>
+
+            <aside class="livro__gaveta" id="livro-sumario" data-livro-gaveta hidden>
+                <h2>Sumário</h2>
+                <ol></ol>
+            </aside>
+
+            <?php // identifica a cópia em tela: desestimula print e repasse ?>
+            <div class="leitor__marca" aria-hidden="true" data-marca="<?php echo esc_attr($marca); ?>"></div>
+        </main>
+
+        <script src="<?php echo esc_url(CONEXAO_BIBLIOTECA_URL.'assets/flip/page-flip.browser.js?v='.CONEXAO_BIBLIOTECA_VERSAO); ?>"></script>
+        <script type="module" src="<?php echo esc_url(CONEXAO_BIBLIOTECA_URL.'assets/livro.js?v='.CONEXAO_BIBLIOTECA_VERSAO); ?>"></script>
+    <?php else : ?>
+        <main class="leitor__palco">
+            <iframe class="leitor__livro" src="<?php echo esc_url($origem); ?>" title="<?php echo esc_attr($titulo); ?>"
+                    allow="fullscreen" allowfullscreen data-livro data-modelo="<?php echo esc_attr($livro['modelo']); ?>"></iframe>
+
+            <?php // identifica a cópia em tela: desestimula print e repasse ?>
+            <div class="leitor__marca" aria-hidden="true" data-marca="<?php echo esc_attr($marca); ?>"></div>
+        </main>
+    <?php endif; ?>
+
+    <?php if ($livro['modelo'] === 'pdf' && ! $modo_livro) : ?>
+        <a class="leitor__modo-livro" href="<?php echo esc_url(conexao_biblioteca_url_leitor($produto_id)); ?>">Modo livro</a>
+    <?php endif; ?>
 
     <script src="<?php echo esc_url(CONEXAO_BIBLIOTECA_URL.'assets/leitor.js?v='.CONEXAO_BIBLIOTECA_VERSAO); ?>"></script>
 </body>

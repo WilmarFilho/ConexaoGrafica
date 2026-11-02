@@ -120,6 +120,33 @@ body.leitor {
   }
 }
 
+.tela-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* no modo rolagem: atalho de volta para o modo livro, no canto da barra */
+.leitor__modo-livro {
+  position: fixed;
+  right: 18px;
+  bottom: 14px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #0B4F73;
+  color: #fff;
+  font-size: 13px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+}
+
+/* a marca d'água em tela só no visualizador de rolagem; no modo livro ela já está no PDF */
+.leitor--modo-livro .leitor__marca {
+  display: none;
+}
+
 @media print {
   /* imprimir a tela não entrega o livro */
   html,
