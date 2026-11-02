@@ -102,24 +102,7 @@ function conexao_recebe_contato(): void
     exit;
 }
 
-/**
- * Remetente dos e-mails do site. O padrão do WordPress é wordpress@localhost,
- * que servidor nenhum aceita.
- */
-add_filter('wp_mail_from', function (string $email): string {
-    if ($email !== 'wordpress@localhost') {
-        return $email;
-    }
-
-    $contato = (string) get_theme_mod('conexao_email', '');
-    $dominio = $contato && str_contains($contato, '@')
-        ? substr($contato, strpos($contato, '@') + 1)
-        : 'conexaoeditora.com.br';
-
-    return 'nao-responda@'.$dominio;
-});
-
-add_filter('wp_mail_from_name', fn () => get_bloginfo('name'));
+// remetente e "Responder para" dos e-mails do site: inc/emails.php
 
 /**
  * Em desenvolvimento, os e-mails vão para o Mailpit (http://localhost:8026),

@@ -13,6 +13,7 @@ require_once get_template_directory().'/inc/icons.php';
 require_once get_template_directory().'/inc/template-tags.php';
 require_once get_template_directory().'/inc/conta.php';
 require_once get_template_directory().'/inc/contato.php';
+require_once get_template_directory().'/inc/emails.php';
 require_once get_template_directory().'/inc/menu.php';
 require_once get_template_directory().'/inc/faq.php';
 require_once get_template_directory().'/inc/ajuda.php';
