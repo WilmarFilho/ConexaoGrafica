@@ -2,6 +2,7 @@
 /**
  * Caixa de compra e frete da página do livro (coluna da direita do Figma).
  * $args['produto']: o produto da loja (simples ou com formatos).
+ * $args['frete']: false na página do capítulo, que no Figma não tem o frete.
  */
 
 if (! defined('ABSPATH')) {
@@ -12,6 +13,7 @@ if (! defined('ABSPATH')) {
 $produto = $args['produto'];
 $id = $produto->get_id();
 $parcelas = 6;
+$com_frete = $args['frete'] ?? true;
 
 // o formulário do WooCommerce (formatos) lê o produto global
 $GLOBALS['product'] = $produto;
@@ -54,6 +56,7 @@ $GLOBALS['product'] = $produto;
         <p class="livro-compra__seguro"><?php echo conexao_livro_svg('cadeado'); // phpcs:ignore WordPress.Security.EscapeOutput ?> Compra segura</p>
     </div>
 
+    <?php if ($com_frete) : ?>
     <div class="frete livro-frete" data-frete data-produto="<?php echo esc_attr($id); ?>"
          data-nonce="<?php echo esc_attr(wp_create_nonce('conexao_frete')); ?>">
         <p class="livro-frete__titulo"><?php echo conexao_livro_svg('pin'); // phpcs:ignore WordPress.Security.EscapeOutput ?> Frete e prazo</p>
@@ -66,4 +69,5 @@ $GLOBALS['product'] = $produto;
 
         <div class="frete__resposta" data-frete-resposta role="status"></div>
     </div>
+    <?php endif; ?>
 </div>

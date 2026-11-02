@@ -11,6 +11,15 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+// Com o tema da editora, a página do capítulo é a do tema (template-parts/livro/capitulo.php,
+// Figma 2281:568). Este arquivo fica como reserva para outro tema.
+if (function_exists('conexao_pagina_capitulo')) {
+    the_post();
+    conexao_pagina_capitulo(get_post());
+
+    return;
+}
+
 get_header();
 
 the_post();

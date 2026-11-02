@@ -231,6 +231,9 @@ function conexao_livro_valor_ficha(string $icone, string $valor): string
     }
 
     if ($icone === 'dimensoes') {
+        // wc_format_dimensions() devolve "17&times;24&times;2 cm"
+        $valor = html_entity_decode($valor, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
         return preg_replace('/\s*cm$/u', 'cm', preg_replace('/\s*[×x]\s*/u', ' x ', $valor) ?? $valor) ?? $valor;
     }
 
@@ -254,4 +257,30 @@ function conexao_pagina_livro(?WC_Product $produto, int $publicacao_id = 0): voi
     }
 
     get_template_part('template-parts/livro/pagina', null, conexao_livro_contexto($produto, $publicacao_id));
+}
+
+/**
+ * Desenha a página do capítulo (Figma 2281:568): mesma grade e mesmas peças da
+ * página do livro, com o capítulo no topo e o livro na coluna da direita.
+ */
+function conexao_pagina_capitulo(WP_Post $post_capitulo): void
+{
+    $post_livro = conexao_doi_livro_do_capitulo($post_capitulo);
+    $livro_id = $post_livro ? $post_livro->ID : 0;
+    $produto = conexao_livro_produto_da_publicacao($livro_id);
+
+    if ($produto && $produto->is_type('variable')) {
+        wp_enqueue_script('wc-add-to-cart-variation');
+    }
+
+    if ($produto) {
+        wp_enqueue_script('wc-single-product');
+    }
+
+    $contexto = conexao_livro_contexto($produto, $livro_id);
+    $contexto['post_livro'] = $post_livro;
+    $contexto['post_capitulo'] = $post_capitulo;
+    $contexto['capitulo'] = conexao_doi_capitulo($post_capitulo->ID);
+
+    get_template_part('template-parts/livro/capitulo', null, $contexto);
 }

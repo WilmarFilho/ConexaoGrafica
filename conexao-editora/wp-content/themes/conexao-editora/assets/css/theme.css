@@ -8173,6 +8173,8 @@ textarea.campo__entrada {
 
 .livro-compra {
   display: grid;
+  /* sem isso a coluna cresce até os botões de 343 e estoura a caixa no celular */
+  grid-template-columns: minmax(0, 1fr);
   /* botões de 343 a 31px da borda externa (30 + 1 da borda), como no Figma */
   padding: 0 23px 38px 30px;
   border: 0;
@@ -8894,5 +8896,702 @@ textarea.campo__entrada {
 @media (max-width: 800px) {
   .livro-abas__painel #review_form_wrapper {
     padding: 20px;
+  }
+}
+
+/* =====================================================================
+   Página do capítulo (Figma "Site - Conexão Editora", quadro 2281:568).
+   Mesma grade da página do livro; a trilha fica dentro da coluna principal
+   e a lateral começa na altura dela. Medidas em px do Figma.
+   ===================================================================== */
+.pagina--capitulo .trilha {
+  margin-bottom: 36px;
+}
+
+.capitulo__lateral {
+  gap: 0;
+  margin-top: 20px;
+}
+
+.capitulo__topo {
+  position: relative;
+}
+
+.capitulo__selos {
+  display: flex;
+  align-items: center;
+}
+
+.capitulo__pilula {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 15px;
+  background: var(--livro-azul-claro);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--livro-azul);
+  white-space: nowrap;
+}
+
+.capitulo__doi {
+  margin-left: 17px;
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.capitulo__copiar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 48px;
+  margin-left: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 15px;
+  background: #e9e9e9;
+  cursor: pointer;
+}
+
+.capitulo__titulo {
+  max-width: 887px;
+  margin: 22px 0 0;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 35px;
+  color: var(--livro-tinta);
+}
+
+/* o selo do ORCID desce abaixo da linha do nome, como no Figma */
+.capitulo__autores {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  column-gap: 6px;
+  max-width: 887px;
+  margin: 10px 0 0;
+  padding-bottom: 8px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-cinza);
+}
+
+.capitulo__autores-rotulo {
+  font-weight: 600;
+}
+
+.capitulo__autor {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.capitulo__autor,
+.capitulo__autor a {
+  color: var(--livro-azul);
+}
+
+/* a vírgula encosta no nome (ou no selo), sem o espaço do gap */
+.capitulo__virgula {
+  margin-left: -6px;
+}
+
+.capitulo__orcid {
+  display: block;
+  margin-bottom: -8px;
+}
+
+.capitulo__orcid img {
+  display: block;
+}
+
+.capitulo__ver-autores {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-azul);
+}
+
+/* Favoritar, Compartilhar, PDF e Citar: caixas de 70 em duas colunas */
+.capitulo__acoes {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 70px);
+  gap: 18px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.capitulo__acao {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  width: 70px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--fonte);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.capitulo__acao-caixa {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  border: 1px solid var(--livro-linha);
+  border-radius: 15px;
+  transition: border-color .15s, background-color .15s;
+}
+
+.capitulo__acao:hover .capitulo__acao-caixa,
+.capitulo__acao:focus-visible .capitulo__acao-caixa {
+  border-color: var(--livro-azul);
+}
+
+.capitulo__acao[aria-pressed="true"] .capitulo__acao-caixa {
+  border-color: var(--livro-azul);
+  background: var(--livro-azul-claro);
+}
+
+/* "Compartilhar" é mais largo que a caixa: o rótulo transborda igual para os dois lados */
+.capitulo__acao-rotulo {
+  width: 110px;
+  margin-inline: -20px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--livro-cinza);
+}
+
+.capitulo__acao--inativa {
+  opacity: .45;
+  cursor: default;
+}
+
+.capitulo__palavras {
+  margin-top: 41px;
+}
+
+/* abas com o espaçamento do Figma (os rótulos não ficam a distâncias iguais) */
+.capitulo-abas {
+  margin-top: 69px;
+}
+
+.capitulo-abas .livro-abas__botao {
+  padding: 0 30px 10px;
+}
+
+.capitulo-abas [data-aba="sumario"] { margin-left: 21px; }
+.capitulo-abas [data-aba="autores"] { margin-left: 13px; }
+.capitulo-abas [data-aba="referencias"] { margin-left: 10px; }
+
+.capitulo-abas .livro-abas__painel {
+  padding-top: 43px;
+}
+
+.capitulo-abas .livro-texto > :last-child {
+  margin-bottom: 0;
+}
+
+.livro-sumario__lista li.e-atual .livro-sumario__texto a {
+  color: var(--livro-azul);
+}
+
+/* Detalhes do capítulo, Como citar e Autores */
+.capitulo-secao {
+  margin-top: 66px;
+}
+
+.capitulo-citar {
+  margin-top: 51px;
+}
+
+#autores-do-capitulo {
+  margin-top: 60px;
+  scroll-margin-top: 24px;
+}
+
+.capitulo-secao__titulo {
+  margin: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--livro-linha);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-cinza);
+}
+
+.capitulo__ficha {
+  margin-top: 32px;
+}
+
+.capitulo__doi-linha {
+  display: flex;
+  align-items: center;
+  margin-top: 42px;
+}
+
+.capitulo__doi-logo {
+  display: block;
+  flex: none;
+  margin-right: 13px;
+}
+
+.capitulo__doi--largo {
+  margin-left: 0;
+}
+
+.capitulo-citar__abas {
+  display: flex;
+  margin-top: 51px;
+  padding-left: 8px;
+  border-bottom: 1px solid var(--livro-linha);
+}
+
+.capitulo-citar__aba {
+  position: relative;
+  padding: 0 30px 12px;
+  border: 0;
+  background: none;
+  font-family: var(--fonte);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  color: var(--livro-cinza);
+  cursor: pointer;
+}
+
+.capitulo-citar__aba + .capitulo-citar__aba {
+  margin-left: -9px;
+}
+
+.capitulo-citar__aba.e-ativa {
+  font-weight: 700;
+  color: var(--livro-azul);
+}
+
+.capitulo-citar__aba.e-ativa::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: var(--livro-azul);
+}
+
+.capitulo-citar__painel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 31px 0 0 14px;
+}
+
+.capitulo-citar__painel[hidden] {
+  display: none;
+}
+
+.capitulo-citar__texto {
+  max-width: 635px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: normal;
+  color: var(--livro-cinza);
+  overflow-wrap: anywhere;
+}
+
+.capitulo-citar__texto--bloco {
+  max-width: 820px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 14px;
+  line-height: 22px;
+  white-space: pre-wrap;
+}
+
+/* cartões dos autores: avatar, nome + ORCID, instituição e a seta da sanfona */
+.capitulo-autores {
+  margin: 44px 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--livro-linha);
+}
+
+.capitulo-autor + .capitulo-autor {
+  border-top: 1px solid var(--livro-linha);
+}
+
+.capitulo-autor__linha {
+  display: grid;
+  grid-template-columns: 51px 375px minmax(0, 1fr) 16px;
+  column-gap: 33px;
+  align-items: center;
+  min-height: 98px;
+  padding: 0 24px 0 48px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.capitulo-autor__linha::-webkit-details-marker {
+  display: none;
+}
+
+.capitulo-autor__sanfona[data-fechada] .capitulo-autor__linha {
+  cursor: default;
+  pointer-events: none;
+}
+
+.capitulo-autor__sanfona[data-fechada] .capitulo-autor__linha a {
+  pointer-events: auto;
+}
+
+.capitulo-autor__avatar .autor-card__iniciais,
+.capitulo-autor__avatar img {
+  display: grid;
+  place-items: center;
+  width: 51px;
+  height: 48px;
+  border-radius: 100px;
+  background: var(--livro-azul-claro);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--livro-cinza);
+  object-fit: cover;
+}
+
+.capitulo-autor__nome-bloco,
+.capitulo-autor__vinculo {
+  display: grid;
+  min-width: 0;
+}
+
+.capitulo-autor__nome {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: normal;
+  color: var(--livro-tinta);
+}
+
+.capitulo-autor__orcid {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: start;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  color: var(--livro-azul);
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.capitulo-autor__orcid img {
+  display: block;
+  flex: none;
+}
+
+.capitulo-autor__vinculo {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  color: var(--livro-cinza);
+}
+
+.capitulo-autor__seta {
+  display: block;
+  transition: transform .2s;
+}
+
+.capitulo-autor__sanfona[open] .capitulo-autor__seta {
+  transform: rotate(180deg);
+}
+
+.capitulo-autor__mais {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 0 24px 24px 132px;
+  font-family: "Inter", var(--fonte);
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--livro-cinza);
+}
+
+.capitulo-autor__mais p {
+  max-width: 820px;
+  margin: 0;
+}
+
+.capitulo-autor__mais a {
+  font-family: var(--fonte);
+  font-weight: 600;
+  color: var(--livro-azul);
+}
+
+/* lateral: o livro (selo + capa), a compra sem frete, as bibliográficas e os capítulos */
+.capitulo-livro {
+  position: relative;
+  display: block;
+  height: 380px;
+  border: 1px solid var(--livro-linha);
+}
+
+.capitulo-livro__selo {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  padding: 0 17px;
+}
+
+.capitulo-livro__capa {
+  position: absolute;
+  top: 45px;
+  left: 99px;
+  width: 200px;
+  height: 291px;
+  border-radius: 15px;
+  object-fit: cover;
+}
+
+.capitulo__lateral .livro-caixa {
+  margin-top: 38px;
+}
+
+.capitulo__lateral .livro-biblio {
+  margin-top: 30px;
+}
+
+.capitulo-lista {
+  margin-top: 32px;
+  padding: 27px 17px 31px 20px;
+  border: 1px solid var(--livro-linha);
+}
+
+.capitulo-lista__itens {
+  margin: 21px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.capitulo-lista__item {
+  display: grid;
+  grid-template-columns: 27px minmax(0, 1fr);
+  column-gap: 17px;
+  align-items: start;
+  padding: 8px 12px 5px 25px;
+  border-radius: 10px;
+}
+
+.capitulo-lista__item.e-atual {
+  padding-bottom: 18px;
+  background: var(--livro-azul-claro);
+}
+
+.capitulo-lista__item.e-atual:not(:first-child) {
+  margin-top: 6px;
+}
+
+.capitulo-lista__numero {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  color: var(--livro-azul);
+}
+
+.e-atual .capitulo-lista__numero {
+  background: var(--livro-azul);
+  color: #fff;
+}
+
+.capitulo-lista__texto {
+  display: grid;
+  min-width: 0;
+}
+
+.capitulo-lista__texto a {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 15px;
+  color: var(--livro-azul);
+  text-decoration: none;
+}
+
+.capitulo-lista__texto a:hover {
+  text-decoration: underline;
+}
+
+.capitulo-lista__texto small {
+  margin-top: 9px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--livro-cinza);
+}
+
+.capitulo-lista__todos {
+  display: grid;
+  place-items: center;
+  width: 343px;
+  max-width: 100%;
+  height: 60px;
+  margin: 27px 0 0 10px;
+  border: 1px solid var(--livro-azul);
+  border-radius: 15px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 20px;
+  color: var(--livro-azul);
+  text-decoration: none;
+}
+
+.capitulo-lista__todos:hover {
+  background: var(--livro-azul);
+  color: #fff;
+}
+
+/* telas menores: a lateral desce, as ações deixam de flutuar sobre o título */
+@media (max-width: 1239px) {
+  .pagina--capitulo .livro__principal,
+  .pagina--capitulo .livro__lateral {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .capitulo__lateral {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 48px;
+  }
+
+  .capitulo__lateral > * {
+    margin-top: 0 !important;
+  }
+
+  .capitulo-autor__linha {
+    grid-template-columns: 51px minmax(0, 1fr) minmax(0, 1fr) 16px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .capitulo__acoes {
+    position: static;
+    grid-template-columns: repeat(4, 70px);
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 800px) {
+  .capitulo__selos {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  /* DOI comprido: a pílula corta com reticências e o copiar fica ao lado */
+  .capitulo__doi {
+    min-width: 0;
+    max-width: calc(100% - 56px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .capitulo__selos .capitulo__doi {
+    margin-left: 0;
+  }
+
+  .capitulo__selos .capitulo__pilula:first-child {
+    margin-right: 100%;
+  }
+
+  .capitulo__titulo {
+    font-size: 24px;
+    line-height: 31px;
+  }
+
+  .capitulo-abas {
+    margin-top: 40px;
+  }
+
+  .capitulo-abas .livro-abas__botao {
+    padding-inline: 16px;
+    margin-left: 0;
+  }
+
+  .capitulo-citar__abas {
+    overflow-x: auto;
+    padding-left: 0;
+    scrollbar-width: none;
+  }
+
+  .capitulo-citar__aba {
+    flex: none;
+    padding-inline: 16px;
+  }
+
+  .capitulo-citar__aba + .capitulo-citar__aba {
+    margin-left: 0;
+  }
+
+  .capitulo-citar__painel {
+    padding-left: 0;
+  }
+
+  .capitulo-citar__texto {
+    font-size: 16px;
+  }
+
+  .capitulo-autor__linha {
+    grid-template-columns: 51px minmax(0, 1fr) 16px;
+    row-gap: 8px;
+    padding: 20px 16px;
+  }
+
+  .capitulo-autor__vinculo {
+    grid-column: 2;
+  }
+
+  .capitulo-autor__seta {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .capitulo-autor__mais {
+    padding: 0 16px 20px;
+  }
+
+  .capitulo__doi-linha {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .capitulo-livro {
+    height: 340px;
+  }
+
+  .capitulo-livro__capa {
+    left: 50%;
+    translate: -50% 0;
   }
 }

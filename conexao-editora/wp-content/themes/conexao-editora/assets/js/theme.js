@@ -938,6 +938,52 @@
                 });
             });
         });
+
+        // "Ver todos os capítulos" (página do capítulo) chega com #capitulos
+        var abaDoEndereco = window.location.hash.slice(1);
+        var botaoDoEndereco = abaDoEndereco ? abas.querySelector('[data-aba="' + abaDoEndereco.replace(/[^a-z-]/g, '') + '"]') : null;
+
+        if (botaoDoEndereco) {
+            botaoDoEndereco.click();
+            abas.scrollIntoView({ block: 'start' });
+        }
+    }
+
+    /* favoritar capítulo: guardado só neste navegador */
+    var favoritar = document.querySelector('[data-favoritar]');
+
+    if (favoritar) {
+        var lerFavoritos = function () {
+            try {
+                return JSON.parse(window.localStorage.getItem('conexao-favoritos') || '[]');
+            } catch (erro) {
+                return [];
+            }
+        };
+
+        var marcarFavorito = function (ligado) {
+            favoritar.setAttribute('aria-pressed', ligado ? 'true' : 'false');
+            favoritar.querySelector('.capitulo__acao-rotulo').textContent = ligado ? 'Favoritado' : 'Favoritar';
+        };
+
+        marcarFavorito(lerFavoritos().indexOf(favoritar.dataset.favoritar) !== -1);
+
+        favoritar.addEventListener('click', function () {
+            var lista = lerFavoritos();
+            var posicao = lista.indexOf(favoritar.dataset.favoritar);
+
+            if (posicao === -1) {
+                lista.push(favoritar.dataset.favoritar);
+            } else {
+                lista.splice(posicao, 1);
+            }
+
+            try {
+                window.localStorage.setItem('conexao-favoritos', JSON.stringify(lista));
+            } catch (erro) {}
+
+            marcarFavorito(posicao === -1);
+        });
     }
 
     /* frete e prazo na página do livro */
