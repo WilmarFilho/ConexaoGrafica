@@ -8688,6 +8688,7 @@ textarea.campo__entrada {
 
 .livro-abas__painel .comment-form > p {
   display: grid;
+  justify-items: start;
   gap: 8px;
   margin: 0 0 20px;
 }
