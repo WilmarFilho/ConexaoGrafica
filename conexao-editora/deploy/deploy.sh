@@ -32,6 +32,10 @@ chmod 750 "$BIBLIOTECA"
 $WP config has CONEXAO_BIBLIOTECA_DIR >/dev/null 2>&1 || $WP config set CONEXAO_BIBLIOTECA_DIR "$BIBLIOTECA" --type=constant
 $WP plugin is-active conexao-biblioteca || $WP plugin activate conexao-biblioteca
 
+echo "== plugin do app do leitor (API do app; usa a biblioteca e o Hub)"
+rsync -a --delete   "$REPO/conexao-editora/wp-content/plugins/conexao-app/"   "$RAIZ/wp-content/plugins/conexao-app/"
+$WP plugin is-active conexao-app || $WP plugin activate conexao-app
+
 echo "== plugin do painel (visual do wp-admin e do login)"
 rsync -a --delete   "$REPO/conexao-editora/wp-content/plugins/conexao-admin/"   "$RAIZ/wp-content/plugins/conexao-admin/"
 $WP plugin is-active conexao-admin || $WP plugin activate conexao-admin
