@@ -26,7 +26,8 @@ add_action('add_meta_boxes', function (string $tipo): void {
 add_action('admin_notices', function (): void {
     $tela = get_current_screen();
 
-    if (! $tela || ! in_array($tela->post_type, CONEXAO_DOI_TIPOS, true)) {
+    // só nas telas das publicações e capítulos, não nas páginas do menu (Leads das fichas)
+    if (! $tela || ! in_array($tela->post_type, CONEXAO_DOI_TIPOS, true) || ! in_array($tela->base, ['edit', 'post'], true)) {
         return;
     }
 
