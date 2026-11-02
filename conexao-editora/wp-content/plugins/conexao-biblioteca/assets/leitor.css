@@ -122,7 +122,8 @@ body.leitor {
 
 @media print {
   /* imprimir a tela não entrega o livro */
-  .leitor__palco {
-    display: none;
+  html,
+  body {
+    display: none !important;
   }
 }

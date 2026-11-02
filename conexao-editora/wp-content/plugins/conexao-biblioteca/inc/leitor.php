@@ -67,6 +67,15 @@ add_action('parse_request', function (WP $wp): void {
             conexao_biblioteca_recusa(404, 'Arquivo não encontrado.');
         }
 
+        // o PDF só sai para o leitor da própria página (fetch do pdf.js); aberto
+        // direto numa aba ou embutido em outro site, viraria download do livro
+        $destino = strtolower((string) ($_SERVER['HTTP_SEC_FETCH_DEST'] ?? ''));
+        $origem = strtolower((string) ($_SERVER['HTTP_SEC_FETCH_SITE'] ?? ''));
+
+        if (in_array($destino, ['document', 'iframe', 'frame', 'embed', 'object'], true) || ($origem !== '' && $origem !== 'same-origin')) {
+            conexao_biblioteca_recusa(403, 'Abra o livro pela sua biblioteca para ler.');
+        }
+
         conexao_biblioteca_entrega($livro['pdf'], 'application/pdf');
     }
 

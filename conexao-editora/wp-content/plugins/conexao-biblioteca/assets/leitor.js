@@ -38,6 +38,18 @@
         });
     }
 
+    // Ctrl+S, Ctrl+P e Ctrl+O não fazem parte da leitura (fora e dentro do livro)
+    function bloqueiaAtalhos(evento) {
+        var tecla = (evento.key || '').toLowerCase();
+
+        if ((evento.ctrlKey || evento.metaKey) && (tecla === 's' || tecla === 'p' || tecla === 'o')) {
+            evento.preventDefault();
+            evento.stopPropagation();
+        }
+    }
+
+    document.addEventListener('keydown', bloqueiaAtalhos, true);
+
     var livro = document.querySelector('[data-livro]');
 
     if (livro && livro.getAttribute('data-modelo') === 'pdf') {
@@ -59,15 +71,31 @@
 
                 documento.head.appendChild(estilo);
 
-                // Ctrl+S e Ctrl+P dentro do leitor
-                documento.addEventListener('keydown', function (evento) {
-                    var tecla = (evento.key || '').toLowerCase();
+                // impressão pelo menu do navegador ou pelo botão direito dentro do livro:
+                // o pdf.js montaria o livro inteiro para imprimir. Ele não chega a montar
+                // (o aviso de impressão é barrado antes dele) e a folha sai em branco.
+                var janela = livro.contentWindow;
+                var semImpressao = documento.createElement('style');
+                semImpressao.media = 'print';
+                semImpressao.textContent = 'html, body { display: none !important; }';
+                documento.head.appendChild(semImpressao);
 
-                    if ((evento.ctrlKey || evento.metaKey) && (tecla === 's' || tecla === 'p' || tecla === 'o')) {
-                        evento.preventDefault();
-                        evento.stopPropagation();
-                    }
+                janela.addEventListener('beforeprint', function (evento) {
+                    evento.stopImmediatePropagation();
                 }, true);
+
+                janela.print = function () {};
+
+                if (janela.PDFViewerApplication) {
+                    janela.PDFViewerApplication.triggerPrinting = function () {};
+                }
+
+                documento.addEventListener('contextmenu', function (evento) {
+                    evento.preventDefault();
+                }, true);
+
+                // Ctrl+S e Ctrl+P dentro do leitor
+                documento.addEventListener('keydown', bloqueiaAtalhos, true);
             } catch (erro) {
                 // leitor em outra origem: segue sem o ajuste
             }

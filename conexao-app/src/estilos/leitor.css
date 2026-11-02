@@ -700,3 +700,11 @@
 body:has(.leitor) .avisos {
   bottom: calc(124px + var(--base-segura));
 }
+
+/* imprimir a tela (Ctrl+P no web app) não entrega o livro */
+@media print {
+  html,
+  body {
+    display: none !important;
+  }
+}
