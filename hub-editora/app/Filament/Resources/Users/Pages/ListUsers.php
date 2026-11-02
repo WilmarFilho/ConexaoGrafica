@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Users\Pages;
 
 use App\Filament\Resources\Users\UserResource;
 use App\Models\SyncLog;
+use App\Support\Fuso;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
@@ -21,7 +22,7 @@ class ListUsers extends ListRecords
         $ultima = SyncLog::query()->where('action', 'access.review.confirmed')->latest('id')->first();
 
         return 'Quem entra no painel e recebe os avisos. Cada pessoa define a própria senha pelo link enviado por e-mail. '
-            .($ultima ? 'Última revisão de acessos: '.$ultima->created_at->format('d/m/Y').'.' : 'Nenhuma revisão de acessos registrada ainda.');
+            .($ultima ? 'Última revisão de acessos: '.Fuso::formata($ultima->created_at, 'd/m/Y').'.' : 'Nenhuma revisão de acessos registrada ainda.');
     }
 
     protected function getHeaderActions(): array

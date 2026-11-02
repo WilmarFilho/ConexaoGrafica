@@ -6,6 +6,7 @@ use App\Models\Channel;
 use App\Models\SyncLog;
 use App\Models\User;
 use App\Notifications\SecurityDigest;
+use App\Support\Fuso;
 use Illuminate\Console\Command;
 
 class SecurityDigestCommand extends Command
@@ -17,7 +18,7 @@ class SecurityDigestCommand extends Command
     public function handle(): int
     {
         $since = now()->subDays((int) $this->option('days'))->startOfDay();
-        $period = $since->format('d/m').' a '.now()->format('d/m/Y');
+        $period = Fuso::formata($since, 'd/m').' a '.Fuso::agora()->format('d/m/Y');
         $logs = SyncLog::query()->where('created_at', '>=', $since);
 
         $count = fn (string $action) => (clone $logs)->where('action', $action)->count();

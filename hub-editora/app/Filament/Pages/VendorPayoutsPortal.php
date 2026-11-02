@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Filament\Resources\VendorPayouts\VendorPayoutResource;
 use App\Models\Vendor;
 use App\Models\VendorPayout;
+use App\Support\Fuso;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -48,7 +49,7 @@ class VendorPayoutsPortal extends Page implements HasTable
         return [
             ['label' => 'A pagar', 'value' => Vendor::money((int) VendorPayout::query()->where('vendor_id', $vendorId)->where('status', VendorPayout::DRAFT)->sum('amount_cents')), 'tone' => 'warning'],
             ['label' => 'Recebido no ano', 'value' => Vendor::money((int) (clone $paid)->whereYear('paid_at', now()->year)->sum('amount_cents')), 'tone' => 'success'],
-            ['label' => 'Último repasse', 'value' => $last ? $last->paid_at->format('d/m/Y') : '—', 'tone' => 'info'],
+            ['label' => 'Último repasse', 'value' => $last ? Fuso::formata($last->paid_at, 'd/m/Y') : '—', 'tone' => 'info'],
         ];
     }
 

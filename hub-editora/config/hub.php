@@ -179,4 +179,7 @@ return [
         ],
     ],
 
+    // fuso das telas e dos recortes por dia; o banco fica em UTC (App\Support\Fuso)
+    'fuso' => env('HUB_FUSO', 'America/Sao_Paulo'),
+
 ];

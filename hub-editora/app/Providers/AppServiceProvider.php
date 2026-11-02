@@ -10,6 +10,7 @@ use App\Models\Book;
 use App\Models\Chapter;
 use App\Support\HubSettings;
 use App\Support\SecurityAudit;
+use Filament\Support\Facades\FilamentTimezone;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -43,6 +44,9 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isProduction()) {
             URL::forceScheme('https');
         }
+
+        // Datas das tabelas e formulários do Filament no horário de Brasília (banco em UTC).
+        FilamentTimezone::set(config('hub.fuso'));
 
         // Contribuições polimórficas do módulo Editorial guardam `book` / `chapter`
         // (contrato, seção 2), não o nome da classe. Mapa não forçado: os

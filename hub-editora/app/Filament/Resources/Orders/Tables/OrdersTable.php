@@ -7,6 +7,7 @@ use App\Filament\Actions\ChangeOrderStatusAction;
 use App\Models\Order;
 use App\Models\Shipment;
 use App\Models\Vendor;
+use App\Support\Fuso;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Support\Enums\FontWeight;
@@ -114,7 +115,7 @@ class OrdersTable
                 TextColumn::make('placed_at')
                     ->label('Recebido')
                     ->since()
-                    ->tooltip(fn (Order $record) => $record->placed_at?->format('d/m/Y H:i'))
+                    ->tooltip(fn (Order $record) => Fuso::formata($record->placed_at))
                     ->sortable(),
             ])
             ->filters([
@@ -153,8 +154,8 @@ class OrdersTable
                         DatePicker::make('until')->label('Até'),
                     ])
                     ->query(fn (Builder $query, array $data) => $query
-                        ->when($data['from'] ?? null, fn (Builder $q, $d) => $q->whereDate('placed_at', '>=', $d))
-                        ->when($data['until'] ?? null, fn (Builder $q, $d) => $q->whereDate('placed_at', '<=', $d)))
+                        ->when($data['from'] ?? null, fn (Builder $q, $d) => $q->where('placed_at', '>=', Fuso::inicioDoDia($d)))
+                        ->when($data['until'] ?? null, fn (Builder $q, $d) => $q->where('placed_at', '<=', Fuso::fimDoDia($d))))
                     ->indicateUsing(function (array $data): array {
                         $out = [];
                         if ($data['from'] ?? null) {

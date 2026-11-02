@@ -67,6 +67,9 @@ return [
 
     'timezone' => 'UTC',
 
+    // horários do agendador (routes/console.php) lidos em Brasília
+    'schedule_timezone' => env('HUB_FUSO', 'America/Sao_Paulo'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

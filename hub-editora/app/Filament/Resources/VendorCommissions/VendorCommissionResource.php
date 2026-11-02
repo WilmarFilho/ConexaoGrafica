@@ -7,6 +7,7 @@ use App\Filament\Resources\VendorCommissions\Pages\ListVendorCommissions;
 use App\Filament\Resources\VendorPayouts\VendorPayoutResource;
 use App\Models\Vendor;
 use App\Models\VendorCommission;
+use App\Support\Fuso;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Resource;
@@ -61,7 +62,7 @@ class VendorCommissionResource extends Resource
             ->defaultSort('earned_at', 'desc')
             ->paginated([25, 50, 100])
             ->columns(array_values(array_filter([
-                TextColumn::make('earned_at')->label('Data')->date('d/m/Y')->sortable(),
+                TextColumn::make('earned_at')->label('Data')->dateTime('d/m/Y')->sortable(),
                 TextColumn::make('order.external_number')->label('Pedido')
                     ->extraAttributes(['class' => 'hub-mono'])
                     ->description(fn (VendorCommission $record) => $record->order?->channel?->name)
@@ -98,8 +99,8 @@ class VendorCommissionResource extends Resource
                         DatePicker::make('until')->label('Até'),
                     ])
                     ->query(fn (Builder $query, array $data) => $query
-                        ->when($data['from'] ?? null, fn (Builder $q, $d) => $q->whereDate('earned_at', '>=', $d))
-                        ->when($data['until'] ?? null, fn (Builder $q, $d) => $q->whereDate('earned_at', '<=', $d))),
+                        ->when($data['from'] ?? null, fn (Builder $q, $d) => $q->where('earned_at', '>=', Fuso::inicioDoDia($d)))
+                        ->when($data['until'] ?? null, fn (Builder $q, $d) => $q->where('earned_at', '<=', Fuso::fimDoDia($d)))),
             ])))
             ->emptyStateHeading('Nenhuma comissão')
             ->emptyStateDescription('As comissões aparecem quando um pedido traz livro de um vendedor.');

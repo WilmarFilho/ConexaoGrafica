@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Http\Middleware\EnsurePasswordIsFresh;
+use App\Support\Fuso;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
@@ -37,7 +38,7 @@ class AdminPanelProvider extends PanelProvider
 
     public static function topbarDate(): string
     {
-        $now = now()->locale('pt_BR');
+        $now = Fuso::agora()->locale('pt_BR');
 
         return ucfirst(str_replace('-feira', '', $now->dayName)).', '.$now->format('d').' '.$now->shortMonthName.' · '.$now->format('H:i');
     }

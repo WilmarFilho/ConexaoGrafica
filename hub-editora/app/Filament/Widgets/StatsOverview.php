@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Shipment;
+use App\Support\Fuso;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
@@ -31,9 +32,12 @@ class StatsOverview extends StatsOverviewWidget
     {
         $paid = fn () => Order::query()->where('payment_status', 'paid');
 
-        $monthStart = now()->startOfMonth();
-        $prevMonthStart = now()->subMonthNoOverflow()->startOfMonth();
-        $prevMonthSameDay = $prevMonthStart->copy()->addDays(now()->day - 1)->endOfDay();
+        // mês e dias contados no horário de Brasília (o banco está em UTC)
+        $agora = Fuso::agora();
+        $monthStart = $agora->startOfMonth()->utc();
+        $prevMonthStart = $agora->subMonthNoOverflow()->startOfMonth();
+        $prevMonthSameDay = $prevMonthStart->addDays($agora->day - 1)->endOfDay()->utc();
+        $prevMonthStart = $prevMonthStart->utc();
 
         $month = (clone $paid())->where('placed_at', '>=', $monthStart);
         $prevMonth = (clone $paid())->whereBetween('placed_at', [$prevMonthStart, $prevMonthSameDay]);
@@ -43,18 +47,18 @@ class StatsOverview extends StatsOverviewWidget
         $prevCount = (clone $prevMonth)->count();
         $prevRevenue = (int) (clone $prevMonth)->sum('total_cents');
 
-        $today = (clone $paid())->whereDate('placed_at', today());
-        $week = (clone $paid())->where('placed_at', '>=', now()->subDays(6)->startOfDay());
+        $today = Fuso::noDia($paid(), 'placed_at', $agora);
+        $week = (clone $paid())->where('placed_at', '>=', Fuso::inicioDoDia($agora->subDays(6)));
 
         // Série diária dos últimos 14 dias para o gráfico miniatura.
-        $series = collect(range(13, 0))->map(fn ($d) => (clone $paid())->whereDate('placed_at', today()->subDays($d))->count())->all();
-        $revenueSeries = collect(range(13, 0))->map(fn ($d) => (int) (clone $paid())->whereDate('placed_at', today()->subDays($d))->sum('total_cents') / 100)->all();
+        $series = collect(range(13, 0))->map(fn ($d) => Fuso::noDia($paid(), 'placed_at', $agora->subDays($d))->count())->all();
+        $revenueSeries = collect(range(13, 0))->map(fn ($d) => (int) Fuso::noDia($paid(), 'placed_at', $agora->subDays($d))->sum('total_cents') / 100)->all();
 
         $awaiting = Order::query()->awaitingShipment()->count();
         $oldest = Order::query()->awaitingShipment()->min('placed_at');
         $problems = Order::query()->where('status', OrderStatus::Problem)->count();
-        $labelsToday = Shipment::query()->whereDate('label_generated_at', today())->count();
-        $shippedWeek = Shipment::query()->where('shipped_at', '>=', now()->subDays(6)->startOfDay())->count();
+        $labelsToday = Fuso::noDia(Shipment::query(), 'label_generated_at', $agora)->count();
+        $shippedWeek = Shipment::query()->where('shipped_at', '>=', Fuso::inicioDoDia($agora->subDays(6)))->count();
 
         return [
             Stat::make('Vendas no mês', $this->money($monthRevenue))

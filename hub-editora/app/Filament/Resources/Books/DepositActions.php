@@ -10,6 +10,7 @@ use App\Editorial\EditorialException;
 use App\Models\Book;
 use App\Models\Deposit;
 use App\Models\DepositItem;
+use App\Support\Fuso;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
@@ -176,8 +177,8 @@ class DepositActions
 
         $html = '<div style="font-size:.85rem;text-align:left"><div style="color:var(--hub-muted);margin-bottom:8px">'
             .'Lote <span class="hub-mono">'.e($deposit->batch_id).'</span> · '.e($deposit->environment_label).' · '.e($deposit->status_label)
-            .($deposit->submitted_at ? ' · enviado em '.$deposit->submitted_at->format('d/m/Y H:i') : '')
-            .($deposit->result_at ? ' · resultado em '.$deposit->result_at->format('d/m/Y H:i') : '')
+            .($deposit->submitted_at ? ' · enviado em '.Fuso::formata($deposit->submitted_at) : '')
+            .($deposit->result_at ? ' · resultado em '.Fuso::formata($deposit->result_at) : '')
             .'</div><table style="width:100%;border-collapse:collapse"><thead><tr style="color:var(--hub-muted);font-size:.78rem;text-align:left">'
             .'<th style="padding:4px 6px">DOI</th><th style="padding:4px 6px">Alvo</th><th style="padding:4px 6px">Estado</th><th style="padding:4px 6px">Mensagem</th></tr></thead><tbody>';
 

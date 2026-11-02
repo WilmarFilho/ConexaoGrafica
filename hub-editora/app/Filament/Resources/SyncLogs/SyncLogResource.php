@@ -10,6 +10,7 @@ use App\Models\Book;
 use App\Models\Chapter;
 use App\Models\Order;
 use App\Models\SyncLog;
+use App\Support\Fuso;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Resource;
@@ -146,8 +147,8 @@ class SyncLogResource extends Resource
                         DatePicker::make('until')->label('Até'),
                     ])
                     ->query(fn (Builder $query, array $data) => $query
-                        ->when($data['from'] ?? null, fn (Builder $q, $d) => $q->whereDate('created_at', '>=', $d))
-                        ->when($data['until'] ?? null, fn (Builder $q, $d) => $q->whereDate('created_at', '<=', $d))),
+                        ->when($data['from'] ?? null, fn (Builder $q, $d) => $q->where('created_at', '>=', Fuso::inicioDoDia($d)))
+                        ->when($data['until'] ?? null, fn (Builder $q, $d) => $q->where('created_at', '<=', Fuso::fimDoDia($d)))),
             ])
             ->filtersFormColumns(2)
             ->recordActions([])

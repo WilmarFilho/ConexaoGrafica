@@ -11,6 +11,7 @@ use App\Integrations\MelhorEnvio\ShipmentService;
 use App\Jobs\GenerateLabel;
 use App\Models\Order;
 use App\Models\Shipment;
+use App\Support\Fuso;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -75,7 +76,7 @@ class Expedicao extends Page implements HasTable
         $awaiting = Order::query()->awaitingShipment()->count();
         $labels = Order::query()->where('status', OrderStatus::LabelGenerated)->count();
         $problems = Order::query()->where('status', OrderStatus::Problem)->count();
-        $shippedToday = Shipment::query()->whereDate('shipped_at', today())->count();
+        $shippedToday = Fuso::noDia(Shipment::query(), 'shipped_at', Fuso::agora())->count();
 
         return [
             ['label' => 'A separar', 'value' => $awaiting, 'tone' => 'warning'],

@@ -9,6 +9,7 @@ use App\Models\Book;
 use App\Models\Chapter;
 use App\Models\Document;
 use App\Models\SyncLog;
+use App\Support\Fuso;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
@@ -107,7 +108,7 @@ class DocumentActions
                 default => 'gray',
             })
             ->tooltip(fn (string $state, Book|Chapter $record) => Document::stateLabel($state)
-                .(($record->sheet?->generated_at) ? ' · gerada em '.$record->sheet->generated_at->format('d/m/Y H:i') : ''))
+                .(($record->sheet?->generated_at) ? ' · gerada em '.Fuso::formata($record->sheet->generated_at) : ''))
             ->url(fn (Book|Chapter $record) => $record->sheet?->public_url, shouldOpenInNewTab: true)
             ->alignCenter();
     }

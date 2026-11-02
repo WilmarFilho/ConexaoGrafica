@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\SyncLog;
 use App\Models\User;
 use App\Notifications\AccessReview;
+use App\Support\Fuso;
 use Illuminate\Console\Command;
 
 /**
@@ -45,7 +46,7 @@ class AccessReviewCommand extends Command
             'perfil' => $u->roleLabel(),
             'situacao' => $u->disabled_at ? 'desativado' : ($u->isLocked() ? 'bloqueado' : 'ativo'),
             'dois_fatores' => filled($u->app_authentication_secret) ? 'sim' : 'não',
-            'ultimo_acesso' => $u->last_login_at?->format('d/m/Y') ?? 'nunca',
+            'ultimo_acesso' => $u->last_login_at ? Fuso::formata($u->last_login_at, 'd/m/Y') : 'nunca',
         ])->all();
 
         $admins = User::query()->admins()->whereNotNull('email')->get();

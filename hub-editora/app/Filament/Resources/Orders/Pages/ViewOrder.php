@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Orders\Pages;
 use App\Filament\Actions\ChangeOrderStatusAction;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Models\Order;
+use App\Support\Fuso;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewOrder extends ViewRecord
@@ -31,6 +32,6 @@ class ViewOrder extends ViewRecord
         /** @var Order $order */
         $order = $this->getRecord();
 
-        return trim(($order->channel?->name ?? '').' · recebido '.($order->placed_at?->format('d/m/Y \à\s H:i') ?? ''));
+        return trim(($order->channel?->name ?? '').' · recebido '.Fuso::formata($order->placed_at, 'd/m/Y \à\s H:i'));
     }
 }

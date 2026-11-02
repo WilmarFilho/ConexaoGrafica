@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Users;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\SyncLog;
 use App\Models\User;
+use App\Support\Fuso;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -99,7 +100,7 @@ class UserResource extends Resource
                 TextColumn::make('situacao')->label('Situação')->badge()
                     ->state(fn (User $record) => match (true) {
                         $record->disabled_at !== null => 'Desativado',
-                        $record->isLocked() => 'Bloqueado até '.$record->locked_until->format('H:i'),
+                        $record->isLocked() => 'Bloqueado até '.Fuso::formata($record->locked_until, 'H:i'),
                         default => 'Ativo',
                     })
                     ->color(fn (string $state) => $state === 'Ativo' ? 'success' : 'danger'),

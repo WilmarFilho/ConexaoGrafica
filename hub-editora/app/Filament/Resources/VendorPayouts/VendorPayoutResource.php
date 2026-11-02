@@ -8,6 +8,7 @@ use App\Filament\Resources\VendorPayouts\RelationManagers\PayoutCommissionsRelat
 use App\Filament\Resources\Vendors\VendorResource;
 use App\Models\Vendor;
 use App\Models\VendorPayout;
+use App\Support\Fuso;
 use BackedEnum;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
@@ -82,7 +83,7 @@ class VendorPayoutResource extends Resource
                         TextEntry::make('period_until')->label('Comissões até')->date('d/m/Y'),
                         TextEntry::make('commissions_count')->label('Comissões'),
                         TextEntry::make('creator.name')->label('Gerado por')->placeholder('—')
-                            ->helperText(fn (VendorPayout $record) => $record->created_at?->format('d/m/Y H:i')),
+                            ->helperText(fn (VendorPayout $record) => Fuso::formata($record->created_at)),
                     ]),
                 Section::make('Pagamento')
                     ->columnSpan(1)

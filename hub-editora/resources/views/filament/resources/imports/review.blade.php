@@ -53,7 +53,7 @@
         <div class="hub-status-card" @if ($import->isProcessing() || $import->status === \App\Models\Import::RECEIVED) wire:poll.10s="syncProposal" @endif>
             <div class="hub-banner">
                 <span class="hub-pill {{ $import->status === \App\Models\Import::ERROR ? 'hub-pill-danger' : 'hub-pill-warn' }}">{{ $import->statusLabel() }}</span>
-                <span class="hub-note">{{ $import->original_name }} · enviado em {{ $import->created_at?->format('d/m/Y H:i') }}{{ $import->creator ? ' por '.$import->creator->name : '' }}</span>
+                <span class="hub-note">{{ $import->original_name }} · enviado em {{ \App\Support\Fuso::formata($import->created_at) }}{{ $import->creator ? ' por '.$import->creator->name : '' }}</span>
             </div>
             @if ($import->status === \App\Models\Import::ERROR)
                 <p style="color:var(--hub-danger);font-size:14px;"><strong>Falhou:</strong> {{ $import->error }}</p>

@@ -60,7 +60,7 @@ class VendorPortal extends Page implements HasTable
         $month = VendorCommission::query()->where('vendor_id', $vendor->id)
             ->whereIn('status', [VendorCommission::AVAILABLE, VendorCommission::PAID])
             ->where('kind', VendorCommission::SALE)
-            ->where('earned_at', '>=', now()->startOfMonth());
+            ->where('earned_at', '>=', \App\Support\Fuso::agora()->startOfMonth()->utc());
 
         return [
             ['label' => 'Livros vendidos no mês', 'value' => (string) (int) (clone $month)->sum('quantity'), 'tone' => 'info'],
