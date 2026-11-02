@@ -104,6 +104,13 @@ $sociais = apply_filters('conexao_login_social', [
                            placeholder="E-mail" value="<?php echo ! empty($_POST['email']) ? esc_attr(wp_unslash($_POST['email'])) : ''; // phpcs:ignore ?>" required>
                 </p>
 
+                <p class="campo campo--icone">
+                    <label class="tela-leitor" for="reg_conexao_cpf">CPF</label>
+                    <span class="campo__icone" aria-hidden="true"><?php conexao_the_icon('cartao', 18); ?></span>
+                    <input type="text" class="campo__entrada" name="conexao_cpf" id="reg_conexao_cpf" inputmode="numeric" maxlength="14" autocomplete="off"
+                           placeholder="CPF" value="<?php echo ! empty($_POST['conexao_cpf']) ? esc_attr(wp_unslash($_POST['conexao_cpf'])) : ''; // phpcs:ignore ?>" required>
+                </p>
+
                 <?php if ('no' === get_option('woocommerce_registration_generate_password')) : ?>
                     <p class="campo campo--icone">
                         <label class="tela-leitor" for="reg_password">Senha</label>

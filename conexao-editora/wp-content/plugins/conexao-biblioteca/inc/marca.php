@@ -15,7 +15,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-const CONEXAO_BIBLIOTECA_MARCA_VERSAO = '1';
+const CONEXAO_BIBLIOTECA_MARCA_VERSAO = '2';
 
 /** Caminho do Ghostscript; sem ele a marca fica desligada e o leitor entrega o original. */
 function conexao_biblioteca_gs(): string
@@ -34,6 +34,12 @@ function conexao_biblioteca_marca_ativa(): bool
 function conexao_biblioteca_marca_texto(WP_User $usuario, int $produto_id): string
 {
     $partes = [trim($usuario->display_name) ?: $usuario->user_login, $usuario->user_email];
+    $cpf = conexao_biblioteca_cpf_mascarado($usuario->ID);
+
+    if ($cpf !== '') {
+        $partes[] = 'CPF '.$cpf;
+    }
+
     $pedido = conexao_biblioteca_pedido_do_livro($usuario->ID, $produto_id);
 
     if ($pedido) {
@@ -43,6 +49,17 @@ function conexao_biblioteca_marca_texto(WP_User $usuario, int $produto_id): stri
     $texto = remove_accents('Licenciado para '.implode(' - ', array_filter($partes)));
 
     return trim((string) preg_replace('/[^\x20-\x7E]/', '', $texto));
+}
+
+/**
+ * CPF do leitor com o meio à mostra (***.456.789-**): identifica quem comprou
+ * sem espalhar o número inteiro em cada página do livro (LGPD).
+ */
+function conexao_biblioteca_cpf_mascarado(int $usuario_id): string
+{
+    $cpf = (string) preg_replace('/\D/', '', (string) get_user_meta($usuario_id, 'billing_cpf', true));
+
+    return strlen($cpf) === 11 ? '***.'.substr($cpf, 3, 3).'.'.substr($cpf, 6, 3).'-**' : '';
 }
 
 /** Número do pedido pago mais recente com este livro (ou o combo que o libera). */

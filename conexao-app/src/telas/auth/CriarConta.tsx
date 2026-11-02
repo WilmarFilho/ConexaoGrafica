@@ -7,12 +7,31 @@ import { dadosDoAparelho } from '../../plataforma/aparelho';
 import { CONFIG } from '../../config';
 import { AvisoDemonstracao, TelaAuth } from './TelaAuth';
 
-type Erros = Partial<Record<'nome' | 'email' | 'senha', string>>;
+type Erros = Partial<Record<'nome' | 'email' | 'cpf' | 'senha', string>>;
+
+/** 123.456.789-09 enquanto digita. */
+function mascaraCpf(valor: string): string {
+  const d = valor.replace(/\D/g, '').slice(0, 11);
+  return d.replace(/^(\d{3})(\d)/, '$1.$2').replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d{1,2})$/, '.$1-$2');
+}
+
+/** Dígitos verificadores (a confirmação final é do servidor, que também barra CPF repetido). */
+function cpfValido(valor: string): boolean {
+  const d = valor.replace(/\D/g, '');
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+  for (let t = 9; t < 11; t++) {
+    let soma = 0;
+    for (let i = 0; i < t; i++) soma += Number(d[i]) * (t + 1 - i);
+    if (Number(d[t]) !== ((10 * soma) % 11) % 10) return false;
+  }
+  return true;
+}
 
 export function CriarConta() {
   const { entrar } = useSessao();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
+  const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -23,13 +42,14 @@ export function CriarConta() {
     const novos: Erros = {};
     if (nome.trim().length < 2) novos.nome = 'Informe seu nome.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) novos.email = 'Informe um e-mail válido.';
+    if (!cpfValido(cpf)) novos.cpf = cpf.trim() ? 'Este CPF não é válido. Confira os números.' : 'Informe o seu CPF.';
     if (senha.length < 8) novos.senha = 'A senha precisa ter pelo menos 8 caracteres.';
     setErros(novos);
     if (Object.keys(novos).length) return;
     setErro(null);
     setEnviando(true);
     try {
-      const r = await api.cadastro({ nome: nome.trim(), email: email.trim(), senha, aparelho: await dadosDoAparelho() });
+      const r = await api.cadastro({ nome: nome.trim(), email: email.trim(), cpf, senha, aparelho: await dadosDoAparelho() });
       await entrar(r);
     } catch (falha) {
       if (falha instanceof ErroApi && Object.keys(falha.campos).length) {
@@ -66,6 +86,16 @@ export function CriarConta() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           erro={erros.email}
+        />
+        <Campo
+          rotulo="CPF"
+          icone="conta"
+          inputMode="numeric"
+          autoComplete="off"
+          value={cpf}
+          onChange={(e) => setCpf(mascaraCpf(e.target.value))}
+          erro={erros.cpf}
+          ajuda="Um CPF por conta. Ele aparece, parcialmente, na marca d'água dos seus e-books."
         />
         <CampoSenha rotulo="Senha" autoComplete="new-password" value={senha} onChange={(e) => setSenha(e.target.value)} erro={erros.senha} ajuda="Mínimo de 8 caracteres." />
         {erro && (

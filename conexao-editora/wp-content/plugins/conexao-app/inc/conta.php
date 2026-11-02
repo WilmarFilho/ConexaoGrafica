@@ -220,6 +220,7 @@ function conexao_app_rota_cadastro(WP_REST_Request $request)
     $nome = is_string($request->get_param('nome')) ? trim(sanitize_text_field($request->get_param('nome'))) : '';
     $email = is_string($request->get_param('email')) ? sanitize_email(trim($request->get_param('email'))) : '';
     $senha = is_string($request->get_param('senha')) ? (string) $request->get_param('senha') : '';
+    $cpf = is_string($request->get_param('cpf')) ? sanitize_text_field($request->get_param('cpf')) : '';
     $campos = [];
 
     if ($nome === '' || mb_strlen($nome) > 120) {
@@ -232,6 +233,15 @@ function conexao_app_rota_cadastro(WP_REST_Request $request)
 
     if (mb_strlen($senha) < 8 || strlen($senha) > 4096) {
         $campos['senha'] = 'A senha precisa ter pelo menos 8 caracteres.';
+    }
+
+    // CPF válido e um por conta (inc/cpf.php do tema; versões antigas do app não mandam: pede para atualizar)
+    if (function_exists('conexao_cpf_problema')) {
+        $problema = conexao_cpf_problema($cpf);
+
+        if ($problema !== '') {
+            $campos['cpf'] = $cpf === '' ? 'Informe o seu CPF. Se o campo não aparece, atualize o app.' : $problema;
+        }
     }
 
     $aparelho = conexao_app_aparelho_do_corpo($request, $campos);
@@ -271,6 +281,10 @@ function conexao_app_rota_cadastro(WP_REST_Request $request)
         }
 
         return conexao_app_erro('indisponivel', 'Não foi possível criar a conta agora. Tente de novo em instantes.');
+    }
+
+    if (function_exists('conexao_cpf_guarda_no_usuario')) {
+        conexao_cpf_guarda_no_usuario((int) $usuario_id, $cpf);
     }
 
     $usuario = get_userdata((int) $usuario_id);

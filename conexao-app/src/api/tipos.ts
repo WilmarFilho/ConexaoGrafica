@@ -189,7 +189,7 @@ export interface OpcoesDownload {
 
 export interface Api {
   login(dados: { email: string; senha: string; aparelho: DadosAparelho; substituir?: number }): Promise<RespostaLogin>;
-  cadastro(dados: { nome: string; email: string; senha: string; aparelho: DadosAparelho }): Promise<RespostaLogin>;
+  cadastro(dados: { nome: string; email: string; cpf: string; senha: string; aparelho: DadosAparelho }): Promise<RespostaLogin>;
   senha(email: string): Promise<void>;
   sair(): Promise<void>;
   eu(): Promise<Eu>;
