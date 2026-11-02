@@ -1,12 +1,16 @@
 /* Modo livro: as páginas viram como num livro de papel */
 .leitor__palco--livro {
   display: grid;
+  /* minmax(0, …): o livro não estica a coluna além da tela */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
   background: #2A3B45;
 }
 
 .livro {
   position: relative;
+  min-width: 0;
   min-height: 0;
   overflow: hidden;
   /* as páginas do StPageFlip têm z-index de até o número de páginas: ficam
@@ -73,6 +77,10 @@
   font: inherit;
   font-size: 13px;
   cursor: pointer;
+}
+
+.livro__botao[hidden] {
+  display: none;
 }
 
 .livro__botao:hover {

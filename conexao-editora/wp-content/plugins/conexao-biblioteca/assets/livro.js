@@ -68,7 +68,8 @@ async function iniciar(palco) {
     let esperaSincronizar = 0;
 
     function medidas() {
-        const larguraPalco = palco.clientWidth;
+        // nunca mais largo que a janela, mesmo se algo esticou o palco
+        const larguraPalco = Math.min(palco.clientWidth, document.documentElement.clientWidth);
         const alturaPalco = palco.clientHeight;
         const retrato = larguraPalco < 760;
         const margem = retrato ? 8 : 24;
