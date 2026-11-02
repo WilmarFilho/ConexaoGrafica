@@ -83,13 +83,7 @@ function conexao_app_rota_email_codigo(WP_REST_Request $request)
         'tentativas' => 0,
     ]);
 
-    $corpo = sprintf(
-        "Olá, %s.\n\nSeu código de confirmação é: %s\n\nDigite este código no app da Conexão Editora. Ele vale por 15 minutos.\n\nSe você não pediu este código, ignore este e-mail.\n\nConexão Editora",
-        conexao_app_nome_usuario($usuario),
-        $codigo
-    );
-
-    if (! wp_mail($email, 'Seu código de confirmação · Conexão Editora', $corpo)) {
+    if (! conexao_app_envia_codigo($email, conexao_app_nome_usuario($usuario), $codigo)) {
         delete_user_meta($usuario->ID, CONEXAO_APP_META_CODIGO);
 
         return conexao_app_erro('indisponivel', 'Não conseguimos enviar o e-mail agora. Tente de novo em instantes.');
@@ -137,4 +131,34 @@ function conexao_app_rota_email_confirmar(WP_REST_Request $request)
     conexao_app_marca_email_verificado($usuario);
 
     return new WP_REST_Response(null, 204);
+}
+
+/**
+ * Código de confirmação no modelo dos e-mails da loja (cabeçalho com a logo,
+ * cores e rodapé do tema). Sem WooCommerce, vai como texto simples.
+ */
+function conexao_app_envia_codigo(string $email, string $nome, string $codigo): bool
+{
+    $assunto = 'Seu código de confirmação · Conexão Editora';
+
+    if (! function_exists('WC') || ! WC()->mailer()) {
+        return wp_mail($email, $assunto, sprintf(
+            "Olá, %s.\n\nSeu código de confirmação é: %s\n\nDigite este código no app da Conexão Editora. Ele vale por 15 minutos.\n\nSe você não pediu este código, ignore este e-mail.\n\nConexão Editora",
+            $nome,
+            $codigo
+        ));
+    }
+
+    $corpo = sprintf(
+        '<p>Olá, %1$s.</p>'
+        .'<p>Digite este código no app da Conexão Editora para confirmar o seu e-mail:</p>'
+        .'<p style="margin:24px 0;text-align:center"><span style="display:inline-block;padding:14px 26px;border-radius:12px;background:#EAF4FB;color:#00448B;font-size:32px;font-weight:800;letter-spacing:.3em">%2$s</span></p>'
+        .'<p>Ele vale por 15 minutos. Se você não pediu este código, pode ignorar este e-mail.</p>',
+        esc_html($nome),
+        esc_html($codigo)
+    );
+
+    $mailer = WC()->mailer();
+
+    return (bool) $mailer->send($email, $assunto, $mailer->wrap_message('Confirme o seu e-mail', $corpo));
 }
