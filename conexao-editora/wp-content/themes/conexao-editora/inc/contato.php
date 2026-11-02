@@ -76,7 +76,7 @@ function conexao_recebe_contato(): void
         exit;
     }
 
-    $destino = get_theme_mod('conexao_email', get_option('admin_email'));
+    $destino = get_theme_mod('conexao_email', conexao_email_resposta());
     $titulo = sprintf('[Site] %s', $assunto ?: 'Contato pelo site');
 
     $corpo = implode("\n", array_filter([

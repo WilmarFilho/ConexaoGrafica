@@ -103,7 +103,7 @@ function conexao_recebe_manuscrito(): void
         $anexos[] = $movido['file'];
     }
 
-    $destino = get_theme_mod('conexao_email', get_option('admin_email'));
+    $destino = get_theme_mod('conexao_email', conexao_email_resposta());
 
     $corpo = implode("\n", array_filter([
         'Nome: '.$nome,

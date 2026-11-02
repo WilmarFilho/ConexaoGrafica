@@ -95,7 +95,7 @@ export function CriarConta() {
           value={cpf}
           onChange={(e) => setCpf(mascaraCpf(e.target.value))}
           erro={erros.cpf}
-          ajuda="Um CPF por conta. Ele aparece, parcialmente, na marca d'água dos seus e-books."
+          ajuda="Um CPF por conta. Ele aparece na marca d'água dos seus e-books."
         />
         <CampoSenha rotulo="Senha" autoComplete="new-password" value={senha} onChange={(e) => setSenha(e.target.value)} erro={erros.senha} ajuda="Mínimo de 8 caracteres." />
         {erro && (

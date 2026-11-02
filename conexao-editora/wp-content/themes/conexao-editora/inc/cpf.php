@@ -2,7 +2,7 @@
 /**
  * CPF obrigatório e válido, um por conta: no checkout (em blocos), no
  * cadastro do site e no do app. Desestimula conta "laranja" para repassar
- * e-book, e o CPF vai, mascarado, na marca d'água do PDF do leitor.
+ * e-book, e o CPF vai, completo, na marca d'água do PDF do leitor.
  *
  * O plugin "Extra Checkout Fields for Brazil" só atua no checkout clássico;
  * no checkout em blocos o campo vem daqui (API de campos adicionais do
