@@ -171,6 +171,12 @@ return [
         // Base das páginas públicas, usada só quando o payload não traz `landing_url`
         // (o WordPress devolve as URLs definitivas ao publicar; são elas que valem).
         'landing_base' => env('CROSSREF_LANDING_BASE', 'https://conexaoeditora.com.br'),
+        // Tabela 2026 da Crossref (US$ por registro novo; atualização é grátis). Ver App\Crossref\Fees.
+        'fees' => [
+            'book' => 1.00,
+            'chapter' => 0.25,
+            'back_year' => 0.15,
+        ],
     ],
 
 ];

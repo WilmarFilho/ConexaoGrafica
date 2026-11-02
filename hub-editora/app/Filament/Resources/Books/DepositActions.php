@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Books;
 use App\Crossref\BookDeposits;
 use App\Crossref\CrossrefException;
 use App\Crossref\DepositService;
+use App\Crossref\Fees;
 use App\Editorial\EditorialException;
 use App\Models\Book;
 use App\Models\Deposit;
@@ -136,6 +137,9 @@ class DepositActions
             $html .= '<div style="padding:8px 10px;border-radius:6px;background:var(--hub-info-bg);color:var(--hub-info);border:1px solid var(--hub-info-bd)">'
                 .'<strong>Ambiente: homologação</strong> (test.crossref.org). Nada é registrado de verdade nem cobrado; em produção a Crossref cobra por DOI.</div>';
         }
+
+        $html .= '<div><strong>Custo '.($prod ? 'estimado' : 'em produção').':</strong> '.e(Fees::summary($book))
+            .'<br><span style="color:var(--hub-muted)">A Crossref cobra em fatura trimestral por e-mail (45 dias para pagar, em dólar, por cartão no portal ou transferência).</span></div>';
 
         if ($book->doi_status === 'registered') {
             $html .= '<div style="color:var(--hub-muted)">O livro já está registrado: este envio atualiza os metadados e as URLs dos mesmos DOIs (o sufixo não muda).</div>';

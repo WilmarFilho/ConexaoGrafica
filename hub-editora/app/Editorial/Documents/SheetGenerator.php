@@ -42,6 +42,9 @@ class SheetGenerator
 
     public const DIR = 'documents';
 
+    /** A capa existe na loja mas não baixou nesta geração (rede/servidor): a próxima tenta de novo. */
+    private bool $coverMissing = false;
+
     public function forBook(Book $book, bool $force = false): Document
     {
         $payload = Payload::forBook($book);
@@ -183,8 +186,14 @@ class SheetGenerator
             return $doc;
         }
 
+        $this->coverMissing = false;
         $pdf = $render();
         $disk = Storage::disk(Document::DISK);
+
+        // sem a capa, o hash fica diferente do dos dados: a próxima geração não pula esta ficha
+        if ($this->coverMissing) {
+            $hash = hash('sha256', $hash.'|sem-capa');
+        }
 
         if ($doc->exists && filled($doc->path) && $doc->path !== $path) {
             $disk->delete($doc->path); // o slug mudou: não deixa arquivo órfão
@@ -201,7 +210,7 @@ class SheetGenerator
         ])->save();
 
         SyncLog::record(null, SyncLog::OUT, 'document.generated', $target,
-            Document::TYPES[$type].' gerada ('.number_format(strlen($pdf) / 1024, 0, ',', '.').' KB)',
+            Document::TYPES[$type].' gerada ('.number_format(strlen($pdf) / 1024, 0, ',', '.').' KB)'.($this->coverMissing ? ', sem a capa (não baixou do site)' : ''),
             ['document_id' => $doc->id, 'hash' => substr($hash, 0, 12), 'template_version' => self::TEMPLATE_VERSION, 'forced' => $force]);
 
         return $doc;
@@ -209,12 +218,18 @@ class SheetGenerator
 
     private function viewData(array $data): array
     {
+        $cover = $this->coverDataUri($data['cover_url'] ?? null);
+
+        if (filled($data['cover_url'] ?? null) && $cover === null) {
+            $this->coverMissing = true;
+        }
+
         return $data + [
             'qr' => filled($data['qr_url'] ?? null) ? $this->qrDataUri($data['qr_url']) : '',
             'generated_at' => now(),
             'template_version' => self::TEMPLATE_VERSION,
             'logo' => self::fileDataUri(resource_path('images/logo-conexao-editora.png')),
-            'cover' => $this->coverDataUri($data['cover_url'] ?? null),
+            'cover' => $cover,
         ];
     }
 

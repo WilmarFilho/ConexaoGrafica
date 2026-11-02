@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Books\Schemas;
 
+use App\Crossref\Fees;
 use App\Editorial\License;
 use App\Filament\Resources\Chapters\ChapterResource;
 use App\Models\Book;
@@ -90,6 +91,10 @@ class BookInfolist
                                 TextEntry::make('doi_status')->label('DOI')->badge()
                                     ->formatStateUsing(fn (string $state) => Book::DOI_STATUSES[$state] ?? $state)
                                     ->color(fn (string $state) => Book::doiStatusColor($state)),
+                                TextEntry::make('custo_doi')->label('Custo do DOI (Crossref)')
+                                    ->state(fn (Book $record) => Fees::summary($record))
+                                    ->helperText('Estimado pela tabela da Crossref; cobrado em fatura trimestral.')
+                                    ->visible(fn (Book $record) => $record->registersDoi()),
                                 TextEntry::make('approver.name')->label('Aprovado por')->placeholder('—'),
                                 TextEntry::make('approved_at')->label('Aprovado em')->dateTime('d/m/Y H:i')->placeholder('—'),
                                 TextEntry::make('published_at')->label('Publicado em')->dateTime('d/m/Y H:i')->placeholder('—'),

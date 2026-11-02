@@ -3,16 +3,19 @@
 namespace Tests\Feature;
 
 use App\Crossref\BookDeposits;
+use App\Crossref\Fees;
 use App\Editorial\BookWorkflow;
 use App\Editorial\Documents\SheetGenerator;
 use App\Editorial\EditorialException;
 use App\Editorial\WordPress\Payload;
 use App\Filament\Resources\Products\Pages\EditProduct;
 use App\Models\Book;
+use App\Models\Document;
 use App\Models\Product;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 use Tests\Support\MakesEditorialFixtures;
 use Tests\TestCase;
@@ -58,6 +61,46 @@ class ProductOnlyBookTest extends TestCase
         $this->expectExceptionMessage('sem DOI');
 
         BookDeposits::make()->register($book->fresh(), User::factory()->create(['role' => 'admin']));
+    }
+
+    public function test_crossref_fee_estimate_counts_only_new_records(): void
+    {
+        $book = $this->tratado();
+        $book->update(['publication_year' => (int) date('Y')]);
+        $chapters = $book->chapters()->count();
+
+        $e = Fees::estimate($book->fresh());
+        $this->assertSame(1, $e['book']);
+        $this->assertSame($chapters, $e['chapters']);
+        $this->assertEqualsWithDelta(1.00 + 0.25 * $chapters, $e['total'], 0.001);
+        $this->assertStringContainsString('US$ 1,00 (livro)', Fees::summary($book->fresh()));
+
+        // obra antiga: tarifa "back-year"; atualização de DOI registrado: grátis
+        $book->update(['publication_year' => (int) date('Y') - 5]);
+        $this->assertEqualsWithDelta(0.15 * ($chapters + 1), Fees::estimate($book->fresh())['total'], 0.001);
+
+        $book->forceFill(['doi_status' => 'registered'])->saveQuietly();
+        $book->chapters()->update(['doi_status' => 'registered']);
+        $this->assertSame(0.0, Fees::estimate($book->fresh())['total']);
+    }
+
+    public function test_sheet_without_the_cover_is_generated_again_next_time(): void
+    {
+        config(['hub.wordpress.url' => 'https://conexaoeditora.test']);
+        Http::fake(['conexaoeditora.test/*' => Http::sequence()->push('erro', 500)->push(base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAwS2OUAAAAABJRU5ErkJggg=='), 200, ['Content-Type' => 'image/png'])]);
+
+        $book = $this->tratado();
+        $book->update(['cover_url' => 'https://conexaoeditora.test/capa.png']);
+        $generator = app(SheetGenerator::class);
+
+        $first = $generator->forBook($book->fresh());
+        $this->assertNotSame(SheetGenerator::hashOf($generator->bookData($book->fresh(), Payload::forBook($book->fresh()))), $first->hash);
+
+        // a capa voltou a responder: sem --forcar, a ficha é refeita
+        $second = $generator->forBook($book->fresh());
+        $this->assertTrue($second->generated_at->gte($first->generated_at));
+        $this->assertSame(SheetGenerator::hashOf($generator->bookData($book->fresh(), Payload::forBook($book->fresh()))), $second->hash);
+        $this->assertSame(1, Document::where('type', Document::BOOK_SHEET)->count());
     }
 
     public function test_product_page_creates_the_book_without_doi(): void
