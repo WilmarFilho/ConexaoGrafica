@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Conexão Biblioteca
  * Description: Livros digitais da Conexão Editora: arquivo protegido (PDF ou flipbook legado), leitura só para quem comprou e a biblioteca do leitor na conta.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Conexão Pro
  * Requires PHP: 8.1
  * Text Domain: conexao-biblioteca
@@ -12,7 +12,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('CONEXAO_BIBLIOTECA_VERSAO', '1.0.1');
+define('CONEXAO_BIBLIOTECA_VERSAO', '1.0.2');
 define('CONEXAO_BIBLIOTECA_PASTA', __DIR__);
 define('CONEXAO_BIBLIOTECA_URL', plugin_dir_url(__FILE__));
 

@@ -9,6 +9,10 @@
   position: relative;
   min-height: 0;
   overflow: hidden;
+  /* as páginas do StPageFlip têm z-index de até o número de páginas: ficam
+     presas aqui dentro, sem passar por cima da gaveta do sumário */
+  isolation: isolate;
+  z-index: 0;
 }
 
 .livro__paginas {
@@ -117,14 +121,14 @@
   position: absolute;
   top: 0;
   left: 0;
-  bottom: 0;
+  bottom: 58px; /* acima da barra de controles */
   width: min(360px, 90%);
   overflow: auto;
   padding: 16px;
   background: rgba(11, 79, 115, .97);
   color: #fff;
   box-shadow: 8px 0 24px rgba(0, 0, 0, .3);
-  z-index: 3;
+  z-index: 10;
 }
 
 .livro__gaveta h2 {
