@@ -1223,6 +1223,11 @@ a.doi-autores-linha__nome:hover {
   gap: 14px;
 }
 
+/* Mesmo caso do .doi-oferta: sem isto as cinco citações aparecem uma embaixo da outra. */
+.doi-citacoes__painel[hidden] {
+  display: none;
+}
+
 .doi-citacoes__texto {
   margin: 0;
   font-size: 13.5px;
