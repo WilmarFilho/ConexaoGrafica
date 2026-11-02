@@ -3,13 +3,17 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Filament\Resources\Books\BookResource;
+use App\Filament\Resources\Imports\ImportResource;
 use App\Models\Book;
 use App\Models\Product;
+use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -78,14 +82,14 @@ class ProductForm
                                     ->helperText('Vazio: usa o % do vendedor.'),
                             ]),
 
-                        Section::make('Livro DOI')
+                        Section::make('Sumário, capítulos e DOI')
                             ->schema([
                                 TextEntry::make('doi_book_title')
                                     ->label('Livro')
                                     ->state(fn (?Product $record) => $record?->doiBook()?->title)
                                     ->url(fn (?Product $record) => ($book = $record?->doiBook()) && BookResource::canView($book) ? BookResource::getUrl('view', ['record' => $book]) : null)
                                     ->color('primary')
-                                    ->placeholder('Nenhum livro DOI ligado a este produto. O vínculo é feito no cadastro do livro, campo "Produto do catálogo do Hub".'),
+                                    ->placeholder('Este produto ainda não tem sumário nem capítulos no Hub.'),
                                 TextEntry::make('doi_book_doi')
                                     ->label('DOI')
                                     ->state(fn (?Product $record) => $record?->doiBook()?->doi)
@@ -104,6 +108,36 @@ class ProductForm
                                     ->badge()
                                     ->color(fn (?Product $record) => Book::statusColor($record?->doiBook()?->status))
                                     ->visible(fn (?Product $record) => (bool) $record?->doiBook()),
+
+                                Actions::make([
+                                    // livro que é só produto: cria a ficha do livro sem DOI, ligada a este produto
+                                    Action::make('cadastrar_livro')
+                                        ->label('Cadastrar sumário e capítulos')
+                                        ->icon('heroicon-o-book-open')
+                                        ->visible(fn (?Product $record) => $record && ! $record->doiBook() && BookResource::canCreate())
+                                        ->requiresConfirmation()
+                                        ->modalHeading('Cadastrar o livro deste produto?')
+                                        ->modalDescription('O Hub cria o livro sem DOI, ligado a este produto, para você preencher resumo, sumário e capítulos (à mão ou importando o PDF). Dá para ativar o DOI depois, no próprio livro.')
+                                        ->modalSubmitActionLabel('Cadastrar')
+                                        ->action(function (Product $record, $livewire) {
+                                            $book = Book::createForProduct($record);
+
+                                            Notification::make()->title('Livro cadastrado sem DOI')->body('Preencha os dados ou importe o PDF do livro.')->success()->send();
+                                            $livewire->redirect(BookResource::getUrl('edit', ['record' => $book]));
+                                        }),
+                                    Action::make('importar_pdf')
+                                        ->label('Importar sumário e capítulos do PDF')
+                                        ->icon('heroicon-o-document-arrow-up')
+                                        ->color('gray')
+                                        ->visible(fn (?Product $record) => (bool) $record?->doiBook() && ImportResource::canCreate())
+                                        ->url(fn (Product $record) => ImportResource::getUrl('create').'?book='.$record->doiBook()->id),
+                                    Action::make('editar_livro')
+                                        ->label('Editar sumário e capítulos')
+                                        ->icon('heroicon-o-pencil-square')
+                                        ->color('gray')
+                                        ->visible(fn (?Product $record) => ($book = $record?->doiBook()) && BookResource::canEdit($book))
+                                        ->url(fn (Product $record) => BookResource::getUrl('edit', ['record' => $record->doiBook()])),
+                                ]),
                             ])
                             ->hiddenOn('create'),
 

@@ -34,7 +34,7 @@ class DepositActions
                 ->label(fn (Book $record) => $record->doi_status === 'registered' ? 'Atualizar DOI na Crossref' : 'Registrar DOI')
                 ->icon(Heroicon::OutlinedCloudArrowUp)
                 ->color(fn () => self::isProduction() ? 'danger' : 'primary')
-                ->visible(fn (Book $record) => $canDeposit() && $record->isPublished())
+                ->visible(fn (Book $record) => $canDeposit() && $record->isPublished() && $record->registersDoi())
                 ->requiresConfirmation()
                 ->modalIcon(Heroicon::OutlinedCloudArrowUp)
                 ->modalHeading(fn (Book $record) => ($record->doi_status === 'registered' ? 'Atualizar o registro na Crossref?' : 'Registrar DOI na Crossref?'))

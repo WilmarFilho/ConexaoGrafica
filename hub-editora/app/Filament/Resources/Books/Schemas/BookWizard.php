@@ -147,11 +147,21 @@ class BookWizard
                     ])
                     ->columnSpanFull(),
 
+                Toggle::make('registers_doi')->label('Registrar DOI na Crossref')
+                    ->default(true)
+                    ->live()
+                    ->disabled(fn (?Book $record) => $record && $record->doi_status !== 'none')
+                    ->dehydrated()
+                    ->helperText('Desligue para o livro que é só produto da loja: o Hub guarda sumário, capítulos e ficha e publica a página no site, sem DOI.')
+                    ->columnSpanFull(),
+
                 TextInput::make('doi_prefix')->label('Prefixo DOI atribuído à editora')
+                    ->visible(fn (Get $get) => (bool) $get('registers_doi'))
                     ->default(fn () => DoiSuffix::prefix())
                     ->disabled()->dehydrated()
                     ->extraInputAttributes(['class' => 'hub-mono']),
                 TextInput::make('doi_suffix')->label('Sufixo DOI do livro')
+                    ->visible(fn (Get $get) => (bool) $get('registers_doi'))
                     ->required()->maxLength(60)
                     ->regex(DoiSuffix::PATTERN)
                     ->validationMessages(['regex' => 'Use só letras minúsculas, números, ponto, hífen e sublinhado.'])
@@ -180,13 +190,14 @@ class BookWizard
                     ->helperText('Sugerido pelo sistema: conexao.{ano}.{NNN}. Editável só enquanto rascunho; depois de validado não muda.'),
 
                 Placeholder::make('doi_preview')->label('Prévia do DOI')
+                    ->visible(fn (Get $get) => (bool) $get('registers_doi'))
                     ->content(fn (Get $get, ?Book $record) => new HtmlString(
                         '<span class="hub-mono">'.e(($record?->doi_prefix ?: DoiSuffix::prefix()).'/'.($get('doi_suffix') ?: '…')).'</span>'
                     )),
 
                 Text::make('O prefixo '.DoiSuffix::DEFAULT_PREFIX.' é demonstrativo e não representa um prefixo real. Configure o prefixo oficial da editora (CROSSREF_PREFIX) antes de um depósito em produção. O DOI só é considerado registrado depois da confirmação da Crossref.')
                     ->color('warning')
-                    ->visible(fn (?Book $record) => DoiSuffix::isDemoPrefix($record?->doi_prefix ?: null)),
+                    ->visible(fn (Get $get, ?Book $record) => $get('registers_doi') && DoiSuffix::isDemoPrefix($record?->doi_prefix ?: null)),
 
                 Actions::make([
                     Action::make('verificar')
@@ -225,7 +236,9 @@ class BookWizard
 
         $prefix = $record?->doi_prefix ?: DoiSuffix::prefix();
         $suffix = strtolower((string) $get('doi_suffix'));
-        if (! DoiSuffix::isWellFormed($suffix)) {
+        if (! $get('registers_doi')) {
+            // livro só produto: sem DOI para conferir
+        } elseif (! DoiSuffix::isWellFormed($suffix)) {
             $problems[] = 'Sufixo DOI mal formado.';
         } elseif (! DoiSuffix::isAvailable($prefix, $suffix, $record)) {
             $problems[] = 'Sufixo DOI já usado por outro livro ou capítulo.';

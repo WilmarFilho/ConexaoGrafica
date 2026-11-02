@@ -105,6 +105,10 @@ class Chapter extends Model
     /** `{prefixo do livro}/{sufixo do capítulo}`. */
     public function getDoiAttribute(): string
     {
+        if ($this->book && ! $this->book->registersDoi()) {
+            return '';
+        }
+
         return ($this->book?->doi_prefix ?? DoiSuffix::prefix()).'/'.$this->doi_suffix;
     }
 

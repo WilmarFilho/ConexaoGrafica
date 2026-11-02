@@ -210,7 +210,7 @@ class SheetGenerator
     private function viewData(array $data): array
     {
         return $data + [
-            'qr' => $this->qrDataUri($data['qr_url']),
+            'qr' => filled($data['qr_url'] ?? null) ? $this->qrDataUri($data['qr_url']) : '',
             'generated_at' => now(),
             'template_version' => self::TEMPLATE_VERSION,
             'logo' => self::fileDataUri(resource_path('images/logo-conexao-editora.png')),

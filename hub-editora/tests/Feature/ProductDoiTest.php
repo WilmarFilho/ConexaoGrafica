@@ -76,13 +76,14 @@ class ProductDoiTest extends TestCase
         $this->admin();
 
         Livewire::test(EditProduct::class, ['record' => $registrado->getRouteKey()])
-            ->assertSee('Livro DOI')
+            ->assertSee('Sumário, capítulos e DOI')
             ->assertSee('Livro com DOI')
             ->assertSee($registrado->doiBook()->doi)
             ->assertSee('Registrado');
 
         Livewire::test(EditProduct::class, ['record' => $sem->getRouteKey()])
-            ->assertSee('Nenhum livro DOI ligado a este produto');
+            ->assertSee('Este produto ainda não tem sumário nem capítulos no Hub.')
+            ->assertSee('Cadastrar sumário e capítulos');
     }
 
     public function test_book_product_selector_lists_only_the_site_store_and_keeps_the_saved_value(): void

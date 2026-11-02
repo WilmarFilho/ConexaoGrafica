@@ -79,13 +79,13 @@
     <h2>Informações bibliográficas</h2>
 
     <table class="doirow"><tr>
-        <td><span class="doirow-label">DOI do capítulo</span><span class="doirow-value">{{ $chapter['doi'] }}</span></td>
+        <td><span class="doirow-label">DOI do capítulo</span><span class="doirow-value">{{ filled($chapter['doi'] ?? null) ? $chapter['doi'] : 'Não se aplica' }}</span></td>
         <td><span class="doirow-label">Páginas</span><span class="doirow-value">{{ $chapter['first_page'] }}–{{ $chapter['last_page'] }}</span></td>
     </tr></table>
 
     <div class="doibox">
         <span class="doibox-label">Publicado em</span>
-        <p class="pubtext">{{ $book['title'] }}@if (filled($book['subtitle'] ?? null)): {{ $book['subtitle'] }}@endif · DOI do livro <a href="https://doi.org/{{ $book['doi'] }}">{{ $book['doi'] }}</a></p>
+        <p class="pubtext">{{ $book['title'] }}@if (filled($book['subtitle'] ?? null)): {{ $book['subtitle'] }}@endif @if (filled($book['doi'] ?? null))· DOI do livro <a href="https://doi.org/{{ $book['doi'] }}">{{ $book['doi'] }}</a>@endif</p>
     </div>
 
     <div class="section">

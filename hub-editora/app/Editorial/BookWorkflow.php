@@ -53,9 +53,12 @@ class BookWorkflow
         $add('isbn', 'ISBN-13', $isbns !== [] && $invalid === [], 'review',
             $isbns === [] ? 'Informe ao menos um ISBN.' : ($invalid ? 'Inválido: '.implode(', ', $invalid) : null));
 
-        $doiOk = filled($book->doi_prefix) && DoiSuffix::isWellFormed($book->doi_suffix)
-            && DoiSuffix::isAvailable($book->doi_prefix, $book->doi_suffix, $book);
-        $add('doi', 'Prefixo e sufixo DOI', $doiOk, 'review', $doiOk ? $book->doi : 'Sufixo inválido ou já usado.');
+        // livro que é só produto da loja: sem DOI, nada a conferir aqui
+        if ($book->registersDoi()) {
+            $doiOk = filled($book->doi_prefix) && DoiSuffix::isWellFormed($book->doi_suffix)
+                && DoiSuffix::isAvailable($book->doi_prefix, $book->doi_suffix, $book);
+            $add('doi', 'Prefixo e sufixo DOI', $doiOk, 'review', $doiOk ? $book->doi : 'Sufixo inválido ou já usado.');
+        }
 
         $unpublishable = $book->contributions->reject(fn (Contribution $c) => $c->isPublishable());
         $add('contributors', 'Organizadores/autores com ORCID ou instituição',
@@ -108,7 +111,7 @@ class BookWorkflow
         } elseif ($chapter->contributions->contains(fn (Contribution $c) => ! $c->isPublishable())) {
             $issues[] = 'autor sem ORCID nem instituição';
         }
-        if (! DoiSuffix::isWellFormed($chapter->doi_suffix)) {
+        if ($chapter->book?->registersDoi() !== false && ! DoiSuffix::isWellFormed($chapter->doi_suffix)) {
             $issues[] = 'sufixo DOI';
         }
 

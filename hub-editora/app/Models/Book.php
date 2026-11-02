@@ -6,6 +6,7 @@ use App\Editorial\DoiSuffix;
 use App\Editorial\EditorialException;
 use App\Editorial\Keywords;
 use App\Editorial\Slug;
+use App\Rules\Isbn13;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -97,6 +98,7 @@ class Book extends Model
             'approved_at' => 'datetime',
             'published_at' => 'datetime',
             'wp_post_id' => 'integer',
+            'registers_doi' => 'boolean',
         ];
     }
 
@@ -168,15 +170,38 @@ class Book extends Model
 
     // ---- Atributos derivados ----------------------------------------------
 
-    /** `{doi_prefix}/{doi_suffix}` — único. */
+    /** `{doi_prefix}/{doi_suffix}` — único. Vazio no livro que é só produto (sem DOI). */
     public function getDoiAttribute(): string
     {
-        return "{$this->doi_prefix}/{$this->doi_suffix}";
+        return $this->registersDoi() ? "{$this->doi_prefix}/{$this->doi_suffix}" : '';
     }
 
     public function getDoiUrlAttribute(): string
     {
-        return 'https://doi.org/'.$this->doi;
+        return $this->doi !== '' ? 'https://doi.org/'.$this->doi : '';
+    }
+
+    /**
+     * Livro sem DOI a partir de um produto da loja ("Cadastrar sumário e
+     * capítulos" na página do produto): título limpo, ISBN e o vínculo.
+     */
+    public static function createForProduct(Product $product): self
+    {
+        return self::create([
+            'title' => Product::cleanTitle($product->name),
+            'product_id' => $product->id,
+            'registers_doi' => false,
+            'isbn_print' => filled($product->isbn) && Isbn13::isValid((string) $product->isbn) ? $product->isbn : null,
+            'publication_year' => (int) date('Y'),
+            'subject_area' => '',
+            'abstract' => '',
+        ]);
+    }
+
+    /** O livro vai para a Crossref? Falso no livro que é só produto da loja. */
+    public function registersDoi(): bool
+    {
+        return $this->registers_doi !== false;
     }
 
     public function statusLabel(): string

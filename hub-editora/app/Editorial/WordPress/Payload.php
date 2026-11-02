@@ -86,7 +86,7 @@ class Payload
             'first_page' => (int) $c->first_page,
             'last_page' => (int) $c->last_page,
             'publication_date' => ($c->publication_date ?? $book->publication_date)?->format('Y-m-d'),
-            'doi' => $book->doi_prefix.'/'.$c->doi_suffix,
+            'doi' => $book->registersDoi() ? $book->doi_prefix.'/'.$c->doi_suffix : '',
             'abstract' => $c->abstract_approved,
             'keywords' => self::strings($c->keywords),
             // Sem licença própria, as do livro (`licenses_inherited` diz qual foi o caso).

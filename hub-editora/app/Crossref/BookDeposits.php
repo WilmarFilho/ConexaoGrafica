@@ -52,6 +52,10 @@ class BookDeposits
             throw new EditorialException('Seu perfil não registra DOI na Crossref.');
         }
 
+        if (! $book->registersDoi()) {
+            throw new EditorialException('Este livro está cadastrado sem DOI (só produto da loja).');
+        }
+
         self::assertRegistrable($book);
 
         try {
