@@ -9,14 +9,15 @@ use App\Models\Chapter;
 use App\Models\Document;
 use App\Models\SyncLog;
 use BaconQrCode\Renderer\Color\Rgb;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\Fill;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Closure;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
@@ -34,7 +35,10 @@ use Illuminate\Support\Str;
 class SheetGenerator
 {
     /** Mude ao alterar o layout: força a regeneração de todas as fichas. */
-    public const TEMPLATE_VERSION = '1.1';
+    public const TEMPLATE_VERSION = '2.0';
+
+    /** Capa maior que isso não entra na ficha (o PDF ficaria pesado demais). */
+    private const MAX_COVER_BYTES = 6 * 1024 * 1024;
 
     public const DIR = 'documents';
 
@@ -112,6 +116,7 @@ class SheetGenerator
             'landing_url' => $book->landing_url,
             'qr_url' => $book->landing_url ?: $book->doi_url,
             'organizers_label' => $book->type === 'edited_book' ? 'Organizadores' : 'Autores',
+            'cover_url' => $book->cover_url,
         ];
     }
 
@@ -155,6 +160,7 @@ class SheetGenerator
             'book_landing_url' => $chapter->book->landing_url,
             'qr_url' => $chapter->landing_url ?: ('https://doi.org/'.$c['doi']),
             'organizers_label' => $chapter->book->type === 'edited_book' ? 'Organizadores' : 'Autores',
+            'cover_url' => $chapter->book->cover_url,
         ];
     }
 
@@ -207,7 +213,50 @@ class SheetGenerator
             'qr' => $this->qrDataUri($data['qr_url']),
             'generated_at' => now(),
             'template_version' => self::TEMPLATE_VERSION,
+            'logo' => self::fileDataUri(resource_path('images/logo-conexao-editora.png')),
+            'cover' => $this->coverDataUri($data['cover_url'] ?? null),
         ];
+    }
+
+    /** Imagem local como data URI (o dompdf roda sem acesso remoto). */
+    private static function fileDataUri(string $path): ?string
+    {
+        if (! is_file($path)) {
+            return null;
+        }
+        $mime = (string) (mime_content_type($path) ?: 'image/png');
+
+        return 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($path));
+    }
+
+    /**
+     * Capa do produto da loja, baixada e embutida. Só imagens do próprio site;
+     * sem capa (ou com falha na rede) a faixa do topo sai sem ela.
+     */
+    public function coverDataUri(?string $url): ?string
+    {
+        if (blank($url) || ! str_starts_with((string) $url, 'https://')) {
+            return null;
+        }
+
+        $site = (string) parse_url((string) config('hub.wordpress.url'), PHP_URL_HOST);
+        $host = (string) parse_url((string) $url, PHP_URL_HOST);
+        if ($site === '' || ($host !== $site && ! str_ends_with($host, '.'.$site))) {
+            return null;
+        }
+
+        try {
+            $response = Http::timeout(15)->get($url);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        $mime = strtolower(trim(explode(';', (string) $response->header('Content-Type'))[0]));
+        if (! $response->successful() || ! in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true) || strlen($response->body()) > self::MAX_COVER_BYTES) {
+            return null;
+        }
+
+        return 'data:'.$mime.';base64,'.base64_encode($response->body());
     }
 
     /** QR Code em SVG embutido (sem Imagick; o dompdf lê SVG). */
@@ -239,17 +288,23 @@ class SheetGenerator
         $options->setIsHtml5ParserEnabled(true);
         $options->setFontCache($cache);
         $options->setTempDir($cache);
-        $options->setChroot(storage_path());
+        // as fontes Nunito ficam em resources/fonts; o resto do disco continua fora de alcance
+        $options->setChroot([storage_path(), resource_path('fonts')]);
 
         $dompdf = new Dompdf($options);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->render();
 
-        // Rodapé com numeração em todas as páginas (o CSS do dompdf não conta páginas).
+        // "01 / 05" à direita do rodapé, em azul (o CSS do dompdf não conta páginas).
         $canvas = $dompdf->getCanvas();
-        $font = $dompdf->getFontMetrics()->getFont('DejaVu Sans');
-        $canvas->page_text(268, 824, 'Página {PAGE_NUM} de {PAGE_COUNT}', $font, 7, [0.45, 0.47, 0.52]);
+        $canvas->page_script(function (int $page, int $total, $canvas, $metrics) {
+            $font = $metrics->getFont('Nunito Black') ?? $metrics->getFont('DejaVu Sans', 'bold');
+            $text = sprintf('%02d / %02d', $page, $total);
+            $width = $metrics->getTextWidth($text, $font, 7);
+            // A4 = 595.28 x 841.89 pt; margem lateral de 18 mm (51 pt); na altura do texto do rodapé, abaixo da linha
+            $canvas->text(595.28 - 51 - $width, 841.89 - 62.4 + 8 + 2 + 11, $text, $font, 7, [0.004, 0.592, 0.831]);
+        });
 
         return (string) $dompdf->output();
     }

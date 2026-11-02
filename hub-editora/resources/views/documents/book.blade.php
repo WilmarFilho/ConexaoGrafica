@@ -1,161 +1,160 @@
-{{-- Ficha científica do livro: capa + identificação, resumo, sumário, como citar, QR. --}}
+{{-- Ficha editorial do livro (layout do Diego): resumo, sumário, dados bibliográficos, referências e direitos autorais. --}}
 @php
     $organizers = collect($book['contributors'])->filter(fn ($c) => $c['role'] === ($book['type'] === 'edited_book' ? 'editor' : 'author'));
     if ($organizers->isEmpty()) { $organizers = collect($book['contributors']); }
-    $formats = ['print' => 'Impresso', 'ebook' => 'E-book', 'both' => 'Impresso e e-book'];
-    $types = ['edited_book' => 'Livro organizado', 'monograph' => 'Monografia', 'reference' => 'Obra de referência', 'other' => 'Livro'];
-    $languages = ['pt' => 'Português', 'en' => 'Inglês', 'es' => 'Espanhol', 'fr' => 'Francês', 'it' => 'Italiano', 'de' => 'Alemão'];
+    $names = $organizers->pluck('name')->implode(', ');
+    $label = $organizers->count() > 1 ? ($book['type'] === 'edited_book' ? 'Organizadores' : 'Autores') : ($book['type'] === 'edited_book' ? 'Organizador' : 'Autor');
+    $languages = ['pt' => 'Português (Brasil)'] + \App\Models\Book::LANGUAGES;
+    $area = trim(($book['subject_area'] ?? '').(filled($book['subject_subarea'] ?? null) ? ' / '.$book['subject_subarea'] : ''));
     $bySection = collect($chapters)->groupBy(fn ($c) => (string) ($c['section'] ?? ''));
-    $commercial = collect($book['commercial'])->filter(fn ($l) => $l['enabled']);
+    $licenses = $book['licenses'] ?? [];
 @endphp
-@extends('documents.layout', [
-    'title' => 'Ficha científica — '.$book['title'],
-    'kind_label' => 'Ficha do livro',
-    'doi_line' => 'DOI '.$book['doi'],
-])
+@extends('documents.layout', ['title' => $book['title'].' — ficha editorial do livro', 'footer' => 'Ficha editorial do livro'])
 
 @section('content')
-<div class="cover">
-    <div class="title-block">
-        <span class="tag">{{ $types[$book['type']] ?? 'Livro' }}</span>
-        <h1 style="margin-top: 10pt;">{{ $book['title'] }}</h1>
-        @if ($book['subtitle'])
-            <p class="subtitle">{{ $book['subtitle'] }}</p>
+{{-- 01 · resumo --}}
+<div class="page">
+    @include('documents.partials.top', ['mark' => 'Livro completo · Resumo'])
+    <div class="eyebrow">Publicação{{ $area !== '' ? ' · '.$area : '' }}</div>
+
+    <table class="hero"><tr>
+        <td>
+            <div class="hero-little">Livro · {{ $book['publisher'] ?: 'Conexão Editora' }}</div>
+            <div class="hero-title">{{ $book['title'] }}</div>
+            @if (filled($book['subtitle'] ?? null))
+                <div class="hero-subtitle">{{ $book['subtitle'] }}</div>
+            @endif
+            @if ($names !== '')
+                <div class="hero-people">{{ $label }}: {{ $names }}</div>
+            @endif
+        </td>
+        @if ($cover)
+            <td class="capa"><img class="cover" src="{{ $cover }}" alt=""></td>
         @endif
-        @if ($book['alt_title'])
-            <p class="alt-title">{{ $book['alt_title'] }}</p>
-        @endif
+    </tr></table>
+
+    <div class="section">
+        <div class="section-title">Resumo do livro</div>
+        <div class="bodytext">
+            @foreach (preg_split('/\n\s*\n/', trim((string) ($book['abstract'] ?? ''))) as $paragraph)
+                @if (trim($paragraph) !== '')<p>{{ trim($paragraph) }}</p>@endif
+            @endforeach
+        </div>
     </div>
 
-    @if ($organizers->isNotEmpty())
-        <div class="people">
-            <div class="label">{{ $organizers_label }}</div>
-            <div class="names">{{ $organizers->pluck('name')->implode(' · ') }}</div>
+    @if ($book['keywords'])
+        <div class="section">
+            <div class="section-title">Palavras-chave</div>
+            <div>@foreach ($book['keywords'] as $kw)<span class="chip">{{ $kw }}</span>@endforeach</div>
         </div>
     @endif
-
-    <div class="publisher">
-        {{ $book['publisher'] }} · {{ $book['publication_place'] }} · {{ $book['publication_year'] }}
-        @if ($book['edition_number'] && $book['edition_number'] > 1)
-            · {{ $book['edition_number'] }}ª edição
-        @endif
-        @if ($book['series'])
-            <br><span class="muted small">{{ $book['series']['title'] }}@if ($book['series']['issn']) · ISSN {{ $book['series']['issn'] }}@endif @if ($book['volume']) · v. {{ $book['volume'] }}@endif</span>
-        @endif
-    </div>
-
-    <table class="bottom" style="width: 100%; border-collapse: collapse;">
-        <tr>
-            <td style="vertical-align: bottom; padding: 0;">
-                <div class="muted small">DOI</div>
-                <div class="mono"><a href="https://doi.org/{{ $book['doi'] }}">https://doi.org/{{ $book['doi'] }}</a></div>
-                @if ($book['isbn_print'])<div class="muted small" style="margin-top: 5pt;">ISBN (impresso) <span class="mono">{{ $book['isbn_print'] }}</span></div>@endif
-                @if ($book['isbn_ebook'])<div class="muted small">ISBN (e-book) <span class="mono">{{ $book['isbn_ebook'] }}</span></div>@endif
-            </td>
-            <td style="width: 110pt; text-align: right; vertical-align: bottom; padding: 0;">
-                <div class="qr-box">
-                    <img src="{{ $qr }}" alt="QR Code">
-                    <div class="url">Página permanente<br>{{ $qr_url }}</div>
-                </div>
-            </td>
-        </tr>
-    </table>
 </div>
 
-<h2>Identificação</h2>
-<table class="meta">
-    <tr><td class="k">Título</td><td>{{ $book['title'] }}@if ($book['subtitle']): {{ $book['subtitle'] }}@endif</td></tr>
-    @if ($organizers->isNotEmpty())
-        <tr><td class="k">{{ $organizers_label }}</td><td>
-            @foreach ($organizers as $o)
-                {{ $o['name'] }}@if (! empty($o['affiliation']['name'])) <span class="muted small">— {{ $o['affiliation']['name'] }}</span>@endif @if ($o['orcid']) <span class="small mono muted">ORCID {{ $o['orcid'] }}</span>@endif<br>
+{{-- 02 · sumário --}}
+<div class="page">
+    @include('documents.partials.top', ['mark' => 'Livro completo · Sumário'])
+    <div class="eyebrow">Capítulos do livro</div>
+    <h2>Sumário do livro</h2>
+    <p class="muted">Capítulos apresentados na página editorial do livro.</p>
+
+    <div class="section">
+        <table class="toc">
+            @foreach ($bySection as $section => $list)
+                @if ($section !== '')
+                    <tr><td colspan="2" class="toc-section">{{ $section }}</td></tr>
+                @endif
+                @foreach ($list as $c)
+                    @php($people = collect($c['contributors'])->pluck('name')->implode(', '))
+                    <tr>
+                        <td class="n"><span class="pnum">{{ str_pad((string) ($c['number'] ?: $c['sequence']), 2, '0', STR_PAD_LEFT) }}</span></td>
+                        <td>
+                            <span class="toc-title">{{ $c['title'] }}@if (filled($c['subtitle'] ?? null)): {{ $c['subtitle'] }}@endif</span>
+                            <span class="toc-small">
+                                @if ($people !== '')Autores: {{ $people }}@endif
+                                @if ($c['first_page'])@if ($people !== '') · @endif p. {{ $c['first_page'] }}–{{ $c['last_page'] }}@endif
+                                @if (filled($c['doi'] ?? null)) · DOI {{ $c['doi'] }}@endif
+                            </span>
+                        </td>
+                    </tr>
+                @endforeach
             @endforeach
-        </td></tr>
-    @endif
-    <tr><td class="k">DOI</td><td class="mono"><a href="https://doi.org/{{ $book['doi'] }}">https://doi.org/{{ $book['doi'] }}</a></td></tr>
-    @if ($book['isbn_print'])<tr><td class="k">ISBN (impresso)</td><td class="mono">{{ $book['isbn_print'] }}</td></tr>@endif
-    @if ($book['isbn_ebook'])<tr><td class="k">ISBN (e-book)</td><td class="mono">{{ $book['isbn_ebook'] }}</td></tr>@endif
-    <tr><td class="k">Editora</td><td>{{ $book['publisher'] }}, {{ $book['publication_place'] }}</td></tr>
-    <tr><td class="k">Publicação</td><td>{{ $book['publication_year'] }}@if ($book['publication_date']) ({{ \Carbon\Carbon::parse($book['publication_date'])->format('d/m/Y') }})@endif @if ($book['edition_number']) · {{ $book['edition_number'] }}ª edição @endif</td></tr>
-    @if ($book['pages'])<tr><td class="k">Páginas</td><td>{{ $book['pages'] }}</td></tr>@endif
-    <tr><td class="k">Formato</td><td>{{ $formats[$book['format']] ?? $book['format'] }}</td></tr>
-    <tr><td class="k">Idioma</td><td>{{ $languages[$book['language']] ?? $book['language'] }}</td></tr>
-    <tr><td class="k">Área</td><td>{{ $book['subject_area'] }}@if ($book['subject_subarea']) · {{ $book['subject_subarea'] }}@endif</td></tr>
-    @if ($book['audience'])<tr><td class="k">Público</td><td>{{ $book['audience'] }}</td></tr>@endif
-    @if ($landing_url)<tr><td class="k">Página permanente</td><td><a href="{{ $landing_url }}">{{ $landing_url }}</a></td></tr>@endif
-</table>
-
-@if ($book['abstract'])
-    <div class="avoid-break">
-        <h2>Resumo</h2>
-        <p class="lead">{{ $book['abstract'] }}</p>
-    </div>
-@endif
-@if ($book['synopsis'])
-    <h3>Sinopse</h3>
-    <p>{{ $book['synopsis'] }}</p>
-@endif
-
-@if ($book['keywords'])
-    <div class="avoid-break">
-    <h2>Palavras-chave</h2>
-    <div>@foreach ($book['keywords'] as $kw)<span class="pill">{{ $kw }}</span>@endforeach</div>
-    @if ($book['keywords_en'])
-        <div class="muted small" style="margin-top: 3pt;">Keywords: {{ implode('; ', $book['keywords_en']) }}</div>
-    @endif
-    </div>
-@endif
-
-@if (count($chapters))
-    <h2>Sumário</h2>
-    <table class="toc">
-        <tr><th>Cap.</th><th>Título e autores</th><th style="text-align: right;">Páginas</th></tr>
-        @foreach ($bySection as $section => $list)
-            @if ($section !== '')
-                <tr class="section"><td colspan="3">{{ $section }}</td></tr>
-            @endif
-            @foreach ($list as $c)
-                <tr>
-                    <td class="n">{{ $c['number'] ?: $c['sequence'] }}</td>
-                    <td>
-                        {{ $c['title'] }}@if ($c['subtitle']): {{ $c['subtitle'] }}@endif
-                        <div class="toc-authors">{{ collect($c['contributors'])->pluck('name')->implode('; ') }} · DOI {{ $c['doi'] }}</div>
-                    </td>
-                    <td class="p">{{ $c['first_page'] }}–{{ $c['last_page'] }}</td>
-                </tr>
-            @endforeach
-        @endforeach
-    </table>
-@endif
-
-@include('documents.licenses', ['licenses' => $book['licenses'] ?? []])
-
-<h2>Como citar este livro</h2>
-@foreach (['abnt', 'apa', 'vancouver'] as $fmt)
-    <div class="cite">
-        <div class="fmt">{{ \App\Editorial\Citations::LABELS[$fmt] }}</div>
-        <div class="txt">{!! $book['citations_html'][$fmt] !!}</div>
-    </div>
-@endforeach
-
-@if ($commercial->isNotEmpty() || $landing_url)
-    <div class="box avoid-break" style="margin-top: 10pt;">
-        <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-                <td style="padding: 0; vertical-align: middle;">
-                    <h3 style="margin-top: 0;">Onde encontrar a obra</h3>
-                    @if ($commercial->isNotEmpty())
-                        <p class="small">Disponível em: {{ $commercial->pluck('label')->map(fn ($l) => str_replace('Comprar ', '', $l))->implode(' · ') }}.</p>
-                    @endif
-                    @if ($landing_url)
-                        <p class="small">Página do livro, com compra e capítulos: <a href="{{ $landing_url }}">{{ $landing_url }}</a></p>
-                    @endif
-                </td>
-                <td style="width: 100pt; text-align: right; padding: 0;">
-                    <div class="qr-box"><img src="{{ $qr }}" alt="QR Code"></div>
-                </td>
-            </tr>
         </table>
+    </div>
+</div>
+
+{{-- 03 · dados bibliográficos --}}
+<div class="page">
+    @include('documents.partials.top', ['mark' => 'Livro completo · Dados bibliográficos'])
+    <div class="eyebrow">Identificação da publicação</div>
+    <h2>Informações bibliográficas</h2>
+
+    <table class="doirow"><tr>
+        <td><span class="doirow-label">ISBN · Impresso</span><span class="doirow-value">{{ $book['isbn_print'] ?: 'Não se aplica' }}</span></td>
+        <td><span class="doirow-label">ISBN · E-book</span><span class="doirow-value">{{ $book['isbn_ebook'] ?: 'Não se aplica' }}</span></td>
+    </tr></table>
+
+    <div class="doibox">
+        <span class="doibox-label">DOI do livro</span>
+        @if (filled($book['doi'] ?? null))
+            <p class="pubtext"><a href="https://doi.org/{{ $book['doi'] }}">https://doi.org/{{ $book['doi'] }}</a></p>
+        @else
+            <p class="pubtext">Não informado no registro bibliográfico.</p>
+        @endif
+    </div>
+
+    <div class="section">
+        <table class="meta">
+            <tr><td class="k">Título</td><td>{{ $book['title'] }}</td></tr>
+            @if (filled($book['subtitle'] ?? null))<tr><td class="k">Subtítulo</td><td>{{ $book['subtitle'] }}</td></tr>@endif
+            @if ($names !== '')<tr><td class="k">{{ $label }}</td><td>{{ $names }}</td></tr>@endif
+            <tr><td class="k">Editora</td><td>{{ $book['publisher'] }}</td></tr>
+            <tr><td class="k">Ano de publicação</td><td>{{ $book['publication_year'] }}</td></tr>
+            @if (filled($book['edition_number'] ?? null))<tr><td class="k">Edição</td><td>{{ $book['edition_number'] }}ª edição</td></tr>@endif
+            @if (filled($book['pages'] ?? null))<tr><td class="k">Extensão</td><td>{{ $book['pages'] }} páginas</td></tr>@endif
+            @if (filled($book['format'] ?? null))<tr><td class="k">Formatos</td><td>{{ \App\Models\Book::FORMATS[$book['format']] ?? $book['format'] }}</td></tr>@endif
+            <tr><td class="k">Idioma</td><td>{{ $languages[$book['language']] ?? $book['language'] }}</td></tr>
+            @if ($area !== '')<tr><td class="k">Área</td><td>{{ $area }}</td></tr>@endif
+            @if (filled($book['audience'] ?? null))<tr><td class="k">Público-alvo</td><td>{{ $book['audience'] }}</td></tr>@endif
+        </table>
+    </div>
+</div>
+
+{{-- 04 · referências --}}
+<div class="page{{ $licenses ? '' : ' page-last' }}">
+    @include('documents.partials.top', ['mark' => 'Livro completo · Referências'])
+    <div class="eyebrow">Citação e direitos</div>
+    <h2>Referências</h2>
+    <p class="bodytext">A referência abaixo identifica o próprio livro e pode ser utilizada para citá-lo. A bibliografia interna consultada pelos autores não integra esta ficha editorial.</p>
+
+    <div class="section">
+        <div class="section-title">Como citar este livro · ABNT</div>
+        <div class="bibliogr">{!! $book['citations_html']['abnt'] !!}</div>
+    </div>
+    <div class="section">
+        <div class="section-title">Referência · APA</div>
+        <div class="bibliogr">{!! $book['citations_html']['apa'] !!}</div>
+    </div>
+    <div class="section">
+        <div class="section-title">Referência · Vancouver</div>
+        <div class="bibliogr">{!! $book['citations_html']['vancouver'] !!}</div>
+    </div>
+    <div class="section">
+        <div class="section-title">Publicação</div>
+        <p class="bodytext">{{ $book['publisher'] }}<br>{{ $book['publication_place'] }}, Brasil<br>Livro em {{ mb_strtolower($languages[$book['language']] ?? 'português') }}@if (filled($book['format'] ?? null)), {{ ['print' => 'disponível em formato impresso', 'ebook' => 'disponível em formato digital', 'both' => 'disponível em formatos impresso e digital'][$book['format']] ?? '' }}@endif.</p>
+    </div>
+    @if (filled($landing_url ?? null))
+        <div class="section">
+            <div class="section-title">Página do livro</div>
+            <p class="bodytext"><a href="{{ $landing_url }}">{{ $landing_url }}</a></p>
+        </div>
+    @endif
+</div>
+
+{{-- 05 · direitos autorais --}}
+@if ($licenses)
+    <div class="page page-last">
+        @include('documents.partials.top', ['mark' => 'Livro completo · Direitos autorais'])
+        @include('documents.licenses', ['licenses' => $licenses, 'subject' => 'Este livro está licenciado', 'lead' => 'Condições de atribuição, compartilhamento e reutilização do livro.'])
     </div>
 @endif
 @endsection

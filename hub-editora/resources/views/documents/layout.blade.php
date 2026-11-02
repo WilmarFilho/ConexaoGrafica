@@ -1,114 +1,107 @@
 {{--
-    Base das fichas científicas em PDF (dompdf). Template inicial, sóbrio e
-    institucional, nas cores dos mockups (navy/teal); o layout definitivo do
-    Diego entra trocando este arquivo e os dois filhos. Regras do dompdf:
-    nada de flex/grid, fontes DejaVu (acentos), tabelas para colunas.
+    Base das fichas em PDF (dompdf), no layout do Diego (conexao-livro.netlify.app):
+    páginas A4 com logo e marcador no topo, faixa azul-marinho com a capa, seções
+    com rótulo azul, cartões de licença e rodapé com a numeração "01 / 05".
+    Regras do dompdf: nada de flex/grid (tabelas fazem as colunas) e só pesos
+    normal/negrito por família, por isso a Nunito entra em três famílias.
 --}}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>{{ $title ?? 'Ficha científica' }}</title>
+<title>{{ $title ?? 'Ficha editorial' }}</title>
 <style>
-    @page { margin: 18mm 18mm 22mm 18mm; }
+    @font-face { font-family: "Nunito"; font-weight: normal; src: url("{{ resource_path('fonts/nunito-400.ttf') }}") format("truetype"); }
+    @font-face { font-family: "Nunito"; font-weight: bold; src: url("{{ resource_path('fonts/nunito-700.ttf') }}") format("truetype"); }
+    @font-face { font-family: "Nunito Semi"; font-weight: normal; src: url("{{ resource_path('fonts/nunito-600.ttf') }}") format("truetype"); }
+    @font-face { font-family: "Nunito Semi"; font-weight: bold; src: url("{{ resource_path('fonts/nunito-800.ttf') }}") format("truetype"); }
+    @font-face { font-family: "Nunito Black"; font-weight: normal; src: url("{{ resource_path('fonts/nunito-900.ttf') }}") format("truetype"); }
+    @font-face { font-family: "Nunito Black"; font-weight: bold; src: url("{{ resource_path('fonts/nunito-900.ttf') }}") format("truetype"); }
+
+    @page { margin: 16mm 18mm 22mm 18mm; }
     * { box-sizing: border-box; }
-    body { font-family: "DejaVu Sans", sans-serif; font-size: 9.5pt; line-height: 1.45; color: #1F2933; margin: 0; }
-    a { color: #0F8B8D; text-decoration: none; }
-    p { margin: 0 0 6pt 0; }
-    h1, h2, h3 { margin: 0; color: #0B2545; font-weight: bold; }
-    h1 { font-size: 20pt; line-height: 1.2; }
-    h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 0.6pt; border-bottom: 1.2pt solid #0F8B8D; padding-bottom: 3pt; margin: 16pt 0 8pt 0; }
-    h3 { font-size: 10pt; margin: 8pt 0 3pt 0; }
+    body { font-family: "Nunito", "DejaVu Sans", sans-serif; font-size: 12px; color: #182a3c; margin: 0; }
+    a { color: #0197D4; text-decoration: none; }
+    p { margin: 0; }
+    .preto { font-family: "Nunito Black", "DejaVu Sans", sans-serif; font-weight: normal; }
 
-    .band { background: #0B2545; color: #FFFFFF; padding: 9pt 12pt; margin-bottom: 14pt; }
-    .band table { width: 100%; border-collapse: collapse; }
-    .band td { padding: 0; vertical-align: middle; }
-    .brand { font-size: 12.5pt; font-weight: bold; letter-spacing: 1pt; }
-    .brand small { display: block; font-size: 7pt; letter-spacing: 2.5pt; font-weight: normal; color: #9FD3D3; }
-    .band .kind { text-align: right; font-size: 8pt; color: #CFE3E3; text-transform: uppercase; letter-spacing: 1pt; }
+    .page { page-break-after: always; }
+    .page-last { page-break-after: auto; }
 
-    .tag { display: inline-block; background: #0F8B8D; color: #FFFFFF; font-size: 7.5pt; padding: 1.5pt 6pt; border-radius: 3pt; text-transform: uppercase; letter-spacing: 0.8pt; }
-    .tag-light { background: #EEF4F7; color: #0B2545; }
-    .doi-tag { display: inline-block; background: #EEF4F7; color: #0B2545; font-size: 8pt; padding: 1.5pt 6pt; border-radius: 3pt; }
-    .muted { color: #6B7280; }
-    .small { font-size: 8pt; }
-    .mono { font-family: "DejaVu Sans Mono", monospace; font-size: 8.5pt; }
-    .subtitle { font-size: 12.5pt; color: #3F4E66; margin: 4pt 0 0 0; }
-    .alt-title { font-size: 9.5pt; color: #6B7280; font-style: italic; margin-top: 2pt; }
-    .lead { font-size: 10pt; }
+    /* topo: logo à esquerda, marcador à direita, linha embaixo */
+    table.top { width: 100%; border-collapse: collapse; border-bottom: 1px solid #dce9f0; }
+    table.top td { padding: 0 0 12px 0; vertical-align: middle; height: 45px; }
+    .logo { width: 145px; height: auto; display: block; }
+    .topmark { text-align: right; font-family: "Nunito"; font-weight: bold; font-size: 9px; letter-spacing: 1.1px; text-transform: uppercase; color: #677685; }
 
-    .pill { display: inline-block; background: #EEF4F7; color: #0B2545; border: 0.6pt solid #DCE3EA; padding: 1.5pt 6pt; margin: 0 3pt 3pt 0; border-radius: 3pt; font-size: 8.5pt; }
+    .eyebrow { font-family: "Nunito Black"; font-size: 9px; color: #0197D4; letter-spacing: 2px; text-transform: uppercase; margin: 19px 0 8px 0; }
+    h2 { font-family: "Nunito Black"; font-weight: normal; font-size: 20px; color: #00448B; margin: 0 0 13px 0; }
+    h3 { font-family: "Nunito Black"; font-weight: normal; font-size: 13px; color: #00448B; margin: 0 0 9px 0; }
 
-    table.meta { width: 100%; border-collapse: collapse; }
-    table.meta td { padding: 3.5pt 6pt; border-bottom: 0.6pt solid #E6EBF0; vertical-align: top; }
-    table.meta td.k { width: 32%; color: #6B7280; font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.4pt; }
+    /* faixa azul com título e capa */
+    table.hero { width: 100%; border-collapse: separate; background: #00448B; border-radius: 12px; margin-top: 22px; }
+    table.hero td { padding: 26px 24px; vertical-align: middle; color: #ffffff; }
+    table.hero td.capa { width: 175px; padding-left: 0; text-align: right; }
+    .hero-little { font-family: "Nunito Semi"; font-weight: bold; font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase; color: #89defd; }
+    .hero-title { font-family: "Nunito Black"; font-size: 27px; line-height: 1.07; color: #ffffff; margin: 12px 0 7px 0; }
+    .hero-subtitle { font-family: "Nunito Semi"; font-weight: bold; font-size: 13px; line-height: 1.35; color: #d9f5ff; }
+    .hero-people { font-size: 11px; line-height: 1.5; color: #d9effd; margin-top: 14px; }
+    .cover { width: 150px; max-height: 213px; border-radius: 5px; }
 
+    .section { margin-top: 20px; }
+    .section-title { font-family: "Nunito Black"; font-size: 10px; color: #0197D4; letter-spacing: 1.6px; text-transform: uppercase; margin: 0 0 10px 0; }
+    .bodytext { font-size: 11.5px; line-height: 1.67; color: #354657; }
+    .bodytext p + p { margin-top: 8px; }
+    .muted { color: #5d7082; font-size: 12px; }
+
+    .chip { display: inline-block; padding: 6px 10px; margin: 0 4px 6px 0; background: #e9f7fd; color: #176388; font-family: "Nunito"; font-weight: bold; font-size: 10px; border-radius: 7px; }
+
+    /* sumário */
     table.toc { width: 100%; border-collapse: collapse; }
-    table.toc th { text-align: left; font-size: 8pt; color: #6B7280; text-transform: uppercase; letter-spacing: 0.4pt; padding: 3pt 5pt; border-bottom: 0.8pt solid #0F8B8D; }
-    table.toc td { padding: 3.5pt 5pt; border-bottom: 0.6pt solid #E6EBF0; vertical-align: top; }
-    table.toc td.n { width: 8%; color: #0F8B8D; font-weight: bold; }
-    table.toc td.p { width: 13%; text-align: right; white-space: nowrap; }
-    table.toc tr.section td { background: #EEF4F7; color: #0B2545; font-weight: bold; padding: 4pt 5pt; }
-    .toc-authors { color: #6B7280; font-size: 8pt; }
+    table.toc td { padding: 12px 0; border-bottom: 1px solid #e2eaf0; vertical-align: top; }
+    table.toc td.n { width: 40px; }
+    .pnum { display: inline-block; width: 27px; height: 27px; line-height: 27px; text-align: center; border-radius: 14px; background: #e5f6fc; color: #00448B; font-family: "Nunito Black"; font-size: 11px; }
+    .toc-title { font-family: "Nunito"; font-weight: bold; font-size: 13px; color: #00448B; }
+    .toc-small { display: block; color: #6d7f90; margin-top: 3px; font-size: 10px; }
+    .toc-section { font-family: "Nunito Black"; font-size: 10px; color: #0197D4; letter-spacing: 1.6px; text-transform: uppercase; padding: 14px 0 4px 0; }
 
-    .cite { border-left: 2.5pt solid #0F8B8D; background: #F7FAFB; padding: 6pt 9pt; margin-bottom: 7pt; page-break-inside: avoid; }
-    .cite .fmt { font-size: 7.5pt; font-weight: bold; color: #0F8B8D; text-transform: uppercase; letter-spacing: 1pt; margin-bottom: 2pt; }
-    .cite .txt { font-size: 9pt; }
+    /* dados bibliográficos */
+    table.doirow { width: 100%; border-collapse: separate; border-spacing: 10px 0; margin: 0 -10px; }
+    table.doirow td { width: 50%; background: #f3faff; border: 1px solid #d7ebf7; border-radius: 8px; padding: 13px; vertical-align: top; }
+    .doirow-label { display: block; color: #698091; font-size: 10px; margin-bottom: 5px; }
+    .doirow-value { font-family: "Nunito"; font-weight: bold; font-size: 13px; color: #00448B; }
+    .doibox { background: #edf8fd; border-left: 4px solid #0197D4; padding: 14px 16px; margin-top: 10px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+    .doibox-label { font-family: "Nunito"; font-weight: bold; color: #00448B; }
+    .pubtext { font-size: 11px; line-height: 1.6; color: #405568; margin-top: 6px; }
+    table.meta { width: 100%; border-collapse: collapse; }
+    table.meta td { padding: 10px 6px; border-bottom: 1px solid #e4edf3; vertical-align: top; font-size: 11px; font-family: "Nunito"; font-weight: bold; color: #253d56; }
+    table.meta td.k { width: 34%; color: #647889; }
 
-    .box { border: 0.8pt solid #DCE3EA; padding: 8pt 10pt; border-radius: 4pt; page-break-inside: avoid; }
-    .license { margin-bottom: 5pt; border-color: #1E88C8; }
-    .license-head { margin-bottom: 3pt; }
-    .cc-icon { display: inline-block; width: 13pt; height: 13pt; line-height: 13pt; text-align: center; border: 0.8pt solid #0B2545; border-radius: 7pt; font-size: 5.5pt; font-weight: bold; color: #0B2545; margin-right: 2pt; }
-    .qr-box { text-align: center; }
-    .qr-box img { width: 86pt; height: 86pt; }
-    .qr-box .url { font-size: 7pt; color: #6B7280; word-wrap: break-word; }
+    /* referências e citação */
+    .bibliogr { padding: 16px; background: #edf8fd; border-left: 4px solid #0197D4; font-size: 11.5px; line-height: 1.7; color: #2b4660; }
+    .listline { padding: 10px 0; border-bottom: 1px solid #dce9f0; font-size: 11px; line-height: 1.55; color: #354657; }
+    .listline b { color: #00448B; }
 
-    .legal { font-size: 7.5pt; color: #6B7280; border-top: 0.6pt solid #DCE3EA; padding-top: 6pt; margin-top: 14pt; }
-    .footer { position: fixed; bottom: -12mm; left: 0; right: 0; font-size: 7.5pt; color: #6B7280; border-top: 0.6pt solid #DCE3EA; padding-top: 3pt; }
-    .footer table { width: 100%; border-collapse: collapse; }
-    .footer td { padding: 0; }
-    .footer td.r { text-align: right; }
+    /* direitos autorais: sete cartões, o atribuído em destaque */
+    .rights-lead { margin: 0 0 8px 0; color: #60778a; font-size: 12px; line-height: 1.6; }
+    table.license { width: 100%; border-collapse: separate; margin-bottom: 4px; border-radius: 12px; page-break-inside: avoid; }
+    table.license td { padding: 6px 12px; vertical-align: middle; }
+    table.license td.icons { width: 106px; }
+    .license-inactive { background: #f4f6f8; border: 2px solid #e2e7eb; color: #82919d; }
+    .license-active { background: #effaff; border: 2px solid #0197D4; color: #00448B; }
+    .cc { display: inline-block; width: 24px; height: 24px; line-height: 21px; text-align: center; border-radius: 12px; font-family: "DejaVu Sans", sans-serif; font-weight: bold; font-size: 7.5px; margin-right: 3px; }
+    .license-inactive .cc { border: 2px solid #c9d1d7; color: #a2adb5; }
+    .license-active .cc { border: 2px solid #0197D4; color: #0197D4; }
+    .license-title { font-family: "Nunito Black"; font-size: 10.5px; line-height: 1.15; margin-bottom: 3px; }
+    .license-text { font-size: 8.4px; line-height: 1.3; }
+    .license-pill { float: right; background: #0197D4; color: #ffffff; font-family: "Nunito Semi"; font-weight: bold; font-size: 9px; border-radius: 12px; padding: 4px 8px; margin: -2px 0 4px 8px; }
 
-    .cover { page-break-after: always; }
-    .cover .title-block { margin-top: 70pt; }
-    .cover h1 { font-size: 26pt; }
-    .cover .people { margin-top: 26pt; }
-    .cover .people .label { font-size: 8pt; color: #6B7280; text-transform: uppercase; letter-spacing: 1pt; }
-    .cover .people .names { font-size: 12pt; color: #0B2545; }
-    .cover .publisher { margin-top: 40pt; font-size: 11pt; color: #0B2545; }
-    .cover .bottom { margin-top: 60pt; }
-    .avoid-break { page-break-inside: avoid; }
-    sup { font-size: 6.5pt; color: #0F8B8D; }
-    .authors { font-size: 11pt; color: #0B2545; margin: 8pt 0 2pt 0; }
-    .affs { font-size: 8.5pt; color: #3F4E66; margin: 0; padding-left: 0; list-style: none; }
-    .affs li { margin-bottom: 1pt; }
+    /* rodapé fixo (a numeração "01 / 05" é desenhada pelo gerador) */
+    .footer { position: fixed; bottom: -12mm; left: 0; right: 0; border-top: 1px solid #dce9f0; padding-top: 8px; color: #8294a4; font-size: 9px; }
 </style>
 </head>
 <body>
-<div class="footer">
-    <table>
-        <tr>
-            <td>{{ $book['publisher'] ?? 'Conexão Editora' }} · ficha gerada em {{ $generated_at->format('d/m/Y H:i') }} · template v{{ $template_version }}</td>
-            <td class="r">{{ $doi_line ?? '' }}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="band">
-    <table>
-        <tr>
-            <td class="brand">{{ mb_strtoupper($book['publisher'] ?? 'Conexão Editora') }}<small>FICHA CIENTÍFICA DE APRESENTAÇÃO</small></td>
-            <td class="kind">{{ $kind_label }}</td>
-        </tr>
-    </table>
-</div>
-
+<div class="footer">Conexão Editora · {{ $footer ?? 'Ficha editorial' }}</div>
 @yield('content')
-
-<p class="legal">
-    Esta é uma ficha de apresentação gerada automaticamente a partir dos metadados registrados pela editora.
-    Ela não substitui a obra nem o capítulo e não reproduz o seu conteúdo. A página permanente e o DOI são os
-    identificadores de referência. {{ $legal_extra ?? '' }}
-</p>
 </body>
 </html>

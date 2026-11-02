@@ -1,110 +1,150 @@
-{{-- Ficha científica do capítulo: título, autores com afiliação e ORCID, livro, resumo, como citar, QR, compra. --}}
+{{-- Ficha editorial do capítulo (layout do Diego): resumo, autores, dados bibliográficos, referências e direitos autorais. --}}
 @php
-    $organizers = collect($book['contributors'])->filter(fn ($c) => $c['role'] === ($book['type'] === 'edited_book' ? 'editor' : 'author'));
-    if ($organizers->isEmpty()) { $organizers = collect($book['contributors']); }
-    $languages = ['pt' => 'Português', 'en' => 'Inglês', 'es' => 'Espanhol', 'fr' => 'Francês', 'it' => 'Italiano', 'de' => 'Alemão'];
-    $commercial = collect($book['commercial'])->filter(fn ($l) => $l['enabled']);
-    $pages = $chapter['first_page'].($chapter['last_page'] && $chapter['last_page'] !== $chapter['first_page'] ? '–'.$chapter['last_page'] : '');
+    $organizers = collect($book['contributors'])->filter(fn ($c) => $c['role'] === 'editor');
+    $languages = ['pt' => 'Português (Brasil)'] + \App\Models\Book::LANGUAGES;
+    $area = trim(($book['subject_area'] ?? '').(filled($book['subject_subarea'] ?? null) ? ' / '.$book['subject_subarea'] : ''));
+    $number = (string) ($chapter['number'] ?: $chapter['sequence']);
+    $names = collect($authors)->pluck('name')->implode(', ');
+    $licenses = $chapter['licenses'] ?? [];
+    $references = (array) ($chapter['references'] ?? []);
 @endphp
-@extends('documents.layout', [
-    'title' => 'Ficha científica — '.$chapter['title'],
-    'kind_label' => 'Ficha do capítulo',
-    'doi_line' => 'DOI '.$chapter['doi'],
-])
+@extends('documents.layout', ['title' => $chapter['title'].' — ficha editorial do capítulo', 'footer' => 'Ficha editorial do capítulo'])
 
 @section('content')
-<table style="width: 100%; border-collapse: collapse;">
-    <tr>
-        <td style="padding: 0; vertical-align: top;">
-            <span class="tag">Capítulo {{ $chapter['number'] ?: $chapter['sequence'] }}</span>
-            <span class="doi-tag">DOI {{ $chapter['doi'] }}</span>
-            <h1 style="margin-top: 8pt;">{{ $chapter['title'] }}</h1>
-            @if ($chapter['subtitle'])
-                <p class="subtitle">{{ $chapter['subtitle'] }}</p>
-            @endif
-            @if ($chapter['title_en'])
-                <p class="alt-title">{{ $chapter['title_en'] }}</p>
-            @endif
+{{-- 01 · resumo --}}
+<div class="page">
+    @include('documents.partials.top', ['mark' => 'Capítulo '.$number.' · Resumo'])
+    <div class="eyebrow">Capítulo de livro{{ $area !== '' ? ' · '.$area : '' }}</div>
 
-            @if (count($authors))
-                <p class="authors">
-                    @foreach ($authors as $a)
-                        {{ $a['name'] }}@if ($a['affiliation'])<sup>{{ $a['affiliation'] }}</sup>@endif @if (! $loop->last) · @endif
-                    @endforeach
-                </p>
-                <ul class="affs">
-                    @foreach ($affiliations as $i => $aff)
-                        <li><sup>{{ $i + 1 }}</sup> {{ $aff }}</li>
-                    @endforeach
-                    @foreach ($authors as $a)
-                        @if ($a['orcid'])
-                            <li class="muted">{{ $a['name'] }} — ORCID <a href="https://orcid.org/{{ $a['orcid'] }}">https://orcid.org/{{ $a['orcid'] }}</a></li>
-                        @endif
-                    @endforeach
-                </ul>
+    <table class="hero"><tr>
+        <td>
+            <div class="hero-little">Capítulo {{ $number }} · {{ $book['title'] }}</div>
+            <div class="hero-title">{{ $chapter['title'] }}</div>
+            @if (filled($chapter['subtitle'] ?? null))
+                <div class="hero-subtitle">{{ $chapter['subtitle'] }}</div>
+            @endif
+            @if ($names !== '')
+                <div class="hero-people">{{ count($authors) > 1 ? 'Autores' : 'Autor' }}: {{ $names }}</div>
             @endif
         </td>
-        <td style="width: 100pt; padding: 0 0 0 10pt; vertical-align: top;">
-            <div class="qr-box">
-                <img src="{{ $qr }}" alt="QR Code">
-                <div class="url">Página permanente<br>{{ $qr_url }}</div>
-            </div>
-        </td>
-    </tr>
-</table>
+        @if ($cover)
+            <td class="capa"><img class="cover" src="{{ $cover }}" alt=""></td>
+        @endif
+    </tr></table>
 
-<h2>Publicado em</h2>
-<table class="meta">
-    <tr><td class="k">Livro</td><td><b>{{ $book['title'] }}</b>@if ($book['subtitle']): {{ $book['subtitle'] }}@endif</td></tr>
-    @if ($organizers->isNotEmpty())
-        <tr><td class="k">{{ $organizers_label }}</td><td>{{ $organizers->pluck('name')->implode('; ') }}</td></tr>
-    @endif
-    <tr><td class="k">Editora</td><td>{{ $book['publisher'] }}, {{ $book['publication_place'] }}, {{ $book['publication_year'] }}@if ($book['edition_number'] && $book['edition_number'] > 1) · {{ $book['edition_number'] }}ª edição @endif</td></tr>
-    @if ($book['isbn_print'])<tr><td class="k">ISBN (impresso)</td><td class="mono">{{ $book['isbn_print'] }}</td></tr>@endif
-    @if ($book['isbn_ebook'])<tr><td class="k">ISBN (e-book)</td><td class="mono">{{ $book['isbn_ebook'] }}</td></tr>@endif
-    <tr><td class="k">DOI do livro</td><td class="mono"><a href="https://doi.org/{{ $book['doi'] }}">https://doi.org/{{ $book['doi'] }}</a></td></tr>
-    <tr><td class="k">DOI do capítulo</td><td class="mono"><a href="https://doi.org/{{ $chapter['doi'] }}">https://doi.org/{{ $chapter['doi'] }}</a></td></tr>
-    <tr><td class="k">Páginas</td><td>{{ $pages }}</td></tr>
-    @if ($chapter['section'])<tr><td class="k">Seção</td><td>{{ $chapter['section'] }}</td></tr>@endif
-    @if ($chapter['publication_date'])<tr><td class="k">Data de publicação</td><td>{{ \Carbon\Carbon::parse($chapter['publication_date'])->format('d/m/Y') }}</td></tr>@endif
-    <tr><td class="k">Idioma</td><td>{{ $languages[$chapter['language']] ?? $chapter['language'] }}</td></tr>
-    <tr><td class="k">Área</td><td>{{ $book['subject_area'] }}@if ($book['subject_subarea']) · {{ $book['subject_subarea'] }}@endif</td></tr>
-    @if ($landing_url)<tr><td class="k">Página permanente</td><td><a href="{{ $landing_url }}">{{ $landing_url }}</a></td></tr>@endif
-</table>
-
-@if ($chapter['abstract'])
-    <div class="avoid-break">
-        <h2>Resumo</h2>
-        <p class="lead">{{ $chapter['abstract'] }}</p>
+    <div class="section">
+        <div class="section-title">Resumo do capítulo</div>
+        <div class="bodytext">
+            @foreach (preg_split('/\n\s*\n/', trim((string) ($chapter['abstract'] ?? ''))) as $paragraph)
+                @if (trim($paragraph) !== '')<p>{{ trim($paragraph) }}</p>@endif
+            @endforeach
+        </div>
     </div>
-@endif
 
-@if ($chapter['keywords'])
-    <div class="avoid-break">
-    <h2>Palavras-chave</h2>
-    <div>@foreach ($chapter['keywords'] as $kw)<span class="pill">{{ $kw }}</span>@endforeach</div>
-    </div>
-@endif
-
-@include('documents.licenses', ['licenses' => $chapter['licenses'] ?? []])
-
-<h2>Como citar este capítulo</h2>
-@foreach (['abnt', 'apa', 'vancouver'] as $fmt)
-    <div class="cite">
-        <div class="fmt">{{ \App\Editorial\Citations::LABELS[$fmt] }}</div>
-        <div class="txt">{!! $chapter['citations_html'][$fmt] !!}</div>
-    </div>
-@endforeach
-
-<div class="box avoid-break" style="margin-top: 10pt;">
-    <h3 style="margin-top: 0;">O livro completo</h3>
-    @if ($commercial->isNotEmpty())
-        <p class="small">Disponível em: {{ $commercial->pluck('label')->map(fn ($l) => str_replace('Comprar ', '', $l))->implode(' · ') }}.</p>
-    @endif
-    @if ($book_landing_url)
-        <p class="small">Comprar o livro e ver os demais capítulos: <a href="{{ $book_landing_url }}">{{ $book_landing_url }}</a></p>
-    @else
-        <p class="small">Página do livro: <a href="https://doi.org/{{ $book['doi'] }}">https://doi.org/{{ $book['doi'] }}</a></p>
+    @if ($chapter['keywords'])
+        <div class="section">
+            <div class="section-title">Palavras-chave</div>
+            <div>@foreach ($chapter['keywords'] as $kw)<span class="chip">{{ $kw }}</span>@endforeach</div>
+        </div>
     @endif
 </div>
+
+{{-- 02 · autores --}}
+<div class="page">
+    @include('documents.partials.top', ['mark' => 'Capítulo '.$number.' · Autores'])
+    <div class="eyebrow">Autoria</div>
+    <h2>Autores e afiliações</h2>
+    <div class="section">
+        @foreach ($authors as $a)
+            <div class="listline">
+                <b>{{ $a['name'] }}</b>@if ($a['affiliation'])<sup>{{ $a['affiliation'] }}</sup>@endif
+                @if (filled($a['orcid']))<br><span class="muted" style="font-size: 10px;">ORCID <a href="https://orcid.org/{{ $a['orcid'] }}">https://orcid.org/{{ $a['orcid'] }}</a></span>@endif
+            </div>
+        @endforeach
+    </div>
+    @if ($affiliations)
+        <div class="section">
+            <div class="section-title">Afiliações</div>
+            @foreach ($affiliations as $i => $aff)
+                <div class="listline"><b>{{ $i + 1 }}.</b> {{ $aff }}</div>
+            @endforeach
+        </div>
+    @endif
+</div>
+
+{{-- 03 · dados bibliográficos --}}
+<div class="page">
+    @include('documents.partials.top', ['mark' => 'Capítulo '.$number.' · Dados bibliográficos'])
+    <div class="eyebrow">Identificação da publicação</div>
+    <h2>Informações bibliográficas</h2>
+
+    <table class="doirow"><tr>
+        <td><span class="doirow-label">DOI do capítulo</span><span class="doirow-value">{{ $chapter['doi'] }}</span></td>
+        <td><span class="doirow-label">Páginas</span><span class="doirow-value">{{ $chapter['first_page'] }}–{{ $chapter['last_page'] }}</span></td>
+    </tr></table>
+
+    <div class="doibox">
+        <span class="doibox-label">Publicado em</span>
+        <p class="pubtext">{{ $book['title'] }}@if (filled($book['subtitle'] ?? null)): {{ $book['subtitle'] }}@endif · DOI do livro <a href="https://doi.org/{{ $book['doi'] }}">{{ $book['doi'] }}</a></p>
+    </div>
+
+    <div class="section">
+        <table class="meta">
+            <tr><td class="k">Título</td><td>{{ $chapter['title'] }}</td></tr>
+            @if ($names !== '')<tr><td class="k">{{ count($authors) > 1 ? 'Autores' : 'Autor' }}</td><td>{{ $names }}</td></tr>@endif
+            <tr><td class="k">Livro</td><td>{{ $book['title'] }}</td></tr>
+            @if ($organizers->isNotEmpty())<tr><td class="k">{{ $organizers->count() > 1 ? 'Organizadores' : 'Organizador' }}</td><td>{{ $organizers->pluck('name')->implode(', ') }}</td></tr>@endif
+            <tr><td class="k">Editora</td><td>{{ $book['publisher'] }}</td></tr>
+            <tr><td class="k">Ano de publicação</td><td>{{ $book['publication_year'] }}</td></tr>
+            <tr><td class="k">Idioma</td><td>{{ $languages[$chapter['language'] ?? $book['language']] ?? ($chapter['language'] ?? $book['language']) }}</td></tr>
+            @if (filled($book['isbn_print'] ?? null))<tr><td class="k">ISBN (impresso)</td><td>{{ $book['isbn_print'] }}</td></tr>@endif
+            @if (filled($book['isbn_ebook'] ?? null))<tr><td class="k">ISBN (e-book)</td><td>{{ $book['isbn_ebook'] }}</td></tr>@endif
+            @if ($area !== '')<tr><td class="k">Área</td><td>{{ $area }}</td></tr>@endif
+        </table>
+    </div>
+</div>
+
+{{-- 04 · referências --}}
+<div class="page{{ $licenses ? '' : ' page-last' }}">
+    @include('documents.partials.top', ['mark' => 'Capítulo '.$number.' · Referências'])
+    <div class="eyebrow">Citação e direitos</div>
+    <h2>Referências</h2>
+
+    <div class="section">
+        <div class="section-title">Como citar este capítulo · ABNT</div>
+        <div class="bibliogr">{!! $chapter['citations_html']['abnt'] !!}</div>
+    </div>
+    <div class="section">
+        <div class="section-title">Referência · APA</div>
+        <div class="bibliogr">{!! $chapter['citations_html']['apa'] !!}</div>
+    </div>
+    <div class="section">
+        <div class="section-title">Referência · Vancouver</div>
+        <div class="bibliogr">{!! $chapter['citations_html']['vancouver'] !!}</div>
+    </div>
+
+    @if (filled($landing_url ?? null))
+        <div class="section">
+            <div class="section-title">Página do capítulo</div>
+            <p class="bodytext"><a href="{{ $landing_url }}">{{ $landing_url }}</a></p>
+        </div>
+    @endif
+
+    @if ($references)
+        <div class="section">
+            <div class="section-title">Referências do capítulo</div>
+            @foreach ($references as $ref)
+                <div class="listline">{{ $ref['text'] ?? '' }}@if (filled($ref['doi'] ?? null)) <a href="https://doi.org/{{ $ref['doi'] }}">https://doi.org/{{ $ref['doi'] }}</a>@endif</div>
+            @endforeach
+        </div>
+    @endif
+</div>
+
+{{-- 05 · direitos autorais --}}
+@if ($licenses)
+    <div class="page page-last">
+        @include('documents.partials.top', ['mark' => 'Capítulo '.$number.' · Direitos autorais'])
+        @include('documents.licenses', ['licenses' => $licenses, 'subject' => 'Este capítulo está licenciado', 'lead' => 'Condições de atribuição, compartilhamento e reutilização do capítulo.'])
+    </div>
+@endif
 @endsection

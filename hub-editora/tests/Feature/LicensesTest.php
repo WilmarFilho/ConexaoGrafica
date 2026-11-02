@@ -108,7 +108,7 @@ class LicensesTest extends TestCase
         $generator = app(SheetGenerator::class);
         $data = $generator->bookData($book->fresh(), Payload::forBook($book->fresh()));
 
-        $html = View::make('documents.book', $data + ['qr' => $generator->qrDataUri('https://x'), 'generated_at' => now(), 'template_version' => SheetGenerator::TEMPLATE_VERSION])->render();
+        $html = View::make('documents.book', $data + ['qr' => $generator->qrDataUri('https://x'), 'generated_at' => now(), 'template_version' => SheetGenerator::TEMPLATE_VERSION, 'logo' => null, 'cover' => null])->render();
 
         $this->assertStringContainsString('Direitos autorais', $html);
         $this->assertStringContainsString('CC BY-NC-ND 4.0', $html);

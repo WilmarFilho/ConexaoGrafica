@@ -213,7 +213,8 @@ function conexao_doi_gravar_publicacao(array $payload)
     }
 
     return [
-        'book' => ['wp_post_id' => $livro_id, 'url' => get_permalink($livro_id)],
+        // a capa vem do produto da loja; o Hub usa nas fichas em PDF
+        'book' => ['wp_post_id' => $livro_id, 'url' => get_permalink($livro_id), 'cover_url' => conexao_doi_capa_url($livro_id, 'large')],
         'chapters' => $resposta_capitulos,
         'people' => $resposta_pessoas,
     ];

@@ -74,6 +74,8 @@ class PublishBook implements ShouldQueue
         $book->forceFill([
             'wp_post_id' => isset($b['wp_post_id']) ? (int) $b['wp_post_id'] : $book->wp_post_id,
             'landing_url' => $b['url'] ?? $book->landing_url,
+            // capa do produto da loja, para as fichas em PDF (vazia quando o livro não tem produto)
+            'cover_url' => array_key_exists('cover_url', $b) ? ($b['cover_url'] ?: null) : $book->cover_url,
         ])->save();
 
         foreach ((array) ($result['chapters'] ?? []) as $c) {

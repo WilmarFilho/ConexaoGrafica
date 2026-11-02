@@ -84,8 +84,8 @@ class DocumentsTest extends TestCase
         $this->assertGreaterThan(10 * 1024, strlen($pdf), 'PDF do livro muito pequeno: '.strlen($pdf).' bytes');
         $this->assertStringContainsString('/Type /Page', $pdf);
         $pages = preg_match_all('~/Type\s*/Page[^s]~', $pdf);
-        $this->assertGreaterThanOrEqual(2, $pages, 'a ficha do livro tem capa e conteúdo');
-        $this->assertLessThanOrEqual(4, $pages);
+        $this->assertGreaterThanOrEqual(4, $pages, 'resumo, sumário, dados bibliográficos e referências');
+        $this->assertLessThanOrEqual(8, $pages);
 
         $chapter = Chapter::find(10);
         $cdoc = $generator->forChapter($chapter);
@@ -97,7 +97,9 @@ class DocumentsTest extends TestCase
         $cpdf = $cdoc->contents();
         $this->assertStringStartsWith('%PDF', $cpdf);
         $this->assertGreaterThan(10 * 1024, strlen($cpdf));
-        $this->assertLessThanOrEqual(2, preg_match_all('~/Type\s*/Page[^s]~', $cpdf), 'ficha do capítulo em 1–2 páginas');
+        $cpages = preg_match_all('~/Type\s*/Page[^s]~', $cpdf);
+        $this->assertGreaterThanOrEqual(4, $cpages, 'resumo, autores, dados bibliográficos e referências');
+        $this->assertLessThanOrEqual(6, $cpages);
 
         $this->assertSame(2, SyncLog::where('action', 'document.generated')->count());
         $this->assertSame($doc->id, $book->fresh()->sheet->id);
@@ -106,23 +108,23 @@ class DocumentsTest extends TestCase
         // O HTML por trás do PDF traz tudo que a ficha promete (o PDF comprime o texto).
         $payload = Payload::forBook($book->fresh());
         $html = view('documents.book', $generator->bookData($book->fresh(), $payload) + [
-            'qr' => $generator->qrDataUri('https://x'), 'generated_at' => now(), 'template_version' => '1.0',
+            'qr' => '', 'generated_at' => now(), 'template_version' => '2.0', 'logo' => null, 'cover' => null,
         ])->render();
         foreach (['Tratado de Doenças Raras', 'Diagnóstico, manejo e políticas públicas', 'Maria Exemplo da Silva', '978-65-00000-00-1',
             'https://doi.org/10.00000/conexao.2026.001', 'Obra organizada que reúne 74 capítulos', 'Políticas públicas', 'Seção 1 — Fundamentos',
             'Uma breve história das doenças raras', '21–34', 'SILVA, Maria Exemplo da; PEREIRA, João Exemplo (org.)', 'Silva, M. E., &amp; Pereira, J. E. (Orgs.)',
-            'Silva ME, Pereira JE, editores', 'data:image/svg+xml;base64,', 'não substitui a obra', 'template v1.0',
+            'Silva ME, Pereira JE, editores', 'Resumo do livro', 'Sumário do livro', 'Informações bibliográficas', 'Ficha editorial do livro',
             'https://conexaoeditora.com.br/livro/tratado-de-doencas-raras/'] as $needle) {
             $this->assertStringContainsString($needle, $html, "ficha do livro sem: {$needle}");
         }
 
         $chtml = view('documents.chapter', $generator->chapterData($chapter->fresh(), $payload) + [
-            'qr' => $generator->qrDataUri('https://x'), 'generated_at' => now(), 'template_version' => '1.0',
+            'qr' => '', 'generated_at' => now(), 'template_version' => '2.0', 'logo' => null, 'cover' => null,
         ])->render();
-        foreach (['Uma breve história das doenças raras', 'A brief history of rare diseases', 'Ana Exemplo Rocha', 'Universidade Federal de Goiás, Goiânia/GO',
+        foreach (['Uma breve história das doenças raras', 'Ana Exemplo Rocha', 'Universidade Federal de Goiás, Goiânia/GO',
             'https://orcid.org/0000-0001-5109-3700', '978-65-00000-00-1', '10.00000/conexao.2026.001.01', '21–34',
             'Este capítulo apresenta a evolução', 'História da medicina', 'ROCHA, Ana Exemplo; SILVA, Maria Exemplo da.',
-            'Comprar o livro', 'capitulo/01/'] as $needle) {
+            'Autores e afiliações', 'Ficha editorial do capítulo', 'capitulo/01/'] as $needle) {
             $this->assertStringContainsString($needle, $chtml, "ficha do capítulo sem: {$needle}");
         }
     }
@@ -341,7 +343,7 @@ class DocumentsTest extends TestCase
 
         // A ficha foi gerada já com a URL permanente devolvida pelo PUT (vai no QR e no texto).
         $html = view('documents.book', app(SheetGenerator::class)->bookData($book, Payload::forBook($book)) + [
-            'qr' => '', 'generated_at' => now(), 'template_version' => '1.0',
+            'qr' => '', 'generated_at' => now(), 'template_version' => '2.0', 'logo' => null, 'cover' => null,
         ])->render();
         $this->assertStringContainsString('https://conexaoeditora.com.br/livro/tratado-de-doencas-raras/', $html);
         $this->assertSame(7, SyncLog::where('action', 'document.published')->firstOrFail()->context['user_id']);
