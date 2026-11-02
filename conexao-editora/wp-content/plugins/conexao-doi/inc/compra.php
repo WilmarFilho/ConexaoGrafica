@@ -131,23 +131,33 @@ function conexao_doi_url_externa_valida(string $url): bool
     return ($partes['scheme'] ?? '') === 'https' && ($host === 'conexaoeditora.com.br' || str_ends_with($host, '.conexaoeditora.com.br'));
 }
 
-/** Endereço que põe o produto no carrinho e abre o carrinho. */
+/** Endereço que põe o produto no carrinho e abre o carrinho (`origem=livro` marca que veio da página do livro). */
 function conexao_doi_url_carrinho(WC_Product $produto, ?WC_Product $pai): string
 {
     $carrinho = function_exists('wc_get_cart_url') ? wc_get_cart_url() : home_url('/carrinho/');
+    $args = ['add-to-cart' => $produto->get_id(), 'origem' => 'livro'];
 
     if ($produto->is_type('variation') && $pai) {
-        $args = ['add-to-cart' => $pai->get_id(), 'variation_id' => $produto->get_id()];
+        $args = ['add-to-cart' => $pai->get_id(), 'variation_id' => $produto->get_id(), 'origem' => 'livro'];
 
         foreach ($produto->get_attributes() as $nome => $valor) {
             $args['attribute_'.$nome] = $valor;
         }
-
-        return add_query_arg($args, $carrinho);
     }
 
-    return add_query_arg('add-to-cart', $produto->get_id(), $carrinho);
+    return add_query_arg($args, $carrinho);
 }
+
+/**
+ * Vindo do botão da página do livro, o aviso padrão do Woo ("... has been added to your cart")
+ * não aparece: o carrinho abre já mostrando o item, e o aviso só repetia isso num quadro genérico.
+ * Avisos de erro (sem estoque, variação inválida) continuam aparecendo.
+ */
+add_filter('wc_add_to_cart_message_html', function (string $html): string {
+    $origem = isset($_GET['origem']) ? sanitize_key(wp_unslash($_GET['origem'])) : '';
+
+    return $origem === 'livro' ? '' : $html;
+});
 
 /** Id da imagem de capa: a do produto Woo ligado (a capa pública vem da loja). */
 function conexao_doi_capa_id(int $livro_id): int

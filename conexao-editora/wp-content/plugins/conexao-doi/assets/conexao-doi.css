@@ -997,6 +997,11 @@ a.doi-autores-linha__nome:hover {
   gap: 14px;
 }
 
+/* O display: grid acima vence o [hidden] do navegador; sem isto as abas de formato mostram os três painéis empilhados. */
+.doi-oferta[hidden] {
+  display: none;
+}
+
 .doi-oferta__preco {
   display: flex;
   align-items: center;
