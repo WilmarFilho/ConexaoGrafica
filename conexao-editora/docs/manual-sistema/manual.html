@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Sistema Conexão Editora: Hub, Site e App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul: #0197d4; --marinho: #00448b; --claro: #e9f7fd; --tinta: #1f2933;
+    --cinza: #5d7082; --linha: #dce9f0; --aviso: #fff6e0; --aviso-tx: #6b4e00;
+  }
+  @page { size: A4; margin: 16mm 16mm 18mm 16mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "Nunito", "Segoe UI", sans-serif; font-size: 10.5pt; line-height: 1.55; color: var(--tinta); background: #fff; }
+  h1, h2, h3 { color: var(--marinho); line-height: 1.2; }
+  h2 { font-size: 19pt; font-weight: 900; margin: 0 0 10px; page-break-after: avoid; }
+  h3 { font-size: 12.5pt; font-weight: 800; margin: 22px 0 6px; page-break-after: avoid; }
+  p { margin: 0 0 9px; }
+  ul, ol { margin: 0 0 10px; padding-left: 20px; }
+  li { margin-bottom: 4px; }
+  a { color: var(--azul); text-decoration: none; }
+  strong { font-weight: 800; }
+  code { font-family: Consolas, monospace; font-size: 9pt; background: #f1f5f8; padding: 1px 4px; border-radius: 4px; }
+
+  .secao { page-break-before: always; }
+  .eyebrow { font-weight: 900; font-size: 8pt; letter-spacing: 2px; text-transform: uppercase; color: var(--azul); margin-bottom: 6px; }
+  .lead { font-size: 11.5pt; color: var(--cinza); margin-bottom: 16px; }
+
+  /* capa */
+  .capa { height: 255mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .capa__logo { width: 180px; }
+  .capa__faixa { background: var(--marinho); color: #fff; border-radius: 18px; padding: 38px 36px; }
+  .capa__faixa .eyebrow { color: #89defd; }
+  .capa__faixa h1 { color: #fff; font-size: 30pt; font-weight: 900; margin: 10px 0 12px; }
+  .capa__faixa p { color: #d9effd; font-size: 12pt; margin: 0; }
+  .capa__pecas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 26px; }
+  .capa__peca { background: rgba(255,255,255,.1); border-radius: 12px; padding: 14px; font-size: 9.5pt; color: #d9effd; }
+  .capa__peca strong { display: block; color: #fff; font-size: 11pt; margin-bottom: 2px; }
+  .capa__rodape { color: var(--cinza); font-size: 9pt; }
+
+  /* sumário */
+  .indice { list-style: none; padding: 0; counter-reset: s; }
+  .indice li { counter-increment: s; display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--linha); font-weight: 700; }
+  .indice li::before { content: counter(s, decimal-leading-zero); color: var(--azul); font-weight: 900; width: 26px; }
+  .indice small { display: block; font-weight: 400; color: var(--cinza); }
+
+  /* blocos */
+  .caixa { border: 1px solid var(--linha); border-radius: 12px; padding: 12px 14px; margin: 12px 0; background: #fafcfd; page-break-inside: avoid; }
+  .caixa--azul { background: var(--claro); border-color: #bfe6f6; }
+  .caixa--aviso { background: var(--aviso); border-color: #f0dca6; color: var(--aviso-tx); }
+  .caixa__titulo { font-weight: 900; color: var(--marinho); margin-bottom: 4px; }
+  .caixa--aviso .caixa__titulo { color: var(--aviso-tx); }
+  .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 9.5pt; page-break-inside: avoid; }
+  th { text-align: left; background: var(--marinho); color: #fff; font-weight: 800; padding: 7px 9px; }
+  td { padding: 7px 9px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+  tr:nth-child(even) td { background: #f7fbfd; }
+
+  figure { margin: 12px 0 16px; page-break-inside: avoid; }
+  figure img { display: block; max-width: 100%; max-height: 150mm; width: auto; margin: 0 auto; border: 1px solid var(--linha); border-radius: 10px; }
+  figure.estreita img { max-height: 205mm; }
+  figure.celular { display: inline-block; width: 26%; margin: 6px 1.5%; vertical-align: top; }
+  figure.celular img { border-radius: 18px; }
+  figcaption { font-size: 8.5pt; color: var(--cinza); margin-top: 5px; text-align: center; }
+
+  .passos { counter-reset: p; list-style: none; padding: 0; }
+  .passos > li { counter-increment: p; position: relative; padding: 0 0 8px 34px; }
+  .passos > li::before { content: counter(p); position: absolute; left: 0; top: 0; width: 23px; height: 23px; border-radius: 50%; background: var(--azul); color: #fff; font-weight: 900; font-size: 9pt; display: grid; place-items: center; }
+
+  .selo { display: inline-block; padding: 1px 8px; border-radius: 99px; font-size: 8.5pt; font-weight: 800; }
+  .selo--hub { background: #e6edfb; color: #2e6bd6; }
+  .selo--site { background: var(--claro); color: var(--azul); }
+  .selo--app { background: #e8f6ee; color: #1b7a43; }
+  .selo--wp { background: #f1eefb; color: #5b3fb3; }
+
+  /* diagrama */
+  .diagrama { display: block; width: 86%; margin: 0 auto 10px; }
+</style>
+</head>
+<body>
+
+<!-- ===================================================== CAPA -->
+<section class="capa">
+  <img class="capa__logo" src="../../wp-content/themes/conexao-editora/assets/img/logo.png" alt="Conexão Editora">
+  <div class="capa__faixa">
+    <div class="eyebrow">Guia do sistema · versão de 02/11/2026</div>
+    <h1>Sistema Conexão Editora</h1>
+    <p>Como funcionam o Hub, o site da editora e o app do leitor: livros, produtos, DOI, fichas, e-books, pedidos e o que muda na virada da Pubcon para a Conexão Editora.</p>
+    <div class="capa__pecas">
+      <div class="capa__peca"><strong>Hub Editora</strong>hub.pubcon.com.br · cadastro, pedidos, expedição e DOI</div>
+      <div class="capa__peca"><strong>Site da editora</strong>conexaoeditora.com.br · loja, páginas dos livros e e-books</div>
+      <div class="capa__peca"><strong>App do leitor</strong>conexaoeditora.com.br/app, Android e iOS · estante, leitura e pedidos</div>
+    </div>
+  </div>
+  <div class="capa__rodape">Preparado por Conexão Pro para a equipe da Conexão Editora. Os prints do Hub usam dados de exemplo; os do site são das páginas públicas em produção.</div>
+</section>
+
+<!-- ===================================================== SUMÁRIO -->
+<section class="secao">
+  <div class="eyebrow">Conteúdo</div>
+  <h2>Sumário</h2>
+  <ol class="indice">
+    <li><span>Visão geral do sistema<small>As três partes e como elas conversam</small></span></li>
+    <li><span>Situação atual: antes da virada<small>Por que o Hub ainda mostra os produtos e os pedidos da Pubcon</small></span></li>
+    <li><span>Livro e produto: a diferença<small>O que cada um guarda e por que o cadastro completo é no Hub</small></span></li>
+    <li><span>Cadastrar um livro no Hub<small>Importar o PDF, revisar, publicar, associar ao produto, com ou sem DOI</small></span></li>
+    <li><span>Produtos no Hub<small>A lista, o produto sem livro e o produto com livro</small></span></li>
+    <li><span>DOI na Crossref<small>Quando registrar, quanto custa e como é cobrado</small></span></li>
+    <li><span>O site da editora<small>Página do livro, página do capítulo, ficha em PDF e leads</small></span></li>
+    <li><span>E-books: como colocar o PDF do livro<small>Envio do arquivo e quem pode ler</small></span></li>
+    <li><span>O app do leitor<small>Estante, leitura, pedidos e de onde eles vêm</small></span></li>
+    <li><span>Pedidos e expedição<small>O caminho de um pedido, do canal de venda até o rastreio</small></span></li>
+    <li><span>A virada para a Conexão Editora<small>O que muda e o que precisa acontecer</small></span></li>
+    <li><span>Pendências e glossário</span></li>
+  </ol>
+</section>
+
+<!-- ===================================================== 1 -->
+<section class="secao">
+  <div class="eyebrow">01 · Visão geral</div>
+  <h2>As três partes do sistema</h2>
+  <p class="lead">O sistema tem três partes que trabalham juntas. Cada uma tem um papel claro, e os dados de um livro nascem num lugar só, o Hub.</p>
+
+  <svg class="diagrama" viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" font-family="Nunito, sans-serif">
+    <defs><marker id="s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5d7082"/></marker></defs>
+    <rect x="270" y="10" width="220" height="120" rx="16" fill="#e6edfb" stroke="#2e6bd6"/>
+    <text x="380" y="40" text-anchor="middle" font-size="17" font-weight="900" fill="#2e6bd6">Hub Editora</text>
+    <text x="380" y="62" text-anchor="middle" font-size="11" fill="#1f2933">Cadastro dos livros (IA), DOI,</text>
+    <text x="380" y="78" text-anchor="middle" font-size="11" fill="#1f2933">fichas, licenças, pedidos de</text>
+    <text x="380" y="94" text-anchor="middle" font-size="11" fill="#1f2933">todos os canais, expedição,</text>
+    <text x="380" y="110" text-anchor="middle" font-size="11" fill="#1f2933">vendedores</text>
+
+    <rect x="20" y="200" width="230" height="115" rx="16" fill="#e9f7fd" stroke="#0197d4"/>
+    <text x="135" y="230" text-anchor="middle" font-size="17" font-weight="900" fill="#0197d4">Site da editora</text>
+    <text x="135" y="252" text-anchor="middle" font-size="11" fill="#1f2933">Loja (WooCommerce), páginas</text>
+    <text x="135" y="268" text-anchor="middle" font-size="11" fill="#1f2933">de livro e capítulo, ficha e</text>
+    <text x="135" y="284" text-anchor="middle" font-size="11" fill="#1f2933">leads, biblioteca de e-books</text>
+
+    <rect x="510" y="200" width="230" height="115" rx="16" fill="#e8f6ee" stroke="#1b7a43"/>
+    <text x="625" y="230" text-anchor="middle" font-size="17" font-weight="900" fill="#1b7a43">App do leitor</text>
+    <text x="625" y="252" text-anchor="middle" font-size="11" fill="#1f2933">Estante, leitura do PDF,</text>
+    <text x="625" y="268" text-anchor="middle" font-size="11" fill="#1f2933">leitura offline, pedidos</text>
+    <text x="625" y="284" text-anchor="middle" font-size="11" fill="#1f2933">(web, Android e iOS)</text>
+
+    <rect x="20" y="20" width="200" height="90" rx="14" fill="#fff" stroke="#c7d3dc" stroke-dasharray="5 4"/>
+    <text x="120" y="48" text-anchor="middle" font-size="13" font-weight="800" fill="#5d7082">Canais de venda</text>
+    <text x="120" y="68" text-anchor="middle" font-size="10.5" fill="#5d7082">Loja (hoje: Pubcon)</text>
+    <text x="120" y="83" text-anchor="middle" font-size="10.5" fill="#5d7082">Pagar.me (páginas de venda)</text>
+    <text x="120" y="98" text-anchor="middle" font-size="10.5" fill="#5d7082">Amazon</text>
+
+    <rect x="560" y="20" width="180" height="90" rx="14" fill="#fff" stroke="#c7d3dc" stroke-dasharray="5 4"/>
+    <text x="650" y="50" text-anchor="middle" font-size="13" font-weight="800" fill="#5d7082">Crossref</text>
+    <text x="650" y="70" text-anchor="middle" font-size="10.5" fill="#5d7082">Registro do DOI</text>
+    <text x="650" y="86" text-anchor="middle" font-size="10.5" fill="#5d7082">(livro e capítulos)</text>
+
+    <line x1="220" y1="65" x2="266" y2="65" stroke="#5d7082" stroke-width="1.6" marker-end="url(#s)"/>
+    <text x="243" y="56" text-anchor="middle" font-size="9.5" fill="#5d7082">pedidos</text>
+    <line x1="490" y1="65" x2="556" y2="65" stroke="#5d7082" stroke-width="1.6" marker-end="url(#s)"/>
+    <text x="523" y="56" text-anchor="middle" font-size="9.5" fill="#5d7082">DOI</text>
+    <line x1="320" y1="130" x2="200" y2="196" stroke="#5d7082" stroke-width="1.6" marker-end="url(#s)"/>
+    <text x="232" y="150" font-size="9.5" fill="#5d7082">publica a página do livro,</text>
+    <text x="232" y="162" font-size="9.5" fill="#5d7082">capítulos e fichas</text>
+    <line x1="440" y1="130" x2="560" y2="196" stroke="#5d7082" stroke-width="1.6" marker-end="url(#s)"/>
+    <text x="510" y="150" font-size="9.5" fill="#5d7082">pedidos de todos os canais</text>
+    <line x1="254" y1="258" x2="506" y2="258" stroke="#5d7082" stroke-width="1.6" marker-end="url(#s)"/>
+    <text x="380" y="250" text-anchor="middle" font-size="9.5" fill="#5d7082">login, estante e PDF dos e-books</text>
+  </svg>
+
+  <div class="tres">
+    <div class="caixa"><span class="selo selo--hub">Hub</span><p style="margin-top:6px">Painel interno da equipe. É onde se <strong>cadastra o livro completo</strong> (importando o PDF com IA), registra o DOI, gera as fichas em PDF, acompanha os pedidos de todos os canais e faz a expedição.</p></div>
+    <div class="caixa"><span class="selo selo--site">Site</span><p style="margin-top:6px">A loja e a vitrine. Mostra a <strong>página do livro e de cada capítulo</strong> com os dados que o Hub publica, vende pelo WooCommerce, libera os e-books e coleta os leads da ficha.</p></div>
+    <div class="caixa"><span class="selo selo--app">App</span><p style="margin-top:6px">Para o leitor. Mesmo login do site. Mostra a <strong>estante de e-books</strong>, lê o PDF (inclusive offline) e acompanha os <strong>pedidos de todos os canais</strong>.</p></div>
+  </div>
+
+  <h3>Quem guarda o quê</h3>
+  <table>
+    <tr><th style="width:28%">Informação</th><th>Onde nasce</th><th>Onde aparece</th></tr>
+    <tr><td>Dados editoriais (resumo, sumário, capítulos, autores, ISBN, licenças)</td><td>Hub</td><td>Site (páginas do livro e do capítulo), fichas em PDF, app</td></tr>
+    <tr><td>DOI do livro e dos capítulos</td><td>Hub → Crossref</td><td>Site, fichas, citações</td></tr>
+    <tr><td>Preço, formatos, estoque, carrinho</td><td>Loja (WooCommerce); depois da virada, o Hub</td><td>Site (caixa de compra)</td></tr>
+    <tr><td>PDF do e-book</td><td>Loja (caixa "Livro digital" do produto)</td><td>Biblioteca do site e app</td></tr>
+    <tr><td>Pedidos e clientes</td><td>Canais de venda (loja, Pagar.me, Amazon)</td><td>Hub (central e expedição) e app</td></tr>
+    <tr><td>Leads da ficha</td><td>Site (pop-up da ficha)</td><td>wp-admin, com exportação CSV</td></tr>
+  </table>
+</section>
+
+<!-- ===================================================== 2 -->
+<section class="secao">
+  <div class="eyebrow">02 · Situação atual</div>
+  <h2>Antes da virada: por que o Hub ainda mostra a Pubcon</h2>
+  <p class="lead">Hoje existem duas lojas no ar. A <strong>Pubcon</strong> (novo.pubcon.com.br) continua sendo a loja ativa, com os clientes e os pedidos. A <strong>loja nova</strong> (conexaoeditora.com.br) já está pronta, mas fica oculta dos buscadores até a virada.</p>
+
+  <table>
+    <tr><th style="width:24%">Assunto</th><th>Hoje (antes da virada)</th><th>Depois da virada</th></tr>
+    <tr><td>Loja ativa</td><td>Pubcon (novo.pubcon.com.br)</td><td>Conexão Editora (conexaoeditora.com.br)</td></tr>
+    <tr><td>Pedidos no Hub</td><td>Lidos da Pubcon, além de Pagar.me e Amazon</td><td>Lidos da loja nova, além de Pagar.me e Amazon</td></tr>
+    <tr><td>Produtos no Hub</td><td>Catálogo <strong>congelado em 29/09/2026</strong> (66 livros, da migração). Produtos criados depois na loja nova <strong>não aparecem</strong></td><td>Iguais à loja nova, atualizados sozinhos</td></tr>
+    <tr><td>Criação de produto</td><td>No wp-admin da loja nova</td><td>No Hub (o Hub cria e atualiza o produto na loja)</td></tr>
+    <tr><td>Páginas dos livros, DOI, fichas</td><td>Já funcionam no site novo</td><td>Sem mudança</td></tr>
+  </table>
+
+  <div class="caixa caixa--aviso">
+    <div class="caixa__titulo">Exemplo real: "Atualidades em Ultrassonografia" (volume 2)</div>
+    <p>O livro do primeiro DOI está à venda na <strong>loja nova</strong> (produto com E-book, Impresso e Combo). Como o catálogo de Produtos do Hub parou em 29/09, ele <strong>não aparece na busca de Produtos do Hub</strong>. O "Atualidades em Ultrassonografia" que aparece lá é outro livro (o volume 1, "Da Propedêutica ao Relatório").</p>
+    <p style="margin:0">Isso não atrapalha a venda nem o DOI: a página do livro no Hub liga a compra direto ao produto da loja nova, na etapa <strong>Comercialização</strong>.</p>
+  </div>
+
+  <h3>Por que o catálogo está congelado</h3>
+  <p>Os pedidos ainda vêm da Pubcon e cada pedido aponta para um produto. Se o Hub passasse a ler os produtos da loja nova antes da virada, os pedidos da Pubcon ficariam sem produto correspondente (e a expedição perderia peso e medidas). Por isso a decisão foi esperar a virada e fazer a troca de uma vez.</p>
+</section>
+
+<!-- ===================================================== 3 -->
+<section class="secao">
+  <div class="eyebrow">03 · Conceitos</div>
+  <h2>Livro e produto: a diferença</h2>
+  <p class="lead">São duas coisas diferentes que andam juntas. Entender isso evita cadastro pela metade.</p>
+
+  <div class="duas">
+    <div class="caixa caixa--azul">
+      <div class="caixa__titulo">Produto (loja)</div>
+      <p>É o item de venda: <strong>título, preço, formatos</strong> (Impresso, E-book, Impresso + E-book), estoque, peso e medidas para o frete, e o <strong>PDF do e-book</strong>.</p>
+      <p style="margin:0">Sozinho, não tem resumo científico, sumário, capítulos, autores com afiliação, ficha nem DOI.</p>
+    </div>
+    <div class="caixa caixa--azul">
+      <div class="caixa__titulo">Livro (Hub)</div>
+      <p>É o cadastro editorial completo: <strong>resumo, palavras-chave, sumário, capítulos</strong> (com autores, ORCID e afiliação), ISBNs, licenças Creative Commons, referências, <strong>fichas em PDF</strong> e, se quiser, <strong>DOI</strong>.</p>
+      <p style="margin:0">É ele que monta a página completa no site.</p>
+    </div>
+  </div>
+
+  <div class="caixa caixa--aviso">
+    <div class="caixa__titulo">Regra principal</div>
+    <p style="margin:0">Todo livro deve ser <strong>cadastrado no Hub</strong>, com ou sem DOI. Um produto criado só na loja aparece no site com o básico (capa, preço, descrição), mas <strong>sem sumário, capítulos, ficha e citação</strong>. Depois da virada, a criação do produto também passa para o Hub.</p>
+  </div>
+
+  <h3>Os dois caminhos para ter o livro completo</h3>
+  <table>
+    <tr><th style="width:32%">Caminho</th><th>Quando usar</th><th>Como</th></tr>
+    <tr><td><strong>A. Importar o livro direto</strong> (recomendado)</td><td>Livro novo, com o PDF em mãos</td><td>Hub → Importações (IA) → enviar o PDF. A IA monta livro, pessoas, capítulos e resumos. Depois de revisar e integrar, o livro é <strong>associado ao produto</strong> na etapa Comercialização.</td></tr>
+    <tr><td><strong>B. Partir de um produto que já existe</strong></td><td>Produto que já está no catálogo do Hub e ainda não tem livro</td><td>Hub → Produtos → abrir o produto → <strong>Cadastrar sumário e capítulos</strong>. O Hub cria o livro sem DOI já ligado ao produto; em seguida, <strong>Importar sumário e capítulos do PDF</strong> ou preencher à mão.</td></tr>
+  </table>
+
+  <h3>Com ou sem DOI</h3>
+  <p>O DOI é uma opção do livro, não o objetivo do cadastro. No livro, a chave <strong>Registrar DOI na Crossref</strong> (etapa Identificadores e DOI):</p>
+  <ul>
+    <li><strong>Ligada</strong> (padrão): o Hub reserva o DOI do livro e de cada capítulo, confere no checklist e permite o registro na Crossref depois de publicado.</li>
+    <li><strong>Desligada</strong>: o livro é só produto da loja. Tem página completa, sumário, capítulos e ficha, mas nenhum DOI aparece e o registro na Crossref fica bloqueado. Dá para ligar depois, enquanto não houve registro.</li>
+  </ul>
+</section>
+
+<!-- ===================================================== 4 -->
+<section class="secao">
+  <div class="eyebrow">04 · Passo a passo</div>
+  <h2>Cadastrar um livro no Hub</h2>
+  <p class="lead">O fluxo completo, do PDF até a página no site.</p>
+
+  <ol class="passos">
+    <li><strong>Importar o PDF.</strong> Em <em>Importações (IA) → Importar PDF com IA</em>, envie o PDF do livro (com camada de texto, até 300 MB). Se o livro já existe no Hub, escolha-o em "Livro já cadastrado" para atualizar em vez de criar outro. A IA leva de alguns minutos a meia hora, conforme o tamanho; o custo estimado fica gravado na importação (cerca de US$ 3 por volume; US$ 10 a 15 para um livro de ~1.000 páginas).</li>
+    <li><strong>Revisar.</strong> Abra a importação e confira obra, pessoas, capítulos e resumos. Espere a leitura terminar antes de editar (a tela avisa e recarrega sozinha). Depois, <strong>Integrar ao catálogo</strong>.</li>
+    <li><strong>Completar o livro.</strong> No livro, confira cada etapa: dados da obra, autores e organizadores, publicação, identificadores e DOI, resumo, licenças (direitos autorais), capítulos e comercialização.</li>
+    <li><strong>Associar ao produto.</strong> Na etapa <strong>Comercialização</strong>, cada modalidade (E-book, Impresso, Combo) aponta para o produto da loja pelo ID. É isso que coloca o preço e o botão de compra na página.</li>
+    <li><strong>Enviar para revisão e aprovar.</strong> O checklist mostra o que falta (ISBN válido, autores com ORCID ou instituição, páginas dos capítulos etc.).</li>
+    <li><strong>Publicar no site.</strong> O Hub envia tudo ao site, recebe os endereços das páginas e gera as <strong>fichas em PDF</strong> do livro e dos capítulos, que vão para o site em seguida.</li>
+    <li><strong>Registrar o DOI</strong> (se ligado), quando o livro estiver conferido no site. Veja a seção 06.</li>
+  </ol>
+
+  <figure>
+    <img src="img/hub-importar.png" alt="">
+    <figcaption>Importar PDF com IA: o arquivo e, opcionalmente, o livro já cadastrado que a importação deve atualizar.</figcaption>
+  </figure>
+  <figure>
+    <img src="img/hub-importacoes.png" alt="">
+    <figcaption>Lista de importações, com a situação e o custo de cada uma.</figcaption>
+  </figure>
+</section>
+
+<section class="secao">
+  <div class="eyebrow">04 · Passo a passo</div>
+  <h2>A página do livro no Hub</h2>
+  <p>Depois de integrado, o livro tem uma página com tudo: situação editorial, DOI, <strong>custo estimado do DOI</strong>, identificadores, capítulos, fichas e as ações (Editar, Ver página, Republicar no site, Tirar de catálogo, Registrar DOI, Gerar ficha, Regenerar e publicar fichas).</p>
+  <figure>
+    <img src="img/hub-livro-ver.png" alt="">
+    <figcaption>Página de um livro publicado (dados de exemplo). À direita, a situação, o custo do DOI na Crossref, os identificadores, os capítulos e as fichas.</figcaption>
+  </figure>
+
+  <h3>Fichas em PDF</h3>
+  <p>As fichas (do livro e de cada capítulo) seguem o layout do Diego: faixa azul com a capa, resumo, sumário, dados bibliográficos, referências (ABNT, APA, Vancouver) e os sete cartões Creative Commons, com a licença atribuída em destaque. São geradas e enviadas ao site na publicação. Se algo mudar no livro, use <strong>Regenerar e publicar fichas</strong>.</p>
+  <div class="caixa">
+    <div class="caixa__titulo">A capa da ficha</div>
+    <p style="margin:0">A capa vem do produto da loja (o site devolve o endereço da imagem na publicação). Se a capa não baixar naquele momento, a ficha sai sem ela e é refeita sozinha na próxima geração.</p>
+  </div>
+</section>
+
+<!-- ===================================================== 5 -->
+<section class="secao">
+  <div class="eyebrow">05 · Produtos</div>
+  <h2>Produtos no Hub</h2>
+  <p class="lead">A lista de Produtos é o catálogo que o Hub usa para os pedidos e a expedição: formatos, peso e medidas (para o frete), estoque, vendedor e o livro ligado.</p>
+  <figure>
+    <img src="img/hub-produtos.png" alt="">
+    <figcaption>Lista de produtos (dados de exemplo). O triângulo na coluna Frete indica produto sem peso ou medidas.</figcaption>
+  </figure>
+
+  <h3>Produto sem livro</h3>
+  <p>No quadro <strong>Sumário, capítulos e DOI</strong>, o produto sem livro mostra o botão <strong>Cadastrar sumário e capítulos</strong>. Ele cria o livro sem DOI, com o título (sem o formato) e o ISBN do produto, e abre o livro para completar.</p>
+  <figure>
+    <img src="img/hub-produto-sem-livro.png" alt="">
+    <figcaption>Produto sem livro: o botão "Cadastrar sumário e capítulos" no quadro da direita.</figcaption>
+  </figure>
+</section>
+
+<section class="secao">
+  <div class="eyebrow">05 · Produtos</div>
+  <h2>Produto com livro</h2>
+  <p>Com o livro ligado, o quadro mostra o livro, o DOI, a situação na Crossref e a etapa, e oferece <strong>Importar sumário e capítulos do PDF</strong> (abre a importação já apontando para esse livro) e <strong>Editar sumário e capítulos</strong>.</p>
+  <figure>
+    <img src="img/hub-produto-com-livro.png" alt="">
+    <figcaption>Produto com livro ligado (dados de exemplo).</figcaption>
+  </figure>
+  <div class="caixa caixa--aviso">
+    <div class="caixa__titulo">Até a virada</div>
+    <p style="margin:0">Esses botões valem para os produtos que já estão no catálogo do Hub. Para um livro da loja nova que ainda não está lá (como o Atualidades volume 2), o caminho é o <strong>A</strong>: importar o livro e associar ao produto na etapa Comercialização.</p>
+  </div>
+</section>
+
+<!-- ===================================================== 6 -->
+<section class="secao">
+  <div class="eyebrow">06 · DOI</div>
+  <h2>DOI na Crossref</h2>
+  <p class="lead">O DOI é um endereço permanente do livro e de cada capítulo. O Hub monta o XML, envia à Crossref e acompanha o resultado.</p>
+
+  <h3>Quando registrar</h3>
+  <ul>
+    <li>Só livro <strong>publicado</strong> no site (o DOI aponta para a página dele).</li>
+    <li>O botão <strong>Registrar DOI</strong> aparece para quem tem permissão. Antes de confirmar, o Hub mostra os DOIs do lote e o custo estimado.</li>
+    <li>Hoje o Hub está em <strong>homologação</strong> (test.crossref.org): nada é registrado de verdade nem cobrado. Vai para produção depois da aprovação do roteiro de testes.</li>
+    <li>Atualizar um livro já registrado (mudou URL, título, resumo) reenvia os mesmos DOIs <strong>sem nova cobrança</strong>.</li>
+  </ul>
+
+  <h3>Quanto custa (tabela da Crossref de 2026)</h3>
+  <table>
+    <tr><th>Registro</th><th>Obra atual (ano corrente ou 2 anteriores)</th><th>Obra antiga</th></tr>
+    <tr><td>Livro (título)</td><td>US$ 1,00</td><td>US$ 0,15</td></tr>
+    <tr><td>Capítulo</td><td>US$ 0,25</td><td>US$ 0,15</td></tr>
+    <tr><td>Atualização de DOI já registrado</td><td colspan="2">Grátis</td></tr>
+  </table>
+  <p>Exemplo: um livro deste ano com 20 capítulos custa US$ 1,00 + 20 × US$ 0,25 = <strong>US$ 6,00</strong>. O Hub mostra essa conta na página do livro e na confirmação do registro. A Crossref anunciou preços menores a partir de 2027; o valor fica numa configuração do Hub, fácil de atualizar.</p>
+
+  <h3>Como a Crossref cobra</h3>
+  <ul>
+    <li><strong>Fatura por e-mail</strong> para o contato de cobrança da conta, a cada <strong>trimestre</strong>, referente aos registros do trimestre anterior. Abaixo de US$ 100, a fatura pode acumular para o próximo.</li>
+    <li>Prazo de <strong>45 dias</strong>, sempre em <strong>dólar</strong>: cartão de crédito ou débito (Visa/Mastercard) no portal de pagamento da Crossref, ou transferência internacional.</li>
+    <li>A <strong>anuidade</strong> de membro vem à parte, em janeiro: US$ 275 para editora com receita entre US$ 1 mil e US$ 1 milhão (US$ 200 abaixo de US$ 1 mil).</li>
+  </ul>
+</section>
+
+<!-- ===================================================== 7 -->
+<section class="secao">
+  <div class="eyebrow">07 · Site</div>
+  <h2>A página do livro</h2>
+  <p class="lead">Uma página só para todo livro, com ou sem DOI, no layout do Figma. Os blocos de DOI, capítulos e citação aparecem quando o livro tem esses dados.</p>
+  <figure>
+    <img src="img/livro.png" alt="">
+    <figcaption>Página do livro em produção: capa e amostras, ficha com ícones, DOI e ISBNs com a marca da Crossref, palavras-chave, abas (Descrição, Sumário, Capítulos, Autores e Organizadores, Detalhes, Avaliações) e a caixa de compra com os formatos.</figcaption>
+  </figure>
+</section>
+
+<section class="secao">
+  <div class="eyebrow">07 · Site</div>
+  <h2>A página do capítulo</h2>
+  <p>Cada capítulo tem página própria (destino do DOI do capítulo): número e DOI, título, autores com ORCID, ações (Favoritar, Compartilhar, PDF da ficha, Citar), detalhes, "Como citar" nos cinco formatos e os autores com instituição. À direita, o livro, a compra, as informações bibliográficas e a lista de capítulos.</p>
+  <figure class="estreita">
+    <img src="img/capitulo.png" alt="">
+    <figcaption>Página do capítulo em produção.</figcaption>
+  </figure>
+</section>
+
+<section class="secao">
+  <div class="eyebrow">07 · Site</div>
+  <h2>Ficha em PDF e leads</h2>
+  <p>Ao clicar no ícone de PDF (no livro ou no capítulo), o leitor vê um pop-up pedindo <strong>nome e e-mail</strong>, com o aceite da política de privacidade (obrigatório) e a opção de receber novidades. Ao enviar, a ficha abre numa aba nova por um link que vale uma hora.</p>
+  <figure>
+    <img src="img/ficha-popup.jpg" alt="">
+    <figcaption>Pop-up da ficha na página do livro.</figcaption>
+  </figure>
+  <p>Os PDFs ficam numa pasta protegida, com nome impossível de adivinhar; ninguém baixa a ficha sem passar pelo cadastro. Cada lead registra <strong>qual livro ou qual capítulo</strong> foi aberto.</p>
+  <figure>
+    <img src="img/wp-leads.jpg" alt="">
+    <figcaption>wp-admin → Publicações DOI → Leads das fichas: busca e exportação em CSV (dados de teste).</figcaption>
+  </figure>
+  <div class="caixa">
+    <div class="caixa__titulo">Uso dos leads</div>
+    <p style="margin:0">Só quem marcou "Quero receber novidades" pode entrar em listas de divulgação (coluna Novidades = Sim). Os demais deram o e-mail apenas para abrir a ficha.</p>
+  </div>
+</section>
+
+<!-- ===================================================== 8 -->
+<section class="secao">
+  <div class="eyebrow">08 · E-books</div>
+  <h2>Como colocar o PDF do e-book</h2>
+  <p class="lead">O arquivo do e-book fica no produto da loja, numa área protegida. Só lê quem tem direito, no site e no app.</p>
+  <div class="duas">
+    <div>
+      <ol class="passos">
+        <li>No wp-admin da loja nova, abra <strong>Produtos</strong> e edite o livro.</li>
+        <li>Na lateral, caixa <strong>Livro digital</strong>, clique em <strong>Enviar PDF</strong> e escolha o arquivo (o produto precisa estar salvo).</li>
+        <li>A caixa passa a mostrar "PDF (modelo novo)" e o link <strong>Abrir no leitor</strong> para conferir.</li>
+        <li>Combo ou coleção: em <strong>Coleção: libera também</strong>, informe os IDs dos produtos que a compra também libera.</li>
+      </ol>
+      <p>Livros antigos ainda podem usar o <strong>flipbook</strong> (pasta legada); quando o PDF é enviado, vale o PDF.</p>
+    </div>
+    <figure style="margin-top:0">
+      <img src="img/wp-livro-digital.png" alt="" style="width:80%;margin:0 auto">
+      <figcaption>Caixa "Livro digital" no produto (wp-admin).</figcaption>
+    </figure>
+  </div>
+
+  <h3>Quem pode ler</h3>
+  <ul>
+    <li>Quem tem <strong>pedido pago</strong> do e-book (ou do combo) na loja: situação "processando" ou "concluído". A leitura libera assim que o pagamento é confirmado; não é preciso enviar o PDF de novo.</li>
+    <li>Quem recebeu uma <strong>concessão</strong>: cortesia, compra em outro canal ou migração da Pubcon (a biblioteca guarda essas liberações).</li>
+    <li>O leitor do site e o app usam a <strong>mesma regra</strong> e o mesmo arquivo; a tela de leitura tem marca d'água com o nome e parte do e-mail do leitor.</li>
+  </ul>
+  <div class="caixa caixa--azul">
+    <div class="caixa__titulo">Antes da virada</div>
+    <p style="margin:0">Como as vendas de e-book ainda acontecem na Pubcon, os leitores da Pubcon continuam lendo por lá. Na virada, as compras e os acessos são migrados para a loja nova (a migração já foi ensaiada em 28/09).</p>
+  </div>
+</section>
+
+<!-- ===================================================== 9 -->
+<section class="secao">
+  <div class="eyebrow">09 · App</div>
+  <h2>O app do leitor</h2>
+  <p class="lead">Um código só para web (conexaoeditora.com.br/app), Android e iOS. O login é o <strong>mesmo do site</strong>. As versões das lojas de aplicativos estão em revisão.</p>
+  <div style="text-align:center">
+    <figure class="celular"><img src="img/app-login.jpg" alt=""><figcaption>Entrada (mesmo e-mail e senha do site)</figcaption></figure>
+    <figure class="celular"><img src="img/app-estante.jpg" alt=""><figcaption>Estante: e-books com direito de leitura</figcaption></figure>
+    <figure class="celular"><img src="img/app-leitor.jpg" alt=""><figcaption>Leitor com sumário, busca, marcadores e marca d'água</figcaption></figure>
+  </div>
+  <p style="font-size:8.5pt;color:var(--cinza);text-align:center">Prints do modo de demonstração do app (dados de exemplo).</p>
+
+  <h3>O que o app faz</h3>
+  <ul>
+    <li><strong>Estante</strong>: os e-books que a pessoa pode ler (mesma regra da biblioteca do site), com "continuar lendo".</li>
+    <li><strong>Leitura</strong>: PDF com sumário, busca no texto, marcadores, progresso sincronizado e temas claro, sépia e escuro.</li>
+    <li><strong>Offline</strong>: "Baixar livro" guarda o PDF dentro do app; ao sair da conta, os arquivos baixados são apagados.</li>
+    <li><strong>Aparelhos</strong>: até 3 por conta; no 4º, o app pede para desconectar um.</li>
+  </ul>
+</section>
+
+<section class="secao">
+  <div class="eyebrow">09 · App</div>
+  <h2>De onde o app pega os pedidos</h2>
+  <div class="duas">
+    <div>
+      <p>A aba <strong>Pedidos</strong> mostra os pedidos dos <strong>últimos 24 meses de todos os canais</strong>, com a linha do tempo (aguardando pagamento → pago → em separação → a caminho → entregue) e o rastreio.</p>
+      <ol class="passos">
+        <li>O app pede os pedidos ao site.</li>
+        <li>O site pergunta ao <strong>Hub</strong>, por uma chamada assinada servidor a servidor, pelos pedidos daquele e-mail.</li>
+        <li>O Hub procura em <strong>todos os canais</strong> (loja, Pagar.me, Amazon) pelo e-mail e devolve só o que o leitor pode ver: sem custos internos nem observações.</li>
+      </ol>
+      <div class="caixa caixa--aviso">
+        <div class="caixa__titulo">E-mail confirmado</div>
+        <p style="margin:0">Como o Hub acha os pedidos pelo e-mail, o app só mostra os pedidos de outros canais quando o leitor <strong>confirma o e-mail</strong> (código de 6 dígitos ou redefinição de senha). Sem isso, mostra só os pedidos da própria conta na loja. Pedidos da Amazon raramente aparecem, porque a Amazon mascara os e-mails.</p>
+      </div>
+    </div>
+    <figure class="celular" style="width:70%;margin:0 15%"><img src="img/app-pedidos.jpg" alt=""><figcaption>Pedidos no app, com o convite para confirmar o e-mail.</figcaption></figure>
+  </div>
+</section>
+
+<!-- ===================================================== 10 -->
+<section class="secao">
+  <div class="eyebrow">10 · Pedidos</div>
+  <h2>Pedidos e expedição</h2>
+  <p class="lead">Todos os pedidos, de todos os canais, ficam numa central só no Hub, com a mesma situação padronizada.</p>
+  <table>
+    <tr><th style="width:22%">Canal</th><th>Como chega ao Hub</th><th>Observação</th></tr>
+    <tr><td>Loja (WooCommerce)</td><td>Aviso automático (webhook) a cada pedido, mais sincronização periódica</td><td>Hoje é a Pubcon; depois da virada, a loja nova</td></tr>
+    <tr><td>Pagar.me</td><td>Páginas de venda (landing pages)</td><td>Pedidos feitos fora da loja</td></tr>
+    <tr><td>Amazon</td><td>Integração com a Amazon Seller</td><td>Livro físico; aprovação da SP-API pendente</td></tr>
+  </table>
+  <h3>O caminho de um pedido físico</h3>
+  <ol class="passos">
+    <li>O pedido chega ao Hub e aparece na <strong>Central de Pedidos</strong>.</li>
+    <li>Pago, entra na <strong>Expedição</strong>: separação, conferência e etiqueta pelo <strong>Melhor Envio</strong> (precisa de saldo na carteira do Melhor Envio).</li>
+    <li>Postado, o código de rastreio volta para o canal de venda e aparece no app do leitor.</li>
+  </ol>
+  <h3>E-book</h3>
+  <p>Pedido só de e-book não passa pela expedição: com o pagamento confirmado, o livro aparece na estante do site e do app.</p>
+  <h3>Vendedores</h3>
+  <p>Livros de autores parceiros têm vendedor no Hub (menu Vendedores): cada venda gera comissão e os repasses são feitos pelo Hub. O vendedor tem um portal próprio, sem dados dos clientes.</p>
+</section>
+
+<!-- ===================================================== 11 -->
+<section class="secao">
+  <div class="eyebrow">11 · Virada</div>
+  <h2>A virada para a Conexão Editora</h2>
+  <p class="lead">A virada troca a loja ativa da Pubcon para a Conexão Editora. Ela já foi ensaiada (28/09) e desfeita a pedido (29/09), até existir a página de transição e a loja nova estar conferida.</p>
+  <h3>O que acontece na virada</h3>
+  <ol class="passos">
+    <li><strong>Migração final</strong> dos clientes, pedidos e acessos aos e-books da Pubcon para a loja nova.</li>
+    <li><strong>Hub passa a ler a loja nova</strong>: novas chaves da API, sincronização de produtos ligada e os pedidos antigos religados aos produtos novos.</li>
+    <li><strong>Página de transição</strong> na Pubcon ("agora somos Conexão Editora") e redirecionamento dos e-books antigos.</li>
+    <li>Loja nova <strong>visível para os buscadores</strong>; webhooks da loja e da Pagar.me apontando para o domínio novo.</li>
+  </ol>
+  <h3>O que passa a valer depois</h3>
+  <ul>
+    <li><strong>Produtos do Hub = produtos da loja nova</strong>, sempre atualizados.</li>
+    <li><strong>Criação do produto no Hub</strong>: preço por formato, descrição, capa, peso e medidas, enviados à loja. O cadastro do livro e do produto acontece no mesmo lugar.</li>
+    <li>O botão <strong>Cadastrar sumário e capítulos</strong> passa a valer para qualquer produto da loja.</li>
+  </ul>
+  <div class="caixa caixa--azul">
+    <div class="caixa__titulo">Recadastro do catálogo</div>
+    <p style="margin:0">A ideia combinada é apagar e recadastrar os livros da loja nova antes da virada, já com <strong>peso e medidas</strong> (hoje 14 produtos estão sem medidas no Hub) e incluindo livros só de vitrine. Clientes e pedidos não são afetados, porque ainda estão na Pubcon.</p>
+  </div>
+</section>
+
+<!-- ===================================================== 12 -->
+<section class="secao">
+  <div class="eyebrow">12 · Pendências e glossário</div>
+  <h2>Pendências conhecidas</h2>
+  <table>
+    <tr><th style="width:38%">Item</th><th>Situação</th></tr>
+    <tr><td>Produto do Atualidades (volume 2) na loja nova</td><td>Botão "Comprar no site oficial" vindo de um link externo antigo do produto; descrição curta ainda provisória; faltam imagens de amostra. Ajuste no wp-admin pela equipe da loja.</td></tr>
+    <tr><td>DOI em produção</td><td>Crossref em homologação até a aprovação do roteiro de testes.</td></tr>
+    <tr><td>Peso e medidas</td><td>14 produtos sem medidas no Hub (afeta o frete).</td></tr>
+    <tr><td>Melhor Envio</td><td>Carteira sem saldo bloqueia a geração de etiquetas.</td></tr>
+    <tr><td>Amazon</td><td>Aguardando a aprovação da SP-API.</td></tr>
+    <tr><td>App nas lojas</td><td>Versão 1.0.0 em revisão na Apple e no Google.</td></tr>
+    <tr><td>Hub cria o produto na loja</td><td>Depois da virada.</td></tr>
+  </table>
+
+  <h2 style="margin-top:22px">Glossário</h2>
+  <table>
+    <tr><th style="width:24%">Termo</th><th>Significado</th></tr>
+    <tr><td>Hub</td><td>Painel interno (hub.pubcon.com.br) de cadastro, pedidos, expedição e DOI.</td></tr>
+    <tr><td>DOI</td><td>Identificador permanente de uma publicação (ex.: 10.68564/conexao.2026.001), registrado na Crossref.</td></tr>
+    <tr><td>Crossref</td><td>Entidade que registra os DOIs e cobra por registro.</td></tr>
+    <tr><td>Ficha</td><td>PDF editorial do livro ou do capítulo, aberto pelo ícone de PDF no site depois do cadastro do leitor.</td></tr>
+    <tr><td>Lead</td><td>Nome e e-mail de quem abriu uma ficha, com a obra aberta.</td></tr>
+    <tr><td>Produto</td><td>Item de venda na loja (preço, formatos, estoque, PDF do e-book).</td></tr>
+    <tr><td>Livro</td><td>Cadastro editorial completo no Hub (resumo, sumário, capítulos, autores, ficha, DOI opcional).</td></tr>
+    <tr><td>Comercialização</td><td>Etapa do livro no Hub que liga cada formato ao produto da loja.</td></tr>
+    <tr><td>Virada</td><td>Troca da loja ativa da Pubcon para a Conexão Editora.</td></tr>
+    <tr><td>Homologação</td><td>Ambiente de teste da Crossref: nada é registrado de verdade nem cobrado.</td></tr>
+  </table>
+</section>
+
+</body>
+</html>
