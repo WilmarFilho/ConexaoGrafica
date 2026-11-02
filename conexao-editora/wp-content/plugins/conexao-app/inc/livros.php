@@ -303,7 +303,14 @@ function conexao_app_rota_pdf(WP_REST_Request $request)
     // percent-encoded (UTF-8): cabeçalho HTTP não carrega acento com segurança
     header('X-Conexao-Marca: '.rawurlencode(conexao_app_marca($usuario)));
 
-    conexao_biblioteca_entrega($arquivo['pdf'], 'application/pdf');
+    // a cópia com nome, e-mail e pedido do leitor (conexao-biblioteca/inc/marca.php)
+    $copia = function_exists('conexao_biblioteca_pdf_do_leitor') ? conexao_biblioteca_pdf_do_leitor($produto_id, $usuario) : $arquivo['pdf'];
+
+    if ($copia === '') {
+        return conexao_app_erro('nao_encontrado', 'Estamos preparando a sua cópia deste livro. Tente de novo em um minuto.');
+    }
+
+    conexao_biblioteca_entrega($copia, 'application/pdf');
 
     return null; // não chega aqui: a entrega encerra a requisição
 }

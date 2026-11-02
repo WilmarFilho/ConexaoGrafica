@@ -76,7 +76,14 @@ add_action('parse_request', function (WP $wp): void {
             conexao_biblioteca_recusa(403, 'Abra o livro pela sua biblioteca para ler.');
         }
 
-        conexao_biblioteca_entrega($livro['pdf'], 'application/pdf');
+        // cada leitor recebe a sua cópia, com nome, e-mail e pedido gravados (marca.php)
+        $copia = conexao_biblioteca_pdf_do_leitor($produto_id, wp_get_current_user());
+
+        if ($copia === '') {
+            conexao_biblioteca_recusa(409, 'Sua cópia do livro ainda está sendo preparada. Tente de novo em instantes.');
+        }
+
+        conexao_biblioteca_entrega($copia, 'application/pdf');
     }
 
     if ($arquivo !== '') {
@@ -232,12 +239,33 @@ function conexao_biblioteca_recusa(int $codigo, string $mensagem): void
     exit;
 }
 
+/** Enquanto a cópia marcada não fica pronta: aviso que se recarrega sozinho. */
+function conexao_biblioteca_preparando(string $titulo): void
+{
+    status_header(200);
+    header('Content-Type: text/html; charset=UTF-8');
+    header('Refresh: 6');
+
+    printf(
+        '<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>%1$s · Conexão Editora</title>'
+        .'<body style="margin:0;display:grid;place-items:center;min-height:100vh;font:16px/1.5 system-ui,sans-serif;background:#F5F7F9;color:#1B2A33">'
+        .'<main style="max-width:440px;text-align:center;padding:24px"><p style="font-size:19px;font-weight:700;margin:0 0 8px">Preparando a sua cópia de %1$s</p>'
+        .'<p style="margin:0;color:#5d7082">Cada leitor recebe o livro com o próprio nome. Na primeira vez isso leva até um minuto; esta página abre o livro sozinha quando ficar pronto.</p></main></body></html>',
+        esc_html($titulo)
+    );
+    exit;
+}
+
 /** A tela de leitura: barra fina em cima, o livro ocupando o resto. */
 function conexao_biblioteca_tela(int $produto_id, array $livro): void
 {
     $usuario = wp_get_current_user();
     $titulo = get_the_title(conexao_biblioteca_produto_base($produto_id));
     $biblioteca = function_exists('wc_get_account_endpoint_url') ? wc_get_account_endpoint_url('biblioteca') : home_url('/');
+
+    if ($livro['modelo'] === 'pdf' && conexao_biblioteca_pdf_do_leitor($produto_id, $usuario) === '') {
+        conexao_biblioteca_preparando($titulo);
+    }
 
     if ($livro['modelo'] === 'pdf') {
         $origem = CONEXAO_BIBLIOTECA_URL.'assets/pdfjs/web/viewer.html?file='
