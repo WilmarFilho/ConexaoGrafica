@@ -63,13 +63,18 @@ function conexao_biblioteca_caixa_produto(WP_Post $post): void
             <?php $deslocamento = conexao_biblioteca_deslocamento($post->ID); ?>
             <span class="description" style="display:block;margin-bottom:6px">
                 <?php if ($deslocamento !== null) : ?>
-                    Usando o sumário do Hub (<?php echo count($do_hub); ?> capítulos), com <?php echo (int) $deslocamento; ?> página(s) de diferença entre o PDF e o livro impresso. Só preencha abaixo para trocar por outro.
+                    <strong>Preenchido automaticamente</strong> com o sumário do Hub (<?php echo count($do_hub); ?> capítulos, <?php echo (int) $deslocamento; ?> página(s) de diferença entre o PDF e o livro impresso). É este que o leitor mostra:
+                    <ol style="margin:6px 0 0;padding-left:0;list-style:none;font-size:12px;line-height:1.5;max-height:220px;overflow:auto">
+                        <?php foreach (conexao_biblioteca_sumario_do_hub($post->ID) as $item) : ?>
+                            <li style="<?php echo ! empty($item['nivel']) ? 'padding-left:12px' : 'font-weight:600;margin-top:4px'; ?>"><?php echo (int) $item['pagina']; ?> · <?php echo esc_html($item['titulo']); ?></li>
+                        <?php endforeach; ?>
+                    </ol>
                 <?php else : ?>
                     O livro tem <?php echo count($do_hub); ?> capítulos no Hub, mas não achei no PDF onde começa o capítulo 1. Informe a diferença de páginas abaixo ou digite o sumário.
                 <?php endif; ?>
             </span>
         <?php endif; ?>
-        <textarea id="conexao-livro-sumario" name="conexao_livro_sumario" rows="8" style="width:100%;font-family:monospace;font-size:12px" placeholder="1 | Capa&#10;5 | Sumário&#10;9 | Capítulo 1 - Introdução"><?php echo esc_textarea(conexao_biblioteca_sumario_para_texto(conexao_biblioteca_sumario_digitado($post->ID))); ?></textarea>
+        <textarea id="conexao-livro-sumario" name="conexao_livro_sumario" rows="8" style="width:100%;font-family:monospace;font-size:12px" placeholder="<?php echo $do_hub ? 'Vazio: usa o sumário do Hub acima. Preencha só para trocar.' : '9 | Capítulo 1 - Introdução'; ?>"><?php echo esc_textarea(conexao_biblioteca_sumario_para_texto(conexao_biblioteca_sumario_digitado($post->ID))); ?></textarea>
         <span class="description">Uma linha por item: <code>página | título</code>, com o número da página <strong>do PDF</strong> (a que o leitor mostra). Usado quando o PDF não traz marcadores próprios.</span>
     </p>
 
