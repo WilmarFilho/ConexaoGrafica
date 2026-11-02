@@ -2,20 +2,22 @@
 
 namespace App\Filament\Resources\Imports\Schemas;
 
+use App\Editorial\License;
 use App\Filament\Resources\Imports\Pages\ReviewImport;
 use App\Models\Book;
 use App\Models\Contribution;
 use App\Rules\Isbn13;
 use App\Rules\Orcid;
 use Closure;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
@@ -110,6 +112,12 @@ class ReviewForm
                     self::field(TagsInput::make('book.keywords')->label(fn () => 'Palavras-chave'.(($book()['keywords_source'] ?? null) === 'ai' ? ' — sugeridas pela IA' : '')), 'keywords', $ctx),
                     TagsInput::make('book.keywords_en')->label('Palavras-chave em inglês'),
                 ]),
+
+                Section::make('Direitos autorais')
+                    ->description('Licença Creative Commons do livro. A IA só marca se estiver impressa no PDF; os capítulos usam a do livro.')
+                    ->schema([
+                        self::field(CheckboxList::make('book.licenses')->hiddenLabel()->options(License::options())->columns(2), 'licenses', $ctx),
+                    ]),
             ]);
     }
 

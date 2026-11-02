@@ -251,7 +251,7 @@ class DocumentsTest extends TestCase
 
         // Payload passa a levar as fichas reais (o WP substitui a lista a cada PUT).
         $p = Payload::forBook(Book::find(1));
-        $this->assertSame([['type' => 'book_sheet', 'attachment_id' => 101, 'url' => $sheet->public_url, 'version' => '1.0', 'generated_at' => $sheet->generated_at->toIso8601String()]], $p['book']['documents']);
+        $this->assertSame([['type' => 'book_sheet', 'attachment_id' => 101, 'url' => $sheet->public_url, 'version' => SheetGenerator::TEMPLATE_VERSION, 'generated_at' => $sheet->generated_at->toIso8601String()]], $p['book']['documents']);
         $this->assertSame('chapter_sheet', $p['chapters'][0]['documents'][0]['type']);
         $this->assertSame(10, Chapter::find(10)->sheet->documentable_id);
         $this->assertNotNull($p['chapters'][1]['documents'][0]['url']);

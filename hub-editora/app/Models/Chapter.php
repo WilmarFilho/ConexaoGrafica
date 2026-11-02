@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Editorial\DoiSuffix;
 use App\Editorial\EditorialException;
 use App\Editorial\Keywords;
+use App\Editorial\License;
 use App\Editorial\Slug;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,6 +39,7 @@ class Chapter extends Model
             'first_page' => 'integer',
             'last_page' => 'integer',
             'keywords' => 'array',
+            'licenses' => 'array',
             'references' => 'array',
             'ai_evidence' => 'array',
             'publication_date' => 'date',
@@ -127,6 +129,14 @@ class Chapter extends Model
     }
 
     /** Idioma do capítulo ou, por herança, do livro. */
+    /** Licenças do capítulo; sem licença própria, as do livro. */
+    public function effectiveLicenses(): array
+    {
+        $own = License::normalize($this->licenses ?? []);
+
+        return $own !== [] ? $own : License::normalize($this->book?->licenses ?? []);
+    }
+
     public function effectiveLanguage(): ?string
     {
         return $this->language ?: $this->book?->language;

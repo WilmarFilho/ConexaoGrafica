@@ -5,6 +5,7 @@ namespace App\Editorial\Import;
 use App\Editorial\Import\Ai\AiException;
 use App\Editorial\Import\Ai\AiGateway;
 use App\Editorial\Import\Ai\UsageMeter;
+use App\Editorial\License;
 use Illuminate\Support\Str;
 
 /**
@@ -26,7 +27,7 @@ use Illuminate\Support\Str;
 class Analyzer
 {
     /** Sobe quando qualquer prompt ou schema muda; fica gravado em imports.prompt_version. */
-    public const PROMPT_VERSION = '2026-10-30.1';
+    public const PROMPT_VERSION = '2026-11-02.1';
 
     public const FORMAT = 'conexao-doi/import-proposal@1';
 
@@ -292,6 +293,7 @@ class Analyzer
             'keywords' => $keywords,
             'keywords_source' => $keywordsSource,
             'keywords_en' => [],
+            'licenses' => License::normalize($fm['licenses'] ?? []),
             'abstract' => $abstract,
             'abstract_source' => $abstractSource,
             'synopsis' => null,

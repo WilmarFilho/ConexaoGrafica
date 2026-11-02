@@ -37,6 +37,7 @@ Extraia:
 - Pessoas: organizadores (role editor) e autores (role author) listados nas páginas iniciais, cada um com a instituição principal resumida. Corpo editorial, conselho e revisores técnicos não entram.
 - Sumário completo: só capítulos de conteúdo, na ordem, com seção/parte, número, título, autores (se o sumário trouxer) e a página impressa inicial. Apresentação, prefácio, índice e anexos não são capítulos; informe a página do primeiro item depois do último capítulo em end_of_chapters_printed_page.
 - Resumo e palavras-chave da obra só se estiverem impressos (literalmente).
+- Licença Creative Commons só se estiver impressa (costuma vir na ficha catalográfica ou no verso da folha de rosto, como "Esta obra está licenciada sob CC BY-NC 4.0"); informe o código. "Todos os direitos reservados" não é licença Creative Commons: deixe vazio.
 TXT;
     }
 

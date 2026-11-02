@@ -2,6 +2,7 @@
 
 namespace App\Editorial\WordPress;
 
+use App\Editorial\License;
 use App\Models\Book;
 use App\Models\Chapter;
 use App\Models\CommercialLink;
@@ -52,6 +53,8 @@ class Payload
                 'doi' => $book->doi,
                 'keywords' => self::strings($book->keywords),
                 'keywords_en' => self::strings($book->keywords_en),
+                // Direitos autorais: código, nome, título, URL, elementos (ícones) e a frase pronta.
+                'licenses' => License::expand($book->licenses ?? [], 'Este livro está licenciado'),
                 'abstract' => $book->abstract,
                 'synopsis' => $book->synopsis,
                 'references' => self::references($book->references),
@@ -86,6 +89,9 @@ class Payload
             'doi' => $book->doi_prefix.'/'.$c->doi_suffix,
             'abstract' => $c->abstract_approved,
             'keywords' => self::strings($c->keywords),
+            // Sem licença própria, as do livro (`licenses_inherited` diz qual foi o caso).
+            'licenses' => License::expand(License::normalize($c->licenses ?? []) ?: ($book->licenses ?? []), 'Este capítulo está licenciado'),
+            'licenses_inherited' => License::normalize($c->licenses ?? []) === [],
             'references' => self::references($c->references),
             'contributors' => $c->contributions->map(fn (Contribution $x) => self::contributor($x))->values()->all(),
             'documents' => self::documents($c->relationLoaded('documents') ? $c->documents : $c->documents()->get()),

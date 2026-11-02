@@ -25,6 +25,7 @@
     "doi": "10.00000/conexao.2026.001",
     "keywords": ["Doenças raras", "Genética", "Diagnóstico", "Políticas públicas"],
     "keywords_en": ["Rare diseases", "Genetics", "Diagnosis", "Public policy"],
+    "licenses": [],
     "abstract": "Obra organizada que reúne 74 capítulos sobre o diagnóstico, o manejo clínico e as políticas públicas relacionadas às doenças raras no Brasil, escrita por especialistas de diversas instituições.",
     "synopsis": "O mais completo tratado brasileiro sobre doenças raras, com a contribuição de mais de 70 autores.",
     "references": [],
@@ -64,6 +65,8 @@
       "doi": "10.00000/conexao.2026.001.01",
       "abstract": "Este capítulo apresenta a evolução do conceito de doença rara, os marcos regulatórios internacionais e brasileiros e o papel das associações de pacientes.",
       "keywords": ["Doenças raras", "História da medicina", "Legislação"],
+      "licenses": [],
+      "licenses_inherited": true,
       "references": [
         { "text": "BRASIL. Ministério da Saúde. Portaria nº 199, de 30 de janeiro de 2014. Diário Oficial da União, Brasília, 2014.", "doi": null }
       ],
@@ -92,6 +95,8 @@
       "doi": "10.00000/conexao.2026.001.02",
       "abstract": "Revisão dos mecanismos genéticos envolvidos nas doenças raras, dos métodos de diagnóstico molecular e do aconselhamento genético.",
       "keywords": ["Genética", "Diagnóstico molecular", "Aconselhamento genético"],
+      "licenses": [],
+      "licenses_inherited": true,
       "references": [],
       "contributors": [
         { "hub_person_id": 4, "name": "Carlos Exemplo Lima", "sort_name": "LIMA, Carlos Exemplo", "orcid": null, "role": "author", "sequence": 1,

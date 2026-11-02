@@ -81,6 +81,9 @@ class BookWorkflow
                 $notApproved->isNotEmpty() ? $notApproved->count().' ainda não aprovado(s)' : null);
         }
 
+        $add('licenses', 'Direitos autorais (licença)', License::normalize($book->licenses ?? []) !== [], 'info',
+            'Sem licença, o site, a ficha e o DOI não informam os direitos autorais.');
+
         $add('commercial', 'Link de compra (produto Woo ou URL)',
             $book->commercialLinks->contains(fn ($l) => $l->enabled && $l->hasDestination()), 'info',
             'Sem link a página fica no ar, só sem o botão de compra.');

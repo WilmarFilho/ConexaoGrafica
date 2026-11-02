@@ -86,6 +86,8 @@
     </div>
 @endif
 
+@include('documents.licenses', ['licenses' => $chapter['licenses'] ?? []])
+
 <h2>Como citar este capítulo</h2>
 @foreach (['abnt', 'apa', 'vancouver'] as $fmt)
     <div class="cite">

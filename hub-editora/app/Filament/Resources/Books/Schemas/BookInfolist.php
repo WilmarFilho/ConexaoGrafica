@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Books\Schemas;
 
+use App\Editorial\License;
 use App\Filament\Resources\Chapters\ChapterResource;
 use App\Models\Book;
 use App\Models\Contribution;
@@ -66,6 +67,9 @@ class BookInfolist
                             ->schema([
                                 TextEntry::make('abstract')->hiddenLabel(),
                                 TextEntry::make('keywords')->label('Palavras-chave')->badge()->color('gray')->placeholder('—'),
+                                TextEntry::make('licenses')->label('Direitos autorais')->badge()->color('info')
+                                    ->formatStateUsing(fn (?string $state) => License::ALL[$state]['name'] ?? $state)
+                                    ->placeholder('nenhuma licença escolhida'),
                             ]),
 
                         Section::make('Prévia do payload enviado ao site')

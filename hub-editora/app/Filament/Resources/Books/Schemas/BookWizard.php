@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Books\Schemas;
 
 use App\Editorial\BookWorkflow;
 use App\Editorial\DoiSuffix;
+use App\Editorial\License;
 use App\Editorial\WordPress\Client;
 use App\Editorial\WordPress\Payload;
 use App\Filament\Resources\Books\BookActions;
@@ -19,14 +20,15 @@ use App\Rules\Isbn13;
 use App\Rules\Orcid;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Actions;
@@ -260,6 +262,10 @@ class BookWizard
                 TagsInput::make('keywords_en')->label('Keywords (inglês)')->splitKeys(['Tab', ',']),
                 Textarea::make('synopsis')->label('Sinopse comercial')->rows(3)->maxLength(5000)
                     ->helperText('Texto da página do site; não vai para a Crossref.'),
+                CheckboxList::make('licenses')->label('Direitos autorais (licença Creative Commons)')
+                    ->options(License::options())
+                    ->descriptions(License::descriptions())
+                    ->helperText('Aparece no site, na ficha e no registro do DOI. Pode marcar mais de uma. Os capítulos usam a do livro, salvo se tiverem a sua.'),
                 Repeater::make('references')->label('Referências da obra')
                     ->defaultItems(0)->collapsed()->addActionLabel('Adicionar referência')->columns(4)
                     ->itemLabel(fn (array $state) => Str::limit($state['text'] ?? 'Referência', 80))

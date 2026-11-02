@@ -128,6 +128,8 @@
     </table>
 @endif
 
+@include('documents.licenses', ['licenses' => $book['licenses'] ?? []])
+
 <h2>Como citar este livro</h2>
 @foreach (['abnt', 'apa', 'vancouver'] as $fmt)
     <div class="cite">

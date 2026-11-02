@@ -34,7 +34,7 @@ use Illuminate\Support\Str;
 class SheetGenerator
 {
     /** Mude ao alterar o layout: força a regeneração de todas as fichas. */
-    public const TEMPLATE_VERSION = '1.0';
+    public const TEMPLATE_VERSION = '1.1';
 
     public const DIR = 'documents';
 

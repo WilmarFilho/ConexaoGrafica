@@ -56,6 +56,9 @@
     .cite .txt { font-size: 9pt; }
 
     .box { border: 0.8pt solid #DCE3EA; padding: 8pt 10pt; border-radius: 4pt; page-break-inside: avoid; }
+    .license { margin-bottom: 5pt; border-color: #1E88C8; }
+    .license-head { margin-bottom: 3pt; }
+    .cc-icon { display: inline-block; width: 13pt; height: 13pt; line-height: 13pt; text-align: center; border: 0.8pt solid #0B2545; border-radius: 7pt; font-size: 5.5pt; font-weight: bold; color: #0B2545; margin-right: 2pt; }
     .qr-box { text-align: center; }
     .qr-box img { width: 86pt; height: 86pt; }
     .qr-box .url { font-size: 7pt; color: #6B7280; word-wrap: break-word; }

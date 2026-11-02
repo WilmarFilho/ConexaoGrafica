@@ -3,16 +3,18 @@
 namespace App\Filament\Resources\Chapters\Schemas;
 
 use App\Editorial\DoiSuffix;
+use App\Editorial\License;
 use App\Editorial\Slug;
 use App\Filament\Resources\Books\Schemas\ContributionsRepeater;
 use App\Models\Book;
 use App\Models\Chapter;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
@@ -79,6 +81,9 @@ class ChapterForm
                         Textarea::make('abstract_approved')->label('Resumo aprovado')->rows(4)->maxLength(5000)
                             ->helperText('Ao aprovar com este campo vazio, o sistema copia o original (ou, na falta dele, a sugestão da IA).'),
                         TagsInput::make('keywords')->label('Palavras-chave')->splitKeys(['Tab', ',']),
+                        CheckboxList::make('licenses')->label('Direitos autorais do capítulo')
+                            ->options(License::options())
+                            ->helperText('Deixe em branco para usar a licença do livro. Marque só se o capítulo tiver licença diferente.'),
                         Repeater::make('references')->label('Referências')
                             ->defaultItems(0)->collapsed()->addActionLabel('Adicionar referência')->columns(4)
                             ->itemLabel(fn (array $state) => Str::limit($state['text'] ?? 'Referência', 80))

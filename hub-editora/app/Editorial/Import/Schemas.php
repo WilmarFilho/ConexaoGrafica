@@ -38,6 +38,7 @@ class Schemas
             'subject_subarea' => self::nullable('string'),
             'keywords' => self::list(self::str(), 'Palavras-chave da obra só se estiverem impressas (ficha catalográfica ou página de resumo)'),
             'abstract' => self::nullable('string', 'Resumo/apresentação da obra somente se existir no PDF, copiado literalmente'),
+            'licenses' => self::list(self::str(), 'Licença Creative Commons impressa (ex.: "licenciado sob CC BY-NC 4.0"), como código: cc-by, cc-by-sa, cc-by-nd, cc-by-nc, cc-by-nc-sa, cc-by-nc-nd ou cc0; vazio se não houver'),
             'contributors' => self::list(self::contributor(true), 'Organizadores e autores listados nas páginas iniciais'),
             'toc' => self::list(self::object([
                 'section' => self::nullable('string', 'Parte/seção do sumário em que os capítulos estão, ou null'),

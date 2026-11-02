@@ -2,6 +2,7 @@
 
 namespace App\Crossref;
 
+use App\Editorial\License;
 use DOMDocument;
 use DOMElement;
 use Illuminate\Support\Str;
@@ -34,6 +35,9 @@ class XmlBuilder
     public const NS_JATS = 'http://www.ncbi.nlm.nih.gov/JATS1';
 
     public const NS_XSI = 'http://www.w3.org/2001/XMLSchema-instance';
+
+    /** Licenças (Access Indicators): `ai:program` com um `ai:license_ref` por licença. */
+    public const NS_AI = 'http://www.crossref.org/AccessIndicators.xsd';
 
     public const NS_XML = 'http://www.w3.org/XML/1998/namespace';
 
@@ -100,6 +104,7 @@ class XmlBuilder
         $root->setAttribute('version', '5.4.0');
         $root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xsi', self::NS_XSI);
         $root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:jats', self::NS_JATS);
+        $root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ai', self::NS_AI);
         $root->setAttributeNS(self::NS_XSI, 'xsi:schemaLocation', self::SCHEMA_LOCATION);
         $this->doc->appendChild($root);
 
@@ -156,6 +161,7 @@ class XmlBuilder
         $this->appendDates($meta, $this->bookDate($book), $this->mediaTypes($book));
         $this->appendIsbns($meta, $book);
         $meta->appendChild($this->publisher($book));
+        $this->appendLicenses($meta, $book['licenses'] ?? []);
         $meta->appendChild($this->doiData($book['doi'], $this->bookLanding($book)));
         $this->appendIf($meta, $this->citationList($book['references'] ?? [], 'b'.($book['hub_id'] ?? 0)));
     }
@@ -179,6 +185,7 @@ class XmlBuilder
         $this->appendDates($meta, $this->bookDate($book), $this->mediaTypes($book));
         $this->appendIsbns($meta, $book);
         $meta->appendChild($this->publisher($book));
+        $this->appendLicenses($meta, $book['licenses'] ?? []);
         $meta->appendChild($this->doiData($book['doi'], $this->bookLanding($book)));
         $this->appendIf($meta, $this->citationList($book['references'] ?? [], 'b'.($book['hub_id'] ?? 0)));
     }
@@ -206,6 +213,7 @@ class XmlBuilder
             $item->appendChild($pages);
         }
 
+        $this->appendLicenses($item, $chapter['licenses'] ?? []);
         $item->appendChild($this->doiData($chapter['doi'], $this->chapterLanding($chapter, $book)));
         $this->appendIf($item, $this->citationList($chapter['references'] ?? [], 'c'.($chapter['hub_id'] ?? 0)));
     }
@@ -372,6 +380,30 @@ class XmlBuilder
         }
 
         return $publisher;
+    }
+
+    /**
+     * Licenças como Access Indicators, logo antes do doi_data (ordem do XSD). Aceita a
+     * lista expandida do payload ({url, ...}) ou só os códigos; sem licença, nada.
+     */
+    private function appendLicenses(DOMElement $parent, array $licenses): void
+    {
+        $urls = array_values(array_unique(array_filter(array_map(
+            fn ($l) => is_array($l) ? ($l['url'] ?? null) : (License::urls([$l])[0] ?? null),
+            $licenses,
+        ))));
+        if ($urls === []) {
+            return;
+        }
+
+        $program = $this->doc->createElementNS(self::NS_AI, 'ai:program');
+        $parent->appendChild($program);
+        $program->setAttribute('name', 'AccessIndicators');
+        foreach ($urls as $url) {
+            $ref = $this->doc->createElementNS(self::NS_AI, 'ai:license_ref', htmlspecialchars($url, ENT_XML1));
+            $ref->setAttribute('applies_to', 'vor');
+            $program->appendChild($ref);
+        }
     }
 
     private function doiData(string $doi, string $resource): DOMElement

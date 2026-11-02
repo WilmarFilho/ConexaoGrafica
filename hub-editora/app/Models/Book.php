@@ -88,6 +88,7 @@ class Book extends Model
             'other_isbns' => 'array',
             'keywords' => 'array',
             'keywords_en' => 'array',
+            'licenses' => 'array',
             'references' => 'array',
             'publication_year' => 'integer',
             'edition_number' => 'integer',

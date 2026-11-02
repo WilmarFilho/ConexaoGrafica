@@ -3,6 +3,7 @@
 namespace App\Editorial\Import;
 
 use App\Editorial\EditorialException;
+use App\Editorial\License;
 use App\Models\Book;
 use App\Models\Chapter;
 use App\Models\Contribution;
@@ -138,6 +139,7 @@ class Integrator
             'other_isbns' => $this->otherIsbns($b['other_isbns'] ?? []),
             'keywords' => $this->strings($b['keywords'] ?? []),
             'keywords_en' => $this->strings($b['keywords_en'] ?? []),
+            'licenses' => License::normalize($b['licenses'] ?? []),
             'abstract' => $this->text($b['abstract'] ?? null),
             'synopsis' => $this->text($b['synopsis'] ?? null),
             'references' => $this->references($b['references'] ?? []),
