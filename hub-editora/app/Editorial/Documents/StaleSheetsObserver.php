@@ -2,6 +2,7 @@
 
 namespace App\Editorial\Documents;
 
+use App\Editorial\License;
 use App\Models\Book;
 use App\Models\Chapter;
 use App\Models\Document;
@@ -20,11 +21,13 @@ class StaleSheetsObserver
         'language', 'publisher', 'publication_place', 'publication_year', 'publication_date', 'pages', 'format',
         'subject_area', 'subject_subarea', 'audience', 'isbn_print', 'isbn_ebook', 'other_isbns', 'doi_prefix',
         'doi_suffix', 'landing_url', 'abstract', 'abstract_en', 'synopsis', 'keywords', 'keywords_en', 'slug',
+        'licenses',
     ];
 
     public const CHAPTER_FIELDS = [
         'sequence', 'section', 'number', 'title', 'subtitle', 'title_en', 'language', 'first_page', 'last_page',
         'publication_date', 'abstract_approved', 'keywords', 'doi_suffix', 'landing_url', 'slug', 'status',
+        'licenses',
     ];
 
     public function updated(Book|Chapter $model): void
@@ -36,6 +39,15 @@ class StaleSheetsObserver
         }
 
         Document::markStale($model);
+
+        // Capítulo sem licença própria mostra a do livro na ficha dele.
+        if ($model instanceof Book && $model->wasChanged('licenses')) {
+            foreach ($model->chapters()->get() as $chapter) {
+                if (License::normalize($chapter->licenses ?? []) === []) {
+                    Document::markStale($chapter);
+                }
+            }
+        }
 
         // O sumário e as citações da ficha do livro usam os dados do capítulo.
         if ($model instanceof Chapter && $model->book_id) {

@@ -205,6 +205,18 @@ class DocumentsTest extends TestCase
         $this->assertTrue($bookDoc->fresh()->stale);
         $this->assertFalse($chapterDoc->fresh()->stale, 'o resumo do livro não entra na ficha do capítulo');
 
+        // Licença do livro: a ficha do livro e a do capítulo que herda a licença.
+        Document::query()->update(['stale' => false]);
+        $book->fresh()->update(['licenses' => ['cc-by']]);
+        $this->assertTrue($bookDoc->fresh()->stale);
+        $this->assertTrue($chapterDoc->fresh()->stale, 'o capítulo sem licença própria usa a do livro');
+
+        // Capítulo com licença própria não muda quando a do livro muda.
+        $chapter->fresh()->update(['licenses' => ['cc-by-nc']]);
+        Document::query()->update(['stale' => false]);
+        $book->fresh()->update(['licenses' => ['cc-by-sa']]);
+        $this->assertFalse($chapterDoc->fresh()->stale);
+
         // Capítulo removido leva a ficha junto.
         Chapter::find(11)->delete();
         app(SheetGenerator::class)->forChapter(Chapter::find(10));
