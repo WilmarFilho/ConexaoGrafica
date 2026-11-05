@@ -74,23 +74,18 @@ class ReviewImport extends Page
     public function syncProposal(): void
     {
         $import = $this->getRecord();
-        if (self::hash($import->result) === $this->resultHash) {
+        if ($import->proposalHash() === $this->resultHash) {
             return;
         }
         $this->startReview($import);
         $this->fillForm();
     }
 
-    private static function hash(mixed $result): string
-    {
-        return md5((string) json_encode($result));
-    }
-
     public function getTitle(): string
     {
         $import = $this->getRecord();
 
-        return ($import->result['book']['title'] ?? null) ?: $import->original_name;
+        return ($import->proposal()['book']['title'] ?? null) ?: $import->original_name;
     }
 
     public function getSubheading(): ?string
@@ -121,14 +116,14 @@ class ReviewImport extends Page
     protected function fillForm(): void
     {
         $import = $this->getRecord();
-        $r = $import->result ?? [];
+        $r = $import->proposal();
         $this->current = max(0, min($this->current, max(0, count($r['chapters'] ?? []) - 1)));
 
         $this->form->fill([
             'book' => $this->withIndexes($r['book'] ?? [], ['contributors']),
             'chapter' => $this->chapterData($r, $this->current),
         ]);
-        $this->resultHash = self::hash($import->result);
+        $this->resultHash = $import->proposalHash();
     }
 
     private function chapterData(array $r, int $i): array
@@ -166,7 +161,7 @@ class ReviewImport extends Page
         if (! $import->isEditable()) {
             return $import;
         }
-        if (self::hash($import->result) !== $this->resultHash) {
+        if ($import->proposalHash() !== $this->resultHash) {
             $this->fillForm();
             Notification::make()
                 ->title('A proposta mudou desde que a tela foi aberta')
@@ -177,7 +172,7 @@ class ReviewImport extends Page
         }
 
         $state = $this->form->getState();
-        $r = $import->result;
+        $r = $import->proposal();
 
         $r['book'] = self::merge($r['book'] ?? [], $state['book'] ?? [], ['contributors']);
         if (isset($r['chapters'][$this->current]) && isset($state['chapter'])) {
@@ -193,7 +188,7 @@ class ReviewImport extends Page
     private function storeResult(Import $import, array $r): void
     {
         $import->forceFill(['result' => $r])->save();
-        $this->resultHash = self::hash($import->refresh()->result);
+        $this->resultHash = $import->refresh()->proposalHash();
     }
 
     /** Campos do formulário sobre o original; listas casadas por `_idx` (evidência, confiança e pendências ficam). */
@@ -260,19 +255,19 @@ class ReviewImport extends Page
     /** `result.book` como está gravado (evidência, pendências, aprovação). */
     public function bookProposal(): array
     {
-        return (array) ($this->getRecord()->result['book'] ?? []);
+        return (array) ($this->getRecord()->proposal()['book'] ?? []);
     }
 
     public function currentChapter(): array
     {
-        return (array) ($this->getRecord()->result['chapters'][$this->current] ?? []);
+        return (array) ($this->getRecord()->proposal()['chapters'][$this->current] ?? []);
     }
 
     /** Lista lateral: um resumo por capítulo. */
     public function chaptersOutline(): array
     {
         $out = [];
-        foreach (array_values((array) ($this->getRecord()->result['chapters'] ?? [])) as $i => $c) {
+        foreach (array_values((array) ($this->getRecord()->proposal()['chapters'] ?? [])) as $i => $c) {
             $out[] = [
                 'index' => $i,
                 'sequence' => $c['sequence'] ?? $i + 1,
@@ -382,7 +377,7 @@ class ReviewImport extends Page
         } catch (StaleFormException) {
             return;
         }
-        $r = $import->result;
+        $r = $import->proposal();
         $approving = empty($r['book']['approved']);
 
         if ($approving) {
@@ -411,7 +406,7 @@ class ReviewImport extends Page
         } catch (StaleFormException) {
             return;
         }
-        $r = $import->result;
+        $r = $import->proposal();
         if (! isset($r['chapters'][$index])) {
             return;
         }
@@ -438,7 +433,7 @@ class ReviewImport extends Page
         } catch (StaleFormException) {
             return;
         }
-        $r = $import->result;
+        $r = $import->proposal();
         $ok = 0;
         $left = 0;
 

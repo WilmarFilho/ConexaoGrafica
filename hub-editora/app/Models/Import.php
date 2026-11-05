@@ -130,11 +130,45 @@ class Import extends Model
 
     // ---- Revisão (frente E2) ------------------------------------------------
 
+    /** Texto JSON de `result` que gerou o cache abaixo (o cast `array` decodifica a cada leitura). */
+    private ?string $proposalRaw = null;
+
+    private array $proposalData = [];
+
+    /**
+     * `result` decodificado uma vez por versão gravada. A tela de revisão lê a proposta
+     * em cada campo; num livro de 74 capítulos (1 MB de JSON, ~6 ms por decodificação)
+     * ler `$this->result` toda vez passava dos 30 s do PHP.
+     */
+    public function proposal(): array
+    {
+        $raw = $this->attributes['result'] ?? null;
+        $raw = is_string($raw) ? $raw : null;
+        if ($raw === null) {
+            return [];
+        }
+        if ($raw !== $this->proposalRaw) {
+            $decoded = json_decode($raw, true);
+            $this->proposalData = is_array($decoded) ? $decoded : [];
+            $this->proposalRaw = $raw;
+        }
+
+        return $this->proposalData;
+    }
+
+    /** Impressão digital da proposta gravada (detecta mudança feita por outra janela ou pela IA). */
+    public function proposalHash(): string
+    {
+        $raw = $this->attributes['result'] ?? null;
+
+        return md5(is_string($raw) ? $raw : 'null');
+    }
+
     /** Tem proposta para revisar/aprovar/integrar. */
     public function hasProposal(): bool
     {
         return in_array($this->status, [self::SUGGESTED, self::REVIEW, self::APPROVED, self::INTEGRATED], true)
-            && is_array($this->result) && filled($this->result['book'] ?? null);
+            && filled($this->proposal()['book'] ?? null);
     }
 
     /** A tela ainda aceita edições e aprovações. */
@@ -145,22 +179,22 @@ class Import extends Model
 
     public function bookApproved(): bool
     {
-        return (bool) ($this->result['book']['approved'] ?? false);
+        return (bool) ($this->proposal()['book']['approved'] ?? false);
     }
 
     public function chapterApproved(int $index): bool
     {
-        return (bool) ($this->result['chapters'][$index]['approved'] ?? false);
+        return (bool) ($this->proposal()['chapters'][$index]['approved'] ?? false);
     }
 
     public function chaptersCount(): int
     {
-        return count($this->result['chapters'] ?? []);
+        return count($this->proposal()['chapters'] ?? []);
     }
 
     public function approvedChaptersCount(): int
     {
-        return count(array_filter($this->result['chapters'] ?? [], fn ($c) => ! empty($c['approved'])));
+        return count(array_filter($this->proposal()['chapters'] ?? [], fn ($c) => ! empty($c['approved'])));
     }
 
     /** Obra aprovada e todos os capítulos (ao menos um) aprovados. */

@@ -177,6 +177,26 @@ class ImportReviewTest extends TestCase
         $this->assertSame(2, $book->chapters()->count());
     }
 
+    public function test_proposal_is_decoded_once_per_saved_version(): void
+    {
+        $import = new Import;
+        $import->forceFill(['result' => ['book' => ['title' => 'A'], 'chapters' => [['title' => 'Um']]]]);
+
+        $first = $import->proposal();
+        $hash = $import->proposalHash();
+        $this->assertSame('A', $first['book']['title']);
+        $this->assertSame($hash, $import->proposalHash(), 'mesma versão, mesma impressão digital');
+
+        $r = $import->proposal();
+        $r['book']['title'] = 'B';
+        $this->assertSame('A', $import->proposal()['book']['title'], 'editar a cópia não mexe na proposta gravada');
+
+        $import->forceFill(['result' => $r]);
+        $this->assertSame('B', $import->proposal()['book']['title'], 'gravou outra versão: decodifica de novo');
+        $this->assertNotSame($hash, $import->proposalHash());
+        $this->assertSame(1, $import->chaptersCount());
+    }
+
     public function test_partial_approval_blocks_integration(): void
     {
         $import = $this->proposal();

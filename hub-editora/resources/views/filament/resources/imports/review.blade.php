@@ -2,7 +2,7 @@
     @php
         /** @var \App\Models\Import $import */
         $import = $this->getRecord();
-        $r = $import->result ?? [];
+        $r = $import->proposal();
     @endphp
 
     {{-- Estilos da tela: inline porque o CSS do Filament não traz utilitários avulsos (ver expedicao.blade.php). --}}

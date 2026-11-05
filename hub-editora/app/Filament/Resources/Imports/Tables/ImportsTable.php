@@ -32,7 +32,7 @@ class ImportsTable
                 TextColumn::make('original_name')
                     ->label('Arquivo')
                     ->weight(FontWeight::Medium)
-                    ->description(fn (Import $record) => $record->result['book']['title'] ?? null)
+                    ->description(fn (Import $record) => $record->proposal()['book']['title'] ?? null)
                     ->searchable()
                     ->sortable()
                     ->wrap(),
@@ -54,19 +54,19 @@ class ImportsTable
 
                 TextColumn::make('chapters')
                     ->label('Capítulos')
-                    ->state(fn (Import $record) => $record->result['summary']['chapters'] ?? null)
+                    ->state(fn (Import $record) => $record->proposal()['summary']['chapters'] ?? null)
                     ->badge()->color('gray')->alignEnd()
                     ->placeholder('—'),
 
                 TextColumn::make('analyzed')
                     ->label('Analisados')
-                    ->state(fn (Import $record) => $record->result['summary']['analyzed'] ?? null)
+                    ->state(fn (Import $record) => $record->proposal()['summary']['analyzed'] ?? null)
                     ->badge()->color('info')->alignEnd()
                     ->placeholder('—'),
 
                 TextColumn::make('needs_review')
                     ->label('A revisar')
-                    ->state(fn (Import $record) => $record->result['summary']['needs_review'] ?? null)
+                    ->state(fn (Import $record) => $record->proposal()['summary']['needs_review'] ?? null)
                     ->badge()
                     ->color(fn ($state) => ((int) $state) > 0 ? 'warning' : 'success')
                     ->alignEnd()

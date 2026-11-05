@@ -177,7 +177,7 @@ class ReviewForm
                     ->defaultItems(0),
 
                 View::make('filament.resources.imports.people')
-                    ->viewData(fn () => ['people' => $page->getRecord()->result['people'] ?? []]),
+                    ->viewData(fn () => ['people' => $page->getRecord()->proposal()['people'] ?? []]),
             ]);
     }
 
