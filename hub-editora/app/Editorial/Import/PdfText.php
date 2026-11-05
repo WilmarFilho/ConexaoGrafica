@@ -56,12 +56,38 @@ class PdfText
     /** Normaliza quebras e espaços sem perder a divisão em linhas (os cabeçalhos dependem dela). */
     private function clean(string $text): string
     {
+        $text = self::utf8($text);
         $text = str_replace(["\r\n", "\r"], "\n", $text);
         $text = preg_replace('/[ \t\x{00A0}]+/u', ' ', $text) ?? $text;
         $text = preg_replace('/ *\n */', "\n", $text) ?? $text;
         $text = preg_replace('/\n{3,}/', "\n\n", $text) ?? $text;
 
         return trim($text);
+    }
+
+    /**
+     * Garante UTF-8 válido. Fonte com codificação própria às vezes sai como byte solto
+     * do Windows-1252 (0x8C = "Œ" de "Œsophageal" numa referência do Tratado de Doenças
+     * Raras), e um byte inválido derruba o json_encode da chamada à IA e do `result`.
+     * Sequências UTF-8 válidas ficam; cada byte solto é lido como Windows-1252.
+     */
+    public static function utf8(string $text): string
+    {
+        if (mb_check_encoding($text, 'UTF-8')) {
+            return $text;
+        }
+
+        $valid = '[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}'
+            .'|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2}';
+
+        return preg_replace_callback("/{$valid}|(.)/s", function (array $m): string {
+            if (! isset($m[1])) {
+                return $m[0];
+            }
+            $char = @mb_convert_encoding($m[1], 'UTF-8', 'Windows-1252');
+
+            return is_string($char) && $char !== '' && mb_check_encoding($char, 'UTF-8') ? $char : '?';
+        }, $text) ?? mb_scrub($text, 'UTF-8');
     }
 
     /**

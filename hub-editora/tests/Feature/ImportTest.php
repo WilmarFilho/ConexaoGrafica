@@ -375,6 +375,20 @@ continua o texto.");
         $this->assertGreaterThan(3, $import->usage['cost_usd']);
     }
 
+    public function test_stray_windows_1252_bytes_in_the_pdf_text_become_valid_utf8(): void
+    {
+        // Página 925 do Tratado de Doenças Raras: "Œsophageal" com o Œ como byte 0x8C solto.
+        $raw = "20. Long Term Digestive Outcome of\n\x8Csophageal Atresia. Doença \xE2\x80\x94 ok";
+        $this->assertFalse(mb_check_encoding($raw, 'UTF-8'));
+
+        $text = PdfText::utf8($raw);
+
+        $this->assertSame("20. Long Term Digestive Outcome of\nŒsophageal Atresia. Doença — ok", $text);
+        $this->assertNotFalse(json_encode(['text' => $text]));
+        $this->assertSame('Atualidades em Ultrassonografia', PdfText::utf8('Atualidades em Ultrassonografia'), 'texto válido não muda');
+        $this->assertTrue(mb_check_encoding(PdfText::utf8("a\x81b\xFF"), 'UTF-8'), 'byte sem equivalente também sai válido');
+    }
+
     public function test_pdf_without_text_layer_fails_with_a_clear_message(): void
     {
         $blank = sys_get_temp_dir().'/hub-blank-'.uniqid().'.pdf';
