@@ -8,7 +8,7 @@ use Tests\Support\PdfFixture as F;
 
 /**
  * API da OpenAI simulada: identifica a etapa pelo nome do schema pedido (front_matter,
- * chapter_part, chapter, book_summary) e devolve JSON plausível para o livro do PdfFixture.
+ * front_matter_people, chapter_part, chapter, book_summary) e devolve JSON plausível para o livro do PdfFixture.
  * Cada chamada custa 1.000 tokens de entrada e 200 de saída.
  * `failures` permite forçar uma exceção na n-ésima chamada (1-based).
  */
@@ -33,7 +33,8 @@ class FakeAiGateway implements AiGateway
 
         $text = implode("\n", array_map(fn ($b) => $b['text'] ?? '', $content));
         $data = match ($stage) {
-            'front_matter' => $this->frontMatter(),
+            'front_matter' => array_diff_key($this->frontMatter(), ['contributors' => 1]),
+            'front_matter_people' => ['contributors' => $this->frontMatter()['contributors'], 'notes' => null],
             'chapter_part' => $this->part($text),
             'book_summary' => $this->bookSummary(),
             default => str_contains($text, F::CH2) || str_contains($text, 'key_points') ? $this->chapter2() : $this->chapter1(),

@@ -27,17 +27,30 @@ TXT;
 Estilo do resumo redigido: escreva uma versão curta do próprio conteúdo, em linguagem científica direta e impessoal, apresentando os conceitos, achados, recomendações e conclusões em si. Não descreva o texto nem deixe claro que é um resumo: nada de "O capítulo aborda", "Este capítulo", "A obra reúne", "Os autores descrevem", "São apresentados", "São revisados", "Discute-se", "Conclui-se que". Comece pelo próprio assunto: por exemplo, "O papel da ultrassonografia na avaliação da hidronefrose no adulto..." e não "O capítulo aborda o papel da ultrassonografia...".
 TXT;
 
-    public static function frontMatter(): string
+    /** Primeira das duas chamadas da obra: tudo menos as pessoas. */
+    public static function frontMatterBook(): string
     {
         return self::RULES."\n\n".<<<'TXT'
 Material: as páginas iniciais de um livro (capa, folha de rosto, ficha catalográfica, corpo editorial, organizadores e autores, sumário). O documento enviado começa na página 1 do PDF, então a posição de cada página no documento é o número da página do PDF a informar em pdf_page.
 
-Extraia:
+Nesta chamada, extraia só a obra e o sumário (as pessoas são extraídas em outra chamada):
 - Dados da obra: título, subtítulo, tipo (obra organizada com vários autores = edited_book), edição, idioma, editora, cidade, ano, data completa se houver, total de páginas, ISBN do impresso e do e-book (a ficha catalográfica costuma distinguir "ISBN" de "ISBN e-book/EPUB/PDF").
-- Pessoas: organizadores (role editor) e autores (role author) listados nas páginas iniciais, cada um com a instituição principal resumida. Corpo editorial, conselho e revisores técnicos não entram.
 - Sumário completo: só capítulos de conteúdo, na ordem, com seção/parte, número, título, autores (se o sumário trouxer) e a página impressa inicial. Apresentação, prefácio, índice e anexos não são capítulos; informe a página do primeiro item depois do último capítulo em end_of_chapters_printed_page.
 - Resumo e palavras-chave da obra só se estiverem impressos (literalmente).
 - Licença Creative Commons só se estiver impressa (costuma vir na ficha catalográfica ou no verso da folha de rosto, como "Esta obra está licenciada sob CC BY-NC 4.0"); informe o código. "Todos os direitos reservados" não é licença Creative Commons: deixe vazio.
+TXT;
+    }
+
+    /** Segunda chamada da obra: só as pessoas, com evidência curta (livro grande tem centenas). */
+    public static function frontMatterPeople(): string
+    {
+        return self::RULES."\n\n".<<<'TXT'
+Material: as páginas iniciais de um livro (capa, folha de rosto, ficha catalográfica, corpo editorial, organizadores e autores, sumário). O documento enviado começa na página 1 do PDF, então a posição de cada página no documento é o número da página do PDF a informar em pdf_page.
+
+Nesta chamada, extraia só as pessoas (a obra e o sumário são extraídos em outra chamada):
+- Organizadores, coordenadores e editores (role editor) e autores (role author) listados nas páginas iniciais, TODOS, na ordem impressa, cada um com a instituição principal resumida. Corpo editorial, conselho e revisores técnicos não entram.
+- Em listas de autores com minicurrículo, a instituição é a do vínculo principal (onde trabalha ou estuda); ignore o restante do currículo.
+- A lista pode ser longa: seja econômico. Em evidence.excerpt use só o nome e a instituição como impressos (até 100 caracteres) e não repita informação em notes.
 TXT;
     }
 

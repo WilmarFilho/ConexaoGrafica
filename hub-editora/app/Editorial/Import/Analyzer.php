@@ -13,8 +13,8 @@ use Illuminate\Support\Str;
  * (livro + capítulos + pessoas) no formato documentado em docs/importacao-ia.md.
  *
  * Três momentos, cada um com saída estruturada (JSON Schema):
- *  1. frontMatter(): as primeiras N páginas vão como documento PDF (layout importa)
- *     → dados da obra, pessoas com instituição, sumário com páginas impressas.
+ *  1. frontMatter(): as primeiras N páginas vão como documento PDF (layout importa),
+ *     em duas chamadas → dados da obra e sumário com páginas impressas; pessoas com instituição.
  *  2. segment(): determinístico, cruza o sumário com os cabeçalhos do texto extraído
  *     → intervalo de páginas do PDF e páginas impressas de cada capítulo.
  *  3. chapter(): o texto do capítulo, com marcadores de página, → título confirmado,
@@ -27,7 +27,7 @@ use Illuminate\Support\Str;
 class Analyzer
 {
     /** Sobe quando qualquer prompt ou schema muda; fica gravado em imports.prompt_version. */
-    public const PROMPT_VERSION = '2026-11-02.1';
+    public const PROMPT_VERSION = '2026-11-05.1';
 
     public const FORMAT = 'conexao-doi/import-proposal@1';
 
@@ -61,26 +61,48 @@ class Analyzer
 
         try {
             if ($slice['path'] !== null) {
-                $content = [
-                    ['type' => 'input_file', 'filename' => 'paginas-iniciais.pdf',
-                        'file_data' => 'data:application/pdf;base64,'.base64_encode(file_get_contents($slice['path']))],
-                    ['type' => 'input_text', 'text' => "As {$sent} primeiras páginas do PDF estão no arquivo acima (página 1 do arquivo = página 1 do PDF). Extraia os dados da obra, as pessoas e o sumário conforme o schema."],
+                $file = ['type' => 'input_file', 'filename' => 'paginas-iniciais.pdf',
+                    'file_data' => 'data:application/pdf;base64,'.base64_encode(file_get_contents($slice['path']))];
+                $content = fn (string $what) => [
+                    $file,
+                    ['type' => 'input_text', 'text' => "As {$sent} primeiras páginas do PDF estão no arquivo acima (página 1 do arquivo = página 1 do PDF). Extraia {$what} conforme o schema."],
                 ];
             } else {
-                $content = [
-                    ['type' => 'input_text', 'text' => "Texto extraído das {$sent} primeiras páginas do PDF (o layout se perdeu; cada página começa com [[p. X | PDF Y]]):\n\n".Segmenter::text($pages, 1, $sent)],
+                $text = Segmenter::text($pages, 1, $sent);
+                $content = fn (string $what) => [
+                    ['type' => 'input_text', 'text' => "Texto extraído das {$sent} primeiras páginas do PDF (o layout se perdeu; cada página começa com [[p. X | PDF Y]]). Extraia {$what} conforme o schema.\n\n".$text],
                 ];
             }
 
-            $result = $this->ai->structured(Prompts::frontMatter(), $content, 'front_matter', Schemas::frontMatter(), $this->maxOutput());
-            $this->usage->add('front_matter', $result);
+            // Duas chamadas: num livro grande (74 capítulos, 130 autores com minicurrículo)
+            // obra + sumário + pessoas numa resposta só passava do limite de saída.
+            $book = $this->frontMatterCall(Prompts::frontMatterBook(), $content('os dados da obra e o sumário'), 'front_matter', Schemas::frontMatterBook());
+            $people = $this->frontMatterCall(Prompts::frontMatterPeople(), $content('as pessoas (organizadores e autores)'), 'front_matter_people', Schemas::frontMatterPeople());
+
+            $data = $book->data;
+            $data['contributors'] = $people->data['contributors'] ?? [];
+            $data['notes'] = implode("\n", array_filter([$this->cleanText($data['notes'] ?? null), $this->cleanText($people->data['notes'] ?? null)])) ?: null;
         } finally {
             if ($slice['mode'] === PdfSlicer::MODE_PDF && $slice['path'] !== null) {
                 @unlink($slice['path']);
             }
         }
 
-        return ['data' => $result->data, 'mode' => $slice['mode'], 'pages' => $sent];
+        return ['data' => $data, 'mode' => $slice['mode'], 'pages' => $sent];
+    }
+
+    /** Uma chamada da leitura da obra; a que falha também entra no custo (foi cobrada). */
+    private function frontMatterCall(string $instructions, array $content, string $schemaName, array $schema): \App\Editorial\Import\Ai\StructuredResult
+    {
+        try {
+            $result = $this->ai->structured($instructions, $content, $schemaName, $schema, $this->maxOutput());
+        } catch (AiException $e) {
+            $this->usage->add('front_matter', $e->usage, null, $e->reason);
+            throw $e;
+        }
+        $this->usage->add('front_matter', $result);
+
+        return $result;
     }
 
     // ------------------------------------------------------- 2. segmentação

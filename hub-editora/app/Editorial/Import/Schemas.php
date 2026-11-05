@@ -10,6 +10,29 @@ namespace App\Editorial\Import;
  */
 class Schemas
 {
+    /**
+     * Leitura da obra em duas chamadas, para um livro grande (dezenas de capítulos,
+     * centenas de autores) não estourar o limite de saída de uma resposta só:
+     * frontMatterBook() traz a obra e o sumário; frontMatterPeople() traz as pessoas.
+     * O Analyzer junta as duas no mesmo formato de frontMatter().
+     */
+    public static function frontMatterBook(): array
+    {
+        $schema = self::frontMatter();
+        unset($schema['properties']['contributors']);
+        $schema['required'] = array_keys($schema['properties']);
+
+        return $schema;
+    }
+
+    public static function frontMatterPeople(): array
+    {
+        return self::object([
+            'contributors' => self::list(self::contributor(true), 'Organizadores e autores listados nas páginas iniciais, todos, na ordem impressa'),
+            'notes' => self::nullable('string', 'Avisos para o revisor humano (nomes ilegíveis, dúvidas de instituição)'),
+        ]);
+    }
+
     public static function frontMatter(): array
     {
         return self::object([
