@@ -122,6 +122,10 @@ class OpenAiGateway implements AiGateway
                 };
                 $transient = $e instanceof RateLimitException || $e instanceof ServerException
                     || $e instanceof TransporterException || in_array($status, [408, 409, 429, 500, 502, 503, 504], true);
+                // 429 por cota/saldo esgotado não passa com espera: falha já, sem segurar a fila.
+                if ($transient && AiAccountProblem::detect($e) === AiAccountProblem::CREDIT) {
+                    $transient = false;
+                }
                 if (! $transient || $attempt >= self::MAX_ATTEMPTS) {
                     throw $e;
                 }

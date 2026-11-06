@@ -581,6 +581,74 @@ continua o texto.");
         Sleep::assertSequence([Sleep::for(8)->seconds(), Sleep::for(91)->seconds(), Sleep::for(60)->seconds()]);
     }
 
+    public function test_out_of_credit_stops_with_a_clear_message_and_emails_admins_and_the_uploader(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+        config(['hub.ai.provider' => 'anthropic']);
+        $admin = \App\Models\User::factory()->create(['role' => \App\Models\User::ROLE_ADMIN]);
+        $uploader = \App\Models\User::factory()->create(['role' => \App\Models\User::ROLE_EDITOR]);
+        $other = \App\Models\User::factory()->create(['role' => \App\Models\User::ROLE_EDITOR]);
+
+        // Chamada 3 = capítulo 1: o saldo acaba no meio (corpo do erro 400 da Anthropic).
+        $this->ai->failures[3] = new \RuntimeException('{"status": 400, "body": {"type": "error", "error": {"type": "invalid_request_error", "message": "Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."}}}');
+        $import = Import::receive($this->pdf, 'tratado.pdf', $uploader->id);
+
+        ProcessImport::dispatchSync($import->id);
+        $import->refresh();
+
+        $this->assertSame(Import::ERROR, $import->status);
+        $this->assertStringStartsWith('Acabou o saldo de créditos da IA (Anthropic). Recarregue em console.anthropic.com', $import->error);
+        $this->assertStringNotContainsString('invalid_request_error', $import->error, 'nada do JSON do provedor na tela');
+        $this->assertTrue($import->canResume(), 'a leitura da obra ficou guardada');
+        $this->assertSame('credit', SyncLog::where('action', 'import.failed')->first()->context['reason']);
+        \Illuminate\Support\Facades\Notification::assertSentTo([$admin, $uploader], \App\Notifications\ImportBlocked::class,
+            fn ($n) => $n->kind === 'credit' && str_contains($n->toMail($admin)->subject, 'acabou o saldo da IA'));
+        \Illuminate\Support\Facades\Notification::assertNotSentTo($other, \App\Notifications\ImportBlocked::class);
+
+        // Segunda falha igual dentro de 6 h: tela explica, e-mail não repete.
+        $again = Import::receive($this->pdf, 'outro.pdf', $uploader->id);
+        $this->ai->failures = [count($this->ai->calls) + 1 => new \RuntimeException('credit balance is too low')];
+        ProcessImport::dispatchSync($again->id);
+        $this->assertStringStartsWith('Acabou o saldo', $again->fresh()->error);
+        \Illuminate\Support\Facades\Notification::assertSentToTimes($admin, \App\Notifications\ImportBlocked::class, 1);
+
+        // Recarregou: Reprocessar continua de onde parou.
+        $this->ai->failures = [];
+        $import->retry();
+        ProcessImport::dispatchSync($import->id);
+        $this->assertSame(Import::SUGGESTED, $import->fresh()->status);
+    }
+
+    public function test_rejected_key_gets_a_clear_message(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+        $this->ai->failures[1] = new \RuntimeException('{"error": {"type": "authentication_error", "message": "invalid x-api-key"}}');
+        $import = Import::receive($this->pdf);
+
+        ProcessImport::dispatchSync($import->id);
+
+        $this->assertStringStartsWith('A chave da IA (OpenAI) foi recusada', $import->fresh()->error);
+        $this->assertStringContainsString('OPENAI_API_KEY', $import->fresh()->error);
+        $this->assertNull(\App\Editorial\Import\Ai\AiAccountProblem::detect(new \RuntimeException('cURL error 28: connection timed out')), 'rede não é problema de conta');
+    }
+
+    public function test_openai_quota_exhausted_is_not_retried(): void
+    {
+        Sleep::fake();
+        $quota = new \OpenAI\Exceptions\ErrorException(['message' => 'You exceeded your current quota, please check your plan and billing details.', 'type' => 'insufficient_quota', 'code' => 'insufficient_quota'], new PsrResponse(429));
+        $fake = new ClientFake([$quota]);
+        $schema = ['type' => 'object', 'properties' => ['t' => ['type' => 'string']], 'required' => ['t'], 'additionalProperties' => false];
+
+        try {
+            (new OpenAiGateway($fake))->structured('x', [['type' => 'input_text', 'text' => 'y']], 'chapter', $schema, 1024);
+            $this->fail('cota esgotada deveria falhar');
+        } catch (\OpenAI\Exceptions\ErrorException $e) {
+            $fake->assertSent(Responses::class, 1);
+            Sleep::assertNeverSlept();
+            $this->assertSame('credit', \App\Editorial\Import\Ai\AiAccountProblem::detect($e));
+        }
+    }
+
     public function test_sdk_gateway_gives_up_after_the_retry_limit(): void
     {
         Sleep::fake();

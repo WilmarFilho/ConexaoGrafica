@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Editorial\Import\Ai\AiAccountProblem;
 use App\Editorial\Import\Ai\AiException;
 use App\Editorial\Import\Analyzer;
 use App\Editorial\Import\PdfText;
@@ -58,14 +59,20 @@ class ProcessImport implements ShouldBeUnique, ShouldQueue
         try {
             $this->run($import, $analyzer, $pdfText);
         } catch (Throwable $e) {
-            $msg = mb_substr($e->getMessage(), 0, 1000);
+            // Saldo ou chave da IA: instrução em português em vez do JSON do provedor, e e-mail.
+            $problem = AiAccountProblem::detect($e);
+            $msg = $problem ? AiAccountProblem::message($problem) : mb_substr($e->getMessage(), 0, 1000);
             $import->forceFill([
                 'status' => Import::ERROR,
                 'error' => $msg,
                 'usage' => $analyzer->usage->toArray(),
             ])->save();
             SyncLog::record(null, SyncLog::IN, 'import.failed', $import, "Importação #{$import->id} falhou: {$msg}",
-                ['file' => $import->original_name, 'reason' => $e instanceof AiException ? $e->reason : get_class($e)], 'error');
+                ['file' => $import->original_name, 'reason' => $problem ?? ($e instanceof AiException ? $e->reason : get_class($e)),
+                    'detail' => $problem ? mb_substr($e->getMessage(), 0, 500) : null], 'error');
+            if ($problem) {
+                AiAccountProblem::notify($import, $problem);
+            }
         }
     }
 
