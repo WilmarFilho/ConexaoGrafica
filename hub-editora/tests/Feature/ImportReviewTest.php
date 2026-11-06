@@ -379,6 +379,28 @@ class ImportReviewTest extends TestCase
         $page->call('goTo', 1)->assertSet('current', 1);
     }
 
+    public function test_save_is_refused_when_the_proposal_changed_between_loading_and_writing(): void
+    {
+        $import = $this->proposal();
+        $loaded = Import::find($import->id);          // a tela carrega a versão atual
+        $hash = $loaded->proposalHash();
+
+        // Outra gravação (reanálise de capítulos) acontece enquanto a ação da tela roda.
+        $r = $import->fresh()->result;
+        $r['chapters'][0]['title'] = 'Capitulo reanalisado';
+        $import->forceFill(['result' => $r])->save();
+
+        $old = $loaded->proposal();
+        $old['book']['approved'] = true;
+        $this->assertFalse($loaded->saveProposalIf($hash, $old), 'a versão velha não grava por cima');
+        $this->assertSame('Capitulo reanalisado', $import->fresh()->result['chapters'][0]['title']);
+        $this->assertFalse($import->fresh()->bookApproved());
+
+        $fresh = Import::find($import->id);
+        $this->assertTrue($fresh->saveProposalIf($fresh->proposalHash(), ['book' => ['approved' => true]] + $fresh->proposal()));
+        $this->assertTrue($import->fresh()->bookApproved());
+    }
+
     public function test_page_shows_progress_or_error_while_there_is_no_proposal(): void
     {
         $this->panel($this->user('editor'));

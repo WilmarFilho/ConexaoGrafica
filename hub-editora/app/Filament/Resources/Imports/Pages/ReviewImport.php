@@ -162,11 +162,7 @@ class ReviewImport extends Page
             return $import;
         }
         if ($import->proposalHash() !== $this->resultHash) {
-            $this->fillForm();
-            Notification::make()
-                ->title('A proposta mudou desde que a tela foi aberta')
-                ->body('A IA terminou a leitura ou alguém salvou em outra janela. A tela foi recarregada com a versão atual; refaça a alteração, se ainda precisar.')
-                ->warning()->persistent()->send();
+            $this->reloadStale();
 
             throw new StaleFormException;
         }
@@ -179,16 +175,39 @@ class ReviewImport extends Page
             $r['chapters'][$this->current] = self::merge($r['chapters'][$this->current], $state['chapter'], ['contributors']);
         }
 
-        $this->storeResult($import, $r);
+        if (! $this->storeResult($import, $r)) {
+            throw new StaleFormException;
+        }
 
         return $import;
     }
 
-    /** Grava `result` e atualiza o hash: o que esta tela acabou de salvar não conta como mudança externa. */
-    private function storeResult(Import $import, array $r): void
+    /** A proposta gravada não é mais a que a tela carregou: recarrega e avisa (nada é gravado). */
+    private function reloadStale(): void
     {
-        $import->forceFill(['result' => $r])->save();
+        $this->record = $this->resolveRecord($this->getRecord()->getKey());
+        $this->fillForm();
+        Notification::make()
+            ->title('A proposta mudou desde que a tela foi aberta')
+            ->body('A IA terminou a leitura ou alguém salvou em outra janela. A tela foi recarregada com a versão atual; refaça a alteração, se ainda precisar.')
+            ->warning()->persistent()->send();
+    }
+
+    /**
+     * Grava `result` só se a versão no banco ainda for a que a tela carregou (conferido
+     * no momento da gravação, com a linha travada) e atualiza o hash: o que esta tela
+     * acabou de salvar não conta como mudança externa. Se mudou, recarrega e devolve false.
+     */
+    private function storeResult(Import $import, array $r): bool
+    {
+        if (! $import->saveProposalIf($this->resultHash, $r)) {
+            $this->reloadStale();
+
+            return false;
+        }
         $this->resultHash = $import->refresh()->proposalHash();
+
+        return true;
     }
 
     /** Campos do formulário sobre o original; listas casadas por `_idx` (evidência, confiança e pendências ficam). */
@@ -393,7 +412,9 @@ class ReviewImport extends Page
         }
 
         $r['book']['approved'] = $approving;
-        $this->storeResult($import, $r);
+        if (! $this->storeResult($import, $r)) {
+            return;
+        }
         $this->syncStatus($import);
 
         Notification::make()->title($approving ? 'Obra aprovada' : 'Obra reaberta para revisão')->success()->send();
@@ -419,7 +440,9 @@ class ReviewImport extends Page
         }
 
         $r['chapters'][$index]['approved'] = $approving;
-        $this->storeResult($import, $r);
+        if (! $this->storeResult($import, $r)) {
+            return;
+        }
         $this->syncStatus($import);
 
         $seq = $r['chapters'][$index]['sequence'] ?? $index + 1;
@@ -449,7 +472,9 @@ class ReviewImport extends Page
             }
         }
 
-        $this->storeResult($import, $r);
+        if (! $this->storeResult($import, $r)) {
+            return;
+        }
         $this->syncStatus($import);
 
         Notification::make()

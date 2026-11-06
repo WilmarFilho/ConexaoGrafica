@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -162,6 +163,25 @@ class Import extends Model
         $raw = $this->attributes['result'] ?? null;
 
         return md5(is_string($raw) ? $raw : 'null');
+    }
+
+    /**
+     * Grava `result` só se a versão no banco ainda for a `$expectedHash` (a que a tela
+     * carregou). Confere e grava dentro de uma transação com a linha travada: sem isso,
+     * uma ação da tela que começou antes de outra gravação (IA, script, outra janela)
+     * terminava depois e regravava a proposta velha por cima.
+     */
+    public function saveProposalIf(string $expectedHash, array $result): bool
+    {
+        return DB::transaction(function () use ($expectedHash, $result) {
+            $current = self::query()->whereKey($this->getKey())->lockForUpdate()->first();
+            if (! $current || $current->proposalHash() !== $expectedHash) {
+                return false;
+            }
+            $this->forceFill(['result' => $result])->save();
+
+            return true;
+        });
     }
 
     /** Tem proposta para revisar/aprovar/integrar. */
