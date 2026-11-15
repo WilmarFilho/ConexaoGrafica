@@ -77,4 +77,55 @@ class ShipmentResumeTest extends TestCase
         Http::assertNotSent(fn ($r) => str_contains($r->url(), '/me/cart'));
         Http::assertSent(fn ($r) => str_contains($r->url(), '/checkout'));
     }
+
+    public function test_shipment_expired_in_the_cart_is_released_for_a_new_purchase(): void
+    {
+        $shipment = $this->problemShipment();
+
+        // O Melhor Envio não conhece mais o envio: devolve lista vazia.
+        Http::fake([self::BASE.'/me/shipment/tracking' => Http::response([])]);
+
+        $s = app(ShipmentService::class)->resume($shipment);
+
+        $this->assertSame(Shipment::CANCELLED, $s->status);
+        $this->assertStringContainsString('expirou no carrinho', $s->problem);
+        Http::assertNotSent(fn ($r) => str_contains($r->url(), '/checkout') || str_contains($r->url(), '/me/cart'));
+    }
+
+    public function test_buy_creates_a_new_shipment_when_the_old_one_expired_in_the_cart(): void
+    {
+        $shipment = $this->problemShipment();
+
+        Http::fake([
+            self::BASE.'/me/shipment/tracking' => Http::sequence()
+                ->push([])
+                ->push(['me-2' => ['status' => 'released', 'tracking' => 'AP111111111BR']]),
+            self::BASE.'/me/shipment/calculate' => Http::response([['id' => 1, 'name' => 'PAC', 'price' => '20.00', 'delivery_time' => 5, 'company' => ['name' => 'Correios']]]),
+            self::BASE.'/me/cart' => Http::response(['id' => 'me-2', 'status' => 'pending']),
+            self::BASE.'/me/shipment/checkout' => Http::response(['purchase' => ['id' => 'p-1']]),
+            self::BASE.'/me/shipment/generate' => Http::response(['me-2' => ['status' => true]]),
+            self::BASE.'/me/shipment/print' => Http::response(['url' => 'https://me.test/nova.pdf']),
+        ]);
+
+        $s = app(ShipmentService::class)->buy($shipment->order);
+
+        $this->assertSame(Shipment::LABEL_GENERATED, $s->status);
+        $this->assertSame('me-2', $s->melhor_envio_id);
+        $this->assertSame('AP111111111BR', $s->tracking_code);
+        $this->assertNull($s->problem);
+        $this->assertSame(1, Shipment::count());
+    }
+
+    public function test_shipment_with_label_that_vanished_from_melhor_envio_is_not_released(): void
+    {
+        $shipment = $this->problemShipment();
+        $shipment->update(['tracking_code' => 'AP502354781BR', 'label_generated_at' => now()]);
+
+        Http::fake([self::BASE.'/me/shipment/tracking' => Http::response([])]);
+
+        $s = app(ShipmentService::class)->resume($shipment);
+
+        $this->assertSame(Shipment::PROBLEM, $s->status);
+        $this->assertSame('Envio não encontrado no Melhor Envio.', $s->problem);
+    }
 }

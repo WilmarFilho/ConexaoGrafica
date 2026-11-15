@@ -216,6 +216,19 @@ class ShipmentService
         try {
             $t = $this->client()->tracking([$meId])[$meId] ?? null;
             if (! $t) {
+                // O Melhor Envio apaga do carrinho o envio que fica dias sem pagamento.
+                // Se ele nunca teve etiqueta nem rastreio, não há nada pago a perder:
+                // marca como expirado para a próxima compra criar um envio novo.
+                if (! $shipment->label_generated_at && ! $shipment->tracking_code) {
+                    $shipment->update([
+                        'status' => Shipment::CANCELLED,
+                        'problem' => 'O envio expirou no carrinho do Melhor Envio por falta de pagamento. Confira o saldo da carteira e clique em Gerar etiqueta.',
+                    ]);
+                    SyncLog::record($this->channel(), 'in', 'label.failed', $order, 'Envio expirou no carrinho do Melhor Envio (sem pagamento); gere um novo', ['me_id' => $meId], 'warning');
+
+                    return $shipment->refresh();
+                }
+
                 throw new RuntimeException('Envio não encontrado no Melhor Envio.');
             }
 
