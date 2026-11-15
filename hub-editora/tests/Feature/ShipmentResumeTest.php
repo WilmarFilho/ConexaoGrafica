@@ -95,6 +95,7 @@ class ShipmentResumeTest extends TestCase
     public function test_buy_creates_a_new_shipment_when_the_old_one_expired_in_the_cart(): void
     {
         $shipment = $this->problemShipment();
+        $shipment->order->items()->create(['name' => 'Livro Físico', 'quantity' => 1, 'unit_cents' => 9000, 'total_cents' => 9000, 'format' => 'fisico']);
 
         Http::fake([
             self::BASE.'/me/shipment/tracking' => Http::sequence()
