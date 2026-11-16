@@ -235,12 +235,14 @@ function conexao_app_rota_cadastro(WP_REST_Request $request)
         $campos['senha'] = 'A senha precisa ter pelo menos 8 caracteres.';
     }
 
-    // CPF válido e um por conta (inc/cpf.php do tema; versões antigas do app não mandam: pede para atualizar)
-    if (function_exists('conexao_cpf_problema')) {
+    // CPF informado precisa ser válido e um por conta (inc/cpf.php do tema). Sem CPF a conta é
+    // criada assim mesmo: o app 1.0.0 das lojas não tem o campo, e o checkout do site exige o
+    // CPF antes de qualquer compra, então nenhum e-book sai sem ele.
+    if ($cpf !== '' && function_exists('conexao_cpf_problema')) {
         $problema = conexao_cpf_problema($cpf);
 
         if ($problema !== '') {
-            $campos['cpf'] = $cpf === '' ? 'Informe o seu CPF. Se o campo não aparece, atualize o app.' : $problema;
+            $campos['cpf'] = $problema;
         }
     }
 

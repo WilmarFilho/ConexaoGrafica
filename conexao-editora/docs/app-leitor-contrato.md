@@ -22,7 +22,7 @@ Versão 1.1 · 23/10/2026. Documento-fonte das duas frentes (servidor e app). Mu
 - **Limite de aparelhos:** opção `conexao_app_limite_aparelhos` (padrão 3). No 4º login o servidor responde `409 limite_aparelhos` com a lista dos aparelhos ativos; o app mostra a tela "Aparelhos conectados" para a pessoa desconectar um e tentar de novo (`POST /login` com `substituir: <id do aparelho>` revoga aquele e entra).
 - Token não expira por tempo; morre ao sair, ao ser desconectado de outro aparelho, ao trocar a senha (hook `after_password_reset` / `profile_update` com senha nova revoga todos) ou se a conta for removida.
 - Esqueci a senha: `POST /senha` com e-mail → `retrieve_password()` (mesmo e-mail do site). Resposta sempre `204` (não revela se o e-mail existe).
-- Criar conta: `POST /cadastro` {nome, email, senha} → `wc_create_new_customer` → já devolve token como no login (`201`). Respeita "registro habilitado" do Woo (fechado → `403 sem_acesso`). Senha com no mínimo 8 caracteres (o Woo não valida senha no servidor). Até 10 tentativas por hora por IP. Conta nova começa com o e-mail **não** confirmado.
+- Criar conta: `POST /cadastro` {nome, email, senha, cpf?} (CPF opcional: se vier, precisa ser válido e único; o app 1.0.0 não manda e o checkout do site exige antes da compra) → `wc_create_new_customer` → já devolve token como no login (`201`). Respeita "registro habilitado" do Woo (fechado → `403 sem_acesso`). Senha com no mínimo 8 caracteres (o Woo não valida senha no servidor). Até 10 tentativas por hora por IP. Conta nova começa com o e-mail **não** confirmado.
 - Esqueci a senha: até 5 pedidos a cada 15 min por IP (depois `429`).
 - Login social (Google/Facebook): fora da versão 1 (precisa das credenciais dos apps OAuth da editora).
 - CORS (só no namespace `conexao-app/v1`): liberar `capacitor://localhost`, `https://localhost`, `http://localhost` (apps nativos) e o próprio domínio; métodos GET/POST/PUT/DELETE/OPTIONS; cabeçalhos aceitos `Authorization`, `Content-Type` (corpo JSON) e `Range` (PDF em pedaços); cabeçalhos expostos ao app `X-Conexao-Marca`, `Content-Length`, `Content-Range`, `Accept-Ranges`. Sem cookies (nunca `Allow-Credentials`). Origem fora da lista não recebe cabeçalho CORS.
@@ -52,7 +52,7 @@ Todos sob `/wp-json/conexao-app/v1`. Datas em ISO 8601 com fuso. Valores em cent
 | Método | Rota | Descrição |
 |---|---|---|
 | POST | `/login` | `{email, senha, aparelho: {nome, plataforma, id_local}, substituir?}` → `{token, usuario, aparelho}` |
-| POST | `/cadastro` | `{nome, email, senha, aparelho}` → igual ao login |
+| POST | `/cadastro` | `{nome, email, senha, cpf?, aparelho}` → igual ao login |
 | POST | `/senha` | `{email}` → 204 |
 | POST | `/sair` | revoga o token atual → 204 |
 | GET | `/eu` | `{usuario: {id, nome, email, iniciais, email_verificado}, aparelho_atual_id}` (o `usuario` do login e do cadastro tem o mesmo formato) |
